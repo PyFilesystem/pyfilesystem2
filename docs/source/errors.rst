@@ -1,0 +1,5 @@
+Errors
+======
+
+.. automodule:: fserrors
+    :members:
