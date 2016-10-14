@@ -55,7 +55,7 @@ class OSFS(FS):
     def __init__(self,
                  root_path,
                  create=False,
-                 create_mode=0x0777,
+                 create_mode=0o777,
                  encoding=None):
         """Create an OSFS instance."""
 
