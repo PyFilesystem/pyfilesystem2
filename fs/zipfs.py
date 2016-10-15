@@ -256,7 +256,7 @@ class ReadZipFS(FS):
         self._check()
         return self._directory.listdir(path)
 
-    def makedir(self, path, mode=0o777, recreate=False):
+    def makedir(self, path, permissions=None, recreate=False):
         self._check()
         raise errors.ResourceReadOnly(path)
 

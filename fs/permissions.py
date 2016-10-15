@@ -4,6 +4,14 @@ from __future__ import print_function
 import six
 
 
+def make_mode(init):
+    """
+    Make a mode integer from an initial value.
+
+    """
+    return Permissions.get_mode(init)
+
+
 class _PermProperty(object):
     """Creates simple properties to get/set permissions."""
     def __init__(self, name):
@@ -78,7 +86,7 @@ class Permissions(object):
             return "Permissions(names={!r})".format(sorted(self._perms))
 
         def check(perm, name):
-            return name if perm in self._perms else '-'
+            return name if perm in self._perms else ''
         user = ''.join((
             check('u_r', 'r'),
             check('u_w', 'w'),
@@ -137,6 +145,43 @@ class Permissions(object):
     def load(cls, permissions):
         """Load a serialized permissions object."""
         return cls(names=permissions)
+
+    @classmethod
+    def create(cls, init=None):
+        """
+        Create a permissions object from an initial value.
+
+        :param init: May be None for equivalent of 0o777 permissions,
+            a mode integer, or a lust of permission names.
+
+        This class method allows for the creation of a Permissions
+        object from a variety of initial values.
+
+        >>> Permissions.create(None)
+        Permissions(user='rwx', group='rwx', other='rwx')
+        >>> Permissions.create(0o700)
+        Permissions(user='rwx', group='', other='')
+        >>> Permissions.create(['u_r', 'u_w', 'u_x'])
+        Permissions(user='rwx', group='', other='')
+
+        """
+        if init is None:
+            return cls(mode=0o777)
+        if isinstance(init, cls):
+            return init
+        if isinstance(init, int):
+            return cls(mode=init)
+        if isinstance(init, list):
+            return cls(names=init)
+        raise ValueError('permissions is invalid')
+
+    @classmethod
+    def get_mode(cls, init):
+        """
+        Convert an initial value to a mode integer.
+
+        """
+        return cls.create(init).mode
 
     def as_str(self):
         """Get a linux-style string representation of permissions."""

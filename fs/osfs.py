@@ -198,8 +198,9 @@ class OSFS(FS):
             names = os.listdir(sys_path)
         return names
 
-    def makedir(self, path, mode=0o777, recreate=False):
+    def makedir(self, path, permissions=None, recreate=False):
         self._check()
+        mode = Permissions.get_mode(permissions)
         self.validatepath(path)
         sys_path = self._to_sys_path(path)
         with convert_os_errors('makedir', path):

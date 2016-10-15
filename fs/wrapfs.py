@@ -93,10 +93,10 @@ class WrapFS(FS):
         _fs = self.delegate_fs()
         return _fs.lock()
 
-    def makedir(self, path, mode=0o777, recreate=False):
+    def makedir(self, path, permissions=None, recreate=False):
         self._check()
         _fs, _path = self.delegate_path(path)
-        return _fs.makedir(_path, mode=mode, recreate=recreate)
+        return _fs.makedir(_path, permissions=permissions, recreate=recreate)
 
     def move(self, src_path, dst_path, overwrite=False):
         # A custom move permits a potentially optimized code path
@@ -260,10 +260,11 @@ class WrapFS(FS):
         _isfile = _fs.isfile(_path)
         return _isfile
 
-    def makedirs(self, path, recreate=False, mode=0o777):
+    def makedirs(self, path, permissions=None, recreate=False):
         self._check()
         _fs, _path = self.delegate_path(path)
-        return _fs.makedirs(_path, recreate=recreate, mode=mode)
+        return _fs.makedirs(
+            _path, permissions=permissions, recreate=recreate)
 
     def open(self,
              path,

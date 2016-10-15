@@ -31,6 +31,7 @@ from .mode import validate_open_mode
 from .path import abspath
 from .path import join
 from .path import normpath
+from .permissions import make_mode
 from .time import datetime_to_epoch
 
 
@@ -82,13 +83,13 @@ class FS(object):
         """
         raise NotImplementedError('listdir')
 
-    def makedir(self, path, mode=0o777, recreate=False):
+    def makedir(self, path, permissions=None, recreate=False):
         """
         Make a directory.
 
         :param path: Path to directory from root.
         :type path: str
-        :param mode: Permission bits
+        :param permissions: Permission instance
         :param recreate: Do not raise an error if the directory
             exists.
         :type recreate: True
@@ -698,7 +699,7 @@ class FS(object):
 
         """
 
-    def makedirs(self, path, recreate=False, mode=0o777):
+    def makedirs(self, path, permissions=None, recreate=False):
         """
         Make a directory, and any missing intermediate directories.
 
@@ -708,6 +709,7 @@ class FS(object):
             attempt to create a directory that already exists. Set to
             `True` to allow directories to be re-created without errors.
         :type recreate: bool
+        :param permissions: Initial permissions.
         :returns: A sub-directory filesystem.
         :rtype: :class:`fs.subfs.SubFS`
 
@@ -718,10 +720,11 @@ class FS(object):
         :raises `fs.errors.ResourceNotFound`: if the path is not found.
 
         """
+        self._check()
         with self._lock:
             dir_paths = tools.get_intermediate_dirs(self, path)
             for dir_path in dir_paths:
-                self.makedir(dir_path, mode=mode)
+                self.makedir(dir_path, permissions=permissions)
 
             try:
                 self.makedir(path)

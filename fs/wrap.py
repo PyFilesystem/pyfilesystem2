@@ -103,7 +103,7 @@ class WrapReadOnly(WrapFS):
 
     wrap_name = 'read-only'
 
-    def makedir(self, path, mode=0o777, recreate=False):
+    def makedir(self, path, permissions=None, recreate=False):
         self._check()
         raise ReadOnly()
 

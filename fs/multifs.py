@@ -181,10 +181,11 @@ class MultiFS(FS):
             raise errors.ResourceNotFound(path)
         return directory
 
-    def makedir(self, path, mode=0o777, recreate=False):
+    def makedir(self, path, permissions=None, recreate=False):
         self._check()
         self._require_writable(path)
-        return self.write_fs.makedir(path, mode=mode, recreate=recreate)
+        return self.write_fs.makedir(
+            path, permissions=permissions, recreate=recreate)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
         self._check()
@@ -294,13 +295,13 @@ class MultiFS(FS):
         else:
             return super(MultiFS, self).validatepath()
 
-    def makedirs(self, path, recreate=False, mode=0x0777):
+    def makedirs(self, path, permissions=None, recreate=False):
         self._check()
         self._require_writable(path)
         return self.write_fs.makedirs(
             path,
-            recreate=recreate,
-            mode=mode
+            permissions=permissions,
+            recreate=recreate
         )
 
     def open(self,

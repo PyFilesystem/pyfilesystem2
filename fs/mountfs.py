@@ -115,10 +115,11 @@ class MountFS(FS):
         fs, delegate_path = self._delegate(path)
         return fs.listdir(delegate_path)
 
-    def makedir(self, path, mode=0o777, recreate=False):
+    def makedir(self, path, permissions=None, recreate=False):
         self._check()
         fs, _path = self._delegate(path)
-        return fs.makedir(_path, mode=mode, recreate=recreate)
+        return fs.makedir(
+            _path, permissions=permissions, recreate=recreate)
 
     def openbin(self, path, mode='r', buffering=-1, **kwargs):
         validate_openbin_mode(mode)
