@@ -83,7 +83,10 @@ class Permissions(object):
 
     def __repr__(self):
         if not self._perms.issubset(self._LINUX_PERMS_NAMES):
-            return "Permissions(names={!r})".format(sorted(self._perms))
+            _perms_str = ", ".join(
+                "'{}'".format(p) for p in sorted(self._perms)
+            )
+            return "Permissions(names=[{}])".format(_perms_str)
 
         def check(perm, name):
             return name if perm in self._perms else ''
@@ -151,11 +154,10 @@ class Permissions(object):
         """
         Create a permissions object from an initial value.
 
-        :param init: May be None for equivalent of 0o777 permissions,
-            a mode integer, or a lust of permission names.
-
-        This class method allows for the creation of a Permissions
-        object from a variety of initial values.
+        :param init: May be None for equivalent for 0o777 permissions,
+            a mode integer, or a list of permission names.
+        :returns: mode integer, that may be used by `os.makedir`
+            (amongst others).
 
         >>> Permissions.create(None)
         Permissions(user='rwx', group='rwx', other='rwx')

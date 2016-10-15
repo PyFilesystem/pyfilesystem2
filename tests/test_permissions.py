@@ -5,10 +5,27 @@ import unittest
 
 from six import text_type
 
-from fs.permissions import Permissions
+from fs.permissions import make_mode, Permissions
 
 
 class TestPermissions(unittest.TestCase):
+
+    def test_make_mode(self):
+        self.assertEqual(make_mode(None), 0o777)
+        self.assertEqual(make_mode(0o755), 0o755)
+        self.assertEqual(make_mode(['u_r', 'u_w', 'u_x']), 0o700)
+        self.assertEqual(make_mode(Permissions(user='rwx')), 0o700)
+
+    def test_create(self):
+        self.assertEqual(Permissions.create(None).mode, 0o777)
+        self.assertEqual(Permissions.create(0o755).mode, 0o755)
+        self.assertEqual(Permissions.create(['u_r', 'u_w', 'u_x']).mode, 0o700)
+        self.assertEqual(
+            Permissions.create(Permissions(user='rwx')).mode,
+            0o700
+        )
+        with self.assertRaises(ValueError):
+            Permissions.create('foo')
 
     def test_constructor(self):
         p = Permissions(names=['foo', 'bar'])
@@ -59,8 +76,14 @@ class TestPermissions(unittest.TestCase):
         self.assertFalse(p.u_w)
 
     def test_repr(self):
-        repr(Permissions())
-        repr(Permissions(names=['foo']))
+        self.assertEqual(
+            repr(Permissions()),
+            "Permissions(user='', group='', other='')",
+        )
+        self.assertEqual(
+            repr(Permissions(names=['foo'])),
+            "Permissions(names=['foo'])"
+        )
         repr(Permissions(user='rwx', group='rw', other='r'))
         repr(Permissions(user='rwx', group='rw', other='r', sticky=True))
         repr(Permissions(user='rwx', group='rw', other='r', setuid=True))
@@ -74,8 +97,8 @@ class TestPermissions(unittest.TestCase):
         self.assertEqual(p.as_str(), 'rwsrwsrwt')
 
     def test_mode(self):
-        p = Permissions(user='rwx', group='rwx', other='rwx')
-        self.assertEqual(p.mode, 0o777)
+        p = Permissions(user='rwx', group='rw', other='')
+        self.assertEqual(p.mode, 0o760)
 
     def test_serialize(self):
         p = Permissions(names=['foo'])
