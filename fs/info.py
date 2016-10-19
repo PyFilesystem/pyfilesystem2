@@ -15,15 +15,14 @@ class Info(object):
     Container for :doc:`info`, returned by the following
     methods:
 
-     * :meth:`fsbase.FS.getinfo`
-     * :meth:`fsbase.FS.scandir`
-     * :meth:`fsbase.FS.filter`
-
+     * :meth:`fs.base.FS.getinfo`
+     * :meth:`fs.base.FS.scandir`
+     * :meth:`fs.base.FS.filter`
 
     :param raw_info: A dict containing resource info.
     :type raw_info: dict
-    :param to_datetime: A callable that converts an epoch time
-        to a datetime object. The default uses
+    :param to_datetime: A callable that converts an epoch time to a
+        datetime object. The default uses
         :func:`fs.time.epoch_to_datetime`.
 
     """
@@ -56,7 +55,6 @@ class Info(object):
 
          >>> info.get('access', 'permissions')
             ['u_r', 'u_w', '_wx']
-
 
         :param namespace: A namespace identifier.
         :type namespace: str

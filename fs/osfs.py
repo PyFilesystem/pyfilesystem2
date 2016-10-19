@@ -134,14 +134,16 @@ class OSFS(FS):
         access['permissions'] = Permissions(
             mode=stat_result.st_mode
         ).dump()
+        access['group_id'] = stat_result.st_gid
+        access['user_id'] = stat_result.st_uid
         try:
-            access['group'] = grp.getgrgid(stat_result.st_gid).gr_name
-        except KeyError:
+            access['group'] = grp.getgrgid(access['group_id']).gr_name
+        except KeyError:  # pragma: nocover
             pass
 
         try:
-            access['user'] = pwd.getpwuid(stat_result.st_uid).pw_name
-        except KeyError:
+            access['user'] = pwd.getpwuid(access['user_id']).pw_name
+        except KeyError:  # pragma: nocover
             pass
         return access
 
@@ -241,15 +243,18 @@ class OSFS(FS):
                 if e.errno == errno.EACCES and sys.platform == "win32":
                     # sometimes windows says this for attempts to remove a dir
                     if os.path.isdir(sys_path):  # pragma: nocover
-                        raise errors.DirectoryNotExpected(path)
+                        raise errors.FileExpected(path)
                 if e.errno == errno.EPERM and sys.platform == "darwin":
                     # sometimes OSX says this for attempts to remove a dir
                     if os.path.isdir(sys_path):  # pragma: nocover
-                        raise errors.DirectoryNotExpected(path)
+                        raise errors.FileExpected(path)
                 raise
 
     def removedir(self, path):
         self._check()
+        _path = abspath(normpath(path))
+        if _path == '/':
+            raise errors.RemoveRootError()
         sys_path = self._to_sys_path(path)
         with convert_os_errors('removedir', path):
             os.rmdir(sys_path)

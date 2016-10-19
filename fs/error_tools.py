@@ -2,6 +2,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import errno
+from contextlib import contextmanager
 import sys
 
 from . import errors as fserrors
@@ -21,7 +22,7 @@ class _ConvertOSErrors(object):
         errno.EEXIST: fserrors.DirectoryExists,
         183: fserrors.DirectoryExists,
         errno.ENOTDIR: fserrors.DirectoryExpected,
-        errno.EISDIR: fserrors.DirectoryNotExpected,
+        errno.EISDIR: fserrors.FileExpected,
         errno.EINVAL: fserrors.ResourceInvalid,
         errno.ENOSPC: fserrors.InsufficientStorage,
         errno.EPERM: fserrors.PermissionDenied,
@@ -58,3 +59,25 @@ class _ConvertOSErrors(object):
 
 # Stops linter complaining about invalid class name
 convert_os_errors = _ConvertOSErrors
+
+
+@contextmanager
+def unwrap_errors(path_replace):
+    """
+    A context manager to re-write the paths in resource exceptions to be
+    in the same context as the wrapped filesystem.
+
+    The only parameter may be the path from the parent, if only one path
+    is to be unwrapped. Or it may be a dictionary that maps wrapped
+    paths on to unwrapped paths.
+
+    """
+    try:
+        yield
+    except fserrors.ResourceError as e:
+        if hasattr(e, 'path'):
+            if isinstance(path_replace, dict):
+                e.path = path_replace.get(e.path, e.path)
+            else:
+                e.path = path_replace
+        reraise(type(e), e)

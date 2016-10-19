@@ -35,7 +35,6 @@ __all__ = [
     'PathError',
     'PermissionDenied',
     'RemoteConnectionError',
-    'RemoveRootFail',
     'ResourceError',
     'ResourceInvalid',
     'ResourceLocked',
@@ -51,14 +50,17 @@ class FSError(Exception):
     default_message = "Unspecified error"
 
     def __init__(self, msg=None):
-        if msg is None:
-            msg = self.default_message.format(**self.__dict__)
-        self.msg = msg
-        super(FSError, self).__init__(msg)
+        self._msg = msg or self.default_message
+        super(FSError, self).__init__()
 
     def __str__(self):
         """The error message."""
-        return self.msg
+        msg = self._msg.format(**self.__dict__)
+        return msg
+
+    def __repr__(self):
+        msg = self._msg.format(**self.__dict__)
+        return "{}({!r})".format(self.__class__.__name__, msg)
 
 
 class FilesystemClosed(FSError):
@@ -122,19 +124,13 @@ class OperationFailed(FSError):
         super(OperationFailed, self).__init__()
 
 
-class ReadOnly(FSError):
-    """Raised when a filesystem doesn't support writing."""
-    default_message = "filesystem is read-only"
-
-
 class Unsupported(OperationFailed):
     """Exception raised for operations that are not supported by the FS."""
 
-    default_message = "operation '{opname}' is unsupported by this filesystem"
+    default_message = "operation '{opname}' is not supported"
 
     def __init__(self, opname):
-        self.opname = opname
-        super(Unsupported, self).__init__()
+        super(Unsupported, self).__init__(opname=opname)
 
 
 class RemoteConnectionError(OperationFailed):
@@ -161,7 +157,7 @@ class OperationTimeout(OperationFailed):
     default_message = "operation '{opname}' failed, operation timed out"
 
 
-class RemoveRootFail(OperationFailed):
+class RemoveRootError(OperationFailed):
     """Attempt to remove the root directory."""
 
     default_message = "root directory may not be removed"
@@ -179,12 +175,6 @@ class ResourceError(FSError):
         super(ResourceError, self).__init__(msg=msg)
 
 
-class Failed(ResourceError):
-    """Raised when an operation failed on a resource."""
-
-    default_message = "operation '{}' failed on '{}'"
-
-
 class ResourceNotFound(ResourceError):
     """Exception raised when a required resource is not found."""
 
@@ -197,7 +187,7 @@ class ResourceInvalid(ResourceError):
     default_message = "resource '{path}' is invalid for this operation"
 
 
-class DirectoryNotExpected(ResourceInvalid):
+class FileExpected(ResourceInvalid):
     """Exception raise when attempting to remove a directory."""
 
     default_message = "path '{path}' should not be a directory"
@@ -253,16 +243,17 @@ class ResourceReadOnly(ResourceError):
 
 
 class IllegalBackReference(ValueError):
-    """Exception raised when too many backrefs exist in a path.
+    """
+    Exception raised when too many backrefs exist in a path.
 
     This error will occur if the back references in a path would be
     outside of the root. For example, "/foo/../../", contains two back
     references which would reference a directory above the root.
 
-    .. note:
+    .. note::
 
-    This exception is a subclass of ``ValueError`` as it is not
-    strictly speaking an issue with a filesystem or resource.
+        This exception is a subclass of ``ValueError`` as it is not
+        strictly speaking an issue with a filesystem or resource.
 
     """
 

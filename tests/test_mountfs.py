@@ -4,7 +4,6 @@ import unittest
 
 from fs.mountfs import MountError, MountFS
 from fs.memoryfs import MemoryFS
-from fs.opener import open_fs
 from fs.tempfs import TempFS
 
 from .test_fs import FSTestCases
@@ -74,3 +73,8 @@ class TestMountFSBehaviours(unittest.TestCase):
         """Test MountFS with nothing mounted."""
         mount_fs = MountFS()
         self.assertEqual(mount_fs.listdir('/'), [])
+
+    def test_mount_self(self):
+        mount_fs = MountFS()
+        with self.assertRaises(ValueError):
+            mount_fs.mount('/', mount_fs)

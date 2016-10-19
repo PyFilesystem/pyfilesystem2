@@ -31,7 +31,6 @@ from .mode import validate_open_mode
 from .path import abspath
 from .path import join
 from .path import normpath
-from .permissions import make_mode
 from .time import datetime_to_epoch
 
 
@@ -44,6 +43,14 @@ class FS(object):
     def __init__(self):
         self._lock = threading.RLock()
         super(FS, self).__init__()
+
+    def __enter__(self):
+        """Allow use of filesystem as a context manager."""
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        """Close filesystem on exit."""
+        self.close()
 
     # ---------------------------------------------------
     # Required methods
@@ -131,7 +138,7 @@ class FS(object):
 
         :raises `fs.errors.ParentDirectoryMissing`: if an intermediate
             directory is missing.
-        :raises `fs.errors.DirectoryNotExpected`: if the path is a
+        :raises `fs.errors.FileExpected`: if the path is a
             directory.
         :raises `fs.errors.ResourceNotFound`: if the path does not
             exist.
@@ -156,14 +163,6 @@ class FS(object):
             exist
         """
         raise NotImplementedError('removedir')
-
-    def __enter__(self):
-        """Allow use of filesystem as a context manager."""
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        """Close filesystem on exit."""
-        self.close()
 
     # ---------------------------------------------------
     # Optional methods
@@ -202,23 +201,18 @@ class FS(object):
         :type src_path: str
         :param dst_path: Path to destination file.
         :type dst_path: str
-        :returns: Number of bytes copied.
-        :rtype: int
 
         If the path specified by ``dst_path`` exists, and is a file,
         it will first be truncated.
 
-        Returns the number of bytes copied.
-
         """
         with self._lock:
-            with self.open(src_path, 'rb') as read_file:
-                with self.open(dst_path, 'wb') as write_file:
-                    bytes_copied = tools.copy_file_data(
+            with closing(self.open(src_path, 'rb')) as read_file:
+                with closing(self.open(dst_path, 'wb')) as write_file:
+                    tools.copy_file_data(
                         read_file,
                         write_file
                     )
-            return bytes_copied
 
     def copydir(self, src_path, dst_path, create=False):
         """
@@ -879,7 +873,8 @@ class FS(object):
             yield info
 
     def setbytes(self, path, contents):
-        """Copy (bytes) data to a file.
+        """
+        Copy (bytes) data to a file.
 
         :param path: Destination path on the filesystem.
         :type path: str

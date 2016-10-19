@@ -3,10 +3,10 @@
 
 from __future__ import unicode_literals
 
-from .lrucache import LRUCache
-
 import re
 from functools import partial
+
+from .lrucache import LRUCache
 
 _MAXCACHE = 1000
 _cache = LRUCache(_MAXCACHE)
@@ -98,7 +98,7 @@ def get_matcher(patterns, case_sensitive):
 
 
     """
-    if not patterns:
+    if not patterns or patterns == '*':
         return lambda name: True
     if case_sensitive:
         return partial(match_any, patterns)

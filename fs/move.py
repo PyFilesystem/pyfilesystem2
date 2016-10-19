@@ -23,7 +23,7 @@ def move_file(src_fs, src_path, dst_fs, dst_path):
     """
     if src_fs is dst_fs:
         # Same filesystem, may be optimized
-        src_fs.move(src_path, dst_path)
+        src_fs.move(src_path, dst_path, overwrite=True)
     else:
         # Standard copy and delete
         with src_fs.lock(), dst_fs.lock():

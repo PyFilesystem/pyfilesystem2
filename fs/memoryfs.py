@@ -52,18 +52,6 @@ class _MemoryFile(object):
         _template = "<memoryfile '{path}' '{mode}'>"
         return _template.format(path=self._path, mode=self._mode)
 
-    def __del__(self):
-        if not self.closed:
-            self.close()
-
-    def _require_readable(self):
-        if not mode.check_readable(self._mode):
-            raise IOError("File not open for reading")
-
-    def _require_writable(self):
-        if not mode.check_writable(self._mode):
-            raise IOError("File not open for writing")
-
     @contextlib.contextmanager
     def _seek_lock(self):
         with self._lock:
@@ -87,27 +75,24 @@ class _MemoryFile(object):
             self.accessed_time
         )
 
+    def fileno(self):
+        raise io.UnsupportedOperation('fileno')
+
     def flush(self):
         pass
 
     def __iter__(self):
-        self._require_readable()
         self._bytes_io.seek(self.pos)
         for line in self._bytes_io:
             yield line
 
     def next(self):
-        self._require_readable()
         with self._seek_lock():
-            return self._bytes_io.next()
+            return next(self._bytes_io)
 
-    def __next__(self):
-        self._require_readable()
-        with self._seek_lock():
-            return self._bytes_io.__next__()
+    __next__ = next
 
     def readline(self, *args, **kwargs):
-        self._require_readable()
         with self._seek_lock():
             self._on_access()
             return self._bytes_io.readline(*args, **kwargs)
@@ -119,7 +104,6 @@ class _MemoryFile(object):
             self.closed = True
 
     def read(self, size=None):
-        self._require_readable()
         if size is None:
             size = -1
         with self._seek_lock():
@@ -127,7 +111,6 @@ class _MemoryFile(object):
             return self._bytes_io.read(size)
 
     def readlines(self):
-        self._require_readable()
         with self._seek_lock():
             return self._bytes_io.readlines()
 
@@ -140,19 +123,16 @@ class _MemoryFile(object):
         return self.pos
 
     def truncate(self, *args, **kwargs):
-        self._require_writable()
         with self._seek_lock():
             self._on_modify()
             self._bytes_io.truncate(*args, **kwargs)
 
     def write(self, data):
-        self._require_writable()
         with self._seek_lock():
             self._on_modify()
             self._bytes_io.write(data)
 
     def writelines(self, sequence):
-        self._require_writable()
         with self._seek_lock():
             self._on_modify()
             self._bytes_io.writelines(sequence)
@@ -324,7 +304,7 @@ class MemoryFS(FS):
             if dir_entry is None:
                 raise errors.ResourceNotFound(path)
             if not dir_entry.is_dir:
-                raise errors.DirectoryNotFound(path)
+                raise errors.DirectoryExpected(path)
             return dir_entry.list()
 
     def makedir(self, path, permissions=None, recreate=False):
@@ -372,7 +352,7 @@ class MemoryFS(FS):
 
                 file_dir_entry = parent_dir_entry.get_entry(file_name)
                 if file_dir_entry.is_dir:
-                    raise errors.DirectoryNotExpected(path)
+                    raise errors.FileExpected(path)
 
                 mem_file = _MemoryFile(
                     path=_path,
@@ -394,11 +374,8 @@ class MemoryFS(FS):
                 else:
                     file_dir_entry = self._get_dir_entry(_path)
 
-                    if file_dir_entry is None:
-                        raise errors.ResourceInvalid(path)
-
                 if file_dir_entry.is_dir:
-                    raise errors.ResourceInvalid(path)
+                    raise errors.FileExpected(path)
 
                 mem_file = _MemoryFile(
                     path=_path,
@@ -409,7 +386,6 @@ class MemoryFS(FS):
                 )
                 file_dir_entry.add_open_file(mem_file)
                 return mem_file
-        raise ValueError('invalid mode')
 
     def remove(self, path):
         self._check()
@@ -422,12 +398,9 @@ class MemoryFS(FS):
             if parent_dir_entry is None or file_name not in parent_dir_entry:
                 raise errors.ResourceNotFound(path)
 
-            if not parent_dir_entry.is_dir:
-                raise errors.ParentDirectoryMissing(path)
-
             file_dir_entry = self._get_dir_entry(_path)
             if file_dir_entry.is_dir:
-                raise errors.DirectoryNotExpected(path)
+                raise errors.FileExpected(path)
 
             parent_dir_entry.remove_entry(file_name)
 
@@ -435,15 +408,15 @@ class MemoryFS(FS):
         self._check()
         _path = self._normpath(path)
 
+        if _path == '/':
+            raise errors.RemoveRootError()
+
         with self._lock:
             dir_path, file_name = split(_path)
             parent_dir_entry = self._get_dir_entry(dir_path)
 
             if parent_dir_entry is None or file_name not in parent_dir_entry:
                 raise errors.ResourceNotFound(path)
-
-            if not parent_dir_entry.is_dir:
-                raise errors.ParentDirectoryMissing(path)
 
             dir_dir_entry = self._get_dir_entry(_path)
             if not dir_dir_entry.is_dir:

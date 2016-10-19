@@ -13,6 +13,7 @@ from datetime import datetime
 import io
 import json
 import math
+import os
 import time
 
 import fs.copy
@@ -485,6 +486,10 @@ class FSTestCases(object):
         for name in self.fs.listdir('dir'):
             self.assertIsInstance(name, text_type)
 
+        self.fs.create('notadir')
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.listdir('notadir')
+
     def test_move(self):
         # Make a file
         self.fs.setbytes('foo', b'egg')
@@ -584,6 +589,7 @@ class FSTestCases(object):
         text = 'Hello, World'
 
         with self.fs.open('foo/hello', 'wt') as f:
+            repr(f)
             f.write(text)
 
         # Read it back
@@ -602,12 +608,53 @@ class FSTestCases(object):
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.open('/foo/bar/test.txt')
 
+        # Test fileno returns a file number, if supported by the file.
+        with self.fs.open('foo/hello') as f:
+            try:
+                fn = f.fileno()
+            except IOError:
+                pass
+            else:
+                self.assertEqual(os.read(fn, 7), b'Goodbye')
+
+    def test_open_files(self):
+        """Test file-like objects work as expected."""
+
+        with self.fs.open('text', 'w') as f:
+            repr(f)
+            text_type(f)
+            self.assertEqual(f.tell(), 0)
+            f.write('Hello\nWorld\n')
+            self.assertEqual(f.tell(), 12)
+            f.writelines(['foo\n', 'bar\n', 'baz\n'])
+
+        with self.fs.open('text', 'r') as f:
+            repr(f)
+            text_type(f)
+            self.assertEqual(
+                f.readlines(),
+                ['Hello\n', 'World\n', 'foo\n', 'bar\n', 'baz\n']
+            )
+
+        with self.fs.open('text', 'r') as f:
+            self.assertEqual(
+                list(f),
+                ['Hello\n', 'World\n', 'foo\n', 'bar\n', 'baz\n']
+            )
+
+        iter_lines = iter(self.fs.open('text'))
+        self.assertEqual(next(iter_lines), 'Hello\n')
+
     def test_openbin(self):
         # Write a binary file
         with self.fs.openbin('file.bin', 'wb') as write_file:
+            repr(write_file)
+            text_type(write_file)
             write_file.write(b'\0\1\2')
         # Read a binary file
         with self.fs.openbin('file.bin', 'rb') as read_file:
+            repr(write_file)
+            text_type(write_file)
             data = read_file.read()
         self.assertEqual(data, b'\0\1\2')
 
@@ -623,6 +670,23 @@ class FSTestCases(object):
         # Open from missing dir
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.openbin('/foo/bar/test.txt')
+
+        self.fs.makedir('foo')
+        # Attempt to open a directory
+        with self.assertRaises(errors.FileExpected):
+            self.fs.openbin('/foo')
+
+        # Attempt to write to a directory
+        with self.assertRaises(errors.FileExpected):
+            self.fs.openbin('/foo', 'w')
+
+        # Opening a file in a directory which doesn't exist
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.openbin('/egg/bar')
+
+        # Opening with a invalid mode
+        with self.assertRaises(ValueError):
+            self.fs.openbin('foo.bin', 'h')
 
     def test_opendir(self):
         self.fs.makedir('foo')
@@ -672,7 +736,17 @@ class FSTestCases(object):
         with self.assertRaises(errors.ResourceInvalid):
             self.fs.remove('dir')
 
+        self.fs.makedirs('foo/bar/baz/')
+
+        error_msg = "resource 'foo/bar/egg/test.txt' not found"
+        with self.assertRaisesRegexp(errors.ResourceNotFound, error_msg):
+            self.fs.remove('foo/bar/egg/test.txt')
+
     def test_removedir(self):
+
+        # Test removing root
+        with self.assertRaises(errors.RemoveRootError):
+            self.fs.removedir('/')
 
         self.fs.makedirs('foo/bar/baz')
         self.assertTrue(self.fs.exists('foo/bar/baz'))
@@ -1020,6 +1094,18 @@ class FSTestCases(object):
             f.write(b'p')
         self.assert_bytes('foo2', b'help')
 
+        # Test __del__ doesn't throw traceback
+        f = self.fs.open('foo2', 'r')
+        del f
+
+        with self.assertRaises(IOError):
+            with self.fs.open('foo2', 'r') as f:
+                f.write('no!')
+
+        with self.assertRaises(IOError):
+            with self.fs.open('newfoo', 'w') as f:
+                f.read(2)
+
     def test_copy_file(self):
         """Test fs.copy.copy_file"""
         bytes_test = b'Hello, World'
@@ -1235,3 +1321,4 @@ class FSTestCases(object):
         self.assert_isdir('foo2/baz/egg')
         self.assert_not_exists('foo/bar/foofoo.txt')
         self.assert_not_exists('foo/bar/baz/egg')
+

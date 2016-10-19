@@ -16,10 +16,6 @@ class RawWrapper(object):
         self.closed = False
         super(RawWrapper, self).__init__()
 
-    def __repr__(self):
-        _msg = "RawWrapper({!r}, mode={!r}, name={!r})"
-        return _msg.format(self._fs, self.mode, self.name)
-
     def close(self):
         self._f.close()
         self.closed = True
@@ -138,7 +134,7 @@ def make_stream(name,
                 io_object,
                 buffering or io.DEFAULT_BUFFER_SIZE
             )
-        elif w:
+        elif w or a:
             io_object = io.BufferedWriter(
                 io_object,
                 buffering or io.DEFAULT_BUFFER_SIZE
@@ -146,11 +142,11 @@ def make_stream(name,
 
     if not binary:
         io_object = io.TextIOWrapper(
-         io_object,
-         encoding=encoding,
-         errors=errors,
-         newline=newline,
-         line_buffering=line_buffering,
+            io_object,
+            encoding=encoding,
+            errors=errors,
+            newline=newline,
+            line_buffering=line_buffering,
         )
 
     return io_object

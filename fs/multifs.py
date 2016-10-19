@@ -39,6 +39,7 @@ class MultiFS(FS):
         self._auto_close = auto_close
         self.write_fs = None
 
+        self._write_fs_name = None
         self._sort_index = 0
         self._filesystems = {}
         self._fs_sequence = None
@@ -82,6 +83,7 @@ class MultiFS(FS):
 
         if write:
             self.write_fs = fs
+            self._write_fs_name = name
 
     def get_fs(self, name):
         """
@@ -141,7 +143,7 @@ class MultiFS(FS):
         """
 
         if check_writable(mode):
-            return self.write_fs
+            return self._write_fs_name, self.write_fs
         for name, fs in self.iterate_fs():
             if fs.exists(path):
                 return name, fs
@@ -291,9 +293,9 @@ class MultiFS(FS):
     def validatepath(self, path):
         self._check()
         if self.write_fs is not None:
-            return self.write_fs.validatepath(path)
+            self.write_fs.validatepath(path)
         else:
-            return super(MultiFS, self).validatepath()
+            super(MultiFS, self).validatepath(path)
 
     def makedirs(self, path, permissions=None, recreate=False):
         self._check()

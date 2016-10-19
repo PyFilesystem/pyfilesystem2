@@ -16,6 +16,7 @@ class Walker(object):
     filesystem.
 
     """
+    # Nothing to do with zombies...
 
     def check_open_dir(self, fs, info):
         """
@@ -36,8 +37,8 @@ class Walker(object):
         to exclude files from the walk.
 
         :param fs: A filesystem object.
-        :type fs: :class:`fsbase.FS`
-        :param info: A :class:`fsinfo.Info` object.
+        :type fs: :class:`fs.base.FS`
+        :param info: A :class:`fs.info.Info` object.
         :rtype: bool
 
         """
@@ -54,11 +55,11 @@ class Walker(object):
         Filters a sequence of resource Info objects.
 
         The default implementation filters those files for which
-        :meth:`fswalk.Walker.check_file` returns True.
+        :meth:`fs.walk.Walker.check_file` returns True.
 
         :param fs: A filesystem object.
-        :type fs: :class:`fsbase.FS`
-        :param infos: A list of :class:`fsinfo.Info` instances.
+        :type fs: :class:`fs.base.FS`
+        :param infos: A list of :class:`fs.info.Info` instances.
         :type infos: list
         :param wildcards: A list of wildcards.
         :type wildcards: list
@@ -77,11 +78,11 @@ class Walker(object):
         directory path.
 
         :param fs: A filesystem object.
-        :type fs: :class:`fsbase.FS`
+        :type fs: :class:`fs.base.FS`
         :param dir_path: A path to a directory.
         :type dir_path: str
         :param on_error: A callable that takes a path, and an
-            :class:`fsinfo.Info` instance.
+            :class:`fs.info.Info` instance.
 
         """
         try:

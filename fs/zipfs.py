@@ -293,9 +293,9 @@ class ReadZipFS(FS):
         return zip_bytes
 
 
-if __name__ == "__main__":
-    from fstree import render
-    from fsopener import open_fs
+if __name__ == "__main__":  # pragma: nocover
+    from fs.tree import render
+    from fs.opener import open_fs
 
     with ZipFS('tests.zip') as zip_fs:
         print(zip_fs.listdir('/'))

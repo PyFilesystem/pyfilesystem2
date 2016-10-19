@@ -31,6 +31,8 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
     def test_which(self):
         self.fs.setbytes('foo', b'bar')
         self.assertEqual(self.fs.which('foo'), ('mem', self.mem_fs))
+        self.assertEqual(self.fs.which('bar', 'w'), ('mem', self.mem_fs))
+        self.assertEqual(self.fs.which('baz'), (None, None))
 
     def test_auto_close(self):
         """Test MultiFS auto close is working"""
@@ -116,3 +118,7 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         fs = MultiFS()
         with self.assertRaises(errors.ResourceReadOnly):
             fs.setbytes('foo', b'bar')
+
+    def test_validate_path(self):
+        self.fs.write_fs = None
+        self.fs.validatepath('foo')

@@ -8,6 +8,7 @@ from .copy import copy_file
 from .info import Info
 from .move import move_file
 from .path import abspath, normpath
+from .error_tools import unwrap_errors
 
 
 @six.python_2_unicode_compatible
@@ -69,13 +70,11 @@ class WrapFS(FS):
         """
         return self._wrap_fs
 
-    def on_write(self):
-        pass
-
     def getinfo(self, path, *namespaces):
         self._check()
         _fs, _path = self.delegate_path(path)
-        raw_info = _fs.getinfo(_path, *namespaces).raw
+        with unwrap_errors(path):
+            raw_info = _fs.getinfo(_path, *namespaces).raw
         if abspath(normpath(path)) == '/':
             raw_info = raw_info.copy()
             raw_info['basic']['name'] = ''
@@ -85,7 +84,8 @@ class WrapFS(FS):
     def listdir(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        dir_list = _fs.listdir(_path)
+        with unwrap_errors(path):
+            dir_list = _fs.listdir(_path)
         return dir_list
 
     def lock(self):
@@ -96,45 +96,55 @@ class WrapFS(FS):
     def makedir(self, path, permissions=None, recreate=False):
         self._check()
         _fs, _path = self.delegate_path(path)
-        return _fs.makedir(_path, permissions=permissions, recreate=recreate)
+        with unwrap_errors(path):
+            return _fs.makedir(
+                _path,
+                permissions=permissions,
+                recreate=recreate
+            )
 
     def move(self, src_path, dst_path, overwrite=False):
         # A custom move permits a potentially optimized code path
-        if not overwrite and self.exists(dst_path):
-            raise errors.DestinationExists(dst_path)
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
-        if src_fs is dst_fs:
-            src_fs.move(_src_path, _dst_path, overwrite=overwrite)
-        else:
+        with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
+            if not overwrite and dst_fs.exists(_dst_path):
+                raise errors.DestinationExists(_dst_path)
             move_file(src_fs, _src_path, dst_fs, _dst_path)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
         self._check()
         _fs, _path = self.delegate_path(path)
-        bin_file = _fs.openbin(
-            _path,
-            mode=mode,
-            buffering=-1,
-            **options
-        )
+        with unwrap_errors(path):
+            bin_file = _fs.openbin(
+                _path,
+                mode=mode,
+                buffering=-1,
+                **options
+            )
         return bin_file
 
     def remove(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _fs.remove(_path)
+        with unwrap_errors(path):
+            _fs.remove(_path)
 
     def removedir(self, path):
         self._check()
+        _path = abspath(normpath(path))
+        if _path == '/':
+            raise errors.RemoveRootError()
         _fs, _path = self.delegate_path(path)
-        _fs.removedir(_path)
+        with unwrap_errors(path):
+            _fs.removedir(_path)
 
     def scandir(self, path, namespaces=None):
         self._check()
         _fs, _path = self.delegate_path(path)
-        for info in _fs.scandir(_path, namespaces=namespaces):
-            yield info
+        with unwrap_errors(path):
+            for info in _fs.scandir(_path, namespaces=namespaces):
+                yield info
 
     def setinfo(self, path, info):
         self._check()
@@ -144,33 +154,39 @@ class WrapFS(FS):
     def settimes(self, path, accessed=None, modified=None):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _fs.settimes(_path, accessed=accessed, modified=modified)
+        with unwrap_errors(path):
+            _fs.settimes(_path, accessed=accessed, modified=modified)
 
     def touch(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _fs.touch(_path)
+        with unwrap_errors(path):
+            _fs.touch(_path)
 
     def copy(self, src_path, dst_path):
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
-        copy_file(src_fs, _src_path, dst_fs, _dst_path)
+        with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
+            copy_file(src_fs, _src_path, dst_fs, _dst_path)
 
     def create(self, path, wipe=False):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _fs.create(_path, wipe=wipe)
+        with unwrap_errors(path):
+            _fs.create(_path, wipe=wipe)
 
     def desc(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        desc = _fs.desc(_path)
+        with unwrap_errors(path):
+            desc = _fs.desc(_path)
         return desc
 
     def exists(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        exists = _fs.exists(_path)
+        with unwrap_errors(path):
+            exists = _fs.exists(_path)
         return exists
 
     def filterdir(self,
@@ -182,29 +198,33 @@ class WrapFS(FS):
                   namespaces=None):
         self._check()
         _fs, _path = self.delegate_path(path)
-        iter_files = _fs.filterdir(
+        iter_files = iter(_fs.filterdir(
            _path,
            exclude_dirs=exclude_dirs,
            exclude_files=exclude_files,
            wildcards=wildcards,
            dir_wildcards=dir_wildcards,
            namespaces=namespaces
-        )
-        return iter_files
+        ))
+        with unwrap_errors(path):
+            for info in iter_files:
+                yield info
 
     def getbytes(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _bytes = _fs.getbytes(_path)
+        with unwrap_errors(path):
+            _bytes = _fs.getbytes(_path)
         return _bytes
 
     def gettext(self, path, encoding=None, errors=None, newline=None):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _text = _fs.gettext(_path,
-                            encoding=encoding,
-                            errors=errors,
-                            newline=newline)
+        with unwrap_errors(path):
+            _text = _fs.gettext(_path,
+                                encoding=encoding,
+                                errors=errors,
+                                newline=newline)
         return _text
 
     def getmeta(self, namespace='standard'):
@@ -215,56 +235,66 @@ class WrapFS(FS):
     def getsize(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        size = _fs.getsize(_path)
+        with unwrap_errors(path):
+            size = _fs.getsize(_path)
         return size
 
     def getsyspath(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        sys_path = _fs.getsyspath(_path)
+        with unwrap_errors(path):
+            sys_path = _fs.getsyspath(_path)
         return sys_path
 
     def gettype(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _type = _fs.gettype(_path)
+        with unwrap_errors(path):
+            _type = _fs.gettype(_path)
         return _type
 
     def geturl(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        url = _fs.geturl(_path)
-        return url
+        with unwrap_errors(path):
+            return _fs.geturl(_path)
 
     def hassyspath(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        has_sys_path = _fs.hassyspath(_path)
+        with unwrap_errors(path):
+            has_sys_path = _fs.hassyspath(_path)
         return has_sys_path
 
     def hasurl(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        has_url = _fs.hasurl(_path)
+        with unwrap_errors(path):
+            has_url = _fs.hasurl(_path)
         return has_url
 
     def isdir(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _isdir = _fs.isdir(_path)
+        with unwrap_errors(path):
+            _isdir = _fs.isdir(_path)
         return _isdir
 
     def isfile(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _isfile = _fs.isfile(_path)
+        with unwrap_errors(path):
+            _isfile = _fs.isfile(_path)
         return _isfile
 
     def makedirs(self, path, permissions=None, recreate=False):
         self._check()
         _fs, _path = self.delegate_path(path)
         return _fs.makedirs(
-            _path, permissions=permissions, recreate=recreate)
+            _path,
+            permissions=permissions,
+            recreate=recreate
+        )
 
     def open(self,
              path,
@@ -277,16 +307,17 @@ class WrapFS(FS):
              **options):
         self._check()
         _fs, _path = self.delegate_path(path)
-        open_file = _fs.open(
-            _path,
-            mode=mode,
-            buffering=buffering,
-            encoding=encoding,
-            errors=errors,
-            newline=newline,
-            line_buffering=line_buffering,
-            **options
-        )
+        with unwrap_errors(path):
+            open_file = _fs.open(
+                _path,
+                mode=mode,
+                buffering=buffering,
+                encoding=encoding,
+                errors=errors,
+                newline=newline,
+                line_buffering=line_buffering,
+                **options
+            )
         return open_file
 
     def opendir(self, path):
@@ -296,12 +327,14 @@ class WrapFS(FS):
             raise errors.ResourceInvalid(
                 "path should reference a directory"
             )
-        return SubFS(self, path)
+        with unwrap_errors(path):
+            return SubFS(self, path)
 
     def setbytes(self, path, contents):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _fs.setbytes(_path, contents)
+        with unwrap_errors(path):
+            _fs.setbytes(_path, contents)
 
     def setfile(self,
                 path,
@@ -311,13 +344,17 @@ class WrapFS(FS):
                 newline=None):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _fs.setfile(_path,
-                    file,
-                    encoding=encoding,
-                    errors=errors,
-                    newline=newline)
+        with unwrap_errors(path):
+            _fs.setfile(
+                _path,
+                file,
+                encoding=encoding,
+                errors=errors,
+                newline=newline
+            )
 
     def validatepath(self, path):
         self._check()
         _fs, _path = self.delegate_path(path)
-        _fs.validatepath(_path)
+        with unwrap_errors(path):
+            _fs.validatepath(_path)

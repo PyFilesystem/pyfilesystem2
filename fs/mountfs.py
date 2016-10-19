@@ -42,10 +42,7 @@ class MountFS(FS):
         self.mounts = []
 
     def __repr__(self):
-        if self.auto_close:
-            return "MountFS(auto_close=True)"
-        else:
-            return "MountFS()"
+        return "MountFS(auto_close={!r})".format(self.auto_close)
 
     def __str__(self):
         return "<mountfs>"
@@ -101,8 +98,6 @@ class MountFS(FS):
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
         fs, delegate_path = self._delegate(path)
-        if fs is self.default_fs:
-            return "{path} on {fs}".format(fs=self, path=path)
         return "{path} on {fs}".format(fs=fs, path=delegate_path)
 
     def getinfo(self, path, *namespaces):
@@ -125,18 +120,11 @@ class MountFS(FS):
         validate_openbin_mode(mode)
         self._check()
         fs, _path = self._delegate(path)
-        if fs is None:
-            if check_writable(mode):
-                raise errors.ResourceReadOnly(path)
-            else:
-                raise errors.ResourceNotFound(path)
         return fs.openbin(_path, mode=mode, buffering=-1, **kwargs)
 
     def remove(self, path):
         self._check()
         fs, _path = self._delegate(path)
-        if fs is self or fs is None:
-            raise errors.ResourceReadOnly(path)
         return fs.remove(_path)
 
     def removedir(self, path):
@@ -145,8 +133,6 @@ class MountFS(FS):
         if path in ('', '/'):
             raise errors.RemoveRootError(path)
         fs, _path = self._delegate(path)
-        if fs is self or fs is None:
-            raise errors.ResourceReadOnly(path)
         return fs.removedir(_path)
 
     def getbytes(self, path):
@@ -212,9 +198,7 @@ class MountFS(FS):
     def validatepath(self, path):
         self._check()
         fs, _path = self._delegate(path)
-        if fs is not None:
-            return super(MountFS, self).validatepath(path)
-        return fs.validatepath(path)
+        return fs.validatepath(_path)
 
     def open(self,
              path,
@@ -227,12 +211,6 @@ class MountFS(FS):
         validate_open_mode(mode)
         self._check()
         fs, _path = self._delegate(path)
-
-        if fs is None:
-            if check_writable(mode):
-                raise errors.ResourceReadOnly(path)
-            else:
-                raise errors.ResourceNotFound(path)
         return fs.open(
             _path,
             mode=mode,

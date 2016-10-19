@@ -10,7 +10,6 @@ from .errors import DirectoryNotEmpty
 from .errors import ResourceNotFound
 from .path import abspath
 from .path import dirname
-from .path import join
 from .path import normpath
 from .path import recursepath
 

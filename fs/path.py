@@ -2,7 +2,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 """
-fspath
+FS Paths
 ========
 
 Useful functions for FS path manipulation.
@@ -139,7 +139,7 @@ def recursepath(path, reverse=False):
 
 
 def isabs(path):
-    """Return True if path is an absolute path."""
+    """Check if a path is an absolute path."""
     return path.startswith('/')
 
 
@@ -152,7 +152,7 @@ def abspath(path):
 
     :param path: A PyFilesytem path
     :type path: str
-    :returns: An abslute path
+    :returns: An absolute path
     :rtype: str
 
     """

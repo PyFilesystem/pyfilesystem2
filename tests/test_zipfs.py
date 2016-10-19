@@ -1,10 +1,15 @@
 from __future__ import unicode_literals
 
+import os
 import tempfile
 import unittest
 
 from fs import zipfs
+from fs.compress import write_zip
+from fs.opener import open_fs
+
 from .test_fs import FSTestCases
+from .test_archives import ArchiveTestCases
 
 
 class TestWriteZipFS(FSTestCases, unittest.TestCase):
@@ -26,9 +31,25 @@ class TestWriteZipFS(FSTestCases, unittest.TestCase):
         del fs._zip_file
 
 
-class TestReadZipFS(unittest.TestCase):
+class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
     """
     Test Reading zip files.
 
     """
-    # TODO:
+    def compress(self, fs):
+        fh, self._temp_path = tempfile.mkstemp()
+        os.close(fh)
+        write_zip(fs, self._temp_path)
+
+    def load_archive(self):
+        return zipfs.ZipFS(self._temp_path)
+
+    def remove_archive(self):
+        os.remove(self._temp_path)
+
+
+class TestRadZipFSMem(TestReadZipFS):
+
+    def make_source_fs(self):
+        return open_fs('mem://')
+
