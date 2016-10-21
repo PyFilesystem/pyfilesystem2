@@ -1,12 +1,14 @@
 Multi FS
 ========
 
-A MultiFS is a filesystem composed of a sequence of other filesystems, where
-the directory structure of each overlays the previous filesystem in the sequence.
+A MultiFS is a filesystem composed of a sequence of other filesystems,
+where the directory structure of each overlays the previous filesystem
+in the sequence.
 
-One use for such a filesystem would be to selectively override a set of files,
-to customize behavior. For example, to create a filesystem that could be used
-to *theme* a web application. We start with the following directories::
+One use for such a filesystem would be to selectively override a set of
+files, to customize behavior. For example, to create a filesystem that
+could be used to *theme* a web application. We start with the following
+directories::
 
 
     `-- templates
@@ -39,15 +41,15 @@ do that::
 Now we have a ``theme_fs`` filesystem that presents a single view of both
 directories::
 
-        |-- snippets
-        |   |-- panel.html
-        |   |-- widget.html
-        |   `-- extra.html
-        |-- index.html
-        |-- profile.html
-        |-- base.html
-        `-- theme.html
+    |-- snippets
+    |   |-- panel.html
+    |   |-- widget.html
+    |   `-- extra.html
+    |-- index.html
+    |-- profile.html
+    |-- base.html
+    `-- theme.html
 
 
-.. automodule:: fsmultifs
+.. automodule:: fs.multifs
     :members:

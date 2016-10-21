@@ -18,8 +18,10 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
 
     :param src_fs: Source filesystem.
     :param src_path: Path to a file on ``src_fs``.
+    :type src_path: str
     :param dst_fs: Destination filesystem.
-    :param dst_fs: Path to a file on ``dst_fs``.
+    :param dst_path: Path to a file on ``dst_fs``.
+    :type dst_path: str
 
     """
     if src_fs is dst_fs:

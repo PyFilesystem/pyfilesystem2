@@ -116,7 +116,7 @@ class Opener(object):
         :param cwd: The current working directory (generally only
             relevant for OS filesystems)
         :type cwd: str
-        :returns: :class:`fsbase.FS`
+        :returns: :class:`fs.base.FS`
 
         """
 

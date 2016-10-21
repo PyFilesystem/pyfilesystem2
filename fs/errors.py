@@ -115,46 +115,42 @@ class OperationFailed(FSError):
 
     default_message = "operation {opname} failed, {details}"
 
-    def __init__(self, path=None, opname="", exc=None):
+    def __init__(self, path=None, exc=None, msg=None):
         self.path = path
-        self.opname = opname
         self.exc = exc
         self.details = '' if exc is None else text_type(exc)
         self.errno = getattr(exc, "errno", None)
-        super(OperationFailed, self).__init__()
+        super(OperationFailed, self).__init__(msg=msg)
 
 
 class Unsupported(OperationFailed):
     """Exception raised for operations that are not supported by the FS."""
 
-    default_message = "operation '{opname}' is not supported"
-
-    def __init__(self, opname):
-        super(Unsupported, self).__init__(opname=opname)
+    default_message = "not supported"
 
 
 class RemoteConnectionError(OperationFailed):
     """Exception raised when operations encounter remote connection trouble."""
 
-    default_message = "operation '{opname}' failed, remote connection error"
+    default_message = "remote connection error"
 
 
 class InsufficientStorage(OperationFailed):
     """Exception raised when operations encounter storage space trouble."""
 
-    default_message = "operation '{opname}' failed, insufficient storage space"
+    default_message = "insufficient storage space"
 
 
 class PermissionDenied(OperationFailed):
     """Permissions error."""
 
-    default_message = "operation {opname} failed, permission denied"
+    default_message = "permission denied"
 
 
 class OperationTimeout(OperationFailed):
     """Filesystem took too long."""
 
-    default_message = "operation '{opname}' failed, operation timed out"
+    default_message = "operation timed out"
 
 
 class RemoveRootError(OperationFailed):
@@ -166,11 +162,10 @@ class RemoveRootError(OperationFailed):
 class ResourceError(FSError):
     """Base exception class for error associated with a specific resource."""
 
-    default_message = "operation '{opname}' failed on path {path}"
+    default_message = "failed on path {path}"
 
-    def __init__(self, path, opname='', exc=None, msg=None):
+    def __init__(self, path, exc=None, msg=None):
         self.path = path
-        self.opname = opname
         self.exc = exc
         super(ResourceError, self).__init__(msg=msg)
 
@@ -188,15 +183,15 @@ class ResourceInvalid(ResourceError):
 
 
 class FileExpected(ResourceInvalid):
-    """Exception raise when attempting to remove a directory."""
+    """Exception raises when a file was expected."""
 
-    default_message = "path '{path}' should not be a directory"
+    default_message = "path '{path}' should be a file"
 
 
 class DirectoryExpected(ResourceInvalid):
-    """Exception raise when attempting to remove a directory."""
+    """Exception raises when a directory was expected."""
 
-    default_message = "path '{path}' should be  directory"
+    default_message = "path '{path}' or parent not a directory"
 
 
 class DestinationExists(ResourceError):

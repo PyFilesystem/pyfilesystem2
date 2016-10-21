@@ -3,20 +3,19 @@
 Resource Info
 =============
 
-Resource information (or *info*) covers standard file details such
-as name, type, size etc., and potentially other less-common information
+Resource information (or *info*) describes standard file details such as
+name, type, size etc., and potentially other less-common information
 associated with a file or directory.
 
 You can retrieve resource info for a single resource by calling
-:meth:`fsbase.FS.getinfo`, or by calling  :meth:`fsbase.FS.scandir`
+:meth:`fs.base.FS.getinfo`, or by calling  :meth:`fs.base.FS.scandir`
 which returns an iterator of resource information for the contents of
-a directory. Additionally, :meth:`fsbase.FS.filterdir` can filter the
+a directory. Additionally, :meth:`fs.base.FS.filterdir` can filter the
 resources in a directory by type and wildcard.
-
 
 Here's an example of retrieving file information::
 
-    >>> from fsosfs import OSFS
+    >>> from fs.osfs import OSFS
     >>> fs = OSFS('.')
     >>> fs.settext('example.txt', 'Hello, World!')
     >>> info = fs.getinfo('example.txt', 'details')
@@ -31,18 +30,17 @@ Info Objects
 ------------
 
 PyFilesystem exposes the resource information via properties of
-:class:`fsinfo.Info` objects.
-
+:class:`fs.info.Info` objects.
 
 
 Namespaces
 ----------
 
 All resource information is contained within one of a number of
-potential *namespaces*, which are logical groups of key / value data.
+potential *namespaces*, which are logical key/value groups.
 
 You can specify which namespace(s) you are interested in as positional
-arguments to :meth:`fsbase.FS.getinfo`. For example, the following
+arguments to :meth:`fs.base.FS.getinfo`. For example, the following
 retrieves the ``details`` and ``access`` namespaces for a file::
 
     resource_info = fs.getinfo('myfile.txt', 'details', 'access')
@@ -54,19 +52,20 @@ flag which indicates if the resource is a directory.
 Basic Namespace
 ~~~~~~~~~~~~~~~
 
-The ``basic`` namespace is always returned. It contains the following keys:
+The ``basic`` namespace is always returned. It contains the following
+keys:
 
 =============== =================== ===========================================
 Name            Type                Description
 --------------- ------------------- -------------------------------------------
 name            str                 Name of the resource.
-is_dir          bool                A boolean that indicates if the
-                                    resource is a directory.
+is_dir          bool                A boolean that indicates if the resource
+                                    is a directory.
 =============== =================== ===========================================
 
-The keys in this namespace can generally be retrieved very quickly. In the
-case of :class:`fsosfs.OSFS` the namespace can be retrieved without a
-potentially expensive system call.
+The keys in this namespace can generally be retrieved very quickly. In
+the case of :class:`fs.osfs.OSFS` the namespace can be retrieved without
+a potentially expensive system call.
 
 Details Namespace
 ~~~~~~~~~~~~~~~~~
@@ -88,44 +87,45 @@ size             int                 Number of bytes used to store the
                                      the overhead (in bytes) used to store
                                      the directory entry.
 type             ResourceType        Resource type, one of the values
-                                     defined in :class:`fsResourceType`.
+                                     defined in :class:`fs.ResourceType`.
 ================ =================== ==========================================
 
-The time values (``accessed_time``, ``created_time`` etc.) may be ``None`` if
-the filesystem doesn't store that information. The ``size`` and ``type`` keys
-are guaranteed to be available, although ``type`` may be
-:attr:`fsResourceType.unknown` if the filesystem is unable to retrieve the
-resource type.
+The time values (``accessed_time``, ``created_time`` etc.) may be
+``None`` if the filesystem doesn't store that information. The ``size``
+and ``type`` keys are guaranteed to be available, although ``type`` may
+be :attr:`fs.ResourceType.unknown` if the filesystem is unable to
+retrieve the resource type.
 
 Access Namespace
 ~~~~~~~~~~~~~~~~
 
-The ``access`` namespace reports permission and ownership information, and
-contains the following keys.
+The ``access`` namespace reports permission and ownership information,
+and contains the following keys.
 
 ================ =================== ==========================================
 Name             type                Description
 ---------------- ------------------- ------------------------------------------
+gid              int                 The group ID.
 group            str                 The group name.
-premissions      Permissions         An instance of
-                                     :class:`fspermissions.Permission`, which
+permissions      Permissions         An instance of
+                                     :class:`fs.permissions.Permissions`, which
                                      contains the permissions for the resource.
-user             str                 The owner of the resource.
+uid              int                 The user ID.
+user             str                 The user name of the owner.
 ================ =================== ==========================================
 
-This namespace is optional, as not all filesystems have a concept of ownership
-or permissions. It is supported by :class:`fsosfs.OSFS`.
+This namespace is optional, as not all filesystems have a concept of
+ownership or permissions. It is supported by :class:`fs.osfs.OSFS`. Some
+values may be ``None`` if the aren't supported by the filesystem.
 
 Stat Namespace
 ~~~~~~~~~~~~~~
 
 The ``stat`` namespace contains information reported by a call to
-`os.stat
-<https://docs.python.org/3.5/library/stat.html>`_. This namespace is
-supported by :class:`fsosfs.OSFS` and potentially other filesystems
-which map directly to the OS filesystem.
-
-Most other filesystems will not support this namespace.
+`os.stat <https://docs.python.org/3.5/library/stat.html>`_. This
+namespace is supported by :class:`fs.osfs.OSFS` and potentially other
+filesystems which map directly to the OS filesystem. Most other
+filesystems will not support this namespace.
 
 
 Other Namespaces
@@ -136,7 +136,7 @@ documentation for the specific filesystem for information on what
 namespaces are supported.
 
 You can retrieve such implementation specific resource information
-with the :meth:`fsinfo.Info.get` method.
+with the :meth:`fs.info.Info.get` method.
 
 .. note::
 
@@ -147,7 +147,7 @@ with the :meth:`fsinfo.Info.get` method.
 Raw Info
 --------
 
-The :class:`fsinfo.Info` class is a wrapper around a simple data
+The :class:`fs.info.Info` class is a wrapper around a simple data
 structure containing the *raw* info. You can access this raw info with
 the ``info.raw`` property.
 
@@ -189,5 +189,5 @@ Because of this requirement, times are stored as
 `epoch times <https://en.wikipedia.org/wiki/Unix_time>`_. The Info object
 will convert these to datetime objects from the standard library.
 Additionally, the Info object will convert permissions from a list of
-string in to a `class`:fspermissions.Permissions` objects.
+strings in to a `class`:fs.permissions.Permissions` objects.
 

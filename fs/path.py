@@ -14,9 +14,9 @@ separated by forward slashes and with an optional leading slash).
 """
 
 
-from .errors import IllegalBackReference
-
 import re
+
+from .errors import IllegalBackReference
 
 
 __all__ = [
@@ -42,7 +42,10 @@ __all__ = [
     "splitext",
 ]
 
-_requires_normalization = re.compile(r'(^|/)\.\.?($|/)|//', re.UNICODE).search
+_requires_normalization = re.compile(
+    r'(^|/)\.\.?($|/)|//',
+    re.UNICODE
+).search
 
 
 def normpath(path):
@@ -52,9 +55,9 @@ def normpath(path):
     This function simplifies a path by collapsing back-references
     and removing duplicated separators.
 
-    :param path: path to normalize
+    :param path: Path to normalize.
     :type path: str
-    :returns: a valid FS path
+    :returns: A valid FS path.
     :type: str
 
     >>> normpath("/foo//bar/frob/../baz")
@@ -89,21 +92,23 @@ def normpath(path):
     return prefix + '/'.join(components)
 
 
-def iteratepath(path, numsplits=None):
+def iteratepath(path):
     """
     Iterate over the individual components of a path.
 
-    :param path: Path to iterate over
-    :numsplits: Maximum number of splits
+    >>> iteratepath('/foo/bar/baz')
+    ['foo', 'bar', 'baz']
+
+    :param path: Path to iterate over.
+    :type path: str
+    :returns: A list of path components.
+    :rtype: list
 
     """
     path = relpath(normpath(path))
     if not path:
         return []
-    if numsplits is None:
-        return path.split('/')
-    else:
-        return path.split('/', numsplits)
+    return path.split('/')
 
 
 def recursepath(path, reverse=False):
@@ -111,7 +116,11 @@ def recursepath(path, reverse=False):
     Get intermediate paths from the root to the given path.
 
     :param path: A PyFilesystem path
-    :param reverse: reverses the order of the paths
+    :type path: str
+    :param reverse: Reverses the order of the paths.
+    :type reverse: bool
+    :returns: A list of paths.
+    :rtype: list
 
     >>> recursepath('a/b/c')
     ['/', '/a', '/a/b', '/a/b/c']
@@ -139,7 +148,15 @@ def recursepath(path, reverse=False):
 
 
 def isabs(path):
-    """Check if a path is an absolute path."""
+    """
+    Check if a path is an absolute path.
+
+    :param path: A filesystem path.
+    :type path: str
+    :rtype bool:
+
+    """
+    # Somewhat trivial, but helps to make code self-documenting
     return path.startswith('/')
 
 
@@ -147,8 +164,9 @@ def abspath(path):
     """
     Convert the given path to an absolute path.
 
-    Since FS objects have no concept of a 'current directory' this simply
-    adds a leading '/' character if the path doesn't already have one.
+    Since FS objects have no concept of a 'current directory' this
+    simply adds a leading '/' character if the path doesn't already have
+    one.
 
     :param path: A PyFilesytem path
     :type path: str
@@ -169,6 +187,7 @@ def relpath(path):
     path if it is present.
 
     :param path: Path to adjust
+    :type path: str
 
     >>> relpath('/a/b')
     'a/b'
@@ -212,8 +231,8 @@ def combine(path1, path2):
     """
     Join two paths together.
 
-    This is faster than `pathjoin`, but only works when the second path
-    is relative, and there are no backreferences in either path.
+    This is faster than ``pathjoin``, but only works when the second
+    path is relative, and there are no back references in either path.
 
     >>> combine("foo/bar", "baz")
     'foo/bar/baz'
@@ -228,11 +247,11 @@ def split(path):
     """
     Split a path into (head, tail) pair.
 
-    This function splits a path into a pair (head, tail) where 'tail'
-    is the last pathname component and 'head' is all preceding
-    components.
+    This function splits a path into a pair (head, tail) where 'tail' is
+    the last pathname component and 'head' is all preceding components.
 
     :param path: Path to split
+    :type path: str
 
     >>> split("foo/bar")
     ('foo', 'bar')
@@ -278,7 +297,8 @@ def isdotfile(path):
     Detect if a path references a dot file, i.e. a resource who's name
     starts with a '.'
 
-    :param path: Path to check
+    :param path: Path to check.
+    :type path: str
 
     >>> isdotfile('.baz')
     True
@@ -298,7 +318,7 @@ def dirname(path):
     Return the parent directory of a path.
 
     This is always equivalent to the 'head' component of the value
-    returned by split(path).
+    returned by ``split(path)``.
 
     :param path: A FS path
 
@@ -323,6 +343,7 @@ def basename(path):
     returned by split(path).
 
     :param path: A FS path
+    :type path: str
 
     >>> basename('foo/bar/baz')
     'baz'
@@ -341,8 +362,10 @@ def issamedir(path1, path2):
     """
     Check if two paths reference a resource in the same directory.
 
-    :param path1: An FS path
-    :param path2: An FS path
+    :param path1: A FS path.
+    :type path1: str
+    :param path2: A FS path.
+    :type path2: str
 
     >>> issamedir("foo/bar/baz.txt", "foo/bar/spam.txt")
     True
@@ -362,7 +385,7 @@ def isbase(path1, path2):
 
 def isparent(path1, path2):
     """
-    Check if path1 is a parent directory of path2.
+    Check if ``path1`` is a parent directory of ``path2``.
 
     :param path1: An FS path
     :param path2: An FS path
@@ -408,6 +431,13 @@ def forcedir(path):
 
 
 def frombase(path1, path2):
+    """
+    Get the final path of ``path2`` that isn't in ``path1``.
+
+    >>> frombase('foo/bar/', 'foo/bar/baz/egg')
+    'baz/egg'
+
+    """
     if not isparent(path1, path2):
         raise ValueError("path1 must be a prefix of path2")
     return path2[len(path1):]
@@ -415,12 +445,13 @@ def frombase(path1, path2):
 
 def relativefrom(base, path):
     """
-    Return a path relative from a given base path,
-    i.e. insert backrefs as appropriate to reach the path from the base.
+    Return a path relative from a given base path, i.e. insert backrefs
+    as appropriate to reach the path from the base.
 
-    :param base_path: Path to a directory
-    :param path: Path you wish to make relative
-
+    :param base: Path to a directory.
+    :type base: str
+    :param path: Path you wish to make relative.
+    :type path: str
 
     >>> relativefrom("foo/bar", "baz/index.html")
     '../../baz/index.html'

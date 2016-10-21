@@ -33,6 +33,8 @@ class TestInfo(unittest.TestCase):
     def test_access(self):
         info = Info({
             "access": {
+                "uid": 10,
+                "gid": 12,
                 "user": 'will',
                 "group": 'devs',
                 "permissions": ['u_r']
@@ -42,6 +44,8 @@ class TestInfo(unittest.TestCase):
         self.assertEqual(info.permissions, Permissions(user='r'))
         self.assertEqual(info.user, 'will')
         self.assertEqual(info.group, 'devs')
+        self.assertEqual(info.uid, 10)
+        self.assertEqual(info.gid, 12)
 
     def test_basic(self):
         # Check simple file

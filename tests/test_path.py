@@ -105,9 +105,6 @@ class TestPathFunctions(unittest.TestCase):
             for path_component, expected in zip(iteratepath(path), results):
                 self.assertEqual(path_component, expected)
 
-        self.assertEqual(list(iteratepath("a/b/c/d", 1)), ["a", "b/c/d"])
-        self.assertEqual(list(iteratepath("a/b/c/d", 2)), ["a", "b", "c/d"])
-
     def test_combine(self):
         self.assertEqual(combine('', 'bar'), 'bar')
         self.assertEqual(combine('foo', 'bar'), 'foo/bar')

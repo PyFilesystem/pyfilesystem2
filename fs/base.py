@@ -1,5 +1,5 @@
 """
-fsbase
+fs.base
 ========
 
 PyFilesystem base class
@@ -26,7 +26,6 @@ from . import move
 from . import tools
 from . import walk
 from . import wildcard
-from .enums import ResourceType
 from .mode import validate_open_mode
 from .path import abspath
 from .path import join
@@ -66,7 +65,7 @@ class FS(object):
             'basic').
         :type keys: str
         :returns: An info object.
-        :rtype: :class:`fsinfo.Info`
+        :rtype: :class:`fs.info.Info`
 
         For more information regarding resource info see :ref:`info`.
 
@@ -85,7 +84,7 @@ class FS(object):
 
         This method will return a list of the resources in a directory.
         A 'resource' is a file, directory, or one of the other types
-        defined in :class:fs`ResourceType`.
+        defined in :class:`fs.ResourceType`.
 
         """
         raise NotImplementedError('listdir')
@@ -157,7 +156,7 @@ class FS(object):
             empty and force is False
         :raises `fs.errors.ParentDirectoryMissing`: if an intermediate
             directory is missing
-        :raises `fs.errors.ResourceInvalid`: if the path is not a
+        :raises `fs.errors.DirectoryExpected`: if the path is not a
             directory
         :raises `fs.errors.ResourceNotFound`: if the path does not
             exist
@@ -319,7 +318,7 @@ class FS(object):
         :param namespaces: A list of info namespaces to include in
             results.
         :type namespaces: list or None
-        :return: An iterator of :class:`fsinfo.Info` objects.
+        :return: An iterator of :class:`fs.info.Info` objects.
         :rtype: iterator
 
         """
@@ -677,7 +676,7 @@ class FS(object):
         :param info: Dict of resource info.
         :type info: dict
 
-        Setinfo is the compliment to :class:`fsbase.getinfo` and is
+        Setinfo is the compliment to :class:`fs.base.getinfo` and is
         used to set info values on a resource.
 
         The ``info`` dict should be in the same format as the raw
@@ -817,10 +816,9 @@ class FS(object):
         """
         from .subfs import SubFS
 
-        _type = self.gettype(path)
-        if _type != ResourceType.directory:
-            raise errors.ResourceInvalid(
-                "path should reference a directory"
+        if not self.getinfo(path).is_dir:
+            raise errors.DirectoryExpected(
+                path
             )
         return SubFS(self, path)
 

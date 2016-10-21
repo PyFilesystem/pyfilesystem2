@@ -69,7 +69,7 @@ class MountFS(FS):
         :param path: A path within the MountFS.
         :type path: str
         :param fs: A filesystem object to mount.
-        :type fs: :class:`fsbase.FS`
+        :type fs: :class:`fs.base.FS`
 
         """
         if fs is self:

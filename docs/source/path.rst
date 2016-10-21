@@ -3,5 +3,5 @@ Path functions
 
 Work with PyFilesystem paths.
 
-.. automodule:: fspath
+.. automodule:: fs.path
     :members:

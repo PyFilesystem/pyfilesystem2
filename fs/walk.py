@@ -24,8 +24,8 @@ class Walker(object):
         directories from the walk.
 
         :param fs: A filesystem object.
-        :type fs: :class:`fsbase.FS`
-        :param info: A :class:`fsinfo.Info` object.
+        :type fs: :class:`fs.base.FS`
+        :param info: A :class:`fs.info.Info` object.
         :rtype: bool
 
         """
@@ -74,7 +74,7 @@ class Walker(object):
 
     def scan(self, fs, dir_path, on_error, namespaces):
         """
-        Get an iterator of :class:`fsinfo.Info` objects for a
+        Get an iterator of :class:`fs.info.Info` objects for a
         directory path.
 
         :param fs: A filesystem object.
@@ -117,11 +117,11 @@ class Walker(object):
         :param namespaces: A list of additional namespaces to add to
             the Info objects.
         :type namespaces: list or None:
-        :returns: Generator of :class:`fsinfo.Info` objects.
+        :returns: Generator of :class:`fs.info.Info` objects.
 
 
         Yields tuples of (<absolute dir path>, <dirs>, <files>), where
-        ``<dirs>`` and ``<files>`` are a list of :class:`fsinfo.Info`
+        ``<dirs>`` and ``<files>`` are a list of :class:`fs.info.Info`
         objects.
 
         """

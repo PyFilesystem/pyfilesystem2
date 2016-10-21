@@ -8,7 +8,7 @@ from operator import itemgetter
 from .base import FS
 from .mode import check_writable
 from . import errors
-from .path import abspath, normpath
+from .path import abspath, dirname, normpath
 
 
 _PrioritizedFS = namedtuple(
@@ -232,7 +232,11 @@ class MultiFS(FS):
 
     def getbytes(self, path):
         self._check()
-        fs = self._delegate_required(path)
+        fs = self._delegate(path)
+        if fs is None:
+            if not self.isdir(dirname(path)):
+                raise errors.DirectoryExpected(path)
+            raise errors.ResourceNotFound(path)
         return fs.getbytes(path)
 
     def gettext(self, path, encoding=None, errors=None, newline=None):

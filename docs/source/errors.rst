@@ -1,5 +1,5 @@
 Errors
 ======
 
-.. automodule:: fserrors
+.. automodule:: fs.errors
     :members:

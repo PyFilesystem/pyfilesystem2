@@ -1,9 +1,9 @@
 Enumerations
 ============
 
-.. autoclass:: fsResourceType
+.. autoclass:: fs.ResourceType
     :members:
 
 
-.. autoclass:: fsSeek
+.. autoclass:: fs.Seek
     :members:

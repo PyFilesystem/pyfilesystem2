@@ -71,14 +71,14 @@ def get_intermediate_dirs(fs, dir_path):
 
     """
     intermediates = []
-    for path in recursepath(abspath(dir_path), reverse=True):
-        try:
-            _type = fs.gettype(path)
-        except ResourceNotFound:
-            intermediates.append(path)
-        else:
-            if _type == ResourceType.directory:
-                break
+    with fs.lock():
+        for path in recursepath(abspath(dir_path), reverse=True):
+            try:
+                resource = fs.getinfo(path)
+            except ResourceNotFound:
+                intermediates.append(abspath(path))
             else:
+                if resource.is_dir:
+                    break
                 raise errors.DirectoryExpected(dir_path)
     return intermediates[::-1][:-1]

@@ -5,7 +5,7 @@ import errno
 from contextlib import contextmanager
 import sys
 
-from . import errors as fserrors
+from . import errors
 
 from six import reraise
 
@@ -14,23 +14,23 @@ class _ConvertOSErrors(object):
     """Context manager to convert OSErrors in to FS Errors."""
 
     ERRORS = {
-        64: fserrors.RemoteConnectionError,  # ENONET
-        errno.ENOENT: fserrors.ResourceNotFound,
-        errno.EFAULT: fserrors.ResourceNotFound,
-        errno.ESRCH: fserrors.ResourceNotFound,
-        errno.ENOTEMPTY: fserrors.DirectoryNotEmpty,
-        errno.EEXIST: fserrors.DirectoryExists,
-        183: fserrors.DirectoryExists,
-        errno.ENOTDIR: fserrors.DirectoryExpected,
-        errno.EISDIR: fserrors.FileExpected,
-        errno.EINVAL: fserrors.ResourceInvalid,
-        errno.ENOSPC: fserrors.InsufficientStorage,
-        errno.EPERM: fserrors.PermissionDenied,
-        errno.ENETDOWN: fserrors.RemoteConnectionError,
-        errno.ECONNRESET: fserrors.RemoteConnectionError,
-        errno.ENAMETOOLONG: fserrors.PathError,
-        errno.EOPNOTSUPP: fserrors.Unsupported,
-        errno.ENOSYS: fserrors.Unsupported
+        64: errors.RemoteConnectionError,  # ENONET
+        errno.ENOENT: errors.ResourceNotFound,
+        errno.EFAULT: errors.ResourceNotFound,
+        errno.ESRCH: errors.ResourceNotFound,
+        errno.ENOTEMPTY: errors.DirectoryNotEmpty,
+        errno.EEXIST: errors.DirectoryExists,
+        183: errors.DirectoryExists,
+        errno.ENOTDIR: errors.DirectoryExpected,
+        errno.EISDIR: errors.FileExpected,
+        errno.EINVAL: errors.ResourceInvalid,
+        errno.ENOSPC: errors.InsufficientStorage,
+        errno.EPERM: errors.PermissionDenied,
+        errno.ENETDOWN: errors.RemoteConnectionError,
+        errno.ECONNRESET: errors.RemoteConnectionError,
+        errno.ENAMETOOLONG: errors.PathError,
+        errno.EOPNOTSUPP: errors.Unsupported,
+        errno.ENOSYS: errors.Unsupported
     }
 
     def __init__(self, opname, path):
@@ -43,15 +43,14 @@ class _ConvertOSErrors(object):
     def __exit__(self, exc_type, exc_value, traceback):
         if exc_type and isinstance(exc_value, EnvironmentError):
             _errno = exc_value.errno
-            fserror = self.ERRORS.get(_errno, fserrors.OperationFailed)
+            fserror = self.ERRORS.get(_errno, errors.OperationFailed)
             if _errno == errno.EACCES and sys.platform == "win32":
                 if getattr(exc_value, 'args', None) == 32:  # pragma: no cover
-                    fserror = fserrors.ResourceLocked
+                    fserror = errors.ResourceLocked
             reraise(
                 fserror,
                 fserror(
                     self._path,
-                    opname=self._opname,
                     exc=exc_value
                 ),
                 traceback
@@ -74,7 +73,7 @@ def unwrap_errors(path_replace):
     """
     try:
         yield
-    except fserrors.ResourceError as e:
+    except errors.ResourceError as e:
         if hasattr(e, 'path'):
             if isinstance(path_replace, dict):
                 e.path = path_replace.get(e.path, e.path)

@@ -20,7 +20,8 @@ except ImportError:
     from scandir import scandir
 
 from . import errors
-from .base import FS, ResourceType
+from .base import FS
+from .enums import ResourceType
 from .info import Info
 from .path import abspath, basename, normpath
 from .permissions import Permissions
@@ -134,15 +135,15 @@ class OSFS(FS):
         access['permissions'] = Permissions(
             mode=stat_result.st_mode
         ).dump()
-        access['group_id'] = stat_result.st_gid
-        access['user_id'] = stat_result.st_uid
+        access['gid'] = stat_result.st_gid
+        access['uid'] = stat_result.st_uid
         try:
-            access['group'] = grp.getgrgid(access['group_id']).gr_name
+            access['group'] = grp.getgrgid(access['gid']).gr_name
         except KeyError:  # pragma: nocover
             pass
 
         try:
-            access['user'] = pwd.getpwuid(access['user_id']).pw_name
+            access['user'] = pwd.getpwuid(access['uid']).pw_name
         except KeyError:  # pragma: nocover
             pass
         return access

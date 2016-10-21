@@ -343,8 +343,10 @@ class MemoryFS(FS):
 
         with self._lock:
             parent_dir_entry = self._get_dir_entry(dir_path)
-            if parent_dir_entry is None or not parent_dir_entry.is_dir:
+            if parent_dir_entry is None:
                 raise errors.ResourceNotFound(path)
+            if not parent_dir_entry.is_dir:
+                raise errors.DirectoryExpected(path)
 
             if 'r' in mode or 'a' in mode:
                 if file_name not in parent_dir_entry:

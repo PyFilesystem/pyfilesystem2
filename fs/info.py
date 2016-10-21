@@ -111,8 +111,7 @@ class Info(object):
     @property
     def is_dir(self):
         """
-        Get a boolean that will be true if the resource is a
-        directory.
+        Check if the resource references a directory.
 
         :rtype: bool
 
@@ -126,7 +125,7 @@ class Info(object):
 
         Requires the ``"details"`` namespace.
 
-        :type: :class:`fsResourceType`
+        :type: :class:`fs.ResourceType`
 
         """
         return ResourceType(self.get('details', 'type', 0))
@@ -236,6 +235,18 @@ class Info(object):
         return self.get('access', 'user')
 
     @property
+    def uid(self):
+        """
+        Get the user id of a resource, or ``None`` if not available.
+
+        Requires the ``"access"`` namespace.
+
+        :rtype: int
+
+        """
+        return self.get('access', 'uid')
+
+    @property
     def group(self):
         """
         Get the group of the resource owner, or ``None`` if not
@@ -247,3 +258,15 @@ class Info(object):
 
         """
         return self.get('access', 'group')
+
+    @property
+    def gid(self):
+        """
+        Get the group id of a resource, or ``None`` if not available.
+
+        Requires the ``"access"`` namespace.
+
+        :rtype: int
+
+        """
+        return self.get('access', 'gid')

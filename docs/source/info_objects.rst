@@ -1,5 +1,5 @@
 Info Objects
 ============
 
-.. automodule:: fsinfo
+.. automodule:: fs.info
     :members:

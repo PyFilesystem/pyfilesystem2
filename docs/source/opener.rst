@@ -3,5 +3,5 @@ Openers
 
 Open filesystems from a URL.
 
-.. automodule:: fsopener
+.. automodule:: fs.opener
     :members:
