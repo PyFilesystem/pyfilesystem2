@@ -211,7 +211,7 @@ class OSFS(FS):
                 os.mkdir(sys_path, mode)
             except OSError as e:
                 if e.errno == errno.ENOENT:
-                    raise errors.ParentDirectoryMissing(path)
+                    raise errors.ResourceNotFound(path)
                 elif e.errno == errno.EEXIST and recreate:
                     pass
                 else:

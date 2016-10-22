@@ -27,11 +27,9 @@ __all__ = [
     'InsufficientStorage',
     'InvalidCharsInPath',
     'InvalidPath',
-    'NotADirectory',
     'NoURL',
     'OperationFailed',
     'OperationTimeout',
-    'ParentDirectoryMissing',
     'PathError',
     'PermissionDenied',
     'RemoteConnectionError',
@@ -191,7 +189,7 @@ class FileExpected(ResourceInvalid):
 class DirectoryExpected(ResourceInvalid):
     """Exception raises when a directory was expected."""
 
-    default_message = "path '{path}' or parent not a directory"
+    default_message = "path '{path}' should be a directory"
 
 
 class DestinationExists(ResourceError):
@@ -211,18 +209,6 @@ class DirectoryNotEmpty(ResourceError):
     """Exception raised when a directory to be removed is not empty."""
 
     default_message = "directory '{path}' is not empty"
-
-
-class ParentDirectoryMissing(ResourceError):
-    """Exception raised when a parent directory is missing."""
-
-    default_message = "a parent directory is missing for path '{path}'"
-
-
-class NotADirectory(ResourceError):
-    """Exception raised when a path should be an directory."""
-
-    default_message = "ancestor in '{path}' is not a directory"
 
 
 class ResourceLocked(ResourceError):

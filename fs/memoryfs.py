@@ -319,7 +319,7 @@ class MemoryFS(FS):
 
             parent_dir = self._get_dir_entry(dir_path)
             if parent_dir is None:
-                raise errors.ParentDirectoryMissing(path)
+                raise errors.ResourceNotFound(path)
 
             dir_entry = parent_dir.get_entry(dir_name)
             if dir_entry is not None and not recreate:

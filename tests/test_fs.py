@@ -544,10 +544,12 @@ class FSTestCases(object):
         self.fs.setbytes('foo/bar.txt', b'egg')
         self.assert_bytes('foo/bar.txt', b'egg')
 
+        # Directorty eixsts
         with self.assertRaises(errors.DirectoryExists):
             self.fs.makedir('foo')
 
-        with self.assertRaises(errors.ParentDirectoryMissing):
+        # Parent directory doesn't exist
+        with self.assertRaises(errors.ResourceNotFound):
             self.fs.makedir('/foo/bar/baz')
 
         self.fs.makedir('/foo/bar')
@@ -689,6 +691,7 @@ class FSTestCases(object):
             self.fs.openbin('foo.bin', 'h')
 
     def test_opendir(self):
+        # Make a simple directory structure
         self.fs.makedir('foo')
         self.fs.setbytes('foo/bar', b'barbar')
         self.fs.setbytes('foo/egg', b'eggegg')
@@ -705,9 +708,9 @@ class FSTestCases(object):
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.opendir('egg')
 
-        # # Check error when doing opendir on a non dir
-        # with self.assertRaises(errors.ResourceInvalid):
-        #     self.fs.opendir('foo/egg')
+        # Check error when doing opendir on a non dir
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.opendir('foo/egg')
 
         # These should work, and will essentially return a 'clone' of sorts
         self.fs.opendir('')

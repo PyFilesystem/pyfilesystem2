@@ -82,6 +82,10 @@ class FS(object):
         :return: list of names, relative to the given directory
         :rtype: list
 
+        :raises `fs.errors.DirectoryExpected`: If `path` is not a
+            directory.
+        :raises `fs.errors.ResourceNotFound`: If `path` does not exist.
+
         This method will return a list of the resources in a directory.
         A 'resource' is a file, directory, or one of the other types
         defined in :class:`fs.ResourceType`.
