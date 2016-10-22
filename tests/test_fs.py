@@ -381,6 +381,9 @@ class FSTestCases(object):
         self.assertEqual(info['details']['size'], 3)
         self.assertEqual(info['details']['type'], int(ResourceType.file))
 
+        # Test getdetails
+        self.assertEqual(info, self.fs.getdetails('foo').raw)
+
         # Raw info should be serializable
         try:
             json.dumps(info)
