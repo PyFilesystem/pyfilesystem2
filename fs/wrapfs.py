@@ -70,11 +70,11 @@ class WrapFS(FS):
         """
         return self._wrap_fs
 
-    def getinfo(self, path, *namespaces):
+    def getinfo(self, path, namespaces=None):
         self._check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            raw_info = _fs.getinfo(_path, *namespaces).raw
+            raw_info = _fs.getinfo(_path, namespaces=namespaces).raw
         if abspath(normpath(path)) == '/':
             raw_info = raw_info.copy()
             raw_info['basic']['name'] = ''
@@ -322,10 +322,9 @@ class WrapFS(FS):
 
     def opendir(self, path):
         from .subfs import SubFS
-        info = self.getinfo(path)
-        if not info.is_dir:
-            raise errors.ResourceInvalid(
-                "path should reference a directory"
+        if not self.getinfo(path).is_dir:
+            raise errors.DirectoryExpected(
+                path=path
             )
         with unwrap_errors(path):
             return SubFS(self, path)

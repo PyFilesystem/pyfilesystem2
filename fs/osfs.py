@@ -169,9 +169,9 @@ class OSFS(FS):
     # Required Methods
     # --------------------------------------------------------
 
-    def getinfo(self, path, *namespaces):
+    def getinfo(self, path, namespaces=None):
         self._check()
-
+        namespaces = namespaces or ()
         sys_path = self.getsyspath(path)
         with convert_os_errors('getinfo', path):
             _stat = os.stat(sys_path)
@@ -197,7 +197,7 @@ class OSFS(FS):
     def listdir(self, path):
         self._check()
         sys_path = self._to_sys_path(path)
-        with convert_os_errors('listdir', path):
+        with convert_os_errors('listdir', path, directory=True):
             names = os.listdir(sys_path)
         return names
 
@@ -257,7 +257,7 @@ class OSFS(FS):
         if _path == '/':
             raise errors.RemoveRootError()
         sys_path = self._to_sys_path(path)
-        with convert_os_errors('removedir', path):
+        with convert_os_errors('removedir', path, directory=True):
             os.rmdir(sys_path)
 
     # --------------------------------------------------------
@@ -324,7 +324,7 @@ class OSFS(FS):
         namespaces = namespaces or ()
         _path = abspath(normpath(path))
         sys_path = self._to_sys_path(_path)
-        with convert_os_errors('scandir', path):
+        with convert_os_errors('scandir', path, directory=True):
             for dir_entry in scandir(sys_path):
                 info = {
                     "basic": {

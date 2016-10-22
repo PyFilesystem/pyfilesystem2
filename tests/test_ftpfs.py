@@ -49,6 +49,8 @@ ftp_port = 30000
 
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
+    __test__ =  False
+
     def make_fs(self):
         global ftp_port
         temp_path = os.path.join(self._temp_dir, text_type(uuid.uuid4()))

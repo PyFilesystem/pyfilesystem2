@@ -204,8 +204,9 @@ class ReadZipFS(FS):
                         _fs.create(resource_name)
             return self._directory_fs
 
-    def getinfo(self, path, *namespaces):
+    def getinfo(self, path, namespaces=None):
         self._check()
+        namespaces = namespaces or ()
         _path = normpath(path)
         if _path == '/':
             raw_info = {

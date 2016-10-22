@@ -159,13 +159,14 @@ class MultiFS(FS):
                 self._filesystems.clear()
                 self._resort()
 
-    def getinfo(self, path, *namespaces):
+    def getinfo(self, path, namespaces=None):
         self._check()
+        namespaces = namespaces or ()
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
         _path = abspath(normpath(path))
-        info = fs.getinfo(_path, *namespaces)
+        info = fs.getinfo(_path, namespaces=namespaces)
         return info
 
     def listdir(self, path):
@@ -234,8 +235,6 @@ class MultiFS(FS):
         self._check()
         fs = self._delegate(path)
         if fs is None:
-            if not self.isdir(dirname(path)):
-                raise errors.DirectoryExpected(path)
             raise errors.ResourceNotFound(path)
         return fs.getbytes(path)
 

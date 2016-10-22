@@ -100,10 +100,10 @@ class MountFS(FS):
         fs, delegate_path = self._delegate(path)
         return "{path} on {fs}".format(fs=fs, path=delegate_path)
 
-    def getinfo(self, path, *namespaces):
+    def getinfo(self, path, namespaces=None):
         self._check()
         fs, _path = self._delegate(path)
-        return fs.getinfo(_path, *namespaces)
+        return fs.getinfo(_path, namespaces=namespaces)
 
     def listdir(self, path):
         self._check()

@@ -13,7 +13,7 @@ from six import reraise
 class _ConvertOSErrors(object):
     """Context manager to convert OSErrors in to FS Errors."""
 
-    ERRORS = {
+    FILE_ERRORS = {
         64: errors.RemoteConnectionError,  # ENONET
         errno.ENOENT: errors.ResourceNotFound,
         errno.EFAULT: errors.ResourceNotFound,
@@ -21,7 +21,8 @@ class _ConvertOSErrors(object):
         errno.ENOTEMPTY: errors.DirectoryNotEmpty,
         errno.EEXIST: errors.DirectoryExists,
         183: errors.DirectoryExists,
-        errno.ENOTDIR: errors.DirectoryExpected,
+        #errno.ENOTDIR: errors.DirectoryExpected,
+        errno.ENOTDIR: errors.ResourceNotFound,
         errno.EISDIR: errors.FileExpected,
         errno.EINVAL: errors.ResourceInvalid,
         errno.ENOSPC: errors.InsufficientStorage,
@@ -33,17 +34,26 @@ class _ConvertOSErrors(object):
         errno.ENOSYS: errors.Unsupported
     }
 
-    def __init__(self, opname, path):
+    DIR_ERRORS = FILE_ERRORS.copy()
+    DIR_ERRORS[errno.ENOTDIR] = errors.DirectoryExpected
+
+    def __init__(self, opname, path, directory=False):
         self._opname = opname
         self._path = path
+        self._directory = directory
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        os_errors = (
+            self.DIR_ERRORS
+            if self._directory
+            else self.FILE_ERRORS
+        )
         if exc_type and isinstance(exc_value, EnvironmentError):
             _errno = exc_value.errno
-            fserror = self.ERRORS.get(_errno, errors.OperationFailed)
+            fserror = os_errors.get(_errno, errors.OperationFailed)
             if _errno == errno.EACCES and sys.platform == "win32":
                 if getattr(exc_value, 'args', None) == 32:  # pragma: no cover
                     fserror = errors.ResourceLocked

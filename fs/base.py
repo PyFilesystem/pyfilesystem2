@@ -55,17 +55,17 @@ class FS(object):
     # Required methods
     # ---------------------------------------------------
 
-    def getinfo(self, path, *namespaces):
+    def getinfo(self, path, namespaces=None):
         """
         Get information regarding a resource on a filesystem.
 
         :param path: A path to a resource on the filesystem.
         :type path: str
-        :param namespace: Info namespace to query (defaults to
+        :param namespaces: Info namespaces to query (defaults to
             'basic').
-        :type keys: str
-        :returns: An info object.
-        :rtype: :class:`fs.info.Info`
+        :type namespaces: list or None
+        :returns: An :class:fs.info.Info: instance.
+        :rtype: Info
 
         For more information regarding resource info see :ref:`info`.
 
@@ -475,7 +475,7 @@ class FS(object):
         use to store the directory entry.
 
         """
-        size = self.getinfo(path, 'details').size
+        size = self.getinfo(path, namespaces=['details']).size
         return size
 
     def getsyspath(self, path):
@@ -541,7 +541,7 @@ class FS(object):
         are reserved for implementation specific resource types.
 
         """
-        resource_type = self.getinfo(path, 'details').type
+        resource_type = self.getinfo(path, namespaces=['details']).type
         return resource_type
 
     def geturl(self, path):
@@ -818,7 +818,7 @@ class FS(object):
 
         if not self.getinfo(path).is_dir:
             raise errors.DirectoryExpected(
-                path
+                path=path
             )
         return SubFS(self, path)
 
@@ -866,7 +866,7 @@ class FS(object):
         for name in self.listdir(_path):
             info = self.getinfo(
                 join(_path, name),
-                *namespaces
+                namespaces=namespaces
             )
             yield info
 
@@ -1007,6 +1007,22 @@ class FS(object):
     # ---------------------------------------------------
     # Helper methods
     # ---------------------------------------------------
+
+    def getdetails(self, path):
+        """
+        Get the *details* resource info.
+
+        This method is shorthand for the following:
+
+            fs.getinfo(path, namespaces=['details'])
+
+        :param path: A path on the filesystem.
+        :type path: str
+        :returns: A :class:`fs.info.Info` instance.
+        :rtype: Info
+
+        """
+        return self.getinfo(path, namespaces=['details'])
 
     def setfile(self,
                 path,

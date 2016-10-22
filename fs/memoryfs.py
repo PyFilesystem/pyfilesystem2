@@ -272,19 +272,18 @@ class MemoryFS(FS):
         dir_entry = self._get_dir_entry(path)
         dir_entry.accessed_time = dir_entry.modified_time = time
 
-    def getinfo(self, path, *namespaces):
+    def getinfo(self, path, namespaces=None):
         self._check()
+        namespaces = namespaces or ()
         dir_entry = self._get_dir_entry(path)
         if dir_entry is None:
             raise errors.ResourceNotFound(path)
-
         info = {
             'basic': {
                 'name': dir_entry.name,
                 'is_dir': dir_entry.is_dir
             }
         }
-
         if 'details' in namespaces:
             info['details'] = {
                 "type": int(dir_entry.resource_type),
@@ -293,7 +292,6 @@ class MemoryFS(FS):
                 "modified": dir_entry.modified_time,
                 "created": dir_entry.created_time,
             }
-
         return Info(info)
 
     def listdir(self, path):
@@ -343,10 +341,8 @@ class MemoryFS(FS):
 
         with self._lock:
             parent_dir_entry = self._get_dir_entry(dir_path)
-            if parent_dir_entry is None:
+            if parent_dir_entry is None or not parent_dir_entry.is_dir:
                 raise errors.ResourceNotFound(path)
-            if not parent_dir_entry.is_dir:
-                raise errors.DirectoryExpected(path)
 
             if 'r' in mode or 'a' in mode:
                 if file_name not in parent_dir_entry:

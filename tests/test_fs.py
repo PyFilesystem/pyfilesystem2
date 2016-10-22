@@ -376,7 +376,7 @@ class FSTestCases(object):
         self.assertTrue(info['basic']['is_dir'])
 
         # Get the info
-        info = self.fs.getinfo('foo', 'details').raw
+        info = self.fs.getinfo('foo', namespaces=['details']).raw
         self.assertIsInstance(info, dict)
         self.assertEqual(info['details']['size'], 3)
         self.assertEqual(info['details']['type'], int(ResourceType.file))
@@ -398,7 +398,7 @@ class FSTestCases(object):
         # Check a number of standard namespaces
         # FS objects may not support all these, but we can at least
         # invoke the code
-        self.fs.getinfo('foo', 'access', 'stat', 'details')
+        self.fs.getinfo('foo', namespaces=['access', 'stat', 'details'])
 
     def test_exists(self):
         """Test exists method."""
@@ -792,7 +792,7 @@ class FSTestCases(object):
         self.fs.setinfo('birthday.txt', change_info)
         new_info = self.fs.getinfo(
             'birthday.txt',
-            'details'
+            namespaces=['details']
         ).raw
         self.assertEqual(new_info['details']['accessed'], now + 60)
         self.assertEqual(new_info['details']['modified'], now + 60 * 60)
@@ -806,7 +806,7 @@ class FSTestCases(object):
             'birthday.txt',
             accessed=datetime(2016, 7, 5),
         )
-        info = self.fs.getinfo('birthday.txt', 'details')
+        info = self.fs.getinfo('birthday.txt', namespaces=['details'])
         self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
         self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=pytz.UTC))
 
@@ -814,11 +814,11 @@ class FSTestCases(object):
         self.fs.touch('new.txt')
         self.assert_isfile('new.txt')
         self.fs.settimes('new.txt', datetime(2016, 7, 5))
-        info = self.fs.getinfo('new.txt', 'details')
+        info = self.fs.getinfo('new.txt', namespaces=['details'])
         self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
         now = time.time()
         self.fs.touch('new.txt')
-        accessed = self.fs.getinfo('new.txt', 'details').raw['details']['accessed']
+        accessed = self.fs.getinfo('new.txt', namespaces=['details']).raw['details']['accessed']
         self.assertTrue(accessed - now < 5)
 
     def test_close(self):
@@ -967,7 +967,7 @@ class FSTestCases(object):
         self.assertIsInstance(_all_bytes, bytes)
         self.assertEqual(_all_bytes, all_bytes)
 
-        with self.assertRaises(errors.DirectoryExpected):
+        with self.assertRaises(errors.ResourceNotFound):
             self.fs.getbytes('foo/bar')
 
         self.fs.makedir('baz')
