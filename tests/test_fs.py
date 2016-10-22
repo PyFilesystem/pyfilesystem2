@@ -291,7 +291,7 @@ class FSTestCases(object):
         self.assertIsInstance(six.text_type(self.fs), six.text_type)
 
     def test_getmeta(self):
-        # Get he meta dict
+        # Get the meta dict
         meta = self.fs.getmeta()
 
         # Check default namespace
