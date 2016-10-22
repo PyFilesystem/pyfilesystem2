@@ -236,12 +236,12 @@ class _FTPFile(object):
                 self.conn.close()
                 self.conn = None
                 self.ftp.voidresp()
-            except error_temp, error_perm:
+            except (error_temp, error_perm):
                 pass
         if self.ftp is not None:
             try:
                 self.ftp.close()
-            except error_temp, error_perm:
+            except (error_temp, error_perm):
                 pass
         self.closed = True
 

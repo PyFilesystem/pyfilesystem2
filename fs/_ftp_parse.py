@@ -695,7 +695,7 @@ if __name__ == '__main__':
         {'line':    '-rw-r--r--   1 root     other     531 Jan 29 03:26 README',
          'type':    'Unix',
          'size':    531,
-         'time':    (current_year, 1, 29, 03, 26, 0, 0, 0, -1),
+         'time':    (current_year, 1, 29, 3, 26, 0, 0, 0, -1),
          'name':    'README',
          'try_cwd': False},
 
@@ -767,7 +767,7 @@ if __name__ == '__main__':
          'type':    'MultiNet/VMS',
          'size':    0,
          # Doesn't parse the seconds
-         'time':    (1996, 1, 29, 03, 33, 0, 0, 0, -1),
+         'time':    (1996, 1, 29, 3, 33, 0, 0, 0, -1),
          'name':    'CII-MANUAL.TEX',
          'try_cwd': False},
 
@@ -790,7 +790,7 @@ if __name__ == '__main__':
         {'line':    '04-14-99  03:47PM                  589 readme.htm',
          'type':    'MS-DOS',
          'size':    589,
-         'time':    (1999, 04, 14, 15, 47, 0, 0, 0, -1),
+         'time':    (1999, 4, 14, 15, 47, 0, 0, 0, -1),
          'name':    'readme.htm',
          'try_cwd': False},
     ]
