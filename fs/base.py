@@ -51,20 +51,22 @@ class FS(object):
         """Close filesystem on exit."""
         self.close()
 
-    # ---------------------------------------------------
-    # Required methods
-    # ---------------------------------------------------
+    # ---------------------------------------------------------------- #
+    # Required methods                                                 #
+    # Filesystems must implement these methods.                        #
+    # ---------------------------------------------------------------- #
 
     def getinfo(self, path, namespaces=None):
         """
-        Get information regarding a resource on a filesystem.
+        Get information regarding a resource (file or directory) on a
+        filesystem.
 
         :param path: A path to a resource on the filesystem.
         :type path: str
         :param namespaces: Info namespaces to query (defaults to
             'basic').
         :type namespaces: list or None
-        :returns: An :class:fs.info.Info: instance.
+        :returns: An :class:`fs.info.Info`: instance.
         :rtype: Info
 
         For more information regarding resource info see :ref:`info`.
@@ -77,9 +79,9 @@ class FS(object):
         """
         Get an iterator of the resource names in a directory.
 
-        :param path: A path to a directory on the filesystem
+        :param path: A path to a directory on the filesystem.
         :type path: str
-        :return: list of names, relative to the given directory
+        :return: list of names, relative to ``path``.
         :rtype: list
 
         :raises `fs.errors.DirectoryExpected`: If `path` is not a
@@ -99,17 +101,13 @@ class FS(object):
 
         :param path: Path to directory from root.
         :type path: str
-        :param permissions: Permission instance
-        :param recreate: Do not raise an error if the directory
-            exists.
-        :type recreate: True
+        :param permissions: :class:`fs.permissions.Permissions`
+            instance.
+        :type permissions: Permissions
+        :param recreate: Do not raise an error if the directory exists.
+        :type recreate: bool
 
-        :raises `fs.errors.DirectoryExists`: if the path already
-            exists.
-        :raises `fs.errors.ParentDirectoryMissing`: if a parent
-            directory is missing.
-        :raises `fs.errors.NotADirectory`: if one of the ancestors in
-            the path isn't a directory.
+        :raises `fs.errors.DirectoryExists`: if the path already exists.
         :raises `fs.errors.ResourceNotFound`: if the path is not found.
 
         """
@@ -127,6 +125,8 @@ class FS(object):
             buffering, 0 to disable buffering, or positive integer to
             indicate buffer size).
         :type buffering: int
+        :param *options: Keyword parameters for any additional
+            information required by the filesystem (if any).
         :rtype: file object
 
         """
@@ -134,15 +134,12 @@ class FS(object):
 
     def remove(self, path):
         """
-        Remove a file or other resource.
+        Remove a file.
 
-        :param path: Path to remove.
+        :param path: Path to the file you want to remove.
         :type path: str
 
-        :raises `fs.errors.ParentDirectoryMissing`: if an intermediate
-            directory is missing.
-        :raises `fs.errors.FileExpected`: if the path is a
-            directory.
+        :raises `fs.errors.FileExpected`: if the path is a directory.
         :raises `fs.errors.ResourceNotFound`: if the path does not
             exist.
 
@@ -167,9 +164,11 @@ class FS(object):
         """
         raise NotImplementedError('removedir')
 
-    # ---------------------------------------------------
-    # Optional methods
-    # ---------------------------------------------------
+    # ---------------------------------------------------------------- #
+    # Optional methods                                                 #
+    # Filesystems *may* implement these methods, as long as the        #
+    # semantics aren't changed.                                        #
+    # ---------------------------------------------------------------- #
 
     def close(self):
         """
@@ -225,6 +224,9 @@ class FS(object):
         :type src_path: str
         :param dst_path: A path to a directory in the filesystem.
         :type dst_path:
+        :param create: If ``True`` then ``src_path`` will be created if
+            it doesn't already exist.
+        :type create: bool
 
         """
         with self._lock:
@@ -304,8 +306,7 @@ class FS(object):
                   dir_wildcards=None,
                   namespaces=None):
         """
-        Get an iterator of resource info, with filtering by
-        wildcard.
+        Get an iterator of resource info, filtered by wildcards.
 
         :param path: A path to a directory on the filesystem.
         :type path: str
@@ -479,7 +480,7 @@ class FS(object):
         use to store the directory entry.
 
         """
-        size = self.getinfo(path, namespaces=['details']).size
+        size = self.getdetails(path).size
         return size
 
     def getsyspath(self, path):
@@ -518,11 +519,11 @@ class FS(object):
         Get the type of a resource.
 
         :param path: A path in the filesystem.
-        :rtype: :class:`fsenum.ResourceType`
+        :returns: :class:`fs.ResourceType`
 
         A type of a resource is an integer that identifies the what
         the resource references. The standard type integers may be one
-        of the values in the `fs.ResourceType` enumerations.
+        of the values in the :class:`fs.ResourceType` enumerations.
 
         The most common resource types, supported by virtually all
         filesystems are ``directory`` (1) and ``file`` (2), but the
@@ -545,7 +546,7 @@ class FS(object):
         are reserved for implementation specific resource types.
 
         """
-        resource_type = self.getinfo(path, namespaces=['details']).type
+        resource_type = self.getdetails(path).type
         return resource_type
 
     def geturl(self, path):
@@ -570,12 +571,13 @@ class FS(object):
         :rtype: bool
 
         """
-        _has_sys_path = True
         try:
             self.getsyspath(path)
         except errors.NoSysPath:
-            _has_sys_path = False
-        return _has_sys_path
+            has_sys_path = False
+        else:
+            has_sys_path = True
+        return has_sys_path
 
     def hasurl(self, path):
         """
@@ -586,11 +588,12 @@ class FS(object):
         :rtype: bool
 
         """
-        has_url = True
         try:
             self.geturl(path)
         except errors.NoURL:
             has_url = False
+        else:
+            has_url = True
         return has_url
 
     def isclosed(self):
@@ -608,7 +611,7 @@ class FS(object):
     def isempty(self, path):
         """
         Check if a directory is empty (contains no files or
-        sub-directories).
+        directories).
 
         :param path: A directory path.
         :type path: str
@@ -659,7 +662,12 @@ class FS(object):
         Move contents of directory ``src_path`` to ``dst_path``.
 
         :param src_path: Path to source directory on the filesystem.
+        :type src_path: str
         :param dst_path: Path to destination directory.
+        :type dst_path: str
+        :param create: If ``True``, then ``dst_path`` will be created if
+            it doesn't already exist.
+        :type create: bool
 
         """
         with self._lock:
@@ -820,7 +828,7 @@ class FS(object):
         """
         from .subfs import SubFS
 
-        if not self.getinfo(path).is_dir:
+        if not self.getbasic(path).is_dir:
             raise errors.DirectoryExpected(
                 path=path
             )
@@ -888,6 +896,53 @@ class FS(object):
             raise ValueError('contents must be bytes')
         with closing(self.open(path, mode='wb')) as write_file:
             write_file.write(contents)
+
+    def setfile(self,
+                path,
+                file,
+                encoding=None,
+                errors=None,
+                newline=None):
+        """
+        Set a file to the contents of a file object.
+
+        :param path: A path on the filesystem.
+        :type path: str
+        :param file: A file object open for reading.
+        :type file: file objects
+        :param encoding: Encoding of destination file, or ``None`` for
+            binary.
+        :type encoding: str
+        :param errors: How encoding errors should be treated (same as
+            ``io.open``).
+        :type errors: str
+        :param newline: Newline parameter (same is ``io.open``).
+        :type newline: str
+
+        This method will read the contents of a supplied file object,
+        and write to a file on the filesystem. If the destination
+        exists, it will first be truncated.
+
+        If `encoding` is supplied, the destination will be opened in
+        text mode.
+
+        Note that the file object ``file`` will *not* be closed by this
+        method. Take care to close it after this method completes
+        (ideally with a context manager). For example::
+
+            with open('myfile.bin') as read_file:
+                my_fs.setfile('myfile.bin', read_file)
+
+        """
+        mode = 'wb' if encoding is None else 'wt'
+
+        with self._lock:
+            with self.open(path,
+                           mode=mode,
+                           encoding=encoding,
+                           errors=errors,
+                           newline=newline) as dst_file:
+                tools.copy_file_data(file, dst_file)
 
     def settimes(self, path, accessed=None, modified=None):
         """
@@ -1008,9 +1063,26 @@ class FS(object):
                     msg = _msg.format(max_chars=max_sys_path_length)
                     raise errors.InvalidPath(path, msg=msg)
 
-    # ---------------------------------------------------
-    # Helper methods
-    # ---------------------------------------------------
+    # ---------------------------------------------------------------- #
+    # Helper methods                                                   #
+    # Filesystems should not implement these methods.                  #
+    # ---------------------------------------------------------------- #
+
+    def getbasic(self, path):
+        """
+        Get the *basic* resource info.
+
+        This method is shorthand for the following:
+
+            fs.getinfo(path, namespaces=['basic'])
+
+        :param path: A path on the filesystem.
+        :type path: str
+        :returns: A :class:`fs.info.Info` instance.
+        :rtype: Info
+
+        """
+        return self.getinfo(path, namespaces=['basic'])
 
     def getdetails(self, path):
         """
@@ -1028,65 +1100,27 @@ class FS(object):
         """
         return self.getinfo(path, namespaces=['details'])
 
-    def setfile(self,
-                path,
-                file,
-                encoding=None,
-                errors=None,
-                newline=None):
-        """
-        Set a file to the contents of a file object.
-
-        :param path: A path on the filesystem.
-        :type path: str
-        :param file: A file object open for reading.
-        :type file: file objects
-        :param encoding: Encoding of destination file, or ``None`` for
-            binary.
-        :type encoding: str
-        :param errors: How encoding errors should be treated (same as
-            ``io.open``).
-        :type errors: str
-        :param newline: Newline parameter (same is ``io.open``).
-        :type newline: str
-
-        This method will read the contents of a supplied file object,
-        and write to a file on the filesystem. If the destination
-        exists, it will first be truncated.
-
-        If `encoding` is supplied, the destination will be opened in
-        text mode.
-
-        .. note::
-            Note that the file object ``file`` will not be closed by this
-            method. Take care to close it after this method completes
-            (ideally with a context manager). For example::
-
-                with open('myfile.bin') as read_file:
-                    my_fs.setfile('myfile.bin', read_file)
-
-        """
-        mode = 'wb' if encoding is None else 'wt'
-
-        with self._lock:
-            with self.open(path,
-                           mode=mode,
-                           encoding=encoding,
-                           errors=errors,
-                           newline=newline) as dst_file:
-                tools.copy_file_data(file, dst_file)
-
     def _check(self):
         """
         Check a filesystem may be used.
 
-        Will throw a `errors.FilesystemClosed` if the filesystem has
-            been closed.
+        Will throw a :class:`fs.errors.FilesystemClosed` if the
+            filesystem is closed.
 
         :returns: None
-        :raises: `errors.FilesystemClosed` if the filesystem is
-            closed.
+        :raises: :class:`fs.errors.FilesystemClosed` if the filesystem
+            is closed.
 
         """
         if self.isclosed():
             raise errors.FilesystemClosed()
+
+    def tree(self, *kwargs):
+        """
+        Render a tree view of the filesystem to stdout or a file.
+
+        The parameters are passed to :func:`fs.tree.render`.
+
+        """
+        from .tree import render
+        render(self, *kwargs)

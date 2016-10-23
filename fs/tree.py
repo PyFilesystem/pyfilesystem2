@@ -28,8 +28,8 @@ def render(fs,
     :type file_out: file or None
     :type encoding: Unicode encoding, or None to auto-detect.
     :type encoding: str or None
-    :param max_levels: Maximum number of levels to display, or None
-        for no maximum.
+    :param max_levels: Maximum number of levels to display, or None for
+        no maximum.
     :type max_levels: int
     :param with_color: Enable terminal color output, or None to detect
         terminal.

@@ -173,7 +173,7 @@ def line_iterator(f, size=None):
             c = read(1)
             if c:
                 append(c)
-            if c in (b'\n', b''):
+            if c in b'\n':
                 yield b''.join(line)
                 del line[:]
     else:
@@ -181,7 +181,7 @@ def line_iterator(f, size=None):
             c = read(1)
             if c:
                 append(c)
-            if c in (b'\n', b'') or len(line) >= size:
+            if c in b'\n' or len(line) >= size:
                 yield b''.join(line)
                 del line[:]
 

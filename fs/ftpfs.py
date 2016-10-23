@@ -35,7 +35,6 @@ def ftp_errors(fs, path=None):
         )
     except error_perm as e:
         code, message = parse_ftp_error(e)
-        print("FTP ERROR {}".format(e))
         if code == 552:
             raise errors.InsufficientStorage(
                 path=path,
@@ -77,13 +76,16 @@ class _FTPFile(object):
 
         self._lock = threading.RLock()
         self.ftp = ftpfs._open_ftp()
-        self.read_pos = 0
+        self.pos = 0
 
     def __enter__(self):
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.close()
+
+    def flush(self):
+        pass
 
     def read(self, size=None):
         with self._lock:
@@ -95,7 +97,7 @@ class _FTPFile(object):
                     rest=self.read_pos
                 )
                 data_bytes = data_file.getvalue()
-                self.read_pos += len(data_bytes)
+                self.pos += len(data_bytes)
                 return data_bytes
             else:
                 data_file = io.BytesIO()
@@ -113,7 +115,7 @@ class _FTPFile(object):
                         if not chunk_bytes:
                             break
                         data_file.write(chunk_bytes)
-                        self.read_pos += len(chunk_bytes)
+                        self.pos += len(chunk_bytes)
                         bytes_remaining -= len(chunk_bytes)
                     data_bytes = data_file.getvalue()
                     return data_bytes
@@ -121,13 +123,31 @@ class _FTPFile(object):
                     conn.close()
                     self.ftp.voidresp()
 
+    def write(self, data):
+        pass
+
+
+    def seek(self, pos, whence=Seek.set):
+        if whence == Seek.set:
+            self.pos = pos
+        elif whence == Seek.current:
+            self.pos = self.pos + pos
+        elif whence == Seek.end:
+            self.pos = max(0, self.fs.getsize(self.path) - pos)
+        else:
+            raise ValueError('invalid value for seek')
+
+    def seekable(self):
+        return True
+
+    def tell(self):
+        return self.pos
+
     def close(self):
         try:
             self.ftp.quit()
         except:
             pass
-
-
 
 
 class FTPFS(FS):
@@ -157,6 +177,9 @@ class FTPFS(FS):
 
     def __repr__(self):
         return "<ftpfps '{}:{}'>".format(self.host, self.port)
+
+    def __str__(self):
+        return "FTPFS({!r})".format(self.port)
 
     def _open_ftp(self):
         _ftp = FTP()
@@ -219,6 +242,17 @@ class FTPFS(FS):
             if not k.startswith('_')
         }
         return raw_info
+
+    def create(self, path, wipe=False):
+        self._check()
+        self.validatepath(path)
+        with ftp_errors(self, path):
+            if wipe or not self.isfile(path):
+                empty_file = io.BytesIO()
+                self.ftp.storbinary(
+                    _encode("STOR {}".format(path)),
+                    empty_file
+                )
 
     def getinfo(self, path, namespaces=None):
         self._check()
