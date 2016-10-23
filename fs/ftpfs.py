@@ -107,10 +107,10 @@ class FTPFile(object):
                     self._socket.close()
                 except:
                     pass
-                try:
-                    self.ftp.quit()
-                except:
-                    pass
+            try:
+                self.ftp.quit()
+            except:
+                pass
             self.closed = True
 
     def flush(self):

@@ -48,8 +48,7 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
         os.remove(self._temp_path)
 
 
-class TestRadZipFSMem(TestReadZipFS):
+class TestReadZipFSMem(TestReadZipFS):
 
     def make_source_fs(self):
         return open_fs('mem://')
-
