@@ -571,12 +571,11 @@ class FS(object):
         :rtype: bool
 
         """
+        _has_sys_path = True
         try:
             self.getsyspath(path)
         except errors.NoSysPath:
             has_sys_path = False
-        else:
-            has_sys_path = True
         return has_sys_path
 
     def hasurl(self, path):
@@ -588,12 +587,11 @@ class FS(object):
         :rtype: bool
 
         """
+        has_url = True
         try:
             self.geturl(path)
         except errors.NoURL:
             has_url = False
-        else:
-            has_url = True
         return has_url
 
     def isclosed(self):
@@ -899,6 +897,32 @@ class FS(object):
         with closing(self.open(path, mode='wb')) as write_file:
             write_file.write(contents)
 
+    def setbin(self, path, file):
+        """
+        Set a file to the contents of a binary file object.
+
+        :param path: A path on the filesystem.
+        :type path: str
+        :param file: A file object open for reading in binary mode.
+        :type file: file object
+
+        This method copies bytes from an open binary file to a file on
+        the filesystem.  If the destination exists, it will first be
+        truncated.
+
+        Note that the file object ``file`` will *not* be closed by this
+        method. Take care to close it after this method completes
+        (ideally with a context manager). For example::
+
+            with open('myfile.bin') as read_file:
+                my_fs.setbin('myfile.bin', read_file)
+
+        """
+
+        with self._lock:
+            with self.open(path, 'wb') as dst_file:
+                tools.copy_file_data(file, dst_file)
+
     def setfile(self,
                 path,
                 file,
@@ -911,7 +935,7 @@ class FS(object):
         :param path: A path on the filesystem.
         :type path: str
         :param file: A file object open for reading.
-        :type file: file objects
+        :type file: file object
         :param encoding: Encoding of destination file, or ``None`` for
             binary.
         :type encoding: str
@@ -1117,7 +1141,7 @@ class FS(object):
         if self.isclosed():
             raise errors.FilesystemClosed()
 
-    def tree(self, *kwargs):
+    def tree(self, **kwargs):
         """
         Render a tree view of the filesystem to stdout or a file.
 
@@ -1125,4 +1149,4 @@ class FS(object):
 
         """
         from .tree import render
-        render(self, *kwargs)
+        render(self, **kwargs)

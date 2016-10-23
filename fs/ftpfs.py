@@ -481,12 +481,21 @@ class FTPFS(FS):
             raw_info = self._make_raw_info(entry)
             yield Info(raw_info)
 
+    def setbin(self, path, file):
+        _path = abspath(normpath(path))
+        self.validatepath(path)
+        with self._lock:
+            with ftp_errors(self, path):
+                self.ftp.storbinary(
+                    "STOR {}".format(_encode(_path)),
+                    file
+                )
+
     def setbytes(self, path, contents):
         if not isinstance(contents, bytes):
             raise ValueError('contents must be bytes')
         _path = abspath(normpath(path))
         self.validatepath(path)
-
         bin_file = io.BytesIO(contents)
         with self._lock:
             with ftp_errors(self, path):
@@ -506,12 +515,6 @@ class FTPFS(FS):
                 if code == 550:
                     if self.isdir(path):
                         raise errors.FileExpected(path)
-
-                    # info = self.getinfo(path)
-                    # if not self.isdir(dirname(path)):
-                    #     raise errors.DirectoryExpected(path)
-                    # if info.is_dir:
-                    #     raise errors.FileExpected(path)
                 raise
 
         data_bytes = data.getvalue()

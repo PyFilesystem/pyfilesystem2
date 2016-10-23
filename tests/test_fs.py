@@ -1032,6 +1032,13 @@ class FSTestCases(object):
             data = f.read()
         self.assertEqual(data, b'bar')
 
+    def test_setbin(self):
+        bytes_file = io.BytesIO(b'bar')
+        self.fs.setbin('foo', bytes_file)
+        with self.fs.open('foo', 'rb') as f:
+            data = f.read()
+        self.assertEqual(data, b'bar')
+
     def test_bin_files(self):
         """Check binary files."""
         with self.fs.openbin('foo1', 'wb') as f:
@@ -1345,4 +1352,13 @@ class FSTestCases(object):
         self.assert_isdir('foo2/baz/egg')
         self.assert_not_exists('foo/bar/foofoo.txt')
         self.assert_not_exists('foo/bar/baz/egg')
+
+    def test_tree(self):
+        self.fs.makedirs('foo/bar')
+        self.fs.create('test.txt')
+        write_tree = io.StringIO()
+        self.fs.tree(file=write_tree)
+        written = write_tree.getvalue()
+        expected = u'|-- foo\n|   `-- bar\n`-- test.txt\n'
+        self.assertEqual(written, expected)
 

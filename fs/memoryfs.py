@@ -13,7 +13,6 @@ from threading import RLock
 import six
 
 from . import errors
-from . import mode
 from .base import FS
 from .enums import ResourceType
 from .info import Info

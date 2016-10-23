@@ -83,7 +83,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
             except IOError:
                 time.sleep(0)
             else:
-                #ftpurl.read()
+                ftpurl.read()
                 ftpurl.close()
                 break
         else:
