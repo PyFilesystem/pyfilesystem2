@@ -476,7 +476,10 @@ class FTPFS(FS):
         self._check()
         self.validatepath(path)
         _path = abspath(normpath(path))
-        entries = self._read_dir(_path)
+        with self._lock:
+            if not self.getbasic(path).is_dir:
+                raise errors.DirectoryExpected(path)
+            entries = self._read_dir(_path)
         for entry in entries:
             raw_info = self._make_raw_info(entry)
             yield Info(raw_info)

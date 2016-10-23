@@ -894,6 +894,8 @@ class FSTestCases(object):
 
     def test_scandir(self):
         # Check exception for scanning dir that doesn't exist
+
+
         with self.assertRaises(errors.ResourceNotFound):
             for info in self.fs.scandir('/foobar'):
                 pass
@@ -905,6 +907,11 @@ class FSTestCases(object):
 
         # Check scanning
         self.fs.create('foo')
+
+        # Can't scandir on a file
+        with self.assertRaises(errors.DirectoryExpected):
+            list(self.fs.scandir('foo'))
+
         self.fs.create('bar')
         self.fs.makedir('dir')
         iter_scandir = self.fs.scandir('/')

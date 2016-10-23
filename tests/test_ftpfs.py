@@ -20,7 +20,7 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 
-
+from fs import errors
 from fs.ftpfs import FTPFS
 
 
@@ -113,3 +113,8 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
                 os.system('kill {}'.format(server.pid))
         shutil.rmtree(self._temp_dir)
         super(TestFTPFS, self).tearDown()
+
+    def test_connection_error(self):
+        fs = FTPFS('ftp.not.a.chance')
+        with self.assertRaises(errors.RemoteConnectionError):
+            fs.listdir('/')

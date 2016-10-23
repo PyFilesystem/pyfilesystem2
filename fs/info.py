@@ -36,6 +36,7 @@ class Info(object):
         """
         self.raw = raw_info
         self._to_datetime = to_datetime
+        self.namespaces = frozenset(self.raw.keys())
 
     def __repr__(self):
         if self.is_dir:
@@ -70,7 +71,8 @@ class Info(object):
 
     def is_writeable(self, namespace, key):
         """
-        Check if a given key in a namespace is writeable.
+        Check if a given key in a namespace is writable (with
+        :meth:`fs.base.FS.setinfo`).
 
         :param namespace: A namespace identifier.
         :type namespace: str
