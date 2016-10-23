@@ -79,6 +79,7 @@ class FTPFile(object):
 
         self._lock = threading.RLock()
         self.ftp = ftpfs._open_ftp()
+        self.ftp.voidcmd(_encode('TYPE I'))
         self.pos = 0
         self._socket = None
         self.closed = False
@@ -100,11 +101,17 @@ class FTPFile(object):
         return line_iterator(self)
 
     def close(self):
-        try:
-            self.ftp.quit()
-        except:
-            pass
-        self._closed = True
+        if not self.closed:
+            if self._socket is not None:
+                try:
+                    self._socket.close()
+                except:
+                    pass
+                try:
+                    self.ftp.quit()
+                except:
+                    pass
+            self.closed = True
 
     def flush(self):
         pass
@@ -134,7 +141,7 @@ class FTPFile(object):
             ftp = self.ftp
             data_file = io.BytesIO()
             bytes_remaining = size
-            self.ftp.voidcmd(_encode('TYPE I'))
+
             sock = self.ftp.transfercmd(
                 _encode('RETR {}'.format(self.path)),
                 self.pos
