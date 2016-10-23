@@ -5,7 +5,7 @@ from .wrapfs import WrapFS
 from .path import abspath, normpath, split
 from .errors import ResourceReadOnly, ResourceNotFound
 from .info import Info
-from mode import check_writable
+from .mode import check_writable
 
 
 def read_only(fs):
