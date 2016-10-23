@@ -163,26 +163,24 @@ def decode_binary(data, encoding=None, errors=None, newline=None):
 
 
 def line_iterator(f, size=None):
-    """A not terribly efficient char by char line iterator"""
+    """A not terribly efficient char by char line iterator."""
     read = f.read
     line = []
     append = line.append
-    c = 1
+    c = True
     join = b''.join
-    is_terminator = b'\n'.__contains__
+    is_terminator = b'\n'.__contains__  # True for '\n' and also for ''
     if size is None or size < 0:
         while c:
             c = read(1)
-            if c:
-                append(c)
+            append(c)
             if is_terminator(c):
                 yield join(line)
                 del line[:]
     else:
         while c:
             c = read(1)
-            if c:
-                append(c)
+            append(c)
             if is_terminator(c) or len(line) >= size:
                 yield join(line)
                 del line[:]
