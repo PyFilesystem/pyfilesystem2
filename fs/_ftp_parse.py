@@ -238,10 +238,10 @@ class FTPListDataParser(object):
                 elif c == 'r':
                     result.try_retr = True
                 elif c == 's':
-                    result.size = long(buf[i+1:j])
+                    result.size = int(buf[i+1:j])
                 elif c == 'm':
                     result.mtime_type = MTIME_TYPE.LOCAL
-                    result.mtime = long(buf[i+1:j])
+                    result.mtime = int(buf[i+1:j])
                 elif c == 'i':
                     result.id_type = ID_TYPE.FULL
                     result.id = buf[i+1:j-i-1]
@@ -302,7 +302,7 @@ class FTPListDataParser(object):
 
                 elif state == 4: # getting tentative size
                     try:
-                        size = long(buf[i:j])
+                        size = int(buf[i:j])
                     except ValueError:
                         pass
                     state = 5
@@ -312,25 +312,25 @@ class FTPListDataParser(object):
                     if month >= 0:
                         state = 6
                     else:
-                        size = long(buf[i:j])
+                        size = int(buf[i:j])
 
                 elif state == 6: # have size and month
-                    mday = long(buf[i:j])
+                    mday = int(buf[i:j])
                     state = 7
 
                 elif state == 7: # have size, month, mday
                     if (j - i == 4) and (buf[i+1] == ':'):
-                        hour = long(buf[i])
-                        minute = long(buf[i+2:i+4])
+                        hour = int(buf[i])
+                        minute = int(buf[i+2:i+4])
                         result.mtime_type = MTIME_TYPE.REMOTE_MINUTE
                         result.mtime = self._guess_time(month, mday, hour, minute)
                     elif (j - i == 5) and (buf[i+2] == ':'):
-                        hour = long(buf[i:i+2])
-                        minute = long(buf[i+3:i+5])
+                        hour = int(buf[i:i+2])
+                        minute = int(buf[i+3:i+5])
                         result.mtime_type = MTIME_TYPE.REMOTE_MINUTE
                         result.mtime = self._guess_time(month, mday, hour, minute)
                     elif j - i >= 4:
-                        year = long(buf[i:j])
+                        year = int(buf[i:j])
                         result.mtime_type = MTIME_TYPE.REMOTE_DAY
                         result.mtime = self._get_mtime(year, month, mday)
                     else:
@@ -395,7 +395,7 @@ class FTPListDataParser(object):
             j = i
 
             j = buf.index('-', j)
-            mday = long(buf[i:j])
+            mday = int(buf[i:j])
 
             j = _skip(buf, j, '-')
             i = j
@@ -407,13 +407,13 @@ class FTPListDataParser(object):
             j = _skip(buf, j, '-')
             i = j
             j = buf.index(' ', j)
-            year = long(buf[i:j])
+            year = int(buf[i:j])
 
             j = _skip(buf, j, ' ')
             i = j
 
             j = buf.index(':', j)
-            hour = long(buf[i:j])
+            hour = int(buf[i:j])
             j = _skip(buf, j, ':')
             i = j
 
@@ -422,7 +422,7 @@ class FTPListDataParser(object):
                 if j == buflen:
                     raise IndexError # abort, abort!
 
-            minute = long(buf[i:j])
+            minute = int(buf[i:j])
 
             result.mtime_type = MTIME_TYPE.REMOTE_MINUTE
             result.mtime = self._get_mtime(year, month, mday, hour, minute)
@@ -446,17 +446,17 @@ class FTPListDataParser(object):
             result = FTPListData(buf)
 
             j = buf.index('-', j)
-            month = long(buf[i:j])
+            month = int(buf[i:j])
 
             j = _skip(buf, j, '-')
             i = j
             j = buf.index('-', j)
-            mday = long(buf[i:j])
+            mday = int(buf[i:j])
 
             j = _skip(buf, j, '-')
             i = j
             j = buf.index(' ', j)
-            year = long(buf[i:j])
+            year = int(buf[i:j])
             if year < 50:
                 year += 2000
             if year < 1000:
@@ -465,14 +465,14 @@ class FTPListDataParser(object):
             j = _skip(buf, j, ' ')
             i = j
             j = buf.index(':', j)
-            hour = long(buf[i:j])
+            hour = int(buf[i:j])
             j = _skip(buf, j, ':')
             i = j
             while not (buf[j] in 'AP'):
                 j += 1
                 if j == buflen:
                     raise IndexError
-            minute = long(buf[i:j])
+            minute = int(buf[i:j])
 
             if buf[j] == 'A':
                 j += 1
@@ -498,7 +498,7 @@ class FTPListDataParser(object):
                 i = j
                 j = buf.index(' ', j)
 
-                result.size = long(buf[i:j])
+                result.size = int(buf[i:j])
                 result.try_retr = True
 
             j = _skip(buf, j, ' ')
@@ -565,10 +565,10 @@ class FTPMlstDataParser(object):
                                                      int(factvalue[12:14]),
                                                      0, 0, 0))
                 elif factname == 'size':
-                    result.size = long(factvalue)
+                    result.size = int(factvalue)
                 elif factname == 'sizd':
                     # some FTP servers report directory size with sizd
-                    result.size = long(factvalue)
+                    result.size = int(factvalue)
                 elif factname == 'type':
                     if factvalue.lower() == 'file':
                         result.try_retr = True

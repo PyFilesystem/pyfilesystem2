@@ -542,12 +542,11 @@ class FSTestCases(object):
         self.assert_not_exists('foo')
         self.fs.makedir('foo')
         self.assert_isdir('foo')
-        self.assertEqual(self.fs.gettype('foo'),
-                         ResourceType.directory)
+        self.assertEqual(self.fs.gettype('foo'), ResourceType.directory)
         self.fs.setbytes('foo/bar.txt', b'egg')
         self.assert_bytes('foo/bar.txt', b'egg')
 
-        # Directorty eixsts
+        # Directory exists
         with self.assertRaises(errors.DirectoryExists):
             self.fs.makedir('foo')
 
@@ -617,7 +616,7 @@ class FSTestCases(object):
         with self.fs.open('foo/hello') as f:
             try:
                 fn = f.fileno()
-            except IOError:
+            except AttributeError:
                 pass
             else:
                 self.assertEqual(os.read(fn, 7), b'Goodbye')
@@ -800,8 +799,10 @@ class FSTestCases(object):
             'birthday.txt',
             namespaces=['details']
         ).raw
-        self.assertEqual(new_info['details']['accessed'], now + 60)
-        self.assertEqual(new_info['details']['modified'], now + 60 * 60)
+        if 'accessed' in new_info.get('_write', []):
+            self.assertEqual(new_info['details']['accessed'], now + 60)
+        if 'modified' in new_info.get('_write', []):
+            self.assertEqual(new_info['details']['modified'], now + 60 * 60)
 
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.setinfo('nothing', {})
@@ -813,19 +814,23 @@ class FSTestCases(object):
             accessed=datetime(2016, 7, 5),
         )
         info = self.fs.getinfo('birthday.txt', namespaces=['details'])
-        self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
-        self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+        writeable = info.get('details', '_write', [])
+        if 'accessed' in writeable:
+            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+        if 'modified' in writeable:
+            self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=pytz.UTC))
 
     def test_touch(self):
         self.fs.touch('new.txt')
         self.assert_isfile('new.txt')
         self.fs.settimes('new.txt', datetime(2016, 7, 5))
         info = self.fs.getinfo('new.txt', namespaces=['details'])
-        self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
-        now = time.time()
-        self.fs.touch('new.txt')
-        accessed = self.fs.getinfo('new.txt', namespaces=['details']).raw['details']['accessed']
-        self.assertTrue(accessed - now < 5)
+        if info.is_writeable('details', 'accessed'):
+            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+            now = time.time()
+            self.fs.touch('new.txt')
+            accessed = self.fs.getinfo('new.txt', namespaces=['details']).raw['details']['accessed']
+            self.assertTrue(accessed - now < 5)
 
     def test_close(self):
         self.assertFalse(self.fs.isclosed())

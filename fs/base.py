@@ -703,6 +703,8 @@ class FS(object):
             my_fs.setinfo('file.txt', details_info)
 
         """
+        if not self.exists(path):
+            raise errors.ResourceNotFound(path)
 
     def makedirs(self, path, permissions=None, recreate=False):
         """

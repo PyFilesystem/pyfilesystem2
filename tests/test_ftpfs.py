@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 
 from six import text_type
 
+from six.moves.urllib.request import urlopen
+
 import os
 import shutil
 import subprocess
@@ -11,7 +13,6 @@ import sys
 import tempfile
 import time
 import unittest
-import urllib
 import uuid
 
 
@@ -78,11 +79,11 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         start_time = time.time()
         while time.time() - start_time < 5:
             try:
-                ftpurl = urllib.urlopen('ftp://127.0.0.1:{}'.format(_ftp_port))
+                ftpurl = urlopen('ftp://127.0.0.1:{}'.format(_ftp_port))
             except IOError:
                 time.sleep(0)
             else:
-                ftpurl.read()
+                #ftpurl.read()
                 ftpurl.close()
                 break
         else:

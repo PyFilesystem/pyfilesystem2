@@ -8,7 +8,7 @@ from operator import itemgetter
 from .base import FS
 from .mode import check_writable
 from . import errors
-from .path import abspath, dirname, normpath
+from .path import abspath, normpath
 
 
 _PrioritizedFS = namedtuple(

@@ -114,6 +114,7 @@ class OSFS(FS):
     def _make_details_from_stat(cls, stat):
         """Make an info dict from a stat_result object."""
         details = {
+            '_write': ['accessed', 'modified'],
             'accessed': stat.st_atime,
             'modified': stat.st_mtime,
             'size': stat.st_size,

@@ -75,8 +75,8 @@ class _MemoryFile(object):
             self.accessed_time
         )
 
-    def fileno(self):
-        raise io.UnsupportedOperation('fileno')
+    # def fileno(self):
+    #     raise io.UnsupportedOperation('fileno')
 
     def flush(self):
         pass
@@ -286,6 +286,7 @@ class MemoryFS(FS):
         }
         if 'details' in namespaces:
             info['details'] = {
+                "_write": ['accessed', 'modified'],
                 "type": int(dir_entry.resource_type),
                 "size": dir_entry.size,
                 "accessed": dir_entry.accessed_time,

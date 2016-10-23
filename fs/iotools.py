@@ -168,21 +168,23 @@ def line_iterator(f, size=None):
     line = []
     append = line.append
     c = 1
+    join = b''.join
+    is_terminator = b'\n'.__contains__
     if size is None or size < 0:
         while c:
             c = read(1)
             if c:
                 append(c)
-            if c in b'\n':
-                yield b''.join(line)
+            if is_terminator(c):
+                yield join(line)
                 del line[:]
     else:
         while c:
             c = read(1)
             if c:
                 append(c)
-            if c in b'\n' or len(line) >= size:
-                yield b''.join(line)
+            if is_terminator(c) or len(line) >= size:
+                yield join(line)
                 del line[:]
 
 

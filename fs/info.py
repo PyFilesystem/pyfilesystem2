@@ -68,6 +68,20 @@ class Info(object):
         except KeyError:
             return default
 
+    def is_writeable(self, namespace, key):
+        """
+        Check if a given key in a namespace is writeable.
+
+        :param namespace: A namespace identifier.
+        :type namespace: str
+        :param key: A key within the namespace.
+        :type key: str
+        :rtype: bool
+
+        """
+        _writeable = self.get(namespace, '_write', ())
+        return key in _writeable
+
     def has_namespace(self, namespace):
         """
         Check if the resource info contains a given namespace.
