@@ -210,11 +210,7 @@ class FS(object):
         """
         with self._lock:
             with closing(self.open(src_path, 'rb')) as read_file:
-                with closing(self.open(dst_path, 'wb')) as write_file:
-                    tools.copy_file_data(
-                        read_file,
-                        write_file
-                    )
+                self.setbin(dst_path, read_file)
 
     def copydir(self, src_path, dst_path, create=False):
         """
@@ -773,8 +769,7 @@ class FS(object):
                     return
         with self._lock:
             with self.open(src_path, 'rb') as read_file:
-                with self.open(dst_path, 'wb') as write_file:
-                    tools.copy_file_data(read_file, write_file)
+                self.setbin(dst_path, read_file)
             self.remove(src_path)
 
     def open(self,
