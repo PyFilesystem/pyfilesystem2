@@ -277,9 +277,6 @@ class OSFS(FS):
         resource_type = self._get_type_from_stat(stat)
         return resource_type
 
-    def hassyspath(self, path):
-        return True
-
     def open(self,
              path,
              mode="r",

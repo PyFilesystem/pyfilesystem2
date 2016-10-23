@@ -567,7 +567,7 @@ class FS(object):
         :rtype: bool
 
         """
-        _has_sys_path = True
+        has_sys_path = True
         try:
             self.getsyspath(path)
         except errors.NoSysPath:
