@@ -10,11 +10,22 @@ from __future__ import unicode_literals
 import six
 
 
+# https://docs.python.org/3/library/functions.html#open
 @six.python_2_unicode_compatible
 class Mode(object):
 
     def __init__(self, mode):
-        self._mode = mode.lower()
+        if not mode:
+            raise ValueError('mode must not be empty')
+        if mode[0] not in 'rwxa':
+            raise ValueError(
+                "mode must start with 'r', 'w', 'x', or 'a'"
+            )
+        if 't' in mode and 'b' in mode:
+            raise ValueError(
+                "mode can't be binary ('b') and text ('t')"
+            )
+            self._mode = mode
         self.__contains__ = self._mode.__contains__
 
     def __repr__(self):
