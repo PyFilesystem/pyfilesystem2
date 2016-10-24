@@ -11,6 +11,7 @@ from __future__ import unicode_literals
 import collections
 from datetime import datetime
 import io
+import itertools
 import json
 import math
 import os
@@ -894,8 +895,6 @@ class FSTestCases(object):
 
     def test_scandir(self):
         # Check exception for scanning dir that doesn't exist
-
-
         with self.assertRaises(errors.ResourceNotFound):
             for info in self.fs.scandir('/foobar'):
                 pass
@@ -936,6 +935,16 @@ class FSTestCases(object):
 
         # Hard to test optional namespaces, but at least run the code
         list(self.fs.scandir('/', namespaces=['details', 'stat', 'access']))
+
+        # Test paging
+        page1 = list(self.fs.scandir('/', page=(None, 2)))
+        self.assertEqual(len(page1), 2)
+        page2 = list(self.fs.scandir('/', page=(2, 4)))
+        self.assertEqual(len(page2), 1)
+        page3 = list(self.fs.scandir('/', page=(4, 6)))
+        self.assertEqual(len(page3), 0)
+        paged = set(r.name for r in itertools.chain(page1, page2))
+        self.assertEqual(paged, {'foo', 'bar', 'dir'})
 
     def test_filterdir(self):
         self.assertEqual(

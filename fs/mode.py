@@ -7,6 +7,50 @@ Tools for managing mode strings (as used in :meth:`fs.base.FS.open` and
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import six
+
+
+@six.python_2_unicode_compatible
+class Mode(object):
+
+    def __init__(self, mode):
+        self._mode = mode.lower()
+        self.__contains__ = self._mode.__contains__
+
+    def __repr__(self):
+        return "Mode({!r})".format(self._mode)
+
+    def __str__(self):
+        return self._mode
+
+    @property
+    def reading(self):
+        return 'r' in self or '+' in self
+
+    @property
+    def writing(self):
+        return 'w' in self or 'a' in self or '+' in self
+
+    @property
+    def updating(self):
+        return '+' in self
+
+    @property
+    def truncate(self):
+        return 'w' in self or 'x' in self
+
+    @property
+    def exclusive(self):
+        return 'x' in self
+
+    @property
+    def binary(self):
+        return 'b' in self
+
+    @property
+    def text(self):
+        return 't' in self or 'b' not in self
+
 
 def check_readable(mode):
     """

@@ -16,6 +16,7 @@ import threading
 import time
 
 from contextlib import closing
+import itertools
 
 import six
 
@@ -166,8 +167,7 @@ class FS(object):
 
     # ---------------------------------------------------------------- #
     # Optional methods                                                 #
-    # Filesystems *may* implement these methods, as long as the        #
-    # semantics aren't changed.                                        #
+    # Filesystems *may* implement these methods.                       #
     # ---------------------------------------------------------------- #
 
     def close(self):
@@ -300,9 +300,13 @@ class FS(object):
                   exclude_files=False,
                   wildcards=None,
                   dir_wildcards=None,
-                  namespaces=None):
+                  namespaces=None,
+                  page=None):
         """
         Get an iterator of resource info, filtered by wildcards.
+
+        This method enhances the :meth:`fs.base.FS.scandir` method with
+        additional filtering functionality.
 
         :param path: A path to a directory on the filesystem.
         :type path: str
@@ -319,6 +323,11 @@ class FS(object):
         :param namespaces: A list of info namespaces to include in
             results.
         :type namespaces: list or None
+        :param page: May be a tuple of (start, end) indexes to return an
+            iterator of a subset of the resource info, or ``None`` to
+            iterator the entire directory. Paging a directory scan may
+            be necessary for very large directories.
+        :type page: tuple or None
         :return: An iterator of :class:`fs.info.Info` objects.
         :rtype: iterator
 
@@ -366,7 +375,11 @@ class FS(object):
                 if not info.is_dir or match(info.name)
             )
 
-        return iter(resources)
+        iter_info = iter(resources)
+        if page is not None:
+            start, end = page
+            iter_info = itertools.islice(iter_info, start, end)
+        return iter_info
 
     def getbytes(self, path):
         """
@@ -596,7 +609,6 @@ class FS(object):
 
     def isdir(self, path):
         """Check a path exists and is a directory."""
-
         try:
             return self.getinfo(path).is_dir
         except errors.ResourceNotFound:
@@ -682,11 +694,11 @@ class FS(object):
         :param info: Dict of resource info.
         :type info: dict
 
-        Setinfo is the compliment to :class:`fs.base.getinfo` and is
+        This method is the compliment to :class:`fs.base.getinfo` and is
         used to set info values on a resource.
 
         The ``info`` dict should be in the same format as the raw
-        info returned by ``getinfo(file).raw``. Here's an aexample:
+        info returned by ``getinfo(file).raw``. Here's an example:
 
             details_info = {
                 "details":
@@ -857,7 +869,7 @@ class FS(object):
             if _dir_path != '/':
                 self.removedir(dir_path)
 
-    def scandir(self, path, namespaces=None):
+    def scandir(self, path, namespaces=None, page=None):
         """
         Get an iterator of resource info.
 
@@ -865,17 +877,29 @@ class FS(object):
         :type path: str
         :param namespaces: A sequence of info namespaces.
         :type namespaces: list
-        :rtype: list
+        :param page: May be a tuple of (start, end) indexes to return an
+            iterator of a subset of the resource info, or ``None`` to
+            iterator the entire directory. Paging a directory scan may
+            be necessary for very large directories.
+        :type page: tuple or None
+        :rtype: iterator
 
         """
         namespaces = namespaces or ()
         _path = abspath(normpath(path))
-        for name in self.listdir(_path):
-            info = self.getinfo(
+
+        info = (
+            self.getinfo(
                 join(_path, name),
                 namespaces=namespaces
             )
-            yield info
+            for name in self.listdir(path)
+        )
+        iter_info = iter(info)
+        if page is not None:
+            start, end = page
+            iter_info = itertools.islice(iter_info, start, end)
+        return iter_info
 
     def setbytes(self, path, contents):
         """

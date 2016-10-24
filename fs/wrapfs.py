@@ -139,11 +139,13 @@ class WrapFS(FS):
         with unwrap_errors(path):
             _fs.removedir(_path)
 
-    def scandir(self, path, namespaces=None):
+    def scandir(self, path, namespaces=None, page=None):
         self._check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            for info in _fs.scandir(_path, namespaces=namespaces):
+            for info in _fs.scandir(_path,
+                                    namespaces=namespaces,
+                                    page=page):
                 yield info
 
     def setinfo(self, path, info):

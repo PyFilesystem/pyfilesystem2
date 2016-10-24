@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 from . import errors
 from .base import FS
 from .memoryfs import MemoryFS
-from .mode import check_writable
 from .path import abspath
 from .path import forcedir
 from .path import normpath
@@ -185,10 +184,10 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.isfile(_path)
 
-    def scandir(self, path, namespaces=None):
+    def scandir(self, path, namespaces=None, page=None):
         self._check()
         fs, _path = self._delegate(path)
-        return fs.scandir(_path, namespaces=namespaces)
+        return fs.scandir(_path, namespaces=namespaces, page=page)
 
     def setinfo(self, path, info):
         self._check()
@@ -220,6 +219,11 @@ class MountFS(FS):
             newline=newline,
             **options
         )
+
+    def setbin(self, path, file):
+        self._check()
+        fs, _path = self._delegate(path)
+        return fs.setbin(path, file)
 
     def setbytes(self, path, contents):
         self._check()

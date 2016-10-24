@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 import errno
 import grp
 import io
+import itertools
 import logging
 import os
 import platform
@@ -317,7 +318,7 @@ class OSFS(FS):
                     with convert_os_errors('setinfo', path):
                         os.utime(sys_path, (accessed, modified))
 
-    def scandir(self, path, namespaces=None):
+    def _scandir(self, path, namespaces=None):
         self._check()
         namespaces = namespaces or ()
         _path = abspath(normpath(path))
@@ -346,3 +347,10 @@ class OSFS(FS):
                         self._make_access_from_stat(stat_result)
 
                 yield Info(info)
+
+    def scandir(self, path, namespaces=None, page=None):
+        iter_info = self._scandir(path, namespaces=namespaces)
+        if page is not None:
+            start, end = page
+            iter_info = itertools.islice(iter_info, start, end)
+        return iter_info

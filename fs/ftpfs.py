@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 from contextlib import contextmanager
 from ftplib import FTP, error_perm, error_temp
 import io
+import itertools
 import socket
 import threading
 
@@ -472,7 +473,7 @@ class FTPFS(FS):
                         raise errors.DirectoryNotEmpty(path)
                 raise
 
-    def scandir(self, path, namespaces=None):
+    def _scandir(self, path, namespaces=None):
         self._check()
         self.validatepath(path)
         _path = abspath(normpath(path))
@@ -483,6 +484,13 @@ class FTPFS(FS):
         for entry in entries:
             raw_info = self._make_raw_info(entry)
             yield Info(raw_info)
+
+    def scandir(self, path, namespaces=None, page=None):
+        iter_info = self._scandir(path, namespaces=namespaces)
+        if page is not None:
+            start, end = page
+            iter_info = itertools.islice(iter_info, start, end)
+        return iter_info
 
     def setbin(self, path, file):
         _path = abspath(normpath(path))

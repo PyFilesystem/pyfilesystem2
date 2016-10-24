@@ -63,15 +63,16 @@ class MultiFS(FS):
         :type name: str
         :param fs: The filesystem to add
         :type fs: Filesystem
-        :param write: If this value is True, then the `fs` will be used
-            as the writeable FS.
+        :param write: If this value is True, then the ``fs`` will be
+            used as the writeable FS.
         :type write: bool
         :param priority: An integer that denotes the priority of the
             filesystem being added. Filesystems will be searched in
-            descending priority order and then by the reverse order
-            they were added. So by default, the most recently added
+            descending priority order and then by the reverse order they
+            were added. So by default, the most recently added
             filesystem will be looked at first.
         :type priority: int
+
         """
 
         self._filesystems[name] = _PrioritizedFS(
@@ -214,13 +215,13 @@ class MultiFS(FS):
         fs = self._delegate_required(path)
         return fs.removedir(path)
 
-    def scandir(self, path, namespaces=None):
+    def scandir(self, path, namespaces=None, page=None):
         self._check()
         seen = set()
         exists = False
         for fs_name, fs in self.iterate_fs():
             try:
-                for info in fs.scandir(path, namespaces=namespaces):
+                for info in fs.scandir(path, namespaces=namespaces, page=page):
                     if info.name not in seen:
                         yield info
                         seen.add(info.name)
@@ -332,6 +333,10 @@ class MultiFS(FS):
             newline=newline,
             **kwargs
         )
+
+    def setbin(self, path, file):
+        self._require_writable(path)
+        self.write_fs.setbin(path, file)
 
     def setbytes(self, path, contents):
         self._require_writable(path)
