@@ -14,9 +14,13 @@ import six
 @six.python_2_unicode_compatible
 class Mode(object):
 
-    def __init__(self, mode):
+    def __init__(self, mode, _valid_chars=frozenset('rwxab+')):
         if not mode:
             raise ValueError('mode must not be empty')
+        if not _valid_chars.issuperset(mode):
+            raise ValueError(
+                "mode '{}' contains invalid characters".format(mode)
+            )
         if mode[0] not in 'rwxa':
             raise ValueError(
                 "mode must start with 'r', 'w', 'x', or 'a'"
