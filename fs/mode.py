@@ -25,14 +25,16 @@ class Mode(object):
             raise ValueError(
                 "mode can't be binary ('b') and text ('t')"
             )
-            self._mode = mode
-        self.__contains__ = self._mode.__contains__
+        self._mode = mode
 
     def __repr__(self):
         return "Mode({!r})".format(self._mode)
 
     def __str__(self):
         return self._mode
+
+    def __contains__(self, c):
+        return c in self._mode
 
     @property
     def reading(self):
@@ -72,9 +74,7 @@ def check_readable(mode):
     :rtype: bool
 
     """
-    if 'r' not in mode and '+' not in mode:
-        return False
-    return True
+    return Mode(mode).reading
 
 
 def check_writable(mode):
@@ -86,9 +86,7 @@ def check_writable(mode):
     :rtype: bool
 
     """
-    if 'r' in mode:
-        return '+' in mode
-    return True
+    return Mode(mode).writing
 
 
 def validate_open_mode(mode, _valid_chars=frozenset('rwabt+')):
