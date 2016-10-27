@@ -14,7 +14,45 @@ import six
 @six.python_2_unicode_compatible
 class Mode(object):
 
-    def __init__(self, mode, _valid_chars=frozenset('rwxab+')):
+    """
+    :param mode: A *mode* as used by ``open``.
+    :type mode: str
+    :raises ValueError: If the mode string is invalid.
+
+    """
+
+    def __init__(self, mode):
+        self._mode = mode
+        self.validate()
+
+    def __repr__(self):
+        return "Mode({!r})".format(self._mode)
+
+    def __str__(self):
+        return self._mode
+
+    def __contains__(self, c):
+        return c in self._mode
+
+    def to_platform(self):
+        """
+        Get a mode string for the current platform.
+
+        Currently, this just removes the 'x' on PY2 because PY2 doesn't
+        support exclusive mode.
+
+        """
+        return self._mode.replace('x', '') if six.PY2 else self._mode
+
+    def validate(self, _valid_chars=frozenset('rwxtab+')):
+        """
+        Validate the mode string.
+
+        :raises ValueError: if the mode contains invalid chars.
+
+        """
+
+        mode = self._mode
         if not mode:
             raise ValueError('mode must not be empty')
         if not _valid_chars.issuperset(mode):
@@ -29,16 +67,21 @@ class Mode(object):
             raise ValueError(
                 "mode can't be binary ('b') and text ('t')"
             )
-        self._mode = mode
 
-    def __repr__(self):
-        return "Mode({!r})".format(self._mode)
+    def validate_bin(self):
+        """
+        Validate a mode for opening a binary file.
 
-    def __str__(self):
-        return self._mode
+        :raises ValueError: if the mode contains invalid chars.
 
-    def __contains__(self, c):
-        return c in self._mode
+        """
+        self.validate()
+        if 't' in self:
+            raise ValueError('mode must be binary')
+
+    @property
+    def create(self):
+        return 'w' in self or 'x' in self
 
     @property
     def reading(self):
@@ -46,7 +89,11 @@ class Mode(object):
 
     @property
     def writing(self):
-        return 'w' in self or 'a' in self or '+' in self
+        return 'w' in self or 'a' in self or '+' in self or 'x' in self
+
+    @property
+    def appending(self):
+        return 'a' in self
 
     @property
     def updating(self):
@@ -93,7 +140,7 @@ def check_writable(mode):
     return Mode(mode).writing
 
 
-def validate_open_mode(mode, _valid_chars=frozenset('rwabt+')):
+def validate_open_mode(mode):
     """
     Check ``mode`` parameter of :meth:`fs.base.FS.open` is valid.
 
@@ -102,15 +149,9 @@ def validate_open_mode(mode, _valid_chars=frozenset('rwabt+')):
     :raises: `ValueError` if mode is not valid.
 
     """
-    if not mode:
-        raise ValueError('mode must not be empty')
-    if mode[0] not in 'rwa':
-        raise ValueError("mode must start with 'r', 'w', or 'a'")
-    if not _valid_chars.issuperset(mode):
-        raise ValueError("mode '{}' contains invalid characters".format(mode))
+    Mode(mode)
 
-
-def validate_openbin_mode(mode, _valid_chars=frozenset('rwab+')):
+def validate_openbin_mode(mode, _valid_chars=frozenset('rwxab+')):
     """
     Check ``mode`` parameter of :meth:`fs.base.FS.openbin` is valid.
 
@@ -123,7 +164,7 @@ def validate_openbin_mode(mode, _valid_chars=frozenset('rwab+')):
         raise ValueError('text mode not valid in openbin')
     if not mode:
         raise ValueError('mode must not be empty')
-    if mode[0] not in 'rwa':
-        raise ValueError("mode must start with 'r', 'w', or 'a'")
+    if mode[0] not in 'rwxa':
+        raise ValueError("mode must start with 'r', 'w', 'a' or 'x'")
     if not _valid_chars.issuperset(mode):
         raise ValueError("mode '{}' contains invalid characters".format(mode))

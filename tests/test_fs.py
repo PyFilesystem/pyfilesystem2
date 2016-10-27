@@ -597,6 +597,10 @@ class FSTestCases(object):
             repr(f)
             f.write(text)
 
+        with self.assertRaises(errors.FileExists):
+            with self.fs.open('foo/hello', 'xt') as f:
+                pass
+
         # Read it back
         with self.fs.open('foo/hello', 'rt') as f:
             hello = f.read()
@@ -1092,7 +1096,7 @@ class FSTestCases(object):
             self.assertEqual(next(f), b'hello\n')
 
         # Test truncate
-        with self.fs.open('foo2', 'rb+') as f:
+        with self.fs.open('foo2', 'r+b') as f:
             f.truncate(3)
         self.assertEqual(self.fs.getsize('foo2'), 3)
         self.assert_bytes('foo2', b'hel')

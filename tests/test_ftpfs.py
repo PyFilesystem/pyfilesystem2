@@ -23,6 +23,7 @@ from pyftpdlib.servers import FTPServer
 from fs import errors
 from fs.ftpfs import FTPFS
 
+from nose.plugins.attrib import attr
 
 if __name__ == "__main__":
     # Run an ftp server that exposes a given directory
@@ -48,6 +49,7 @@ from .test_fs import FSTestCases
 ftp_port = 30000
 
 
+@attr('slow')
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     def make_fs(self):

@@ -20,7 +20,7 @@ from .path import abspath
 from .path import iteratepath
 from .path import normpath
 from .path import split
-from .mode import validate_openbin_mode
+from .mode import Mode
 
 
 @six.python_2_unicode_compatible
@@ -30,7 +30,7 @@ class _MemoryFile(object):
         self._path = path
         self._memory_fs = memory_fs
         self._bytes_io = bytes_io
-        self._mode = mode
+        self._mode = Mode(mode)
         self._lock = lock
 
         self.accessed_time = time.time()
@@ -38,14 +38,14 @@ class _MemoryFile(object):
         self.closed = False
         self.pos = 0
 
-        if 'a' in mode:
-            with self._lock:
-                self._bytes_io.seek(0, os.SEEK_END)
-                self.pos = self._bytes_io.tell()
-        elif 'w' in mode:
+        if self._mode.truncate:
             with self._lock:
                 self._bytes_io.seek(0)
                 self._bytes_io.truncate()
+        elif self._mode.appending:
+            with self._lock:
+                self._bytes_io.seek(0, os.SEEK_END)
+                self.pos = self._bytes_io.tell()
 
     def __str__(self):
         _template = "<memoryfile '{path}' '{mode}'>"
@@ -334,7 +334,8 @@ class MemoryFS(FS):
             return self.opendir(path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
-        validate_openbin_mode(mode)
+        _mode = Mode(mode)
+        _mode.validate_bin()
         self._check()
         _path = self._normpath(path)
         dir_path, file_name = split(_path)
@@ -344,25 +345,7 @@ class MemoryFS(FS):
             if parent_dir_entry is None or not parent_dir_entry.is_dir:
                 raise errors.ResourceNotFound(path)
 
-            if 'r' in mode or 'a' in mode:
-                if file_name not in parent_dir_entry:
-                    raise errors.ResourceNotFound(path)
-
-                file_dir_entry = parent_dir_entry.get_entry(file_name)
-                if file_dir_entry.is_dir:
-                    raise errors.FileExpected(path)
-
-                mem_file = _MemoryFile(
-                    path=_path,
-                    memory_fs=self,
-                    bytes_io=file_dir_entry.bytes_file,
-                    mode=mode,
-                    lock=file_dir_entry._lock
-                )
-                file_dir_entry.add_open_file(mem_file)
-                return mem_file
-
-            if 'w' in mode:
+            if _mode.create:
                 if file_name not in parent_dir_entry:
                     file_dir_entry = self._make_dir_entry(
                         ResourceType.file,
@@ -371,6 +354,8 @@ class MemoryFS(FS):
                     parent_dir_entry.set_entry(file_name, file_dir_entry)
                 else:
                     file_dir_entry = self._get_dir_entry(_path)
+                    if _mode.exclusive:
+                        raise errors.FileExists(path)
 
                 if file_dir_entry.is_dir:
                     raise errors.FileExpected(path)
@@ -384,6 +369,23 @@ class MemoryFS(FS):
                 )
                 file_dir_entry.add_open_file(mem_file)
                 return mem_file
+
+            if file_name not in parent_dir_entry:
+                raise errors.ResourceNotFound(path)
+
+            file_dir_entry = parent_dir_entry.get_entry(file_name)
+            if file_dir_entry.is_dir:
+                raise errors.FileExpected(path)
+
+            mem_file = _MemoryFile(
+                path=_path,
+                memory_fs=self,
+                bytes_io=file_dir_entry.bytes_file,
+                mode=mode,
+                lock=file_dir_entry._lock
+            )
+            file_dir_entry.add_open_file(mem_file)
+            return mem_file
 
     def remove(self, path):
         self._check()

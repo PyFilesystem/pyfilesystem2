@@ -22,6 +22,7 @@ __all__ = [
     'DirectoryExists',
     'DirectoryNotEmpty',
     'FilesystemClosed',
+    'FileExists',
     'FSError',
     'IllegalBackReference',
     'InsufficientStorage',
@@ -178,6 +179,12 @@ class ResourceInvalid(ResourceError):
     """Exception raised when a resource is the wrong type."""
 
     default_message = "resource '{path}' is invalid for this operation"
+
+
+class FileExists(ResourceError):
+    """Exception raises when opening a file in exclusive mode."""
+
+    default_message = "resource '{path}' exists"
 
 
 class FileExpected(ResourceInvalid):

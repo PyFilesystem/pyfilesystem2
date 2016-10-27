@@ -19,7 +19,7 @@ class _ConvertOSErrors(object):
         errno.EFAULT: errors.ResourceNotFound,
         errno.ESRCH: errors.ResourceNotFound,
         errno.ENOTEMPTY: errors.DirectoryNotEmpty,
-        errno.EEXIST: errors.DirectoryExists,
+        errno.EEXIST: errors.FileExists,
         183: errors.DirectoryExists,
         #errno.ENOTDIR: errors.DirectoryExpected,
         errno.ENOTDIR: errors.ResourceNotFound,
@@ -36,6 +36,7 @@ class _ConvertOSErrors(object):
 
     DIR_ERRORS = FILE_ERRORS.copy()
     DIR_ERRORS[errno.ENOTDIR] = errors.DirectoryExpected
+    DIR_ERRORS[errno.EEXIST] = errors.DirectoryExists
 
     def __init__(self, opname, path, directory=False):
         self._opname = opname

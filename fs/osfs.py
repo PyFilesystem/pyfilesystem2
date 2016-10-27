@@ -21,13 +21,14 @@ except ImportError:
     from scandir import scandir
 
 from . import errors
+from errors import FileExists
 from .base import FS
 from .enums import ResourceType
 from .info import Info
 from .path import abspath, basename, normpath
 from .permissions import Permissions
 from .error_tools import convert_os_errors
-from .mode import validate_openbin_mode, validate_open_mode
+from .mode import Mode, validate_openbin_mode, validate_open_mode
 
 
 log = logging.getLogger('fs.osfs')
@@ -208,7 +209,7 @@ class OSFS(FS):
         mode = Permissions.get_mode(permissions)
         self.validatepath(path)
         sys_path = self._to_sys_path(path)
-        with convert_os_errors('makedir', path):
+        with convert_os_errors('makedir', path, directory=True):
             try:
                 os.mkdir(sys_path, mode)
             except OSError as e:
@@ -287,14 +288,17 @@ class OSFS(FS):
              newline=None,
              line_buffering=False,
              **options):
+        _mode = Mode(mode)
         validate_open_mode(mode)
         self._check()
         self.validatepath(path)
         sys_path = self._to_sys_path(path)
         with convert_os_errors('open', path):
+            if six.PY2 and _mode.exclusive and self.exists(path):
+                raise FileExists(path)
             return io.open(
                sys_path,
-               mode=mode,
+               mode=six.text_type(_mode),
                buffering=buffering,
                encoding=encoding,
                errors=errors,

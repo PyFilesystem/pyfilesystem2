@@ -13,7 +13,7 @@ from six import text_type, PY2
 from .base import FS
 from .enums import ResourceType, Seek
 from .constants import DEFAULT_CHUNK_SIZE
-from .mode import validate_openbin_mode
+from .mode import Mode, validate_openbin_mode
 from .info import Info
 from .iotools import line_iterator
 from .path import abspath, normpath, split
@@ -426,20 +426,22 @@ class FTPFS(FS):
         return self.opendir(path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
-        validate_openbin_mode(mode)
+        _mode = Mode(mode)
+        _mode.validate_bin()
         self._check()
         self.validatepath(path)
-        mode = mode.lower()
 
         with self._lock:
             try:
                 info = self.getinfo(path)
             except errors.ResourceNotFound:
-                if 'r' in mode or 'a' in mode:
+                if _mode.reading:
                     raise errors.ResourceNotFound(path)
             else:
                 if info.is_dir:
                     raise errors.FileExpected(path)
+            if _mode.exclusive:
+                raise errors.FileExists(path)
             f = FTPFile(self, abspath(normpath(path)), mode)
         return f
 
