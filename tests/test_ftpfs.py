@@ -46,17 +46,18 @@ if __name__ == "__main__":
 
 from .test_fs import FSTestCases
 
-ftp_port = 30000
+ftp_port_offset = 0
+ftp_port = 30000 + (os.getpid() % 8)
 
 
 @attr('slow')
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     def make_fs(self):
-        global ftp_port
+        global ftp_port_offset
         temp_path = os.path.join(self._temp_dir, text_type(uuid.uuid4()))
-        _ftp_port = ftp_port
-        ftp_port += 1
+        _ftp_port = ftp_port + ftp_port_offset
+        ftp_port_offset += 1
 
         os.mkdir(temp_path)
         env = os.environ.copy()
