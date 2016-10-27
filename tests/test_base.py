@@ -64,3 +64,5 @@ class TestNotImplemented(unittest.TestCase):
             self.fs.remove('foo')
         with self.assertRaises(NotImplementedError):
             self.fs.removedir('foo')
+        with self.assertRaises(NotImplementedError):
+            self.fs.setinfo('foo', {})

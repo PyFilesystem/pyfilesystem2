@@ -1004,6 +1004,16 @@ class FSTestCases(object):
         self.fs.create('foo.py')
         self.fs.create('foo.pyc')
 
+        page1 = list(self.fs.filterdir('/', page=(None, 2)))
+        page2 = list(self.fs.filterdir('/', page=(2, 4)))
+        page3 = list(self.fs.filterdir('/', page=(4, 6)))
+
+        self.assertEqual(len(page1), 2)
+        self.assertEqual(len(page2), 2)
+        self.assertEqual(len(page3), 0)
+        names = [info.name for info in itertools.chain(page1, page2, page3)]
+        self.assertEqual(set(names), {'foo.txt', 'foo.py', 'foo.pyc', 'bar'})
+
         # Check filtering by wildcard
         dir_list = [info.name for info in self.fs.filterdir('/', wildcards=['*.py'])]
         self.assertEqual(set(dir_list), {'bar', 'foo.py'})

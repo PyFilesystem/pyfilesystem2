@@ -197,7 +197,8 @@ class WrapFS(FS):
                   exclude_files=False,
                   wildcards=None,
                   dir_wildcards=None,
-                  namespaces=None):
+                  namespaces=None,
+                  page=None):
         self._check()
         _fs, _path = self.delegate_path(path)
         iter_files = iter(_fs.filterdir(
@@ -206,7 +207,8 @@ class WrapFS(FS):
            exclude_files=exclude_files,
            wildcards=wildcards,
            dir_wildcards=dir_wildcards,
-           namespaces=namespaces
+           namespaces=namespaces,
+           page=page
         ))
         with unwrap_errors(path):
             for info in iter_files:
