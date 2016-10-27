@@ -13,7 +13,7 @@ from six import text_type, PY2
 from .base import FS
 from .enums import ResourceType, Seek
 from .constants import DEFAULT_CHUNK_SIZE
-from .mode import Mode, validate_openbin_mode
+from .mode import Mode
 from .info import Info
 from .iotools import line_iterator
 from .path import abspath, normpath, split
@@ -229,14 +229,19 @@ class FTPFS(FS):
         'virtual': False,
     }
 
-    def __init__(self, host,
-                 user='', passwd='', acct='', timeout=None, port=21):
+    def __init__(self,
+                 host,
+                 user='',
+                 passwd='',
+                 acct='',
+                 timeout=10,
+                 port=21):
         super(FTPFS, self).__init__()
         self.host = host
         self.user = user
         self.passwd = passwd
         self.acct = acct
-        self.timeout = None
+        self.timeout = timeout
         self.port = port
 
         self._ftp = None

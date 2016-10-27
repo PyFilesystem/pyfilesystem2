@@ -222,16 +222,17 @@ class OSFS(FS):
             return self.opendir(path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
-        validate_openbin_mode(mode)
+        _mode = Mode(mode)
+        _mode.validate_bin()
         self._check()
         self.validatepath(path)
-        if 'b' not in mode:
-            mode += 'b'
         sys_path = self._to_sys_path(path)
         with convert_os_errors('openbin', path):
+            if six.PY2 and _mode.exclusive and self.exists(path):
+                raise errors.FileExists(path)
             binary_file = io.open(
                 sys_path,
-                mode=mode,
+                mode=_mode.to_platform_bin(),
                 buffering=buffering,
                 **options
             )
@@ -298,7 +299,7 @@ class OSFS(FS):
                 raise FileExists(path)
             return io.open(
                sys_path,
-               mode=six.text_type(_mode),
+               mode=_mode.to_platform(),
                buffering=buffering,
                encoding=encoding,
                errors=errors,

@@ -1,3 +1,3 @@
 #!/bin/sh
-nosetests --with-coverage --cover-package=fs tests
+nosetests -vv --with-coverage --cover-package=fs tests
 rm .coverage

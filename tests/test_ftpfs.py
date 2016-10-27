@@ -117,6 +117,6 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         super(TestFTPFS, self).tearDown()
 
     def test_connection_error(self):
-        fs = FTPFS('ftp.not.a.chance')
+        fs = FTPFS('ftp.not.a.chance', timeout=1)
         with self.assertRaises(errors.RemoteConnectionError):
             fs.listdir('/')

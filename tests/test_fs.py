@@ -626,6 +626,49 @@ class FSTestCases(object):
             else:
                 self.assertEqual(os.read(fn, 7), b'Goodbye')
 
+    def test_openbin_rw(self):
+        # Open a file that doesn't exist
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.openbin('doesnotexist', 'r')
+
+        self.fs.makedir('foo')
+
+        # Create a new text file
+        text = b'Hello, World'
+
+        with self.fs.openbin('foo/hello', 'w') as f:
+            repr(f)
+            f.write(text)
+
+        with self.assertRaises(errors.FileExists):
+            with self.fs.openbin('foo/hello', 'x') as f:
+                pass
+
+        # Read it back
+        with self.fs.openbin('foo/hello', 'r') as f:
+            hello = f.read()
+        self.assertEqual(hello, text)
+        self.assert_bytes('foo/hello', text)
+
+        # Test overwrite
+        text = b'Goodbye, World'
+        with self.fs.openbin('foo/hello', 'w') as f:
+            f.write(text)
+        self.assert_bytes('foo/hello', text)
+
+        # Open from missing dir
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.openbin('/foo/bar/test.txt')
+
+        # Test fileno returns a file number, if supported by the file.
+        with self.fs.openbin('foo/hello') as f:
+            try:
+                fn = f.fileno()
+            except AttributeError:
+                pass
+            else:
+                self.assertEqual(os.read(fn, 7), b'Goodbye')
+
     def test_open_files(self):
         """Test file-like objects work as expected."""
 

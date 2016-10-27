@@ -15,6 +15,9 @@ import six
 class Mode(object):
 
     """
+    Mode objects provide
+
+
     :param mode: A *mode* as used by ``open``.
     :type mode: str
     :raises ValueError: If the mode string is invalid.
@@ -42,7 +45,20 @@ class Mode(object):
         support exclusive mode.
 
         """
-        return self._mode.replace('x', '') if six.PY2 else self._mode
+        return self._mode.replace('x', 'w') if six.PY2 else self._mode
+
+    def to_platform_bin(self):
+        """
+        Get a *binary* mode string for the current platform.
+
+        Currently, this just removes the 'x' on PY2 because PY2 doesn't
+        support exclusive mode.
+
+        """
+        _mode = self.to_platform().replace('t', '')
+        if 'b' not in _mode:
+            _mode += 'b'
+        return _mode
 
     def validate(self, _valid_chars=frozenset('rwxtab+')):
         """
@@ -150,6 +166,7 @@ def validate_open_mode(mode):
 
     """
     Mode(mode)
+
 
 def validate_openbin_mode(mode, _valid_chars=frozenset('rwxab+')):
     """
