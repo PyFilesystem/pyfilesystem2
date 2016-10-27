@@ -40,7 +40,7 @@ setup(
     packages=find_packages(),
     platforms=['any'],
     test_suite="nose.collector",
-    tests_require=['mock', 'pytz'],
+    tests_require=['mock', 'pytz', 'pyftpdlib'],
     url="http://pypi.python.org/pypi/fs/",
     version=__version__,
 )
