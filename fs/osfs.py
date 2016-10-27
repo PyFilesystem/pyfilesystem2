@@ -1,4 +1,4 @@
-
+from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -21,14 +21,14 @@ except ImportError:
     from scandir import scandir
 
 from . import errors
-from errors import FileExists
+from .errors import FileExists
 from .base import FS
 from .enums import ResourceType
 from .info import Info
 from .path import abspath, basename, normpath
 from .permissions import Permissions
 from .error_tools import convert_os_errors
-from .mode import Mode, validate_openbin_mode, validate_open_mode
+from .mode import Mode, validate_open_mode
 
 
 log = logging.getLogger('fs.osfs')

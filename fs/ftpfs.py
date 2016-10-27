@@ -167,8 +167,8 @@ class FTPFile(object):
                 data_bytes = data_file.getvalue()
                 return data_bytes
             finally:
-                sock.close()
                 ftp.voidresp()
+                sock.close()
 
     def seek(self, pos, whence=Seek.set):
         if whence == Seek.set:
