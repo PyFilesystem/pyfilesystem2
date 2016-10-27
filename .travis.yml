@@ -9,7 +9,7 @@ before_install:
   - pip install -r testrequirements.txt
 
 install:
-  - pip install -e fs
+  - pip install -e .
 
 # command to run tests
 script: nosetests
