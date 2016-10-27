@@ -522,6 +522,33 @@ class FTPFS(FS):
                     bin_file
                 )
 
+    def setinfo(self, path, info):
+        """
+        Set info on a resource.
+
+        :param path: Path to a resource on the filesystem.
+        :type path: str
+        :param info: Dict of resource info.
+        :type info: dict
+
+        This method is the compliment to :class:`fs.base.getinfo` and is
+        used to set info values on a resource.
+
+        The ``info`` dict should be in the same format as the raw
+        info returned by ``getinfo(file).raw``. Here's an example:
+
+            details_info = {
+                "details":
+                {
+                    "modified_time": time.time()
+                }
+            }
+            my_fs.setinfo('file.txt', details_info)
+
+        """
+        if not self.exists(path):
+            raise errors.ResourceNotFound(path)
+
     def getbytes(self, path):
         _path = abspath(normpath(path))
         data = io.BytesIO()
