@@ -12,4 +12,5 @@ install:
   - pip install -e .
 
 # command to run tests
-script: nosetests
+script:
+  - nosetests --with-coverage --cover-package=fs tests
