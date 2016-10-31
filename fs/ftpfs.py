@@ -1,6 +1,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 import calendar
 import io
 import itertools
@@ -27,6 +28,7 @@ from .path import abspath
 from .path import basename
 from .path import normpath
 from .path import split
+import _ftp_parse as ftp_parse
 
 
 @contextmanager
@@ -228,7 +230,7 @@ class FTPFS(FS):
 
     def __init__(self,
                  host,
-                 user='',
+                 user='anonymous',
                  passwd='',
                  acct='',
                  timeout=10,
@@ -249,11 +251,16 @@ class FTPFS(FS):
         return "FTPFS({!r}, port={!r})".format(self.host, self.port)
 
     def __str__(self):
-        return "<ftpfs '{}:{}'>".format(self.host, self.port)
+        _fmt = (
+            "<ftpfs '{host}'>"
+            if self.port == 21
+            else "<ftpfs '{host}:{port}'>"
+        )
+        return _fmt.format(host=self.host, port=self.port)
 
     def _open_ftp(self):
         _ftp = FTP()
-        _ftp.set_debuglevel(2)
+        #_ftp.set_debuglevel(2)
         with ftp_errors(self):
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
@@ -284,6 +291,19 @@ class FTPFS(FS):
                             k, _, v = line[1:].partition(' ')
                             self._features[k] = v
         return self._features
+
+    def _read_dir(self, path):
+        _path = abspath(normpath(path))
+        lines = []
+        with ftp_errors(self, path=path):
+            self.ftp.retrlines(
+                _encode('LIST {}'.format(_path)),
+                lines.append
+            )
+        lines = [line.decode('utf-8') for line in lines]
+        _list = [Info(raw_info) for raw_info in ftp_parse.parse(lines)]
+        dir_listing = OrderedDict({info.name: info for info in _list})
+        return dir_listing
 
     @property
     def supports_mlst(self):
@@ -372,9 +392,8 @@ class FTPFS(FS):
 
     def getinfo(self, path, namespaces=None):
         self._check()
-        self.validatepath(path)
+        _path = self.validatepath(path)
         namespaces = namespaces or ()
-        _path = abspath(normpath(path))
 
         if _path == '/':
             return Info({
@@ -407,34 +426,16 @@ class FTPFS(FS):
             return Info(raw_info)
         else:
             with ftp_errors(self, path=path):
-                self.ftp.voidcmd(_encode('TYPE I'))
-                size = int(self.ftp.size(_path))
-                is_dir = self.isdir(_path)
-                try:
-                    self.ftp.cwd(_path)
-                except error_perm:
-                    is_dir = False
-                else:
-                    is_dir = True
-                return Info({
-                    "basic": {
-                        "name": basename(_path.rstrip('/')),
-                        "is_dir": is_dir
-                    },
-                    "details": {
-                        "size": size,
-                        "type": (
-                            int(ResourceType.directory)
-                            if is_dir else
-                            int(ResourceType.file)
-                        )
-                    },
-                })
+                dir_name, file_name = split(_path)
+                directory = self._read_dir(dir_name)
+                if file_name not in directory:
+                    raise errors.ResourceNotFound(path)
+                info = directory[file_name]
+                return info
 
     # def isdir(self, path):
     #     self._check()
-    #     self.validatepath(path)
-    #     _path = abspath(normpath(path))
+    #     _path = self.validatepath(path)
     #     try:
     #         self.ftp.cwd(_path)
     #     except error_perm:
@@ -444,8 +445,7 @@ class FTPFS(FS):
 
     # def isfile(self, path):
     #     self._check()
-    #     self.validatepath(path)
-    #     _path = abspath(normpath(path))
+    #     _path = self.validatepath(path)
     #     try:
     #         self.ftp.cwd(_path)
     #     except error_perm:
@@ -455,16 +455,12 @@ class FTPFS(FS):
 
     def listdir(self, path):
         self._check()
-        self.validatepath(path)
-        _path = abspath(normpath(path))
+        _path = self.validatepath(path)
         with self._lock:
-            if self.supports_mlst:
-                dir_list = [
-                    info.name
-                    for info in self.scandir(path)
-                ]
-            else:
-                dir_list = self.ftp.nlist(_path)
+            dir_list = [
+                info.name
+                for info in self.scandir(_path)
+            ]
         return dir_list
 
     def makedir(self, path, permissions=None, recreate=False):
@@ -549,8 +545,8 @@ class FTPFS(FS):
         self.validatepath(path)
         _path = abspath(normpath(path))
         with self._lock:
-            lines = []
             if self.supports_mlst:
+                lines = []
                 with ftp_errors(self, path=path):
                     try:
                         self.ftp.retrlines(
@@ -563,8 +559,14 @@ class FTPFS(FS):
                         raise # pragma: no cover
                 for raw_info in self._parse_mlsx(lines):
                     yield Info(raw_info)
+            else:
+                with self._lock:
+                    for info in self._read_dir(_path).values():
+                        yield info
 
     def scandir(self, path, namespaces=None, page=None):
+        if not self.supports_mlst and not self.getinfo(path).is_dir:
+            raise errors.DirectoryExpected(path)
         iter_info = self._scandir(path, namespaces=namespaces)
         if page is not None:
             start, end = page
@@ -597,29 +599,6 @@ class FTPFS(FS):
                 )
 
     def setinfo(self, path, info):
-        """
-        Set info on a resource.
-
-        :param path: Path to a resource on the filesystem.
-        :type path: str
-        :param info: Dict of resource info.
-        :type info: dict
-
-        This method is the compliment to :class:`fs.base.getinfo` and is
-        used to set info values on a resource.
-
-        The ``info`` dict should be in the same format as the raw
-        info returned by ``getinfo(file).raw``. Here's an example:
-
-            details_info = {
-                "details":
-                {
-                    "modified_time": time.time()
-                }
-            }
-            my_fs.setinfo('file.txt', details_info)
-
-        """
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
 
@@ -649,32 +628,25 @@ class FTPFS(FS):
         super(FTPFS, self).close()
 
 
-if __name__ == "__main__":  # pragma: no cover
-    ftp_fs = FTPFS('127.0.0.1', port=2121)
-    print(ftp_fs.features)
-    ftp_fs.openbin('new.txt', 'w').write(b'test')
-    #print(list(ftp_fs.scandir('foobar')))
-    ftp_fs.makedirs('/foo/baz', recreate=True)
-    print(ftp_fs.isfile('test.txt'))
-    print(ftp_fs.isdir('test.txt'))
-    print(ftp_fs.isdir('foo'))
-    print(ftp_fs.isfile('foo'))
-    print(ftp_fs.isdir('nope'))
-    print(ftp_fs.isfile('nope'))
-    print(ftp_fs.getinfo('test.txt').raw)
-    print(ftp_fs.getinfo('foo').raw)
+# if __name__ == "__main__":  # pragma: no cover
+#     ftp_fs = FTPFS('127.0.0.1', port=2121)
+#     print(ftp_fs.features)
+#     ftp_fs.openbin('new.txt', 'w').write(b'test')
+#     #print(list(ftp_fs.scandir('foobar')))
+#     ftp_fs.makedirs('/foo/baz', recreate=True)
+#     print(ftp_fs.isfile('test.txt'))
+#     print(ftp_fs.isdir('test.txt'))
+#     print(ftp_fs.isdir('foo'))
+#     print(ftp_fs.isfile('foo'))
+#     print(ftp_fs.isdir('nope'))
+#     print(ftp_fs.isfile('nope'))
+#     print(ftp_fs.getinfo('test.txt').raw)
+#     print(ftp_fs.getinfo('foo').raw)
 
-    # for info in ftp_fs.scandir('test.txt'):
-    #     print(info)
+#     print(list(ftp_fs.scandir('/foo')))
+#     print(ftp_fs.listdir('/foo'))
 
-    print(list(ftp_fs.scandir('/foo')))
-    print(ftp_fs.listdir('/foo'))
 
-    # print(ftp_fs.listdir('/'))
-    # ftp_fs.makedirs('foo/bar/', recreate=True)
-    # ftp_fs.setbytes('foo/bar/test.txt', b'hello')
-
-    # f = ftp_fs.openbin('foo/bar/test.txt')
-    # print(f.read(3))
-    # print(f.read(3))
-    # print(ftp_fs.listdir('foo/bar/test.txt'))
+if __name__ == "__main__":
+    fs = FTPFS('ftp.mirror.nl', 'anonymous', 'willmcgugan@gmail.com')
+    print(list(fs.scandir('/')))

@@ -281,6 +281,7 @@ class ZipOpener(Opener):
         )
         return zip_fs
 
+
 @registry.install
 class FTPOpener(Opener):
     protocols = ['ftp']
@@ -296,6 +297,9 @@ class FTPOpener(Opener):
             user=parse_result.username,
             passwd=parse_result.password,
         )
-        if dir_path:
-            ftp_fs = ftp_fs.opendir(dir_path)
+        ftp_fs = (
+            ftp_fs.opendir(dir_path)
+            if dir_path else
+            ftp_fs
+        )
         return ftp_fs

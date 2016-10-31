@@ -273,8 +273,7 @@ class FSTestCases(object):
     def assert_bytes(self, path, contents):
         """Assert a file contains the given bytes."""
         assert isinstance(contents, bytes)
-        with self.fs.open(path, 'rb') as f:
-            data = f.read()
+        data = self.fs.getbytes(path)
         self.assertEqual(data, contents)
         self.assertIsInstance(data, bytes)
 
@@ -1443,4 +1442,3 @@ class FSTestCases(object):
         written = write_tree.getvalue()
         expected = u'|-- foo\n|   `-- bar\n`-- test.txt\n'
         self.assertEqual(expected, written)
-

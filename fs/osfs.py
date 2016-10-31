@@ -108,8 +108,8 @@ class OSFS(FS):
 
     def _to_sys_path(self, path):
         """Convert a FS path to a path on the OS."""
-        _path = self.validatepath(path).lstrip('/').replace('/', os.sep)
-        sys_path = os.path.join(self.root_path, _path)
+        path = normpath(path).lstrip('/').replace('/', os.sep)
+        sys_path = os.path.join(self.root_path, path)
         return sys_path
 
     @classmethod
@@ -173,6 +173,7 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def getinfo(self, path, namespaces=None):
+        self._check()
         namespaces = namespaces or ()
         sys_path = self.getsyspath(path)
         with convert_os_errors('getinfo', path):

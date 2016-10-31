@@ -136,13 +136,13 @@ class Permissions(object):
     def __ne__(self, other):
         return not (self.__eq__(other))
 
-    def copy(self):
-        """Make a copy of this permissions object."""
-        return Permissions(names=list(self._perms))
-
-    def dump(self):
-        """Get a list suitable for serialization."""
-        return sorted(self._perms)
+    @classmethod
+    def parse(cls, ls):
+        """Parse permissions in linux notation."""
+        user = ls[:3]
+        group = ls[3:6]
+        other = ls[6:9]
+        return cls(user=user, group=group, other=other)
 
     @classmethod
     def load(cls, permissions):
@@ -184,6 +184,14 @@ class Permissions(object):
 
         """
         return cls.create(init).mode
+
+    def copy(self):
+        """Make a copy of this permissions object."""
+        return Permissions(names=list(self._perms))
+
+    def dump(self):
+        """Get a list suitable for serialization."""
+        return sorted(self._perms)
 
     def as_str(self):
         """Get a linux-style string representation of permissions."""

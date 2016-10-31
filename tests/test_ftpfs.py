@@ -22,7 +22,8 @@ from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
 
 from fs import errors
-from fs.ftpfs import FTPFS
+from fs.subfs import SubFS
+from fs.opener import open_fs
 
 from nose.plugins.attrib import attr
 
@@ -54,11 +55,13 @@ ftp_port = 30000 + (os.getpid() % 8)
 class TestFTPFSClass(unittest.TestCase):
 
     def test_parse_ftp_time(self):
+        from fs.ftpfs import FTPFS
         self.assertIsNone(FTPFS._parse_ftp_time('notreallyatime'))
         t = FTPFS._parse_ftp_time('19740705000000')
         self.assertEqual(t, 142214400)
 
     def test_parse_mlsx(self):
+        from fs.ftpfs import FTPFS
         info = list(
             FTPFS._parse_mlsx(['create=19740705000000;modify=19740705000000; /foo'])
         )[0]
@@ -68,11 +71,18 @@ class TestFTPFSClass(unittest.TestCase):
         info = list(FTPFS._parse_mlsx(['foo=bar; ..']))
         self.assertEqual(info, [])
 
+    def test_opener(self):
+        from fs.ftpfs import FTPFS
+        ftp_fs = open_fs('ftp://will:wfc@ftp.example.org')
+        self.assertIsInstance(ftp_fs, FTPFS)
+        self.assertEqual(ftp_fs.host, 'ftp.example.org')
+
 
 @attr('slow')
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     def make_fs(self):
+        from fs.ftpfs import FTPFS
         global ftp_port_offset
         temp_path = os.path.join(self._temp_dir, text_type(uuid.uuid4()))
         _ftp_port = ftp_port + ftp_port_offset
@@ -137,6 +147,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         super(TestFTPFS, self).tearDown()
 
     def test_connection_error(self):
+        from fs.ftpfs import FTPFS
         fs = FTPFS('ftp.not.a.chance', timeout=1)
         with self.assertRaises(errors.RemoteConnectionError):
             fs.listdir('/')
@@ -152,3 +163,15 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
             raise ftplib.error_perm('nope')
         self.fs.ftp.sendcmd = broken_sendcmd
         self.assertEqual(self.fs.features, {})
+
+
+class TestFTPFSNoMLSD(TestFTPFS):
+
+    def make_fs(self):
+        ftp_fs = super(TestFTPFSNoMLSD, self).make_fs()
+        ftp_fs.features
+        del ftp_fs.features['MLST']
+        return ftp_fs
+
+    def test_features(self):
+        pass
