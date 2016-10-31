@@ -561,6 +561,9 @@ class FSTestCases(object):
         with self.assertRaises(errors.DirectoryExists):
             self.fs.makedir('foo/bar/baz')
 
+        with self.assertRaises(errors.DirectoryExists):
+            self.fs.makedir('foo/bar.txt')
+
     def test_makedirs(self):
         self.assertFalse(self.fs.exists('foo'))
         self.fs.makedirs('foo')
@@ -686,6 +689,12 @@ class FSTestCases(object):
             self.assertEqual(
                 f.readlines(),
                 ['Hello\n', 'World\n', 'foo\n', 'bar\n', 'baz\n']
+            )
+
+        with self.fs.open('text', 'r') as f:
+            self.assertEqual(
+                f.readlines(8),
+                ['Hello\n', 'World\n']
             )
 
         with self.fs.open('text', 'r') as f:
@@ -1433,5 +1442,5 @@ class FSTestCases(object):
         self.fs.tree(file=write_tree)
         written = write_tree.getvalue()
         expected = u'|-- foo\n|   `-- bar\n`-- test.txt\n'
-        self.assertEqual(written, expected)
+        self.assertEqual(expected, written)
 

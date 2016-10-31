@@ -93,7 +93,11 @@ class NoSysPath(PathError):
 class NoURL(PathError):
     """Raised when there is no URL for a given path."""
 
-    default_message = "path '{path}' has no URL"
+    default_message = "path '{path}' has no '{purpose}' URL"
+
+    def __init__(self, path, purpose, msg=None):
+        self.purpose = purpose
+        super(NoURL, self).__init__(path, msg=msg)
 
 
 class InvalidPath(PathError):

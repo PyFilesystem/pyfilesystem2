@@ -6,6 +6,7 @@ from six import text_type
 
 from six.moves.urllib.request import urlopen
 
+import ftplib
 import os
 import shutil
 import subprocess
@@ -48,6 +49,24 @@ from .test_fs import FSTestCases
 
 ftp_port_offset = 0
 ftp_port = 30000 + (os.getpid() % 8)
+
+
+class TestFTPFSClass(unittest.TestCase):
+
+    def test_parse_ftp_time(self):
+        self.assertIsNone(FTPFS._parse_ftp_time('notreallyatime'))
+        t = FTPFS._parse_ftp_time('19740705000000')
+        self.assertEqual(t, 142214400)
+
+    def test_parse_mlsx(self):
+        info = list(
+            FTPFS._parse_mlsx(['create=19740705000000;modify=19740705000000; /foo'])
+        )[0]
+        self.assertEqual(info['details']['modified'], 142214400)
+        self.assertEqual(info['details']['created'], 142214400)
+
+        info = list(FTPFS._parse_mlsx(['foo=bar; ..']))
+        self.assertEqual(info, [])
 
 
 @attr('slow')
@@ -121,3 +140,15 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         fs = FTPFS('ftp.not.a.chance', timeout=1)
         with self.assertRaises(errors.RemoteConnectionError):
             fs.listdir('/')
+
+        with self.assertRaises(errors.RemoteConnectionError):
+            fs.makedir('foo')
+
+        with self.assertRaises(errors.RemoteConnectionError):
+            fs.open('foo.txt')
+
+    def test_features(self):
+        def broken_sendcmd(cmd):
+            raise ftplib.error_perm('nope')
+        self.fs.ftp.sendcmd = broken_sendcmd
+        self.assertEqual(self.fs.features, {})

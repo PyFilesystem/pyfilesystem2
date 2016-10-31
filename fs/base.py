@@ -584,18 +584,24 @@ class FS(object):
         resource_type = self.getdetails(path).type
         return resource_type
 
-    def geturl(self, path):
+    def geturl(self, path, purpose='download'):
         """
         Get a URL to the given resource.
 
         :param path: A path on the filesystem
         :type path: str
+        :param purpose: A short string that indicates which URL to
+            retrieve for the given path (if there is more than one). The
+            default is `'download'`, which should return a URL that
+            serves the file. See the filesystem documentation for
+            information on what other URLs may be generated.
+        :type purpose: str
         :returns: A URL.
         :rtype: str
         :raises `fs.errors.NoURL`: If the path does not map to a URL.
 
         """
-        raise errors.NoURL(path)
+        raise errors.NoURL(path, purpose)
 
     def hassyspath(self, path):
         """
@@ -613,18 +619,21 @@ class FS(object):
             has_sys_path = False
         return has_sys_path
 
-    def hasurl(self, path):
+    def hasurl(self, path, purpose='download'):
         """
         Check if a path has a corresponding URL.
 
         :param path: A path on the filesystem
         :type path: str
+        :param purpose: A purpose parameter, as given in
+            `meth`:fs.base.FS.geturl`.
+        :type purpose: str
         :rtype: bool
 
         """
         has_url = True
         try:
-            self.geturl(path)
+            self.geturl(path, purpose=purpose)
         except errors.NoURL:
             has_url = False
         return has_url
@@ -1072,7 +1081,8 @@ class FS(object):
 
     def validatepath(self, path):
         """
-        Check if a path is valid on this filesystem.
+        Check if a path is valid on this filesystem, and return a
+        normalized absolute path.
 
         Many filesystems have restrictions on the format of paths they
         support. This method will check that `path` is valid on the
@@ -1081,12 +1091,18 @@ class FS(object):
 
         :param path: A path
         :type path: str
+        :returns: A normalized, absolute path.
+        :rtype str:
         :raises `fs.errors.InvalidPath`: If the path is invalid.
+        :raises: :class:`fs.errors.FilesystemClosed` if the filesystem
+            is closed.
 
         """
+        self._check()
 
         if isinstance(path, bytes):
             raise ValueError('path must not be bytes')
+
         meta = self.getmeta()
 
         invalid_chars = meta.get('invalid_path_chars')
@@ -1095,7 +1111,7 @@ class FS(object):
                 raise errors.InvalidCharsInPath(path)
 
         max_sys_path_length = meta.get('max_sys_path_length')
-        if max_sys_path_length:
+        if max_sys_path_length is not None:
             try:
                 sys_path = self.getsyspath(path)
             except errors.NoSysPath:  # pragma: no cover
@@ -1106,6 +1122,8 @@ class FS(object):
                         '(max {max_chars} characters in sys path)'
                     msg = _msg.format(max_chars=max_sys_path_length)
                     raise errors.InvalidPath(path, msg=msg)
+        path = abspath(normpath(path))
+        return path
 
     # ---------------------------------------------------------------- #
     # Helper methods                                                   #

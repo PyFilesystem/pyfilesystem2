@@ -164,10 +164,10 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.gettype(_path)
 
-    def geturl(self, path):
+    def geturl(self, path, purpose='download'):
         self._check()
         fs, _path = self._delegate(path)
-        return fs.geturl(path)
+        return fs.geturl(path, purpose=purpose)
 
     def hasurl(self, path):
         self._check()

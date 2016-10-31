@@ -264,10 +264,10 @@ class MultiFS(FS):
         fs = self._delegate_required(path)
         return fs.gettype(path)
 
-    def geturl(self, path):
+    def geturl(self, path, purpose='download'):
         self._check()
         fs = self._delegate_required(path)
-        return fs.geturl(path)
+        return fs.geturl(path, purpose=purpose)
 
     def hassyspath(self, path):
         self._check()

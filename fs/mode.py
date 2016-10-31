@@ -56,9 +56,7 @@ class Mode(object):
 
         """
         _mode = self.to_platform().replace('t', '')
-        if 'b' not in _mode:
-            _mode += 'b'
-        return _mode
+        return _mode if 'b' in _mode else _mode + 'b'
 
     def validate(self, _valid_chars=frozenset('rwxtab+')):
         """

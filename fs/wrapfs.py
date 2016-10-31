@@ -257,11 +257,11 @@ class WrapFS(FS):
             _type = _fs.gettype(_path)
         return _type
 
-    def geturl(self, path):
+    def geturl(self, path, purpose='download'):
         self._check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            return _fs.geturl(_path)
+            return _fs.geturl(_path, purpose='download')
 
     def hassyspath(self, path):
         self._check()

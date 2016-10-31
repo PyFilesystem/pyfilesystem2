@@ -16,7 +16,6 @@ from . import errors
 from .base import FS
 from .enums import ResourceType
 from .info import Info
-from .path import abspath
 from .path import iteratepath
 from .path import normpath
 from .path import split
@@ -240,11 +239,6 @@ class MemoryFS(FS):
     def _make_dir_entry(self, *args, **kwargs):
         return _DirEntry(*args, **kwargs)
 
-    def _normpath(self, path):
-        path = abspath(normpath(path))
-        self.validatepath(path)
-        return path
-
     def _get_dir_entry(self, dir_path):
         """Get a directory entry, or None if one doesn't exist."""
         with self._lock:
@@ -272,9 +266,9 @@ class MemoryFS(FS):
         dir_entry.accessed_time = dir_entry.modified_time = time
 
     def getinfo(self, path, namespaces=None):
-        self._check()
         namespaces = namespaces or ()
-        dir_entry = self._get_dir_entry(path)
+        _path = self.validatepath(path)
+        dir_entry = self._get_dir_entry(_path)
         if dir_entry is None:
             raise errors.ResourceNotFound(path)
         info = {
@@ -296,7 +290,7 @@ class MemoryFS(FS):
 
     def listdir(self, path):
         self._check()
-        _path = self._normpath(path)
+        _path = self.validatepath(path)
         with self._lock:
             dir_entry = self._get_dir_entry(_path)
             if dir_entry is None:
@@ -306,8 +300,7 @@ class MemoryFS(FS):
             return dir_entry.list()
 
     def makedir(self, path, permissions=None, recreate=False):
-        self._check()
-        _path = abspath(self._normpath(path))
+        _path = self.validatepath(path)
         with self._lock:
             if _path == '/':
                 if recreate:
@@ -336,8 +329,7 @@ class MemoryFS(FS):
     def openbin(self, path, mode="r", buffering=-1, **options):
         _mode = Mode(mode)
         _mode.validate_bin()
-        self._check()
-        _path = self._normpath(path)
+        _path = self.validatepath(path)
         dir_path, file_name = split(_path)
 
         with self._lock:
@@ -388,8 +380,7 @@ class MemoryFS(FS):
             return mem_file
 
     def remove(self, path):
-        self._check()
-        _path = self._normpath(path)
+        _path = self.validatepath(path)
 
         with self._lock:
             dir_path, file_name = split(_path)
@@ -405,8 +396,7 @@ class MemoryFS(FS):
             parent_dir_entry.remove_entry(file_name)
 
     def removedir(self, path, force=False):
-        self._check()
-        _path = self._normpath(path)
+        _path = self.validatepath(path)
 
         if _path == '/':
             raise errors.RemoveRootError()
@@ -428,8 +418,7 @@ class MemoryFS(FS):
             parent_dir_entry.remove_entry(file_name)
 
     def setinfo(self, path, info):
-        self._check()
-        _path = self._normpath(path)
+        _path = self.validatepath(path)
         with self._lock:
             dir_path, file_name = split(_path)
             parent_dir_entry = self._get_dir_entry(dir_path)
