@@ -28,7 +28,7 @@ from .path import abspath
 from .path import basename
 from .path import normpath
 from .path import split
-import _ftp_parse as ftp_parse
+from . import _ftp_parse as ftp_parse
 
 
 @contextmanager
@@ -300,7 +300,10 @@ class FTPFS(FS):
                 _encode('LIST {}'.format(_path)),
                 lines.append
             )
-        lines = [line.decode('utf-8') for line in lines]
+        lines = [
+            line.decode('utf-8') if isinstance(line, bytes) else line
+            for line in lines
+        ]
         _list = [Info(raw_info) for raw_info in ftp_parse.parse(lines)]
         dir_listing = OrderedDict({info.name: info for info in _list})
         return dir_listing
