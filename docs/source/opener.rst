@@ -1,5 +1,5 @@
-Openers
-=======
+fs.opener
+=========
 
 Open filesystems from a URL.
 

@@ -1,5 +1,5 @@
-Filesystem Base
-===============
+fs.base.FS
+==========
 
 The filesystem base class is common to all filesystems. If you
 familiarize yourself with this (rather straightforward) API, you can

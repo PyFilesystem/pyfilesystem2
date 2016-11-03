@@ -41,6 +41,7 @@ class FS(object):
     _meta = {}
 
     def __init__(self):
+        self._closed = False
         self._lock = threading.RLock()
         super(FS, self).__init__()
 
@@ -62,8 +63,7 @@ class FS(object):
         Get information regarding a resource (file or directory) on a
         filesystem.
 
-        :param path: A path to a resource on the filesystem.
-        :type path: str
+        :param str path: A path to a resource on the filesystem.
         :param namespaces: Info namespaces to query (defaults to
             'basic').
         :type namespaces: list or None
@@ -80,8 +80,7 @@ class FS(object):
         """
         Get an iterator of the resource names in a directory.
 
-        :param path: A path to a directory on the filesystem.
-        :type path: str
+        :param str path: A path to a directory on the filesystem.
         :return: list of names, relative to ``path``.
         :rtype: list
 
@@ -100,8 +99,7 @@ class FS(object):
         """
         Make a directory.
 
-        :param path: Path to directory from root.
-        :type path: str
+        :param str path: Path to directory from root.
         :param permissions: :class:`fs.permissions.Permissions`
             instance.
         :type permissions: Permissions
@@ -118,15 +116,13 @@ class FS(object):
         """
         Open a binary file-like object.
 
-        :param path: A path on the filesystem.
-        :type path: str
-        :param mode: Mode to open file.
-        :type mode: str
+        :param str path: A path on the filesystem.
+        :param str mode: Mode to open file.
         :param buffering: Buffering policy (-1  to use default
             buffering, 0 to disable buffering, or positive integer to
             indicate buffer size).
         :type buffering: int
-        :param *options: Keyword parameters for any additional
+        :param options: Keyword parameters for any additional
             information required by the filesystem (if any).
         :rtype: file object
 
@@ -137,8 +133,7 @@ class FS(object):
         """
         Remove a file.
 
-        :param path: Path to the file you want to remove.
-        :type path: str
+        :param str path: Path to the file you want to remove.
 
         :raises `fs.errors.FileExpected`: if the path is a directory.
         :raises `fs.errors.ResourceNotFound`: if the path does not
@@ -151,8 +146,7 @@ class FS(object):
         """
         Remove a directory from the filesystem.
 
-        :param path: Path of the directory to remove
-        :type path: str
+        :param str path: Path of the directory to remove
 
         :raises `fs.errors.DirectoryNotEmpty`: if the directory is not
             empty and force is False
@@ -169,16 +163,14 @@ class FS(object):
         """
         Set info on a resource.
 
-        :param path: Path to a resource on the filesystem.
-        :type path: str
+        :param str path: Path to a resource on the filesystem.
         :param info: Dict of resource info.
-        :type info: dict
 
         This method is the compliment to :class:`fs.base.getinfo` and is
         used to set info values on a resource.
 
         The ``info`` dict should be in the same format as the raw
-        info returned by ``getinfo(file).raw``. Here's an example:
+        info returned by ``getinfo(file).raw``. Here's an example::
 
             details_info = {
                 "details":
@@ -264,10 +256,8 @@ class FS(object):
         """
         Create an empty file.
 
-        :param path: Path to new file in filesystem.
-        :type path: str
-        :param wipe: If ``True``, truncate file to 0 bytes if it exists.
-        :type wipe: bool
+        :param str path: Path to new file in filesystem.
+        :param bool wipe: If ``True``, truncate file to 0 bytes if it exists.
         :returns: True if file was created, False if it already existed.
         :rtype bool:
 
@@ -287,8 +277,7 @@ class FS(object):
         """
         Return a short descriptive text regarding a path.
 
-        :param path: A path to a resource on the filesystem.
-        :type path: str
+        :param str path: A path to a resource on the filesystem.
         :rtype: str
 
         """
@@ -305,8 +294,7 @@ class FS(object):
         """
         Check if a path maps to a resource.
 
-        :param path: Path to a resource
-        :type path: str
+        :param str path: Path to a resource
         :rtype: bool
 
         A ``path`` exists if it maps to any resource (including
@@ -334,12 +322,9 @@ class FS(object):
         This method enhances the :meth:`fs.base.FS.scandir` method with
         additional filtering functionality.
 
-        :param path: A path to a directory on the filesystem.
-        :type path: str
-        :param exclude_dirs: Exclude directories.
-        :type exclude_dirs: bool
-        :param exclude_files: Exclude files.
-        :type exclude_files: bool
+        :param str path: A path to a directory on the filesystem.
+        :param bool exclude_dirs: Exclude directories.
+        :param bool exclude_files: Exclude files.
         :param wildcards: A list of unix shell-style wildcards to filter
             file names.
         :type wildcards: list or None
@@ -411,8 +396,7 @@ class FS(object):
         """
         Get the contents of a file as bytes.
 
-        :param path: A path to a readable file on the filesystem.
-        :type path: str
+        :param str path: A path to a readable file on the filesystem.
         :rtype: bytes
         :returns: file contents
 
@@ -428,15 +412,11 @@ class FS(object):
         """
         Get the contents of a file as a string.
 
-        :param path: A path to a readable file on the filesystem.
-        :type path: str
-        :param encoding: Encoding to use when reading contents in text
-            mode.
-        :type encoding: str
-        :param errors: Unicode errors parameter.
-        :type errors: str
-        :param newline: Newlines parameter.
-        :rtype: str
+        :param str path: A path to a readable file on the filesystem.
+        :param str encoding: Encoding to use when reading contents in
+            text mode.
+        :param str errors: Unicode errors parameter.
+        :param str newline: Newlines parameter.
         :returns: file contents.
 
         """
@@ -457,8 +437,7 @@ class FS(object):
 
         :param keys: A list of keys to retrieve, or None for all keys.
         :type keys: list or None
-        :param namespace: The meta namespace (default is `"standard"`).
-        :type namespace: str
+        :param str namespace: The meta namespace (default is `"standard"`).
         :rtype: dict
 
         Meta information is associated with a *namespace* which may be
@@ -503,8 +482,7 @@ class FS(object):
         """
         Get the size (in bytes) of a resource.
 
-        :param path: A path to a resource.
-        :type path: str
+        :param str path: A path to a resource.
         :rtype: int
 
         The *size* of a file is the total number of readable bytes,
@@ -522,8 +500,7 @@ class FS(object):
         """
         Get an *system path* to a resource.
 
-        :param path: A path on the filesystem.
-        :type path: str
+        :param str path: A path on the filesystem.
         :rtype: str
         :raises NoSysPath: If there is no corresponding system path.
 
@@ -588,14 +565,12 @@ class FS(object):
         """
         Get a URL to the given resource.
 
-        :param path: A path on the filesystem
-        :type path: str
-        :param purpose: A short string that indicates which URL to
+        :param str path: A path on the filesystem
+        :param str purpose: A short string that indicates which URL to
             retrieve for the given path (if there is more than one). The
             default is `'download'`, which should return a URL that
             serves the file. See the filesystem documentation for
             information on what other URLs may be generated.
-        :type purpose: str
         :returns: A URL.
         :rtype: str
         :raises `fs.errors.NoURL`: If the path does not map to a URL.
@@ -607,8 +582,7 @@ class FS(object):
         """
         Check if a path maps to a system path.
 
-        :param path: A path on the filesystem
-        :type path: str
+        :param str path: A path on the filesystem
         :rtype: bool
 
         """
@@ -623,11 +597,9 @@ class FS(object):
         """
         Check if a path has a corresponding URL.
 
-        :param path: A path on the filesystem
-        :type path: str
-        :param purpose: A purpose parameter, as given in
-            `meth`:fs.base.FS.geturl`.
-        :type purpose: str
+        :param str path: A path on the filesystem
+        :param str purpose: A purpose parameter, as given in
+            :meth:`fs.base.FS.geturl`.
         :rtype: bool
 
         """
@@ -654,8 +626,7 @@ class FS(object):
         Check if a directory is empty (contains no files or
         directories).
 
-        :param path: A directory path.
-        :type path: str
+        :param str path: A directory path.
         :rtype: bool
 
         """
@@ -702,10 +673,8 @@ class FS(object):
         """
         Move contents of directory ``src_path`` to ``dst_path``.
 
-        :param src_path: Path to source directory on the filesystem.
-        :type src_path: str
-        :param dst_path: Path to destination directory.
-        :type dst_path: str
+        :param str src_path: Path to source directory on the filesystem.
+        :param str dst_path: Path to destination directory.
         :param create: If ``True``, then ``dst_path`` will be created if
             it doesn't already exist.
         :type create: bool
@@ -724,12 +693,10 @@ class FS(object):
         """
         Make a directory, and any missing intermediate directories.
 
-        :param path: Path to directory from root.
-        :type path: str
-        :param recreate: If ``False`` (default), it is an error to
+        :param str path: Path to directory from root.
+        :param bool recreate: If ``False`` (default), it is an error to
             attempt to create a directory that already exists. Set to
             `True` to allow directories to be re-created without errors.
-        :type recreate: bool
         :param permissions: Initial permissions.
         :returns: A sub-directory filesystem.
         :rtype: :class:`fs.subfs.SubFS`
@@ -761,14 +728,11 @@ class FS(object):
         """
         Move a file from `src_path` to `dst_path`.
 
-        :param src_path: A path on the filesystem to move.
-        :type src_path: str
-        :param dst_path: A path on the filesystem where the source file
-            will be written to.
-        :type dst_path: str
-        :param overwrite: If `True` destination path will be overwritten
-            if it exists.
-        :type overwrite: bool
+        :param str src_path: A path on the filesystem to move.
+        :param str dst_path: A path on the filesystem where the source
+            file will be written to.
+        :param bool overwrite: If `True` destination path will be
+            overwritten if it exists.
 
         """
 
@@ -835,8 +799,7 @@ class FS(object):
     def opendir(self, path):
         """Get a filesystem object for a sub-directory.
 
-        :param path: Path to a directory on the filesystem.
-        :type path: str
+        :param str path: Path to a directory on the filesystem.
         :returns: A filesystem object representing a sub-directory.
         :rtype: :class:`fs.subfs.SubFS`
 
@@ -856,8 +819,7 @@ class FS(object):
         This method is similar to :meth:`fs.base.removedir`, but will
         remove the contents of the directory if it is not empty.
 
-        :param dir_path: Path to a directory on the filesystem.
-        :type dir_path: str
+        :param str dir_path: Path to a directory on the filesystem.
 
         """
 
@@ -881,10 +843,8 @@ class FS(object):
         """
         Get an iterator of resource info.
 
-        :param path: A path on the filesystem
-        :type path: str
-        :param namespaces: A sequence of info namespaces.
-        :type namespaces: list
+        :param str path: A path on the filesystem
+        :param list namespaces: A sequence of info namespaces.
         :param page: May be a tuple of (start, end) indexes to return an
             iterator of a subset of the resource info, or ``None`` to
             iterator the entire directory. Paging a directory scan may
@@ -913,10 +873,8 @@ class FS(object):
         """
         Copy (bytes) data to a file.
 
-        :param path: Destination path on the filesystem.
-        :type path: str
-        :param contents: A bytes object with data to be written
-        :type contents: bytes
+        :param str path: Destination path on the filesystem.
+        :param bytes contents: A bytes object with data to be written
 
         """
         if not isinstance(contents, bytes):
@@ -928,8 +886,7 @@ class FS(object):
         """
         Set a file to the contents of a binary file object.
 
-        :param path: A path on the filesystem.
-        :type path: str
+        :param str path: A path on the filesystem.
         :param file: A file object open for reading in binary mode.
         :type file: file object
 
@@ -959,18 +916,14 @@ class FS(object):
         """
         Set a file to the contents of a file object.
 
-        :param path: A path on the filesystem.
-        :type path: str
+        :param str path: A path on the filesystem.
         :param file: A file object open for reading.
         :type file: file object
-        :param encoding: Encoding of destination file, or ``None`` for
-            binary.
-        :type encoding: str
-        :param errors: How encoding errors should be treated (same as
-            ``io.open``).
-        :type errors: str
-        :param newline: Newline parameter (same is ``io.open``).
-        :type newline: str
+        :param str encoding: Encoding of destination file, or ``None``
+            for binary.
+        :param str errors: How encoding errors should be treated (same
+            as ``io.open``).
+        :param str newline: Newline parameter (same is ``io.open``).
 
         This method will read the contents of a supplied file object,
         and write to a file on the filesystem. If the destination
@@ -1036,16 +989,13 @@ class FS(object):
         """
         Create or replace a file with text.
 
-        :param contents: Path on the filesystem.
-        :type path: str
-        :param encoding: Encoding of destination file (default 'UTF-8).
-        :type encoding: str
-        :param errors: Error parameter for encoding (same as
+        :param str contents: Path on the filesystem.
+        :param str encoding: Encoding of destination file (default
+            'UTF-8).
+        :param str errors: Error parameter for encoding (same as
             ``io.open``).
-        :type errors: str
-        :param newline: Newline parameter for encoding (same as
+        :param str newline: Newline parameter for encoding (same as
             ``io.open``).
-        :type newline: str
 
         """
         if not isinstance(contents, six.text_type):
@@ -1062,10 +1012,9 @@ class FS(object):
         Create a new file if ``path`` doesn't exist, or update accessed
         and modified times if the path does exist.
 
-        This method is similar to the *nix command of the same name.
+        This method is similar to the \*nix command of the same name.
 
-        :param path: A path to a file on the filesystem.
-        :type path: str
+        :param str path: A path to a file on the filesystem.
 
         """
         with self._lock:
@@ -1085,12 +1034,11 @@ class FS(object):
         normalized absolute path.
 
         Many filesystems have restrictions on the format of paths they
-        support. This method will check that `path` is valid on the
+        support. This method will check that ``path`` is valid on the
         underlaying storage mechanism and throw a
         :class:`fs.errors.InvalidPath` exception if it is not.
 
-        :param path: A path
-        :type path: str
+        :param str path: A path
         :returns: A normalized, absolute path.
         :rtype str:
         :raises `fs.errors.InvalidPath`: If the path is invalid.
@@ -1138,8 +1086,7 @@ class FS(object):
 
             fs.getinfo(path, namespaces=['basic'])
 
-        :param path: A path on the filesystem.
-        :type path: str
+        :param str path: A path on the filesystem.
         :returns: A :class:`fs.info.Info` instance.
         :rtype: Info
 
@@ -1154,8 +1101,7 @@ class FS(object):
 
             fs.getinfo(path, namespaces=['details'])
 
-        :param path: A path on the filesystem.
-        :type path: str
+        :param str path: A path on the filesystem.
         :returns: A :class:`fs.info.Info` instance.
         :rtype: Info
 

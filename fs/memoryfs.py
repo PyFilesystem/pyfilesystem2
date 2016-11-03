@@ -220,18 +220,17 @@ class MemoryFS(FS):
         'virtual': False,
     }
 
-    def __init__(self, thread_safe=True):
+    def __init__(self):
         """
         Create an in-memory filesystem.
 
         """
         self._meta = self._meta.copy()
-        self.thread_safe = bool(thread_safe)
         self._lock = RLock()
         self.root = self._make_dir_entry(ResourceType.directory, '')
 
     def __repr__(self):
-        return "MemoryFS()".format(self.thread_safe)
+        return "MemoryFS()"
 
     def __str__(self):
         return "<memfs>"

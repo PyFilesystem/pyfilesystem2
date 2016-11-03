@@ -66,7 +66,7 @@ class OSFS(FS):
         self.encoding = encoding or sys.getfilesystemencoding()
 
         _root_path = os.path.expanduser(os.path.expandvars(root_path))
-        _root_path = os.path.normpath(os.path.abspath(root_path))
+        _root_path = os.path.normpath(os.path.abspath(_root_path))
         self.root_path = _root_path
 
         if create:
@@ -96,7 +96,7 @@ class OSFS(FS):
 
         if 'PC_PATH_MAX' in os.pathconf_names:
             _meta['max_sys_path_length'] =\
-                os.pathconf(root_path, os.pathconf_names['PC_PATH_MAX'])
+                os.pathconf(_root_path, os.pathconf_names['PC_PATH_MAX'])
 
     def __repr__(self):
         return "OSFS({!r}, encoding={!r})".format(self.root_path,

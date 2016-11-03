@@ -12,35 +12,12 @@ Contents:
    :maxdepth: 2
 
    introduction.rst
+   guide.rst
    concepts.rst
    info.rst
+   reference.rst
+   builtin.rst
 
-
-Builtin Filesystems
-===================
-
-.. toctree::
-   :maxdepth: 3
-
-   osfs.rst
-   memoryfs.rst
-   mountfs.rst
-   multifs.rst
-   subfs.rst
-
-
-Code Documentation
-==================
-
-.. toctree::
-   :maxdepth: 3
-
-   base.rst
-   errors.rst
-   enums.rst
-   info_objects.rst
-   opener.rst
-   path.rst
 
 
 Indices and tables

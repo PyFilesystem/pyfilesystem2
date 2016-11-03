@@ -7,8 +7,8 @@ FS Paths
 
 Useful functions for FS path manipulation.
 
-This is broadly similar to the standard ``os.path`` module but works with
-paths in the canonical format expected by all FS objects (that is,
+This is broadly similar to the standard ``os.path`` module but works
+with paths in the canonical format expected by all FS objects (that is,
 separated by forward slashes and with an optional leading slash).
 
 """
@@ -55,14 +55,12 @@ def normpath(path):
     This function simplifies a path by collapsing back-references
     and removing duplicated separators.
 
-    :param path: Path to normalize.
-    :type path: str
+    :param str path: Path to normalize.
     :returns: A valid FS path.
     :type: str
 
     >>> normpath("/foo//bar/frob/../baz")
     '/foo/bar/baz'
-
     >>> normpath("foo/../../bar")
     Traceback (most recent call last)
         ...
@@ -99,8 +97,7 @@ def iteratepath(path):
     >>> iteratepath('/foo/bar/baz')
     ['foo', 'bar', 'baz']
 
-    :param path: Path to iterate over.
-    :type path: str
+    :param str path: Path to iterate over.
     :returns: A list of path components.
     :rtype: list
 
@@ -115,10 +112,8 @@ def recursepath(path, reverse=False):
     """
     Get intermediate paths from the root to the given path.
 
-    :param path: A PyFilesystem path
-    :type path: str
-    :param reverse: Reverses the order of the paths.
-    :type reverse: bool
+    :param str path: A PyFilesystem path
+    :param bool reverse: Reverses the order of the paths.
     :returns: A list of paths.
     :rtype: list
 
@@ -151,9 +146,8 @@ def isabs(path):
     """
     Check if a path is an absolute path.
 
-    :param path: A filesystem path.
-    :type path: str
-    :rtype bool:
+    :param str path: A filesystem path.
+    :rtype: bool
 
     """
     # Somewhat trivial, but helps to make code self-documenting
@@ -168,8 +162,7 @@ def abspath(path):
     simply adds a leading '/' character if the path doesn't already have
     one.
 
-    :param path: A PyFilesytem path
-    :type path: str
+    :param str path: A PyFilesytem path
     :returns: An absolute path
     :rtype: str
 
@@ -183,11 +176,11 @@ def relpath(path):
     """
     Convert the given path to a relative path.
 
-    This is the inverse of abspath(), stripping a leading '/' from the
-    path if it is present.
+    This is the inverse of abspath(), stripping a leading ``'/'`` from
+    the path if it is present.
 
-    :param path: Path to adjust
-    :type path: str
+    :param str path: Path to adjust
+    :rtype: str
 
     >>> relpath('/a/b')
     'a/b'
@@ -201,13 +194,12 @@ def join(*paths):
     Join any number of paths together.
 
     :param paths: Paths to join are given in positional arguments.
+    :rtype: str
 
     >>> pathjoin('foo', 'bar', 'baz')
     'foo/bar/baz'
-
     >>> pathjoin('foo/bar', '../baz')
     'foo/baz'
-
     >>> pathjoin('foo/bar', '/baz')
     '/baz'
 
@@ -231,6 +223,10 @@ def combine(path1, path2):
     """
     Join two paths together.
 
+    :param str path1: A filesystem path.
+    :param str path2: A filesystem path.
+    :rtype: str
+
     This is faster than ``pathjoin``, but only works when the second
     path is relative, and there are no back references in either path.
 
@@ -250,15 +246,13 @@ def split(path):
     This function splits a path into a pair (head, tail) where 'tail' is
     the last pathname component and 'head' is all preceding components.
 
-    :param path: Path to split
-    :type path: str
+    :param str path: Path to split
+    :rtype: str
 
     >>> split("foo/bar")
     ('foo', 'bar')
-
     >>> split("foo/bar/baz")
     ('foo/bar', 'baz')
-
     >>> split("/foo/bar/baz")
     ('/foo/bar', 'baz')
 
@@ -275,12 +269,13 @@ def splitext(path):
     last '.' and the extension).
 
     :param path: A path to split
+    :returns: tuple of (path, extension)
+    :rtype: tuple
 
     >>> splitext('baz.txt')
-    ('baz', 'txt')
-
+    ('baz', '.txt')
     >>> splitext('foo/bar/baz.txt')
-    ('foo/bar/baz', 'txt')
+    ('foo/bar/baz', '.txt')
 
     """
 
@@ -299,13 +294,12 @@ def isdotfile(path):
 
     :param path: Path to check.
     :type path: str
+    :rtype: bool
 
     >>> isdotfile('.baz')
     True
-
     >>> isdotfile('foo/bar/.baz')
     True
-
     >>> isdotfile('foo/bar.baz')
     False
 
@@ -320,14 +314,13 @@ def dirname(path):
     This is always equivalent to the 'head' component of the value
     returned by ``split(path)``.
 
-    :param path: A FS path
+    :param str path: A FS path
+    :rtype: str
 
     >>> dirname('foo/bar/baz')
     'foo/bar'
-
     >>> dirname('/foo/bar')
     '/foo'
-
     >>> dirname('/foo')
     '/'
 
@@ -342,15 +335,13 @@ def basename(path):
     This is always equivalent to the 'tail' component of the value
     returned by split(path).
 
-    :param path: A FS path
-    :type path: str
+    :param str path: A FS path
+    :rtype: str
 
     >>> basename('foo/bar/baz')
     'baz'
-
     >>> basename('foo/bar')
     'bar'
-
     >>> basename('foo/bar/')
     ''
 
@@ -362,10 +353,9 @@ def issamedir(path1, path2):
     """
     Check if two paths reference a resource in the same directory.
 
-    :param path1: A FS path.
-    :type path1: str
-    :param path2: A FS path.
-    :type path2: str
+    :param str path1: A FS path.
+    :param str path2: A FS path.
+    :rtype: bool
 
     >>> issamedir("foo/bar/baz.txt", "foo/bar/spam.txt")
     True
@@ -377,7 +367,14 @@ def issamedir(path1, path2):
 
 
 def isbase(path1, path2):
-    """Check if path1 is a base of path2."""
+    """
+    Check if path1 is a base of path2.
+
+    :param str path1: A FS path.
+    :param str path2: A FS path.
+    :rtype: bool
+
+    """
     p1 = forcedir(abspath(path1))
     p2 = forcedir(abspath(path2))
     return p1 == p2 or p1.startswith(p2)
@@ -387,8 +384,9 @@ def isparent(path1, path2):
     """
     Check if ``path1`` is a parent directory of ``path2``.
 
-    :param path1: An FS path
-    :param path2: An FS path
+    :param str path1: An FS path
+    :param str path2: An FS path
+    :rtype: bool
 
     >>> isparent("foo/bar", "foo/bar/spam.txt")
     True
@@ -417,6 +415,7 @@ def forcedir(path):
     Ensure the path ends with a trailing forward slash
 
     :param path: An FS path
+    :rtype: bool
 
     >>> forcedir("foo/bar")
     'foo/bar/'
@@ -434,6 +433,10 @@ def frombase(path1, path2):
     """
     Get the final path of ``path2`` that isn't in ``path1``.
 
+    :param str path1: An FS path
+    :param str path2: An FS path
+    :rtype: bool
+
     >>> frombase('foo/bar/', 'foo/bar/baz/egg')
     'baz/egg'
 
@@ -448,10 +451,8 @@ def relativefrom(base, path):
     Return a path relative from a given base path, i.e. insert backrefs
     as appropriate to reach the path from the base.
 
-    :param base: Path to a directory.
-    :type base: str
-    :param path: Path you wish to make relative.
-    :type path: str
+    :param str base: Path to a directory.
+    :param atr path: Path you wish to make relative.
 
     >>> relativefrom("foo/bar", "baz/index.html")
     '../../baz/index.html'
@@ -476,9 +477,12 @@ def iswildcard(path):
     """
     Check if a path ends with a wildcard.
 
-    >>> is_wildcard('foo/bar/baz.*')
+    :param int path: An FS path.
+    :rtype: bool
+
+    >>> iswildcard('foo/bar/baz.*')
     True
-    >>> is_wildcard('foo/bar')
+    >>> iswildcard('foo/bar')
     False
 
     """

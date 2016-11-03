@@ -43,7 +43,7 @@ def copy_structure(src_fs, dst_fs):
     :param dst_fs: Destination filesystem.
 
     """
-    with src_fs.lock():
+    with src_fs.lock(), dst_fs.lock():
         for dir_path in walk.walk_dirs(src_fs):
             dst_fs.makedir(dir_path, recreate=True)
 
@@ -66,7 +66,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, create=False):
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
 
-    with src_fs.lock():
+    with src_fs.lock(), dst_fs.lock():
         if create:
             dst_fs.makedir(_dst_path, recreate=True)
         else:

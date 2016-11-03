@@ -1,5 +1,5 @@
-Path functions
-==============
+fs.path
+=======
 
 Work with PyFilesystem paths.
 

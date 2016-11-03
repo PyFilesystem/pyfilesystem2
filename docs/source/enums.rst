@@ -1,5 +1,5 @@
-Enumerations
-============
+fs.enums
+========
 
 .. autoclass:: fs.ResourceType
     :members:
