@@ -247,7 +247,8 @@ def split(path):
     the last pathname component and 'head' is all preceding components.
 
     :param str path: Path to split
-    :rtype: str
+    :rtype: tuple
+    :returns: tuple of ``(head, tail)``
 
     >>> split("foo/bar")
     ('foo', 'bar')
@@ -269,7 +270,7 @@ def splitext(path):
     last '.' and the extension).
 
     :param path: A path to split
-    :returns: tuple of (path, extension)
+    :returns: tuple of ``(path, extension)``
     :rtype: tuple
 
     >>> splitext('baz.txt')

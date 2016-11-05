@@ -130,7 +130,7 @@ class Permissions(object):
         if isinstance(other, Permissions):
             names = other.dump()
         else:
-            names = list(other)
+            names = other
         return self.dump() == names
 
     def __ne__(self, other):

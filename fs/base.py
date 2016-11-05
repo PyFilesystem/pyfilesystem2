@@ -234,18 +234,17 @@ class FS(object):
         """
         Copy the contents of ``src_path`` to ``dst_path``.
 
-        :param str src_path: A path to a directory on the filesystem.
-        :param str dst_path: A path to a directory in the filesystem.
-        :param create: If ``True`` then ``src_path`` will be created if
+        :param str src_path: Source directory.
+        :param str dst_path: Destination directory.
+        :param bool reate: If ``True`` then ``src_path`` will be created if
             it doesn't already exist.
-        :type create: bool
-        :raises `fs.errors.DirectoryExists`: If the directory exists,
-            and ``create`` is not True.
+        :raises `fs.errors.ResourceNotFound`: If the destination
+            directory does not exist, and ``create`` is not True.
 
         """
         with self._lock:
-            if create:
-                self.makedirs(dst_path, recreate=True)
+            if not create and not self.exists(dst_path):
+                raise errors.ResourceNotFound(dst_path)
             copy.copy_dir(
                 self,
                 src_path,
@@ -258,7 +257,8 @@ class FS(object):
         Create an empty file.
 
         :param str path: Path to new file in filesystem.
-        :param bool wipe: If ``True``, truncate file to 0 bytes if it exists.
+        :param bool wipe: If ``True``, truncate file to 0 bytes if it
+            exists.
         :returns: True if file was created, False if it already existed.
         :rtype bool:
 
@@ -682,8 +682,8 @@ class FS(object):
 
         """
         with self._lock:
-            if create:
-                self.makedirs(dst_path, recreate=True)
+            if not create and not self.exists(dst_path):
+                raise errors.ResourceNotFound(dst_path)
             move.move_dir(
                 self,
                 src_path,

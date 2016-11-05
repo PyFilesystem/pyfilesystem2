@@ -9,10 +9,6 @@ from .path import frombase
 from .path import normpath
 
 
-class CopyError(Exception):
-    """An error occurred during copying."""
-
-
 def copy_fs(src_fs, dst_fs):
     """
     Copy the contents of one filesystem to another.
@@ -93,12 +89,16 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path):
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
                 dst_fs.makedir(_dst_path, recreate=True)
-                for dir_path, _dirs, files in walk.walk(src_fs, _src_path):
+                for dir_path, dirs, files in walk.walk(src_fs, _src_path):
                     copy_path = combine(
                         _dst_path,
                         frombase(_src_path, dir_path)
                     )
-                    dst_fs.makedir(copy_path, recreate=True)
+                    for info in dirs:
+                        dst_fs.makedir(
+                            info.make_path(copy_path),
+                            recreate=True
+                        )
                     for info in files:
                         copy_file(
                             src_fs,

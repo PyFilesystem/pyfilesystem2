@@ -1423,6 +1423,9 @@ class FSTestCases(object):
         self.assert_text('foo/bar/foofoo.txt', 'Hello')
         self.assert_isdir('foo/bar/baz/egg')
 
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.copydir('foo', 'foofoo')
+
     def test_movedir(self):
         self.fs.makedirs('foo/bar/baz/egg')
         self.fs.settext('foo/bar/foofoo.txt', 'Hello')
@@ -1432,6 +1435,9 @@ class FSTestCases(object):
         self.assert_isdir('foo2/baz/egg')
         self.assert_not_exists('foo/bar/foofoo.txt')
         self.assert_not_exists('foo/bar/baz/egg')
+
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.movedir('foo', 'foofoo')
 
     def test_tree(self):
         self.fs.makedirs('foo/bar')

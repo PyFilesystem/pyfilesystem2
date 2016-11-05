@@ -69,7 +69,7 @@ Calling :meth:`fs.base.FS.tree` on a FS object will give you a nice ASCII repres
 Closing Filesystems
 ~~~~~~~~~~~~~~~~~~~
 
-Closing a filesystem may be an alien concept if you are accustomed to using the Python standard library, but FS objects have a ``close`` method (:meth:`fs.base.FS.close`) which will perform any required clean-up actions. For many filesystems (notably :class:`fs.osfs.OSFS`), the close method does very little, but other filesystems may only finalize files or release resources once ``close()`` is called.
+FS objects have a ``close`` method (:meth:`fs.base.FS.close`) which will perform any required clean-up actions. For many filesystems (notably :class:`fs.osfs.OSFS`), the ``close`` method does very little, but other filesystems may only finalize files or release resources once ``close()`` is called.
 
 You can call ``close`` explicitly once you are finished using a filesystem. For example::
 
@@ -166,10 +166,17 @@ Moving and Copying
 
 You can move and copy file contents with :meth:`fs.base.FS.move` and :meth:`fs.base.FS.copy` methods, and the equivalent :meth:`fs.base.FS.movedir` and :meth:`fs.base.FS.copydir` methods which operate on directories rather than files.
 
-These move and copy methods are optimized where possible, and depending on the implementation, they may be more performant than reading and writing open files.
+These move and copy methods are optimized where possible, and depending on the implementation, they may be more performant than reading and writing files.
 
-To move and/or copy files *between* filesystems (as apposed to within the same filesystem), use the :mod:`fs.move` and :mod:`fs.copy` modules. The methods in these modules accept both FS objects and FS URLS, which can make for quite elegant code. For instance, the following will compress the contents of your projects folder::
+To move and/or copy files *between* filesystems (as apposed to within the same filesystem), use the :mod:`fs.move` and :mod:`fs.copy` modules. The methods in these modules accept both FS objects and FS URLS. For instance, the following will compress the contents of your projects folder::
 
     >>> from fs.copy import copy_fs
     >>> copy_fs('~/projects', 'zip://projects.zip')
+
+Which is the equivalent to this, more verbose, code:::
+
+    >>> from fs.copy import copy_fs
+    >>> from fs.osfs import OSFS
+    >>> from fs.zipfs import ZipFS
+    >>> copy_fs(OSFS('~/projects'), ZipFS('projects.zip'))
 

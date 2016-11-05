@@ -16,6 +16,11 @@ class TestPermissions(unittest.TestCase):
         self.assertEqual(make_mode(['u_r', 'u_w', 'u_x']), 0o700)
         self.assertEqual(make_mode(Permissions(user='rwx')), 0o700)
 
+
+    def test_parse(self):
+        self.assertEqual(Permissions.parse('---------').mode, 0o764)
+        self.assertEqual(Permissions.parse('rwxrw-r--').mode, 0o764)
+
     def test_create(self):
         self.assertEqual(Permissions.create(None).mode, 0o777)
         self.assertEqual(Permissions.create(0o755).mode, 0o755)

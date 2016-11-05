@@ -6,10 +6,6 @@ from .copy import copy_file
 from .opener import manage_fs
 
 
-class MoveError(Exception):
-    """An error occurred during move."""
-
-
 def move_fs(src_fs, dst_fs):
     """
     Move the contents of a filesystem to another filesystem.

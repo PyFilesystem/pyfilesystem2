@@ -97,6 +97,26 @@ class TestRegistry(unittest.TestCase):
         self.assertEqual(mem_fs, mem_fs_2)
 
 
+class TestManageFS(unittest.TestCase):
+
+    def test_manage_fs_url(self):
+        with opener.manage_fs('mem://') as mem_fs:
+            self.assertIsInstance(mem_fs, MemoryFS)
+
+    def test_manage_fs_obj(self):
+        mem_fs = MemoryFS()
+        with opener.manage_fs(mem_fs) as open_mem_fs:
+            self.assertIs(mem_fs, open_mem_fs)
+
+    def test_manage_fs_error(self):
+        try:
+            with opener.manage_fs('mem://') as mem_fs:
+                1/0
+        except ZeroDivisionError:
+            pass
+
+        self.assertTrue(mem_fs.isclosed())
+
 class TestOpeners(unittest.TestCase):
 
     def test_repr(self):
