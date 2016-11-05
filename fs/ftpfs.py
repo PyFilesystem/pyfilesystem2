@@ -217,6 +217,17 @@ class FTPFile(object):
 
 
 class FTPFS(FS):
+    """
+    A FTP (File Transport Protocol) Filesystem.
+
+    :param str host: A FTP host, e.g. ``'ftp.mirror.nl'``.
+    :param str user: A username (default is ``'anonymous'``)
+    :param passwd: Password for the server, or None for anon.
+    :param acct: Account
+    :param int timeout: Timeout for contacting server (in seconds).
+    :param int port: Port number (default 21).
+
+    """
 
     _meta = {
         'case_insensitive': False,
@@ -275,7 +286,7 @@ class FTPFS(FS):
 
     @property
     def features(self):
-        """Get features dict from ftp server."""
+        """Get features dict from FTP server."""
         if self._features is None:
             try:
                 response = self.ftp.sendcmd(_encode("FEAT"))

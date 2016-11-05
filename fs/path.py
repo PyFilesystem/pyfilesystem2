@@ -247,8 +247,8 @@ def split(path):
     the last pathname component and 'head' is all preceding components.
 
     :param str path: Path to split
-    :rtype: tuple
     :returns: tuple of ``(head, tail)``
+    :rtype: tuple
 
     >>> split("foo/bar")
     ('foo', 'bar')

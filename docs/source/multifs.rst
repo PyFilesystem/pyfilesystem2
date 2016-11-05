@@ -1,5 +1,5 @@
-Multi FS
-========
+Multi Filesystem
+================
 
 A MultiFS is a filesystem composed of a sequence of other filesystems,
 where the directory structure of each overlays the previous filesystem
