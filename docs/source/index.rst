@@ -15,8 +15,8 @@ Contents:
    guide.rst
    concepts.rst
    info.rst
-   reference.rst
    builtin.rst
+   reference.rst
 
 
 

@@ -1,9 +1,13 @@
+..  _concepts:
+
 Concepts
 ========
 
 The following describes some core concepts when working with
 PyFilesystem. If you are skimming this documentation, pay particular
 attention to the first section on paths.
+
+..  _paths:
 
 Paths
 -----

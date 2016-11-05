@@ -1279,16 +1279,18 @@ class FSTestCases(object):
             ['/bar/baz/test.txt']
         )
 
-        # Test copying to a sub dir
-        other_fs = open_fs(protocol)
-        with self.assertRaises(fs.copy.CopyError):
-            fs.copy.copy_dir(self.fs, '/foo', other_fs, '/egg')
+        print('BEFORE')
+        self.fs.tree()
+        other_fs.tree()
+        fs.copy.copy_dir(self.fs, '/foo', other_fs, '/egg')
 
-        fs.copy.copy_dir(self.fs, '/foo', other_fs, '/egg', create=True)
-
+        print('FS')
+        self.fs.tree()
+        print('OTHER')
+        other_fs.tree()
         self.assertEqual(
             list(walk.walk_files(other_fs)),
-            ['/egg/bar/baz/test.txt']
+            ['/bar/baz/test.txt', '/egg/bar/baz/test.txt']
         )
 
     def _test_copy_dir_write(self, protocol):
@@ -1362,10 +1364,7 @@ class FSTestCases(object):
         self.fs.settext('top.txt', 'Hello, World')
         self.fs.settext('/foo/bar/baz/test.txt', 'Goodbye, World')
 
-        with self.assertRaises(fs.move.MoveError):
-            fs.move.move_dir(self.fs, 'foo', self.fs, 'foo2')
-
-        fs.move.move_dir(self.fs, 'foo', self.fs, 'foo2', create=True)
+        fs.move.move_dir(self.fs, 'foo', self.fs, 'foo2')
 
         expected = {
             "/egg",

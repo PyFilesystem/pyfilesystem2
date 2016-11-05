@@ -2,12 +2,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from contextlib import contextmanager
 import os
 import re
 
 from collections import namedtuple
-
-from .base import FS
 
 
 ParseResult = namedtuple(
@@ -36,6 +35,31 @@ _RE_FS_URL = re.compile(r'''
 !(.*?)$
 )*$
 ''', re.VERBOSE)
+
+
+@contextmanager
+def manage_fs(fs_url, create=False, writeable=True, cwd='.'):
+    """
+
+    A context manager that auto-closes a filesytem if required.
+
+    """
+    from .base import FS
+    if isinstance(fs_url, FS):
+        yield fs_url
+    else:
+        _fs = open_fs(
+            fs_url,
+            create=create,
+            writeable=writeable,
+            cwd=cwd
+        )
+        try:
+            yield _fs
+        except:
+            raise
+        finally:
+            _fs.close()
 
 
 class ParseError(ValueError):
@@ -67,7 +91,7 @@ def parse(fs_url):
 
     fs_name, credentials, url1, url2, path = match.groups()
     if credentials:
-        username, colon, password = credentials.partition(':')
+        username, _, password = credentials.partition(':')
         url = url1
     else:
         username = None
@@ -80,6 +104,8 @@ def parse(fs_url):
         url,
         path
     )
+
+
 
 
 class Opener(object):
@@ -220,15 +246,17 @@ class Registry(object):
         component).
 
         """
+        from .base import FS
         if isinstance(fs_url, FS):
-            return fs_url
-        _fs, path = self.open(
-            fs_url,
-            writeable=writeable,
-            create=create,
-            cwd=cwd,
-            default_protocol=default_protocol
-        )
+            _fs = fs_url
+        else:
+            _fs, path = self.open(
+                fs_url,
+                writeable=writeable,
+                create=create,
+                cwd=cwd,
+                default_protocol=default_protocol
+            )
         return _fs
 
 

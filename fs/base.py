@@ -234,22 +234,23 @@ class FS(object):
         """
         Copy the contents of ``src_path`` to ``dst_path``.
 
-        :param src_path: A path to a directory on the filesystem.
-        :type src_path: str
-        :param dst_path: A path to a directory in the filesystem.
-        :type dst_path:
+        :param str src_path: A path to a directory on the filesystem.
+        :param str dst_path: A path to a directory in the filesystem.
         :param create: If ``True`` then ``src_path`` will be created if
             it doesn't already exist.
         :type create: bool
+        :raises `fs.errors.DirectoryExists`: If the directory exists,
+            and ``create`` is not True.
 
         """
         with self._lock:
+            if create:
+                self.makedirs(dst_path, recreate=True)
             copy.copy_dir(
                 self,
                 src_path,
                 self,
-                dst_path,
-                create=create
+                dst_path
             )
 
     def create(self, path, wipe=False):
@@ -681,12 +682,13 @@ class FS(object):
 
         """
         with self._lock:
+            if create:
+                self.makedirs(dst_path, recreate=True)
             move.move_dir(
                 self,
                 src_path,
                 self,
-                dst_path,
-                create=create
+                dst_path
             )
 
     def makedirs(self, path, permissions=None, recreate=False):
