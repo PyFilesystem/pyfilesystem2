@@ -18,7 +18,7 @@ class TestPermissions(unittest.TestCase):
 
 
     def test_parse(self):
-        self.assertEqual(Permissions.parse('---------').mode, 0o764)
+        self.assertEqual(Permissions.parse('---------').mode, 0)
         self.assertEqual(Permissions.parse('rwxrw-r--').mode, 0o764)
 
     def test_create(self):
