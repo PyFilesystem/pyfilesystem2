@@ -97,6 +97,8 @@ class MountFS(FS):
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
         fs, delegate_path = self._delegate(path)
+        if fs is self.default_fs:
+            fs = self
         return "{path} on {fs}".format(fs=fs, path=delegate_path)
 
     def getinfo(self, path, namespaces=None):
