@@ -239,7 +239,7 @@ class IllegalBackReference(ValueError):
     Exception raised when too many backrefs exist in a path.
 
     This error will occur if the back references in a path would be
-    outside of the root. For example, "/foo/../../", contains two back
+    outside of the root. For example, ``"/foo/../../"``, contains two back
     references which would reference a directory above the root.
 
     .. note::

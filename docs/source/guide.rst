@@ -1,5 +1,5 @@
-Guide
-=====
+PyFilesystem Guide
+==================
 
 The PyFilesytem interface simplifies most aspects of working with files and directories, even for quite simple operations. This guide covers how to work with PyFilesystem objects.
 
@@ -173,7 +173,7 @@ To move and/or copy files *between* filesystems (as apposed to within the same f
     >>> from fs.copy import copy_fs
     >>> copy_fs('~/projects', 'zip://projects.zip')
 
-Which is the equivalent to this, more verbose, code:::
+Which is the equivalent to this, more verbose, code::
 
     >>> from fs.copy import copy_fs
     >>> from fs.osfs import OSFS

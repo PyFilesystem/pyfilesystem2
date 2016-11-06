@@ -67,10 +67,11 @@ class FS(object):
         :param namespaces: Info namespaces to query (defaults to
             'basic').
         :type namespaces: list or None
-        :returns: An :class:`fs.info.Info`: instance.
-        :rtype: Info
+        :returns: Resource information object.
+        :rtype: :class:`fs.info.Info`
 
-        For more information regarding resource info see :ref:`info`.
+        For more information regarding resource information see
+        :ref:`info`.
 
         """
 
@@ -236,7 +237,7 @@ class FS(object):
 
         :param str src_path: Source directory.
         :param str dst_path: Destination directory.
-        :param bool reate: If ``True`` then ``src_path`` will be created if
+        :param bool create: If ``True`` then ``src_path`` will be created if
             it doesn't already exist.
         :raises `fs.errors.ResourceNotFound`: If the destination
             directory does not exist, and ``create`` is not True.
@@ -257,9 +258,9 @@ class FS(object):
         Create an empty file.
 
         :param str path: Path to new file in filesystem.
-        :param bool wipe: If ``True``, truncate file to 0 bytes if it
-            exists.
-        :returns: True if file was created, False if it already existed.
+        :param bool wipe: Truncate any existing file to 0 bytes.
+        :returns: ``True`` if file was created, ``False`` if it already
+            existed.
         :rtype bool:
 
         The default behavior is to create a new file if one doesn't
@@ -398,8 +399,8 @@ class FS(object):
         Get the contents of a file as bytes.
 
         :param str path: A path to a readable file on the filesystem.
-        :rtype: bytes
         :returns: file contents
+        :rtype: bytes
 
         :raises: :class:`fs.errors.ResourceNotFound` if ``path`` does
             not exist.
@@ -1084,13 +1085,15 @@ class FS(object):
         """
         Get the *basic* resource info.
 
-        This method is shorthand for the following:
+        :param str path: A path on the filesystem.
+        :returns: Resource information object for ``path``.
+        :rtype: :class:`fs.info.Info`
+
+        This method is shorthand for the following::
 
             fs.getinfo(path, namespaces=['basic'])
 
-        :param str path: A path on the filesystem.
-        :returns: A :class:`fs.info.Info` instance.
-        :rtype: Info
+
 
         """
         return self.getinfo(path, namespaces=['basic'])
@@ -1099,13 +1102,13 @@ class FS(object):
         """
         Get the *details* resource info.
 
-        This method is shorthand for the following:
+        :param str path: A path on the filesystem.
+        :returns: Resource information object for ``path``.
+        :rtype: :class:`fs.info.Info`
+
+        This method is shorthand for the following::
 
             fs.getinfo(path, namespaces=['details'])
-
-        :param str path: A path on the filesystem.
-        :returns: A :class:`fs.info.Info` instance.
-        :rtype: Info
 
         """
         return self.getinfo(path, namespaces=['details'])
