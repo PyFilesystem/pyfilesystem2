@@ -102,11 +102,13 @@ class TestManageFS(unittest.TestCase):
     def test_manage_fs_url(self):
         with opener.manage_fs('mem://') as mem_fs:
             self.assertIsInstance(mem_fs, MemoryFS)
+        self.assertTrue(mem_fs.isclosed())
 
     def test_manage_fs_obj(self):
         mem_fs = MemoryFS()
         with opener.manage_fs(mem_fs) as open_mem_fs:
             self.assertIs(mem_fs, open_mem_fs)
+        self.assertFalse(mem_fs.isclosed())
 
     def test_manage_fs_error(self):
         try:
