@@ -78,3 +78,7 @@ class TestMountFSBehaviours(unittest.TestCase):
         mount_fs = MountFS()
         with self.assertRaises(ValueError):
             mount_fs.mount('/', mount_fs)
+
+    def test_desc(self):
+        mount_fs = MountFS()
+        mount_fs.desc('/')

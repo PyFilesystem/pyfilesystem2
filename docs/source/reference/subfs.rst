@@ -1,5 +1,5 @@
-Sub FS
-======
+Sub Filesystem
+==============
 
 .. automodule:: fs.subfs
     :members:

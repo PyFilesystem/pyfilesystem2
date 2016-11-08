@@ -67,13 +67,12 @@ def _parse_time(t):
         except ValueError:
             _t = time.strptime(t, '%b %d %H:%M')
     except ValueError:
-        raise
         # Unknown time format
         return None
 
     epoch_time = time.mktime((
         _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year,
-        _t.tm_mon, _t.tm_mday - 1, _t.tm_hour, _t.tm_min, 0, 0, 0, -1
+        _t.tm_mon, _t.tm_mday - 1, _t.tm_hour, _t.tm_min, 0, 0, 0, 0
     ))
 
     return epoch_time
@@ -115,31 +114,8 @@ def decode_linux(line, match):
     details = raw_info['details']
     if mtime_epoch is not None:
         details['modified'] = mtime_epoch
-    if uid.isdigit():
-        access['uid'] = int(uid)
-    else:
-        access['user'] = uid
-    if gid.isdigit():
-        access['gid'] = int(gid)
-    else:
-        access['group'] = gid
+
+    access['user'] = uid
+    access['group'] = gid
 
     return raw_info
-
-
-if __name__ == "__main__":
-
-    linux_list = """
-lrwxrwxrwx    1 0        0              19 Jan 18  2006 debian -> ./pub/mirror/debian
-drwxr-xr-x   10 0        0            4096 Aug 03 09:21 debian-archive
-lrwxrwxrwx    1 0        0              27 Nov 30  2015 debian-backports -> pub/mirror/debian-backports
-drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub
--rw-r--r--    1 0        0              26 Mar 04  2010 robots.txt
-"""
-
-    lines = linux_list.splitlines()
-
-    import pprint
-
-    for info in parse(lines):
-        pprint.pprint(info)

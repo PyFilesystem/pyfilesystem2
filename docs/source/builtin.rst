@@ -4,9 +4,9 @@ Builtin Filesystems
 .. toctree::
    :maxdepth: 3
 
-   ftpfs.rst
-   memoryfs.rst
-   mountfs.rst
-   multifs.rst
-   osfs.rst
-   subfs.rst
+   reference/ftpfs.rst
+   reference/memoryfs.rst
+   reference/mountfs.rst
+   reference/multifs.rst
+   reference/osfs.rst
+   reference/subfs.rst

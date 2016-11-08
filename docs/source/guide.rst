@@ -1,5 +1,5 @@
-PyFilesystem Guide
-==================
+Guide
+=====
 
 The PyFilesytem interface simplifies most aspects of working with files and directories, even for quite simple operations. This guide covers how to work with PyFilesystem objects.
 
@@ -144,6 +144,21 @@ The :class:`fs.base.FS.makedir` and :class:`fs.base.FS.makedirs` methods also re
     ['__init__.py', 'README.md']
 
 Working with ``SubFS`` objects means that you can generally avoid writing much path manipulation code, which tends to be error prone.
+
+Walking
+~~~~~~~
+
+Often you will need to scan the files in a given directory, and any sub-directories. This is known as *walking* the filesystem.
+
+Here's how you would print the paths to all your Python files in your home-directory (and sub-directories)::
+
+    >>> from fs import open_fs
+    >>> from fs import walk
+    >>> home_fs = open_fs(~/)
+    >>> for path in walk(home_fs, wildcards=['*.py']):
+    ...     print(path)
+
+This might take a while to run, if you have a lot of Python code!
 
 Working with Files
 ~~~~~~~~~~~~~~~~~~

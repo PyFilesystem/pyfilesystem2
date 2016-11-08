@@ -12,15 +12,13 @@ from .time import epoch_to_datetime
 
 class Info(object):
     """
-    Container for :doc:`info`, returned by the following
-    methods:
+    Container for :ref:`info`, returned by the following methods:
 
      * :meth:`fs.base.FS.getinfo`
      * :meth:`fs.base.FS.scandir`
-     * :meth:`fs.base.FS.filter`
+     * :meth:`fs.base.FS.filterfir`
 
-    :param raw_info: A dict containing resource info.
-    :type raw_info: dict
+    :param dict raw_info: A dict containing resource info.
     :param to_datetime: A callable that converts an epoch time to a
         datetime object. The default uses
         :func:`fs.time.epoch_to_datetime`.
@@ -54,8 +52,8 @@ class Info(object):
         """
         Get a raw info value.
 
-         >>> info.get('access', 'permissions')
-            ['u_r', 'u_w', '_wx']
+        >>> info.get('access', 'permissions')
+        ['u_r', 'u_w', '_wx']
 
         :param namespace: A namespace identifier.
         :type namespace: str
