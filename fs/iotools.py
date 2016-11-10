@@ -1,5 +1,5 @@
-from __future__ import unicode_literals, print_function
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import io
 from io import SEEK_SET, SEEK_CUR
@@ -39,7 +39,7 @@ class RawWrapper(object):
 
     def writable(self):
         if hasattr(self._f, 'writeable'):
-            return self._fs.writeable()
+            return self._f.writeable()
         return 'w' in self.mode
 
     def seekable(self):

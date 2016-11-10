@@ -153,12 +153,12 @@ Often you will need to scan the files in a given directory, and any sub-director
 Here's how you would print the paths to all your Python files in your home-directory (and sub-directories)::
 
     >>> from fs import open_fs
-    >>> from fs import walk
-    >>> home_fs = open_fs(~/)
-    >>> for path in walk(home_fs, wildcards=['*.py']):
+    >>> from fs.walk import walk_files
+    >>> home_fs = open_fs('~/')
+    >>> for path in walk_files(home_fs, wildcards=['*.py']):
     ...     print(path)
 
-This might take a while to run, if you have a lot of Python code!
+This might take a while to run, if you have a lot of Python code.
 
 Working with Files
 ~~~~~~~~~~~~~~~~~~
