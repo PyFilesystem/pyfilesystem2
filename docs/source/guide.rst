@@ -1,7 +1,20 @@
 Guide
 =====
 
-The PyFilesytem interface simplifies most aspects of working with files and directories, even for quite simple operations. This guide covers how to work with PyFilesystem objects.
+The PyFilesytem interface simplifies most aspects of working with files and directories. This guide covers what you need to know about working with FS objects.
+
+Why use PyFilesystem?
+~~~~~~~~~~~~~~~~~~~~~
+
+If you are comfortable using the Python standard library, you might be wondering why you need another API for working with files and directories.
+
+There are a number of benefits. PyFilesystem is generally simpler, and less error prone than the equivalent code using the ``os`` and ``io`` modules. That may be good enough reason to use PyFilesytem, given that bugs in such code could cause data loss. But simpler code is only a tangential benefit for many.
+
+The abstraction offered by FS objects means that you can write code that is agnostic to where your files are physically located. For instance, if you wrote a function that searches a directory for duplicates files, it will work unaltered with a directory on your hard-drive, or in a zip file, or on an FTP server, etc.
+
+As long as an FS object exists for your chosen filesystem (or any data store that resembles a filesystem), you can use the same API. This means that you can defer the decision regarding where you store data to later. If you decide to store configuration in the *cloud*, it could be a single line change and not a major refactor.
+
+PyFilesystem can also be beneficial for unit-testing; by swapping the OS filesystem with an in-memory filesystem, you can write tests without having to manage (or mock) file IO.
 
 Opening Filesystems
 ~~~~~~~~~~~~~~~~~~~
@@ -50,7 +63,7 @@ If you don't specify the protocol in the FS URL, then PyFilesystem will assume y
 Tree
 ~~~~
 
-Calling :meth:`fs.base.FS.tree` on a FS object will give you a nice ASCII representation of your files system. Here's an example::
+Calling :meth:`fs.base.FS.tree` on a FS object will give you a nice ASCII representation of your filessystem. Here's an example::
 
     >>> from fs import open_fs
     >>> my_fs = open_fs('.')
@@ -115,7 +128,7 @@ This will add a ``size`` and ``modified`` property (and others) to the resource 
 
     >>> sum(info.size for info in directory)
 
-See :ref:`info` for more information on Resource information.
+See :ref:`info` for more information.
 
 Sub Directories
 ~~~~~~~~~~~~~~~
