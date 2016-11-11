@@ -250,7 +250,7 @@ class Registry(object):
         if isinstance(fs_url, FS):
             _fs = fs_url
         else:
-            _fs, path = self.open(
+            _fs, _path = self.open(
                 fs_url,
                 writeable=writeable,
                 create=create,

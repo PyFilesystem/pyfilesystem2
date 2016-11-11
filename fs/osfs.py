@@ -73,9 +73,9 @@ class OSFS(FS):
             try:
                 if not os.path.isdir(_root_path):
                     os.makedirs(_root_path, mode=create_mode)
-            except OSError as e:
+            except OSError as error:
                 raise errors.CreateFailed(
-                    'unable to create {} ({})'.format(root_path, e)
+                    'unable to create {} ({})'.format(root_path, error)
                 )
 
         _meta = self._meta = {
@@ -212,10 +212,10 @@ class OSFS(FS):
         with convert_os_errors('makedir', path, directory=True):
             try:
                 os.mkdir(sys_path, mode)
-            except OSError as e:
-                if e.errno == errno.ENOENT:
+            except OSError as error:
+                if error.errno == errno.ENOENT:
                     raise errors.ResourceNotFound(path)
-                elif e.errno == errno.EEXIST and recreate:
+                elif error.errno == errno.EEXIST and recreate:
                     pass
                 else:
                     raise
@@ -244,12 +244,12 @@ class OSFS(FS):
         with convert_os_errors('remove', path):
             try:
                 os.remove(sys_path)
-            except OSError as e:
-                if e.errno == errno.EACCES and sys.platform == "win32":
+            except OSError as error:
+                if error.errno == errno.EACCES and sys.platform == "win32":
                     # sometimes windows says this for attempts to remove a dir
                     if os.path.isdir(sys_path):  # pragma: nocover
                         raise errors.FileExpected(path)
-                if e.errno == errno.EPERM and sys.platform == "darwin":
+                if error.errno == errno.EPERM and sys.platform == "darwin":
                     # sometimes OSX says this for attempts to remove a dir
                     if os.path.isdir(sys_path):  # pragma: nocover
                         raise errors.FileExpected(path)
@@ -298,13 +298,13 @@ class OSFS(FS):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise FileExists(path)
             return io.open(
-               sys_path,
-               mode=_mode.to_platform(),
-               buffering=buffering,
-               encoding=encoding,
-               errors=errors,
-               newline=newline,
-               **options
+                sys_path,
+                mode=_mode.to_platform(),
+                buffering=buffering,
+                encoding=encoding,
+                errors=errors,
+                newline=newline,
+                **options
             )
 
     def setinfo(self, path, info):

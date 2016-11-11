@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 from . import constants
 from . import errors
-from .enums import ResourceType
 from .errors import DirectoryNotEmpty
 from .errors import ResourceNotFound
 from .path import abspath
@@ -35,12 +34,10 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
     """
     Copy data from one file object to another.
 
-    :param src_file: File open for reading.
-    :type src_file: file object
-    :param dst_file: File open for writing.
-    :type dst_file: file object
-    :param chunk_size: Number of bytes to copy at a time (None to use
-        sensible default).
+    :param file src_file: File open for reading.
+    :param file dst_file: File open for writing.
+    :param int chunk_size: Number of bytes to copy at a time (None to
+        use sensible default).
     :returns: Number of bytes copied.
     :rtype: int
 

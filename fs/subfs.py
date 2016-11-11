@@ -1,3 +1,8 @@
+"""
+
+A SubFS represents a directory in a 'parent' filesystem.
+
+"""
 
 from __future__ import print_function
 from __future__ import unicode_literals

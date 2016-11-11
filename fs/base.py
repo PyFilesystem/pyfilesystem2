@@ -237,8 +237,8 @@ class FS(object):
 
         :param str src_path: Source directory.
         :param str dst_path: Destination directory.
-        :param bool create: If ``True`` then ``src_path`` will be created if
-            it doesn't already exist.
+        :param bool create: If ``True`` then ``src_path`` will be
+            created if it doesn't already exist.
         :raises `fs.errors.ResourceNotFound`: If the destination
             directory does not exist, and ``create`` is not True.
 
@@ -261,7 +261,7 @@ class FS(object):
         :param bool wipe: Truncate any existing file to 0 bytes.
         :returns: ``True`` if file was created, ``False`` if it already
             existed.
-        :rtype bool:
+        :rtype: bool
 
         The default behavior is to create a new file if one doesn't
         already exist. If ``wipe`` is set to ``True``, any existing
@@ -439,7 +439,8 @@ class FS(object):
 
         :param keys: A list of keys to retrieve, or None for all keys.
         :type keys: list or None
-        :param str namespace: The meta namespace (default is `"standard"`).
+        :param str namespace: The meta namespace (default is
+            `"standard"`).
         :rtype: dict
 
         Meta information is associated with a *namespace* which may be

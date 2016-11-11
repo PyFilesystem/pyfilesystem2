@@ -1,18 +1,16 @@
-from __future__ import print_function
-from __future__ import unicode_literals
-
 """
-FS Paths
-========
-
-Useful functions for FS path manipulation.
+Useful functions for working with PyFilesystem paths.
 
 This is broadly similar to the standard ``os.path`` module but works
 with paths in the canonical format expected by all FS objects (that is,
 separated by forward slashes and with an optional leading slash).
 
+See :ref:`paths` for an explanation of PyFilesystem paths.
+
 """
 
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import re
 
@@ -158,8 +156,8 @@ def abspath(path):
     """
     Convert the given path to an absolute path.
 
-    Since FS objects have no concept of a 'current directory' this
-    simply adds a leading '/' character if the path doesn't already have
+    Since FS objects have no concept of a *current directory*, this
+    simply adds a leading ``/`` character if the path doesn't already have
     one.
 
     :param str path: A PyFilesytem path
@@ -436,7 +434,7 @@ def frombase(path1, path2):
 
     :param str path1: An FS path
     :param str path2: An FS path
-    :rtype: bool
+    :rtype: str
 
     >>> frombase('foo/bar/', 'foo/bar/baz/egg')
     'baz/egg'

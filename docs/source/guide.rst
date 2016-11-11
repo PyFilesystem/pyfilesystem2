@@ -183,7 +183,7 @@ You can open a file from a FS object with :meth:`fs.base.FS.open`, which is very
     ...        print(reminder_file.read())
     buy coffee
 
-In the case of a ``OSFS``, a standard file-like object will be returned. Other filesystems may return a different object supporting the same methods. For instance, :class:`fs.memoryfs.MemoryFS` will return a `io.BytesIO` object.
+In the case of a ``OSFS``, a standard file-like object will be returned. Other filesystems may return a different object supporting the same methods. For instance, :class:`fs.memoryfs.MemoryFS` will return a ``io.BytesIO`` object.
 
 PyFilesystem also offers a number of shortcuts for common file related operations. For instance, :meth:`fs.base.FS.getbytes` will return the file contents as a bytes object, and :meth:`fs.base.FS.settext` will read unicode text. Using these methods is generally preferable to opening files, because the FS object may have an optimized implementation.
 

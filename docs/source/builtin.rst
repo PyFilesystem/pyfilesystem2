@@ -10,3 +10,4 @@ Builtin Filesystems
    reference/multifs.rst
    reference/osfs.rst
    reference/subfs.rst
+   reference/tempfs.rst

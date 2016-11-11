@@ -58,8 +58,8 @@ def move_dir(src_fs, src_path, dst_fs, dst_path):
     :param dst_path: A path to a directory on ``dst_fs``.
 
     """
-    with manage_fs(src_fs) as _src_fs:
-        with manage_fs(dst_fs, create=True) as _dst_fs:
+    with manage_fs(src_fs) as src_fs:
+        with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
                 dst_fs.makedir(dst_path, recreate=True)
                 copy_dir(

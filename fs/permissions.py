@@ -1,5 +1,10 @@
-from __future__ import unicode_literals
+"""
+An abstract permissions container.
+
+"""
+
 from __future__ import print_function
+from __future__ import unicode_literals
 
 import six
 
@@ -18,8 +23,8 @@ class _PermProperty(object):
         self._name = name
         self.__doc__ = "Boolean for '{}' permission.".format(name)
 
-    def __get__(self, obj, type=None):
-        return self._name in obj._perms
+    def __get__(self, obj, obj_type=None):
+        return self._name in obj
 
     def __set__(self, obj, value):
         if value:
@@ -70,9 +75,9 @@ class Permissions(object):
             }
         else:
             perms = self._perms = set()
-            perms.update('u_' + p for p in (user or ''))
-            perms.update('g_' + p for p in (group or ''))
-            perms.update('o_' + p for p in (other or ''))
+            perms.update('u_' + p for p in user or '')
+            perms.update('g_' + p for p in group or '')
+            perms.update('o_' + p for p in other or '')
 
         if sticky:
             self._perms.add('sticky')
@@ -88,22 +93,23 @@ class Permissions(object):
             )
             return "Permissions(names=[{}])".format(_perms_str)
 
-        def check(perm, name):
+        def _check(perm, name):
             return name if perm in self._perms else ''
+
         user = ''.join((
-            check('u_r', 'r'),
-            check('u_w', 'w'),
-            check('u_x', 'x')
+            _check('u_r', 'r'),
+            _check('u_w', 'w'),
+            _check('u_x', 'x')
         ))
         group = ''.join((
-            check('g_r', 'r'),
-            check('g_w', 'w'),
-            check('g_x', 'x')
+            _check('g_r', 'r'),
+            _check('g_w', 'w'),
+            _check('g_x', 'x')
         ))
         other = ''.join((
-            check('o_r', 'r'),
-            check('o_w', 'w'),
-            check('o_x', 'x')
+            _check('o_r', 'r'),
+            _check('o_w', 'w'),
+            _check('o_x', 'x')
         ))
         args = []
         _fmt = "user='{}', group='{}', other='{}'"
@@ -134,7 +140,7 @@ class Permissions(object):
         return self.dump() == names
 
     def __ne__(self, other):
-        return not (self.__eq__(other))
+        return not self.__eq__(other)
 
     @classmethod
     def parse(cls, ls):
@@ -214,7 +220,7 @@ class Permissions(object):
 
     @property
     def mode(self):
-        """*nix mode integer."""
+        """Mode integer."""
         mode = 0
         for name, mask in self._LINUX_PERMS:
             if name in self._perms:
@@ -223,6 +229,7 @@ class Permissions(object):
 
     @mode.setter
     def mode(self, mode):
+        """Set mode integer."""
         self._perms = {
             name
             for name, mask in self._LINUX_PERMS

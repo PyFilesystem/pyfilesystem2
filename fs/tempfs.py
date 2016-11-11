@@ -12,6 +12,19 @@ from .osfs import OSFS
 
 @six.python_2_unicode_compatible
 class TempFS(OSFS):
+    """
+    Create a temporary filesystem.
+
+    :param str identifier: A string to distinguish the directory within
+        the OS temp location, used as part of the directory name.
+    :param str temp_dir: An OS path to your temp directory (leave as
+        ``None`` to auto-detect)
+    :param bool auto_clean: If True, the directory contents will be
+        wiped on close.
+    :param bool ignore_clean_errors: If True, any errors in the clean
+        process will be raised. If False, they will be suppressed.
+
+    """
 
     def __init__(self,
                  identifier=None,
