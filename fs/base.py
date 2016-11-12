@@ -32,6 +32,7 @@ from .path import abspath
 from .path import join
 from .path import normpath
 from .time import datetime_to_epoch
+from .walk import Walker
 
 
 class FS(object):
@@ -43,6 +44,7 @@ class FS(object):
     def __init__(self):
         self._closed = False
         self._lock = threading.RLock()
+        self.walker = Walker.bind(self)
         super(FS, self).__init__()
 
     def __enter__(self):
@@ -895,7 +897,7 @@ class FS(object):
         :type file: file object
 
         This method copies bytes from an open binary file to a file on
-        the filesystem.  If the destination exists, it will first be
+        the filesystem. If the destination exists, it will first be
         truncated.
 
         Note that the file object ``file`` will *not* be closed by this

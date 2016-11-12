@@ -8,13 +8,13 @@ Why use PyFilesystem?
 
 If you are comfortable using the Python standard library, you might be wondering why you need another API for working with files and directories.
 
-There are a number of benefits. PyFilesystem is generally simpler, and less error prone than the equivalent code using the ``os`` and ``io`` modules. That may be good enough reason to use PyFilesytem, given that bugs in such code could cause data loss. But simpler code is only a tangential benefit for many.
+Code using PyFilesystem is generally simpler and less error prone than the equivalent code using the ``os`` and ``io`` modules. That may be good enough reason to use PyFilesytem, given that bugs in such code could cause data loss. But simpler code is only a tangential benefit.
 
 The abstraction offered by FS objects means that you can write code that is agnostic to where your files are physically located. For instance, if you wrote a function that searches a directory for duplicates files, it will work unaltered with a directory on your hard-drive, or in a zip file, or on an FTP server, etc.
 
 As long as an FS object exists for your chosen filesystem (or any data store that resembles a filesystem), you can use the same API. This means that you can defer the decision regarding where you store data to later. If you decide to store configuration in the *cloud*, it could be a single line change and not a major refactor.
 
-PyFilesystem can also be beneficial for unit-testing; by swapping the OS filesystem with an in-memory filesystem, you can write tests without having to manage (or mock) file IO.
+PyFilesystem can also be beneficial for unit-testing; by swapping the OS filesystem with an in-memory filesystem, you can write tests without having to manage (or mock) file IO. And you can be sure that your code will work on Linux, MacOS, and Windows.
 
 Opening Filesystems
 ~~~~~~~~~~~~~~~~~~~
@@ -166,12 +166,11 @@ Often you will need to scan the files in a given directory, and any sub-director
 Here's how you would print the paths to all your Python files in your home-directory (and sub-directories)::
 
     >>> from fs import open_fs
-    >>> from fs.walk import walk_files
     >>> home_fs = open_fs('~/')
-    >>> for path in walk_files(home_fs, wildcards=['*.py']):
+    >>> for path in home_fs.walker.walk_files(wildcards=['*.py']):
     ...     print(path)
 
-This might take a while to run, if you have a lot of Python code.
+This might take a while to run if you have a lot of Python code!
 
 Working with Files
 ~~~~~~~~~~~~~~~~~~
@@ -185,7 +184,7 @@ You can open a file from a FS object with :meth:`fs.base.FS.open`, which is very
 
 In the case of a ``OSFS``, a standard file-like object will be returned. Other filesystems may return a different object supporting the same methods. For instance, :class:`fs.memoryfs.MemoryFS` will return a ``io.BytesIO`` object.
 
-PyFilesystem also offers a number of shortcuts for common file related operations. For instance, :meth:`fs.base.FS.getbytes` will return the file contents as a bytes object, and :meth:`fs.base.FS.settext` will read unicode text. Using these methods is generally preferable to opening files, because the FS object may have an optimized implementation.
+PyFilesystem also offers a number of shortcuts for common file related operations. For example, :meth:`fs.base.FS.getbytes` will return the file contents as a bytes object, and :meth:`fs.base.FS.gettext` will read unicode text. Using these methods is generally preferable to explicitly opening files, because the FS object may have an optimized implementation.
 
 Other *shortcut* methods are :meth:`fs.base.FS.setbin`, :meth:`fs.base.FS.setbytes`, :meth:`fs.base.FS.settext`.
 
