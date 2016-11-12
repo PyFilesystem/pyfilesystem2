@@ -167,10 +167,12 @@ Here's how you would print the paths to all your Python files in your home-direc
 
     >>> from fs import open_fs
     >>> home_fs = open_fs('~/')
-    >>> for path in home_fs.walker.walk_files(wildcards=['*.py']):
+    >>> for path in home_fs.walk.files(wildcards=['*.py']):
     ...     print(path)
 
 This might take a while to run if you have a lot of Python code!
+
+The ``walk`` attribute on FS objects is instance of a :class:`fs.walk.Walker`, which should be able to handle most directory walking requirements. It is designed to be customizable, if you do need to further tune the directory walk.
 
 Working with Files
 ~~~~~~~~~~~~~~~~~~

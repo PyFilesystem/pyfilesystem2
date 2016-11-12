@@ -44,7 +44,6 @@ class FS(object):
     def __init__(self):
         self._closed = False
         self._lock = threading.RLock()
-        self.walker = Walker.bind(self)
         super(FS, self).__init__()
 
     def __enter__(self):
@@ -54,6 +53,10 @@ class FS(object):
     def __exit__(self, exc_type, exc_value, traceback):
         """Close filesystem on exit."""
         self.close()
+
+    @property
+    def walk(self):
+        return Walker.bind(self)
 
     # ---------------------------------------------------------------- #
     # Required methods                                                 #

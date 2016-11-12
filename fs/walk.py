@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 from collections import deque
 from functools import partial
 import itertools
-import weakref
 
 import six
 
@@ -41,7 +40,7 @@ class Walker(object):
 
             >>> from fs import open_fs
             >>> home_fs = open_fs('~/')
-            >>> for path in home_fs.walker.walk_files(wildcards=['*.py']):
+            >>> for path in home_fs.walk.files(wildcards=['*.py']):
             ...     print(path)
 
 
@@ -324,24 +323,24 @@ class BoundWalker(object):
     """A Walker that works with a single FS object."""
 
     def __init__(self, fs, walker):
-        self._fs = weakref.ref(fs)
+        self.fs = fs
         self.walker = walker
-        self.walk = partial(walker.walk, fs)
-        self.walk_files = partial(walker.walk_files, fs)
-        self.walk_dirs = partial(walker.walk_dirs, fs)
-        self.walk_info = partial(walker.walk_info, fs)
+        self.files = partial(walker.walk_files, fs)
+        self.dirs = partial(walker.walk_dirs, fs)
+        self.info = partial(walker.walk_info, fs)
+
+    def __call__(self, *args, **kwargs):
+        return self.walker.walk(self.fs, *args, **kwargs)
 
     def __repr__(self):
         return "BoundWalker({!r}, {!r})".format(self.fs, self.walker)
 
-    @property
-    def fs(self):
-        """Gets the weakref FS object."""
-        return self._fs()
+# Allow access to default walker from the module
+# For example:
+#     fs.walk.walk_files(my_ds)
 
-
-walker = Walker()
-walk = walker.walk
-walk_files = walker.walk_files
-walk_dirs = walker.walk_dirs
-walk_info = walker.walk_info
+default_walker = Walker()
+walk = default_walker.walk
+walk_files = default_walker.walk_files
+walk_info = default_walker.walk_info
+walk_dirs = default_walker.walk_dirs
