@@ -161,7 +161,7 @@ class MultiFS(FS):
                 self._resort()
 
     def getinfo(self, path, namespaces=None):
-        self._check()
+        self.check()
         namespaces = namespaces or ()
         fs = self._delegate(path)
         if fs is None:
@@ -171,7 +171,7 @@ class MultiFS(FS):
         return info
 
     def listdir(self, path):
-        self._check()
+        self.check()
         directory = []
         exists = False
         for _name, _fs in self.iterate_fs():
@@ -186,13 +186,13 @@ class MultiFS(FS):
         return directory
 
     def makedir(self, path, permissions=None, recreate=False):
-        self._check()
+        self.check()
         self._require_writable(path)
         return self.write_fs.makedir(
             path, permissions=permissions, recreate=recreate)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
-        self._check()
+        self.check()
         if check_writable(mode):
             self._require_writable(path)
             _fs = self.write_fs
@@ -206,17 +206,17 @@ class MultiFS(FS):
         )
 
     def remove(self, path):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.remove(path)
 
     def removedir(self, path):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.removedir(path)
 
     def scandir(self, path, namespaces=None, page=None):
-        self._check()
+        self.check()
         seen = set()
         exists = False
         for fs_name, fs in self.iterate_fs():
@@ -233,14 +233,14 @@ class MultiFS(FS):
             raise errors.ResourceNotFound(path)
 
     def getbytes(self, path):
-        self._check()
+        self.check()
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
         return fs.getbytes(path)
 
     def gettext(self, path, encoding=None, errors=None, newline=None):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.gettext(
             path,
@@ -250,59 +250,59 @@ class MultiFS(FS):
         )
 
     def getsize(self, path):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.getsize(path)
 
     def getsyspath(self, path):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.getsyspath(path)
 
     def gettype(self, path):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.gettype(path)
 
     def geturl(self, path, purpose='download'):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.geturl(path, purpose=purpose)
 
     def hassyspath(self, path):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.hassyspath(path)
 
     def hasurl(self, path):
-        self._check()
+        self.check()
         fs = self._delegate_required(path)
         return fs.hasurl(path)
 
     def isdir(self, path):
-        self._check()
+        self.check()
         fs = self._delegate(path)
         return fs and fs.isdir(path)
 
     def isfile(self, path):
-        self._check()
+        self.check()
         fs = self._delegate(path)
         return fs and fs.isfile(path)
 
     def setinfo(self, path, info):
-        self._check()
+        self.check()
         self._require_writable(path)
         return self.write_fs.setinfo(path, info)
 
     def validatepath(self, path):
-        self._check()
+        self.check()
         if self.write_fs is not None:
             self.write_fs.validatepath(path)
         else:
             super(MultiFS, self).validatepath(path)
 
     def makedirs(self, path, permissions=None, recreate=False):
-        self._check()
+        self.check()
         self._require_writable(path)
         return self.write_fs.makedirs(
             path,
@@ -318,7 +318,7 @@ class MultiFS(FS):
              errors=None,
              newline=None,
              **kwargs):
-        self._check()
+        self.check()
         if check_writable(mode):
             self._require_writable(path)
             _fs = self.write_fs

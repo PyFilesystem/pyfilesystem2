@@ -173,7 +173,7 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def getinfo(self, path, namespaces=None):
-        self._check()
+        self.check()
         namespaces = namespaces or ()
         sys_path = self.getsyspath(path)
         with convert_os_errors('getinfo', path):
@@ -198,14 +198,14 @@ class OSFS(FS):
         return Info(info)
 
     def listdir(self, path):
-        self._check()
+        self.check()
         sys_path = self._to_sys_path(path)
         with convert_os_errors('listdir', path, directory=True):
             names = os.listdir(sys_path)
         return names
 
     def makedir(self, path, permissions=None, recreate=False):
-        self._check()
+        self.check()
         mode = Permissions.get_mode(permissions)
         self.validatepath(path)
         sys_path = self._to_sys_path(path)
@@ -224,7 +224,7 @@ class OSFS(FS):
     def openbin(self, path, mode="r", buffering=-1, **options):
         _mode = Mode(mode)
         _mode.validate_bin()
-        self._check()
+        self.check()
         self.validatepath(path)
         sys_path = self._to_sys_path(path)
         with convert_os_errors('openbin', path):
@@ -239,7 +239,7 @@ class OSFS(FS):
         return binary_file
 
     def remove(self, path):
-        self._check()
+        self.check()
         sys_path = self._to_sys_path(path)
         with convert_os_errors('remove', path):
             try:
@@ -256,7 +256,7 @@ class OSFS(FS):
                 raise
 
     def removedir(self, path):
-        self._check()
+        self.check()
         _path = abspath(normpath(path))
         if _path == '/':
             raise errors.RemoveRootError()
@@ -273,7 +273,7 @@ class OSFS(FS):
         return sys_path
 
     def gettype(self, path):
-        self._check()
+        self.check()
         sys_path = self._to_sys_path(path)
         with convert_os_errors('gettype', path):
             stat = os.stat(sys_path)
@@ -291,7 +291,7 @@ class OSFS(FS):
              **options):
         _mode = Mode(mode)
         validate_open_mode(mode)
-        self._check()
+        self.check()
         self.validatepath(path)
         sys_path = self._to_sys_path(path)
         with convert_os_errors('open', path):
@@ -308,7 +308,7 @@ class OSFS(FS):
             )
 
     def setinfo(self, path, info):
-        self._check()
+        self.check()
         sys_path = self._to_sys_path(path)
         if not os.path.exists(sys_path):
             raise errors.ResourceNotFound(path)
@@ -324,7 +324,7 @@ class OSFS(FS):
                         os.utime(sys_path, (accessed, modified))
 
     def _scandir(self, path, namespaces=None):
-        self._check()
+        self.check()
         namespaces = namespaces or ()
         _path = abspath(normpath(path))
         sys_path = self._to_sys_path(_path)

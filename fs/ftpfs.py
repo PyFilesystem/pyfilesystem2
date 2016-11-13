@@ -324,7 +324,7 @@ class FTPFS(FS):
         return 'MLST' in self.features
 
     def create(self, path, wipe=False):
-        self._check()
+        self.check()
         self.validatepath(path)
         with ftp_errors(self, path):
             if wipe or not self.isfile(path):
@@ -405,7 +405,7 @@ class FTPFS(FS):
             yield raw_info
 
     def getinfo(self, path, namespaces=None):
-        self._check()
+        self.check()
         _path = self.validatepath(path)
         namespaces = namespaces or ()
 
@@ -448,7 +448,7 @@ class FTPFS(FS):
                 return info
 
     # def isdir(self, path):
-    #     self._check()
+    #     self.check()
     #     _path = self.validatepath(path)
     #     try:
     #         self.ftp.cwd(_path)
@@ -458,7 +458,7 @@ class FTPFS(FS):
     #         return True
 
     # def isfile(self, path):
-    #     self._check()
+    #     self.check()
     #     _path = self.validatepath(path)
     #     try:
     #         self.ftp.cwd(_path)
@@ -468,7 +468,7 @@ class FTPFS(FS):
     #         return False
 
     def listdir(self, path):
-        self._check()
+        self.check()
         _path = self.validatepath(path)
         with self._lock:
             dir_list = [
@@ -478,7 +478,7 @@ class FTPFS(FS):
         return dir_list
 
     def makedir(self, path, permissions=None, recreate=False):
-        self._check()
+        self.check()
         self.validatepath(path)
         _path = abspath(normpath(path))
 
@@ -506,7 +506,7 @@ class FTPFS(FS):
     def openbin(self, path, mode="r", buffering=-1, **options):
         _mode = Mode(mode)
         _mode.validate_bin()
-        self._check()
+        self.check()
         self.validatepath(path)
 
         with self._lock:
@@ -524,7 +524,7 @@ class FTPFS(FS):
         return f
 
     def remove(self, path):
-        self._check()
+        self.check()
         self.validatepath(path)
         _path = abspath(normpath(path))
         dir_name, file_name = split(_path)
@@ -535,7 +535,7 @@ class FTPFS(FS):
                 self.ftp.delete(_encode(_path))
 
     def removedir(self, path):
-        self._check()
+        self.check()
         _path = abspath(normpath(path))
         self.validatepath(path)
         if _path == '/':
@@ -555,7 +555,7 @@ class FTPFS(FS):
                 raise  # pragma: no cover
 
     def _scandir(self, path, namespaces=None):
-        self._check()
+        self.check()
         self.validatepath(path)
         _path = abspath(normpath(path))
         with self._lock:

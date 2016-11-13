@@ -136,7 +136,8 @@ class Walker(WalkerBase):
                  ignore_errors=False,
                  on_error=None,
                  search="breadth",
-                 wildcards=None):
+                 wildcards=None,
+                 exclude_dirs=None):
         if search not in ('breadth', 'depth'):
             raise ValueError("search must be 'breadth' or 'depth'")
         self.ignore_errors = ignore_errors
@@ -148,6 +149,7 @@ class Walker(WalkerBase):
         self.on_error = on_error or (lambda path, error: True)
         self.search = search
         self.wildcards = wildcards
+        self.exclude_dirs = exclude_dirs
         super(Walker, self).__init__()
 
 
@@ -187,14 +189,17 @@ class Walker(WalkerBase):
             ('on_error', self.on_error, None),
             ('search', self.search, 'breadth'),
             ('wildcards', self.wildcards, None),
-            ('namespaces', self.namespaces, None)
+            ('exclude_dirs', self.exclude_dirs, None)
         ])
 
 
+    def check_open_dir(self, fs, info):
+        if self.exclude_dirs is None:
+            return True
+        return not fs.match(self.exclude_dirs, info.name)
+
     def check_file(self, fs, info):
-        return (
-            wildcard.imatch_any(self.wildcards, info.name)
-        )
+        return fs.match(self.wildcards, info.name)
 
     def _scan(self, fs, dir_path, namespaces):
         """
@@ -322,42 +327,57 @@ class BoundWalker(object):
 
     def __call__(self,
                  path='/',
+                 ignore_errors=False,
                  on_error=None,
                  search="breadth",
                  wildcards=None,
-                 namespaces=None):
+                 namespaces=None,
+                 exclude_dirs=None):
         """Invokes :meth:`fs.walk.Walker.walk` with bound FS object."""
         walker = self._make_walker(
-           on_error=on_error,
-           search=search,
-           wildcards=wildcards
+            ignore_errors=ignore_errors,
+            on_error=on_error,
+            search=search,
+            wildcards=wildcards,
+            exclude_dirs=exclude_dirs
         )
         return walker.walk(self.fs, path=path, namespaces=namespaces)
 
     def files(self,
               path='/',
+              ignore_errors=False,
               on_error=None,
               search="breadth",
-              wildcards=None):
+              wildcards=None,
+              exclude_dirs=None):
         """
         Invokes :meth:`fs.walk.Walker.walk_files` with bound FS object.
 
         """
         walker = self._make_walker(
-           on_error=on_error,
-           search=search,
-           wildcards=wildcards
+            ignore_errors=ignore_errors,
+            on_error=on_error,
+            search=search,
+            wildcards=wildcards,
+            exclude_dirs=exclude_dirs
         )
         return walker.walk_files(self.fs, path=path)
 
-    def dirs(self, path='/', on_error=None, search="breadth"):
+    def dirs(self,
+             path='/',
+             ignore_errors=False,
+             on_error=None,
+             search="breadth",
+             exclude_dirs=None):
         """
         Invokes :meth:`fs.walk.Walker.walk_dirs` with bound FS object.
 
         """
         walker = self._make_walker(
+            ignore_errors=ignore_errors,
             on_error=on_error,
-            search=search
+            search=search,
+            exclude_dirs=exclude_dirs
         )
         return walker.walk_dirs(self.fs, path=path)
 
@@ -366,6 +386,7 @@ class BoundWalker(object):
              on_error=None,
              search="breadth",
              wildcards=None,
+             exclude_dirs=None,
              namespaces=None):
         """
         Invokes :meth:`fs.walk.Walker.walk_indo` with bound FS object.
@@ -374,7 +395,8 @@ class BoundWalker(object):
         walker = self._make_walker(
            on_error=on_error,
            search=search,
-           wildcards=wildcards
+           wildcards=wildcards,
+           exclude_dirs=exclude_dirs
         )
         return walker.walk_info(self.fs, path=path, namespaces=namespaces)
 

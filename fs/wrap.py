@@ -104,15 +104,15 @@ class WrapReadOnly(WrapFS):
     wrap_name = 'read-only'
 
     def makedir(self, path, permissions=None, recreate=False):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def move(self, src_path, dst_path, overwrite=False):
-        self._check()
+        self.check()
         raise ResourceReadOnly(dst_path)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
-        self._check()
+        self.check()
         if check_writable(mode):
             raise ResourceReadOnly(path)
         return self._wrap_fs.openbin(
@@ -123,15 +123,15 @@ class WrapReadOnly(WrapFS):
         )
 
     def remove(self, path):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def removedir(self, path):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def setinfo(self, path, info):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def settext(self,
@@ -140,23 +140,23 @@ class WrapReadOnly(WrapFS):
                 encoding='utf-8',
                 errors=None,
                 newline=None):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def settimes(self, path, accessed=None, modified=None):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def copy(self, src_path, dst_path):
-        self._check()
+        self.check()
         raise ResourceReadOnly(dst_path)
 
     def create(self, path, wipe=False):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def makedirs(self, path, recreate=False, mode=0o777):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def open(self,
@@ -168,7 +168,7 @@ class WrapReadOnly(WrapFS):
              newline=None,
              line_buffering=False,
              **options):
-        self._check()
+        self.check()
         if check_writable(mode):
             raise ResourceReadOnly(path)
         return self._wrap_fs.open(
@@ -183,7 +183,7 @@ class WrapReadOnly(WrapFS):
         )
 
     def setbytes(self, path, contents):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def setfile(self,
@@ -192,11 +192,11 @@ class WrapReadOnly(WrapFS):
                 encoding=None,
                 errors=None,
                 newline=None):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
     def touch(self, path):
-        self._check()
+        self.check()
         raise ResourceReadOnly(path)
 
 if __name__ == "__main__":

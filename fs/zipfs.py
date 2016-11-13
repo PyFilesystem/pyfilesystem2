@@ -188,7 +188,7 @@ class ReadZipFS(FS):
         as the zip.
 
         """
-        self._check()
+        self.check()
         with self._lock:
             if self._directory_fs is None:
                 self._directory_fs = _fs = MemoryFS()
@@ -205,7 +205,7 @@ class ReadZipFS(FS):
             return self._directory_fs
 
     def getinfo(self, path, namespaces=None):
-        self._check()
+        self.check()
         namespaces = namespaces or ()
         _path = normpath(path)
         if _path == '/':
@@ -254,15 +254,15 @@ class ReadZipFS(FS):
         return Info(raw_info)
 
     def listdir(self, path):
-        self._check()
+        self.check()
         return self._directory.listdir(path)
 
     def makedir(self, path, permissions=None, recreate=False):
-        self._check()
+        self.check()
         raise errors.ResourceReadOnly(path)
 
     def openbin(self, path, mode="r", buffering=-1, **kwargs):
-        self._check()
+        self.check()
         if 'w' in mode or '+' in mode or 'a' in mode:
             raise errors.ResourceReadOnly(path)
 
@@ -274,11 +274,11 @@ class ReadZipFS(FS):
         return bin_file
 
     def remove(self, path):
-        self._check()
+        self.check()
         raise errors.ResourceReadOnly(path)
 
     def removedir(self, path):
-        self._check()
+        self.check()
         raise errors.ResourceReadOnly(path)
 
     def close(self):
@@ -286,7 +286,7 @@ class ReadZipFS(FS):
         self._zip.close()
 
     def getbytes(self, path):
-        self._check()
+        self.check()
         if not self._directory.isfile(path):
             raise errors.ResourceNotFound(path)
         zip_name = self._path_to_zip_name(path)

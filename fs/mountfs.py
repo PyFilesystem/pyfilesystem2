@@ -102,34 +102,34 @@ class MountFS(FS):
         return "{path} on {fs}".format(fs=fs, path=delegate_path)
 
     def getinfo(self, path, namespaces=None):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.getinfo(_path, namespaces=namespaces)
 
     def listdir(self, path):
-        self._check()
+        self.check()
         fs, delegate_path = self._delegate(path)
         return fs.listdir(delegate_path)
 
     def makedir(self, path, permissions=None, recreate=False):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.makedir(
             _path, permissions=permissions, recreate=recreate)
 
     def openbin(self, path, mode='r', buffering=-1, **kwargs):
         validate_openbin_mode(mode)
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.openbin(_path, mode=mode, buffering=-1, **kwargs)
 
     def remove(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.remove(_path)
 
     def removedir(self, path):
-        self._check()
+        self.check()
         path = normpath(path)
         if path in ('', '/'):
             raise errors.RemoveRootError(path)
@@ -137,12 +137,12 @@ class MountFS(FS):
         return fs.removedir(_path)
 
     def getbytes(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.getbytes(_path)
 
     def gettext(self, path, encoding=None, errors=None, newline=None):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.gettext(
             _path,
@@ -152,52 +152,52 @@ class MountFS(FS):
         )
 
     def getsize(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.getsize(path)
 
     def getsyspath(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.getsyspath(path)
 
     def gettype(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.gettype(_path)
 
     def geturl(self, path, purpose='download'):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.geturl(path, purpose=purpose)
 
     def hasurl(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.hasurl(_path)
 
     def isdir(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.isdir(_path)
 
     def isfile(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.isfile(_path)
 
     def scandir(self, path, namespaces=None, page=None):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.scandir(_path, namespaces=namespaces, page=page)
 
     def setinfo(self, path, info):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.setinfo(path, info)
 
     def validatepath(self, path):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.validatepath(_path)
 
@@ -210,7 +210,7 @@ class MountFS(FS):
              newline=None,
              **options):
         validate_open_mode(mode)
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.open(
             _path,
@@ -223,12 +223,12 @@ class MountFS(FS):
         )
 
     def setbin(self, path, file):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.setbin(path, file)
 
     def setbytes(self, path, contents):
-        self._check()
+        self.check()
         fs, _path = self._delegate(path)
         return fs.setbytes(path, contents)
 

@@ -288,7 +288,7 @@ class MemoryFS(FS):
         return Info(info)
 
     def listdir(self, path):
-        self._check()
+        self.check()
         _path = self.validatepath(path)
         with self._lock:
             dir_entry = self._get_dir_entry(_path)

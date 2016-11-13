@@ -717,7 +717,7 @@ class FS(object):
         :raises `fs.errors.ResourceNotFound`: if the path is not found.
 
         """
-        self._check()
+        self.check()
         with self._lock:
             dir_paths = tools.get_intermediate_dirs(self, path)
             for dir_path in dir_paths:
@@ -1051,7 +1051,7 @@ class FS(object):
             is closed.
 
         """
-        self._check()
+        self.check()
 
         if isinstance(path, bytes):
             raise ValueError('path must not be bytes')
@@ -1115,7 +1115,7 @@ class FS(object):
         """
         return self.getinfo(path, namespaces=['details'])
 
-    def _check(self):
+    def check(self):
         """
         Check a filesystem may be used.
 
@@ -1129,6 +1129,30 @@ class FS(object):
         """
         if self.isclosed():
             raise errors.FilesystemClosed()
+
+    def match(self, wildcards, name):
+        """
+        Check if a name matches any of a list of wildcards.
+
+        :param list wildcards: A list of wildcards, e.g. ``['*.py']``
+        :param str name: A file or directory name (not a path)
+        :rtype: bool
+
+        If a filesystem is case *insensitive* (such as Windows) then
+        this method will perform a case insensitive match (i.e. ``*.py``
+        will match the same files as ``*.PY``). Otherwise the match will
+        be case sensitive (``*.py`` and ``*.PYzz will match different
+        names).
+
+            >>> home_fs.match(['*.py'], '__init__.py')
+            True
+            >>> home_fs.match(['*.jpg', '*.png'], 'foo.gif')
+            False
+
+        """
+        case_sensitive = self.getmeta().get('case_sensitive', True)
+        matcher = wildcard.get_matcher(wildcards, case_sensitive)
+        return matcher(name)
 
     def tree(self, **kwargs):
         """
