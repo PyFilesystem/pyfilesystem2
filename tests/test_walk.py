@@ -25,10 +25,10 @@ class TestWalk(unittest.TestCase):
 
     def test_invalid(self):
         with self.assertRaises(ValueError):
-            walk.walk(self.fs, search='random')
+            self.fs.walk(search='random')
 
     def test_walk_files(self):
-        files = list(walk.walk_files(self.fs))
+        files = list(self.fs.walk.files())
 
         self.assertEqual(
             files,
@@ -40,7 +40,7 @@ class TestWalk(unittest.TestCase):
             ]
         )
 
-        files = list(walk.walk_files(self.fs, search="depth"))
+        files = list(self.fs.walk.files(search="depth"))
         print(repr(files))
 
         self.assertEqual(
@@ -54,7 +54,7 @@ class TestWalk(unittest.TestCase):
         )
 
     def test_walk_dirs(self):
-        dirs = list(walk.walk_dirs(self.fs))
+        dirs = list(self.fs.walk.dirs())
         self.assertEqual(
             dirs,
             [
@@ -67,7 +67,7 @@ class TestWalk(unittest.TestCase):
             ]
         )
 
-        dirs = list(walk.walk_dirs(self.fs, search="depth"))
+        dirs = list(self.fs.walk.dirs(search="depth"))
         self.assertEqual(
             dirs,
             [
@@ -90,7 +90,7 @@ class TestWalk(unittest.TestCase):
 
         self.fs.scandir = broken_scandir
 
-        files = list(walk.walk_files(self.fs, search="depth"))
+        files = list(self.fs.walk.files(search="depth"))
         self.assertEqual(
             files,
             [
@@ -101,8 +101,7 @@ class TestWalk(unittest.TestCase):
 
         with self.assertRaises(FSError):
             list(
-                walk.walk_files(
-                    self.fs,
+                self.fs.walk.files(
                     on_error=lambda path, error: False
                 )
             )

@@ -834,12 +834,8 @@ class FS(object):
 
         _dir_path = abspath(normpath(dir_path))
         with self._lock:
-            walker = walk.Walker()
-            gen_info = walker.walk_info(
-                self,
-                _dir_path,
-                search="depth"
-            )
+            walker = walk.Walker(search="depth")
+            gen_info = walker.walk_info(self, _dir_path)
             for _path, info in gen_info:
                 if info.is_dir:
                     self.removedir(_path)

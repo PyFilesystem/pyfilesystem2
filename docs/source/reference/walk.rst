@@ -5,7 +5,7 @@ Walk a directory structure.
 
 The ``Walker`` class in this module does the work of *walking* a filesystem. In other words, listing each resource in a directory, and any sub-directories.
 
-To walk a filesystem (or directory) you can construct a :class::`fs.walk.Walker` object and use its methods to do the walking. Here's an example that prints the path to every Python file in your projects directory::
+To walk a filesystem (or directory) you can construct a :class:`fs.walk.Walker` object and use its methods to do the walking. Here's an example that prints the path to every Python file in your projects directory::
 
     >>> from fs import open_fs
     >>> from fs.walk import Walker

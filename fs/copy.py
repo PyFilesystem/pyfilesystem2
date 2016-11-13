@@ -1,7 +1,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from . import walk
+from .walk import Walker
 from .opener import manage_fs
 from .path import abspath
 from .path import combine
@@ -9,7 +9,7 @@ from .path import frombase
 from .path import normpath
 
 
-def copy_fs(src_fs, dst_fs):
+def copy_fs(src_fs, dst_fs, walker=None):
     """
     Copy the contents of one filesystem to another.
 
@@ -21,7 +21,7 @@ def copy_fs(src_fs, dst_fs):
     :type dst_fs: FS URL or instance
 
     """
-    copy_dir(src_fs, '/', dst_fs, '/')
+    copy_dir(src_fs, '/', dst_fs, '/', walker=walker)
 
 
 def copy_file(src_fs, src_path, dst_fs, dst_path):
@@ -51,7 +51,7 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
                         dst_fs.setbin(dst_path, read_file)
 
 
-def copy_structure(src_fs, dst_fs):
+def copy_structure(src_fs, dst_fs, walker=None):
     """
     Copy directories (but not files) from ``src_fs`` to ``dst_fs``.
 
@@ -61,14 +61,15 @@ def copy_structure(src_fs, dst_fs):
     :type dst_fs: FS URL or instance
 
     """
+    walker = walker or Walker()
     with manage_fs(src_fs, writeable=False) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
-                for dir_path in walk.walk_dirs(src_fs):
+                for dir_path in walker.walk_dirs(src_fs):
                     dst_fs.makedir(dir_path, recreate=True)
 
 
-def copy_dir(src_fs, src_path, dst_fs, dst_path):
+def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None):
     """
     Copy a directory from one filesystem to another.
 
@@ -82,6 +83,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path):
 
     """
 
+    walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
 
@@ -89,7 +91,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path):
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
                 dst_fs.makedir(_dst_path, recreate=True)
-                for dir_path, dirs, files in walk.walk(src_fs, _src_path):
+                for dir_path, dirs, files in walker.walk(src_fs, _src_path):
                     copy_path = combine(
                         _dst_path,
                         frombase(_src_path, dir_path)
