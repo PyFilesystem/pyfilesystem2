@@ -107,7 +107,8 @@ def get_matcher(patterns, case_sensitive):
 
 
 def _translate(pattern, case_sensitive=True):
-    """Translate a shell PATTERN to a regular expression.
+    """
+    Translate a shell PATTERN to a regular expression.
 
     There is no way to quote meta-characters.
 

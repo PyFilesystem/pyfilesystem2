@@ -1095,8 +1095,6 @@ class FS(object):
 
             fs.getinfo(path, namespaces=['basic'])
 
-
-
         """
         return self.getinfo(path, namespaces=['basic'])
 
@@ -1140,8 +1138,8 @@ class FS(object):
 
         If a filesystem is case *insensitive* (such as Windows) then
         this method will perform a case insensitive match (i.e. ``*.py``
-        will match the same files as ``*.PY``). Otherwise the match will
-        be case sensitive (``*.py`` and ``*.PYzz will match different
+        will match the same names as ``*.PY``). Otherwise the match will
+        be case sensitive (``*.py`` and ``*.PY`` will match different
         names).
 
             >>> home_fs.match(['*.py'], '__init__.py')
@@ -1149,7 +1147,12 @@ class FS(object):
             >>> home_fs.match(['*.jpg', '*.png'], 'foo.gif')
             False
 
+        If ``wildcards`` is ``None``, or (``['*']``), then this method
+        will return True.
+
         """
+        if wildcards is None:
+            return True
         case_sensitive = self.getmeta().get('case_sensitive', True)
         matcher = wildcard.get_matcher(wildcards, case_sensitive)
         return matcher(name)

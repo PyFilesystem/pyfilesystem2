@@ -10,18 +10,18 @@ To walk a filesystem (or directory) you can construct a :class:`fs.walk.Walker` 
     >>> from fs import open_fs
     >>> from fs.walk import Walker
     >>> home_fs = open_fs('~/projects')
-    >>> walker = Walker()
-    >>> for path in walker.walk_files(home_fs, wildcards=['*.py']):
+    >>> walker = Walker(wildcards=['*.py'])
+    >>> for path in walker.walk_files(home_fs):
     ...     print(path)
 
-Generally speaking, however, you will only need to construct a Walker object if you want to customize some behavior of the walking algorithm. This is because filesystem objects already have a walker attribute, which you can use as follows::
+Generally speaking, however, you will only need to construct a Walker object if you want to customize some behavior of the walking algorithm. This is because you can access the functionality of a Walker object via the ``walk`` attribute on FS objects. Here's an example::
 
     >>> from fs import open_fs
     >>> home_fs = open_fs('~/projects')
-    >>> for path in home_fs.walker.walk_files(wildcards=['*.py']):
+    >>> for path in home_fs.walk.files(wildcards=['*.py']):
     ...     print(path)
 
-Note that the ``walk_files`` method above doesn't require a ``fs`` parameter. This is because the ``walker`` object has been *bound* to filesystem (see :meth:`fs.walk.Walker.bind`).
+Note that the ``files`` method above doesn't require a ``fs`` parameter. This is because the ``walker`` object has been *bound* to filesystem (see :meth:`fs.walk.Walker.bind`).
 
 
 Search Methods

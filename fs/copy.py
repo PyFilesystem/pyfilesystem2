@@ -1,3 +1,9 @@
+"""
+
+Functions for copying resources *between* filesystem.
+
+"""
+
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -19,6 +25,10 @@ def copy_fs(src_fs, dst_fs, walker=None):
     :type src_path: str
     :param dst_fs: Destination filesystem.
     :type dst_fs: FS URL or instance
+    :param walker: A walker object that will be used to scan for files
+        in ``src_fs``. Set this if you only want to consider a sub-set
+        of the resources in ``src_fs``.
+    :type walker: :class:`fs.walk.Walker`
 
     """
     copy_dir(src_fs, '/', dst_fs, '/', walker=walker)
@@ -59,6 +69,10 @@ def copy_structure(src_fs, dst_fs, walker=None):
     :type src_fs: FS URL or instance
     :param dst_fs: Destination filesystem.
     :type dst_fs: FS URL or instance
+    :param walker: A walker object that will be used to scan for files
+        in ``src_fs``. Set this if you only want to consider a sub-set
+        of the resources in ``src_fs``.
+    :type walker: :class:`fs.walk.Walker`
 
     """
     walker = walker or Walker()
@@ -80,6 +94,10 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None):
     :param dst_fs: Destination filesystem.
     :type dst_fs: FS URL or instance
     :param dst_path: A path to a directory on ``dst_fs``.
+    :param walker: A walker object that will be used to scan for files
+        in ``src_fs``. Set this if you only want to consider a sub-set
+        of the resources in ``src_fs``.
+    :type walker: :class:`fs.walk.Walker`
 
     """
 
