@@ -79,7 +79,7 @@ def copy_structure(src_fs, dst_fs, walker=None):
     with manage_fs(src_fs, writeable=False) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
-                for dir_path in walker.walk_dirs(src_fs):
+                for dir_path in walker.dirs(src_fs):
                     dst_fs.makedir(dir_path, recreate=True)
 
 

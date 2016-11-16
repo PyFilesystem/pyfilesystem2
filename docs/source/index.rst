@@ -15,6 +15,7 @@ Contents:
    guide.rst
    concepts.rst
    info.rst
+   walking.rst
    builtin.rst
    reference.rst
 

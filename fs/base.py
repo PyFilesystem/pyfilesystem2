@@ -835,7 +835,7 @@ class FS(object):
         _dir_path = abspath(normpath(dir_path))
         with self._lock:
             walker = walk.Walker(search="depth")
-            gen_info = walker.walk_info(self, _dir_path)
+            gen_info = walker.info(self, _dir_path)
             for _path, info in gen_info:
                 if info.is_dir:
                     self.removedir(_path)
@@ -1148,7 +1148,7 @@ class FS(object):
             False
 
         If ``wildcards`` is ``None``, or (``['*']``), then this method
-        will return True.
+        will always return True.
 
         """
         if wildcards is None:

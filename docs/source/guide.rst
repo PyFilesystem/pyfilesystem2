@@ -61,9 +61,9 @@ If you don't specify the protocol in the FS URL, then PyFilesystem will assume y
     ['world domination.doc', 'paella-recipe.txt', 'jokes.txt', 'projects']
 
 Tree
-~~~~
+%%%%
 
-Calling :meth:`fs.base.FS.tree` on a FS object will give you a nice ASCII representation of your filessystem. Here's an example::
+Calling :meth:`fs.base.FS.tree` on a FS object will print an ascii tree view of your filesystem. Here's an example::
 
     >>> from fs import open_fs
     >>> my_fs = open_fs('.')
@@ -77,6 +77,8 @@ Calling :meth:`fs.base.FS.tree` on a FS object will give you a nice ASCII repres
     │   ╰── readme.txt
     ├── lib.ini
     ╰── readme.txt
+
+This can be a useful debugging aid!
 
 
 Closing Filesystems

@@ -1439,6 +1439,9 @@ class FSTestCases(object):
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.movedir('foo', 'foofoo')
 
+    def test_match(self):
+        self.assertTrue(self.fs.match(['*.py'], 'foo.py'))
+
     def test_tree(self):
         self.fs.makedirs('foo/bar')
         self.fs.create('test.txt')

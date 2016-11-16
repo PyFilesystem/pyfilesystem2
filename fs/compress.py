@@ -44,7 +44,7 @@ def write_zip(src_fs,
     )
     walker = walker or Walker()
     with _zip:
-        gen_walk = walker.walk_info(src_fs, namespaces=["details", "stat"])
+        gen_walk = walker.info(src_fs, namespaces=["details", "stat"])
         for path, info in gen_walk:
             # Zip names must be relative, directory names must end
             # with a slash.

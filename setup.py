@@ -25,7 +25,7 @@ install_requires = [
     "pytz",
     "scandir",
     "setuptools",
-    "six",
+    "six==1.10.0",
 ]
 
 setup(
