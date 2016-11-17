@@ -6,11 +6,11 @@ The PyFilesytem interface simplifies most aspects of working with files and dire
 Why use PyFilesystem?
 ~~~~~~~~~~~~~~~~~~~~~
 
-If you are comfortable using the Python standard library, you might be wondering why you need another API for working with files and directories.
+If you are comfortable using the Python standard library, you may be wondering; *why learn another API for working with files?*
 
-Code using PyFilesystem is generally simpler and less error prone than the equivalent code using the ``os`` and ``io`` modules. That may be good enough reason to use PyFilesytem, given that bugs in such code could cause data loss. But simpler code is only a tangential benefit.
+The PyFilesystem API is generally simpler than the ``os`` and ``io`` modules. There are fewer ways to shoot yourself in the foot, the code tends to be more terse, and (arguably) more readable. This may be reason alone to use it, but there are other compelling reasons you should use ``import fs`` for even straightforward filesystem code.
 
-The abstraction offered by FS objects means that you can write code that is agnostic to where your files are physically located. For instance, if you wrote a function that searches a directory for duplicates files, it will work unaltered with a directory on your hard-drive, or in a zip file, or on an FTP server, etc.
+The abstraction offered by FS objects means that you can write code that is agnostic to where your files are physically located. For instance, if you wrote a function that searches a directory for duplicates files, it will work unaltered with a directory on your hard-drive, or in a zip file, on an FTP server, on Amazon S3, etc.
 
 As long as an FS object exists for your chosen filesystem (or any data store that resembles a filesystem), you can use the same API. This means that you can defer the decision regarding where you store data to later. If you decide to store configuration in the *cloud*, it could be a single line change and not a major refactor.
 
@@ -35,7 +35,7 @@ Here's how you would list the files/directories in your home directory::
 
 Notice that the parameter to ``listdir`` is a single forward slash, indicating that we want to list the *root* of the filesystem. This is because from the point of view of ``home_fs``, the root is the directory we used to construct the ``OSFS``.
 
-Also note that it is a forward slash, even on windows. This is because FS paths are in a consistent format regardless of the platform. Details such as the separator and encoding are abstracted away. See :ref:`paths` for details.
+Also note that it is a forward slash, even on Windows. This is because FS paths are in a consistent format regardless of the platform. Details such as the separator and encoding are abstracted away. See :ref:`paths` for details.
 
 Other filesystems interfaces may have other requirements for their constructor. For instance, here is how you would open a FTP filesystem::
 
@@ -84,7 +84,7 @@ This can be a useful debugging aid!
 Closing Filesystems
 ~~~~~~~~~~~~~~~~~~~
 
-FS objects have a ``close`` method (:meth:`fs.base.FS.close`) which will perform any required clean-up actions. For many filesystems (notably :class:`fs.osfs.OSFS`), the ``close`` method does very little, but other filesystems may only finalize files or release resources once ``close()`` is called.
+FS objects have a ``close`` method (:meth:`fs.base.FS.close`) which will perform any required clean-up actions. For many filesystems (notably :class:`fs.osfs.OSFS`), the ``close`` method does very little, however, other filesystems may only finalize files or release resources once ``close()`` is called.
 
 You can call ``close`` explicitly once you are finished using a filesystem. For example::
 
@@ -113,7 +113,7 @@ An alternative method exists for listing directories; if you call :meth:`fs.base
     >>> directory
     [<dir 'fs'>, <dir 'moya'>, <file 'README.md'>]
 
-Info objects have a number of advantages over just a filename. For instance, you can know if a name references a directory with the :meth:`fs.info.Info.is_dir` method. Otherwise you would need to call :meth:`fs.base.FS.isdir` for each name in the directory, which may involve additional system calls (or request in the case of a network filesystem).
+Info objects have a number of advantages over just a filename. For instance, you can know if a name references a directory with :attr:`fs.info.Info.is_dir`. Otherwise you would need to call :meth:`fs.base.FS.isdir` for each name in the directory, which may involve additional system calls (or request in the case of a network filesystem).
 
 The reason that ``scandir`` returns an iterable rather than a list, is that it can be more efficient to retrieve directory information in chunks if the directory is very large, or if the information must be retrieved over a network.
 
@@ -174,7 +174,9 @@ Here's how you would print the paths to all your Python files in your home-direc
 
 This might take a while to run if you have a lot of Python code!
 
-The ``walk`` attribute on FS objects is instance of a :class:`fs.walk.Walker`, which should be able to handle most directory walking requirements. It is designed to be customizable, if you do need to further tune the directory walk.
+The ``walk`` attribute on FS objects is instance of a :class:`fs.walk.BoundWalker`, which should be able to handle most directory walking requirements. It is designed to be customizable, if you do need to further tune the directory walk.
+
+See :ref:`walking` for more information on walking directories.
 
 Working with Files
 ~~~~~~~~~~~~~~~~~~

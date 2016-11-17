@@ -170,7 +170,7 @@ class FS(object):
         Set info on a resource.
 
         :param str path: Path to a resource on the filesystem.
-        :param info: Dict of resource info.
+        :param dict info: Dict of resource info.
 
         This method is the compliment to :class:`fs.base.getinfo` and is
         used to set info values on a resource.
@@ -178,13 +178,13 @@ class FS(object):
         The ``info`` dict should be in the same format as the raw
         info returned by ``getinfo(file).raw``. Here's an example::
 
-            details_info = {
-                "details":
-                {
-                    "modified_time": time.time()
-                }
+        details_info = {
+            "details":
+            {
+                "modified_time": time.time()
             }
-            my_fs.setinfo('file.txt', details_info)
+        }
+        my_fs.setinfo('file.txt', details_info)
 
         """
         raise NotImplementedError('setinfo')
@@ -1017,7 +1017,7 @@ class FS(object):
         Create a new file if ``path`` doesn't exist, or update accessed
         and modified times if the path does exist.
 
-        This method is similar to the \*nix command of the same name.
+        This method is similar to the linux command of the same name.
 
         :param str path: A path to a file on the filesystem.
 

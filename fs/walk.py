@@ -364,16 +364,11 @@ class BoundWalker(object):
     """
 
     def __init__(self, fs, walker_class=Walker):
-        self._fs = weakref.ref(fs)
+        self.fs = fs
         self.walker_class = walker_class
 
     def __repr__(self):
         return "BoundWalker({!r})".format(self.fs)
-
-    @property
-    def fs(self):
-        """The bound FS object."""
-        return self._fs()
 
     def _make_walker(self, *args, **kwargs):
         """Create a walker instance."""
