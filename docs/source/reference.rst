@@ -6,8 +6,8 @@ Reference
 
    reference/base.rst
    reference/copy.rst
-   reference/errors.rst
    reference/enums.rst
+   reference/errors.rst
    reference/info_objects.rst
    reference/move.rst
    reference/opener.rst

@@ -8,11 +8,12 @@ Why use PyFilesystem?
 
 If you are comfortable using the Python standard library, you may be wondering; *why learn another API for working with files?*
 
-The PyFilesystem API is generally simpler than the ``os`` and ``io`` modules. There are fewer ways to shoot yourself in the foot, the code tends to be more terse, and (arguably) more readable. This may be reason alone to use it, but there are other compelling reasons you should use ``import fs`` for even straightforward filesystem code.
+The PyFilesystem API is generally simpler than the ``os`` and ``io`` modules -- there are fewer edge cases and less ways to shoot yourself in the foot. This may be reason alone to use it, but there are other compelling reasons you should use ``import fs`` for even straightforward filesystem code.
 
 The abstraction offered by FS objects means that you can write code that is agnostic to where your files are physically located. For instance, if you wrote a function that searches a directory for duplicates files, it will work unaltered with a directory on your hard-drive, or in a zip file, on an FTP server, on Amazon S3, etc.
 
 As long as an FS object exists for your chosen filesystem (or any data store that resembles a filesystem), you can use the same API. This means that you can defer the decision regarding where you store data to later. If you decide to store configuration in the *cloud*, it could be a single line change and not a major refactor.
+
 
 PyFilesystem can also be beneficial for unit-testing; by swapping the OS filesystem with an in-memory filesystem, you can write tests without having to manage (or mock) file IO. And you can be sure that your code will work on Linux, MacOS, and Windows.
 
@@ -84,7 +85,7 @@ This can be a useful debugging aid!
 Closing Filesystems
 ~~~~~~~~~~~~~~~~~~~
 
-FS objects have a ``close`` method (:meth:`fs.base.FS.close`) which will perform any required clean-up actions. For many filesystems (notably :class:`fs.osfs.OSFS`), the ``close`` method does very little, however, other filesystems may only finalize files or release resources once ``close()`` is called.
+FS objects have a :meth:`fs.base.FS.close` methd which will perform any required clean-up actions. For many filesystems (notably :class:`fs.osfs.OSFS`), the ``close`` method does very little. Other filesystems may only finalize files or release resources once ``close()`` is called.
 
 You can call ``close`` explicitly once you are finished using a filesystem. For example::
 
@@ -102,20 +103,23 @@ Using FS objects as a context manager is recommended as it will ensure every FS 
 Directory Information
 ~~~~~~~~~~~~~~~~~~~~~
 
-Filesystem objects have a ``listdir`` method which is similar to ``os.listdir``; it takes a path to a directory and returns a list of file names. Here's an example::
+Filesystem objects have a :meth:`fs.base.FS.listdir` method which is similar to ``os.listdir``; it takes a path to a directory and returns a list of file names. Here's an example::
 
     >>> home_fs.listdir('/projects')
     ['fs', 'moya', 'README.md']
 
-An alternative method exists for listing directories; if you call :meth:`fs.base.FS.scandir` it will return an *iterable* of :ref:`info` objects. Here's an example::
+An alternative method exists for listing directories; :meth:`fs.base.FS.scandir` returns an *iterable* of :ref:`info` objects. Here's an example::
 
     >>> directory = list(home_fs.scandir('/projects'))
     >>> directory
     [<dir 'fs'>, <dir 'moya'>, <file 'README.md'>]
 
-Info objects have a number of advantages over just a filename. For instance, you can know if a name references a directory with :attr:`fs.info.Info.is_dir`. Otherwise you would need to call :meth:`fs.base.FS.isdir` for each name in the directory, which may involve additional system calls (or request in the case of a network filesystem).
+Info objects have a number of advantages over just a filename. For instance you can tell if an info object references a file or a directory with the :attr:`fs.info.Info.is_dir` attribute, without an additional system call. Info objects may also contain information such as size, modified time, etc. if you request it in the ``namespaces`` parameter.
 
-The reason that ``scandir`` returns an iterable rather than a list, is that it can be more efficient to retrieve directory information in chunks if the directory is very large, or if the information must be retrieved over a network.
+
+.. note::
+
+    The reason that ``scandir`` returns an iterable rather than a list, is that it can be more efficient to retrieve directory information in chunks if the directory is very large, or if the information must be retrieved over a network.
 
 Additionally, FS objects have a :meth:`fs.base.FS.filterdir` method which extends ``scandir`` with the ability to filter directory contents by wildcard(s). Here's how you might find all the Python files in a directory:
 
@@ -165,23 +169,21 @@ Walking
 
 Often you will need to scan the files in a given directory, and any sub-directories. This is known as *walking* the filesystem.
 
-Here's how you would print the paths to all your Python files in your home-directory (and sub-directories)::
+Here's how you would print the paths to all your Python files in your home directory::
 
     >>> from fs import open_fs
     >>> home_fs = open_fs('~/')
     >>> for path in home_fs.walk.files(wildcards=['*.py']):
     ...     print(path)
 
-This might take a while to run if you have a lot of Python code!
-
-The ``walk`` attribute on FS objects is instance of a :class:`fs.walk.BoundWalker`, which should be able to handle most directory walking requirements. It is designed to be customizable, if you do need to further tune the directory walk.
+The ``walk`` attribute on FS objects is instance of a :class:`fs.walk.BoundWalker`, which should be able to handle most directory walking requirements.
 
 See :ref:`walking` for more information on walking directories.
 
 Working with Files
 ~~~~~~~~~~~~~~~~~~
 
-You can open a file from a FS object with :meth:`fs.base.FS.open`, which is very similar to ``io.open`` in the standard library. Here's how you might open a file called reminder.txt in your home directory::
+You can open a file from a FS object with :meth:`fs.base.FS.open`, which is very similar to ``io.open`` in the standard library. Here's how you might open a file called "reminder.txt" in your home directory::
 
     >>> with open_fs('~/') as home_fs:
     ...     with home_fs.open('reminder.txt') as reminder_file:
@@ -190,7 +192,7 @@ You can open a file from a FS object with :meth:`fs.base.FS.open`, which is very
 
 In the case of a ``OSFS``, a standard file-like object will be returned. Other filesystems may return a different object supporting the same methods. For instance, :class:`fs.memoryfs.MemoryFS` will return a ``io.BytesIO`` object.
 
-PyFilesystem also offers a number of shortcuts for common file related operations. For example, :meth:`fs.base.FS.getbytes` will return the file contents as a bytes object, and :meth:`fs.base.FS.gettext` will read unicode text. Using these methods is generally preferable to explicitly opening files, because the FS object may have an optimized implementation.
+PyFilesystem also offers a number of shortcuts for common file related operations. For example, :meth:`fs.base.FS.getbytes` will return the file contents as a bytes, and :meth:`fs.base.FS.gettext` will read unicode text. Using these methods is generally preferable to explicitly opening files, as the FS object may have an optimized implementation.
 
 Other *shortcut* methods are :meth:`fs.base.FS.setbin`, :meth:`fs.base.FS.setbytes`, :meth:`fs.base.FS.settext`.
 
@@ -212,4 +214,10 @@ Which is the equivalent to this, more verbose, code::
     >>> from fs.osfs import OSFS
     >>> from fs.zipfs import ZipFS
     >>> copy_fs(OSFS('~/projects'), ZipFS('projects.zip'))
+
+The :func:`fs.copy.copy_fs` and :func:`fs.copy.copy_dir` functions also accept a :class:`fs.walk.Walker` parameter, which can you use to filter the files that will be copied. For instance, if you only wanted back up your python files, you could use something like this::
+
+    >>> from fs.copy import copy_fs
+    >>> from fs.walk import Walker
+    >>> copy_fs('~/projects', 'zip://projects.zip', walker=Walker(wildcards=['*.py']))
 

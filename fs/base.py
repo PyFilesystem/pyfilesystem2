@@ -84,7 +84,7 @@ class FS(object):
 
     def listdir(self, path):
         """
-        Get an iterator of the resource names in a directory.
+        Get a list of the resource names in a directory.
 
         :param str path: A path to a directory on the filesystem.
         :return: list of names, relative to ``path``.
