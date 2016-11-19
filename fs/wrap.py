@@ -147,7 +147,7 @@ class WrapReadOnly(WrapFS):
         self.check()
         raise ResourceReadOnly(path)
 
-    def copy(self, src_path, dst_path):
+    def copy(self, src_path, dst_path, overwrite=False):
         self.check()
         raise ResourceReadOnly(dst_path)
 

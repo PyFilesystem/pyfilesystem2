@@ -219,7 +219,7 @@ class FS(object):
         """
         self._closed = True
 
-    def copy(self, src_path, dst_path):
+    def copy(self, src_path, dst_path, overwrite=False):
         """
         Copy file contents from ``src_path`` to ``dst_path``.
 
@@ -227,12 +227,15 @@ class FS(object):
         :type src_path: str
         :param dst_path: Path to destination file.
         :type dst_path: str
-
-        If the path specified by ``dst_path`` exists, and is a file,
-        it will first be truncated.
+        :raises `fs.errors.DestinationExists`: If ``dst_path`` exists,
+            and overwrite == ``False``.
+        :raises `fs.errors.ResourceNotFound`: If a parent directory of
+            ``dst_path`` does not exist.
 
         """
         with self._lock:
+            if not overwrite and self.exists(dst_path):
+                raise errors.DestinationExists(dst_path)
             with closing(self.open(src_path, 'rb')) as read_file:
                 self.setbin(dst_path, read_file)
 
@@ -319,35 +322,35 @@ class FS(object):
                   path,
                   exclude_dirs=False,
                   exclude_files=False,
-                  wildcards=None,
-                  dir_wildcards=None,
+                  files=None,
+                  dirs=None,
                   namespaces=None,
                   page=None):
         """
         Get an iterator of resource info, filtered by wildcards.
 
-        This method enhances the :meth:`fs.base.FS.scandir` method with
-        additional filtering functionality.
-
         :param str path: A path to a directory on the filesystem.
         :param bool exclude_dirs: Exclude directories.
         :param bool exclude_files: Exclude files.
-        :param wildcards: A list of unix shell-style wildcards to filter
-            file names.
+        :param files: A list of unix shell-style patterns to filter
+            file names, e.g. ``['*.py']``.
         :type wildcards: list or None
-        :param dir_wildcards: A list of unix shell-style wildcards to
+        :param dirs: A list of unix shell-style wildcards to
             filter directory names.
-        :type dir_wildcards: list or None
+        :type dirs: list or None
         :param namespaces: A list of info namespaces to include in
             results.
         :type namespaces: list or None
-        :param page: May be a tuple of (start, end) indexes to return an
-            iterator of a subset of the resource info, or ``None`` to
-            iterator the entire directory. Paging a directory scan may
-            be necessary for very large directories.
+        :param page: May be a tuple of ``(<start>, <end>)`` indexes to
+            return an iterator of a subset of the resource info, or
+            ``None`` to iterator the entire directory. Paging a
+            directory scan may be necessary for very large directories.
         :type page: tuple or None
         :return: An iterator of :class:`fs.info.Info` objects.
         :rtype: iterator
+
+        This method enhances the :meth:`fs.base.FS.scandir` method with
+        additional filtering functionality.
 
         """
 
@@ -369,24 +372,24 @@ class FS(object):
                 if info.is_dir
             )
 
-        if wildcards is not None:
-            if isinstance(wildcards, six.text_type):
+        if files is not None:
+            if isinstance(files, six.text_type):
                 raise ValueError(
                     'wildcards must be a sequence, not a string'
                 )
-            match = wildcard.get_matcher(wildcards, case_sensitive)
+            match = wildcard.get_matcher(files, case_sensitive)
             resources = (
                 info
                 for info in resources
                 if info.is_dir or match(info.name)
             )
 
-        if dir_wildcards is not None:
-            if isinstance(dir_wildcards, six.text_type):
+        if dirs is not None:
+            if isinstance(dirs, six.text_type):
                 raise ValueError(
                     'dir_wildcards must be a sequence, not a string'
                 )
-            match = wildcard.get_matcher(dir_wildcards, case_sensitive)
+            match = wildcard.get_matcher(dirs, case_sensitive)
             resources = (
                 info
                 for info in resources
@@ -577,8 +580,8 @@ class FS(object):
         :param str purpose: A short string that indicates which URL to
             retrieve for the given path (if there is more than one). The
             default is `'download'`, which should return a URL that
-            serves the file. See the filesystem documentation for
-            information on what other URLs may be generated.
+            serves the file. Other filesystems may support other values
+            for ``purpose``.
         :returns: A URL.
         :rtype: str
         :raises `fs.errors.NoURL`: If the path does not map to a URL.
@@ -712,9 +715,8 @@ class FS(object):
 
         :raises `fs.errors.DirectoryExists`: if the path is already
             a directory, and ``recreate`` is False.
-        :raises `fs.errors.NotADirectory`: if one of the ancestors in
-            the path isn't a directory.
-        :raises `fs.errors.ResourceNotFound`: if the path is not found.
+        :raises `fs.errors.DirectoryExpected`: if one of the ancestors
+            in the path isn't a directory.
 
         """
         self.check()
@@ -742,6 +744,10 @@ class FS(object):
             file will be written to.
         :param bool overwrite: If `True` destination path will be
             overwritten if it exists.
+        :raises `fs.errors.DestinationExists`: If ``dst_path`` exists,
+            and overwrite == ``False``.
+        :raises `fs.errors.ResourceNotFound`: If a parent directory of
+            ``dst_path`` does not exist.
 
         """
 
@@ -811,6 +817,8 @@ class FS(object):
         :param str path: Path to a directory on the filesystem.
         :returns: A filesystem object representing a sub-directory.
         :rtype: :class:`fs.subfs.SubFS`
+        :raises `fs.errors.DirectoryExpected`: If ``dst_path`` does not
+            exist or is not a directory.
 
         """
         from .subfs import SubFS
@@ -850,10 +858,10 @@ class FS(object):
 
         :param str path: A path on the filesystem
         :param list namespaces: A sequence of info namespaces.
-        :param page: May be a tuple of (start, end) indexes to return an
-            iterator of a subset of the resource info, or ``None`` to
-            iterator the entire directory. Paging a directory scan may
-            be necessary for very large directories.
+        :param page: May be a tuple of ``(<start>, <end>)`` indexes to
+            return an iterator of a subset of the resource info, or
+            ``None`` to iterator the entire directory. Paging a
+            directory scan may be necessary for very large directories.
         :type page: tuple or None
         :rtype: iterator
 
@@ -1128,11 +1136,11 @@ class FS(object):
         if self.isclosed():
             raise errors.FilesystemClosed()
 
-    def match(self, wildcards, name):
+    def match(self, patterns, name):
         """
         Check if a name matches any of a list of wildcards.
 
-        :param list wildcards: A list of wildcards, e.g. ``['*.py']``
+        :param list patterns: A list of patterns, e.g. ``['*.py']``
         :param str name: A file or directory name (not a path)
         :rtype: bool
 
@@ -1147,14 +1155,14 @@ class FS(object):
             >>> home_fs.match(['*.jpg', '*.png'], 'foo.gif')
             False
 
-        If ``wildcards`` is ``None``, or (``['*']``), then this method
+        If ``patterns`` is ``None``, or (``['*']``), then this method
         will always return True.
 
         """
-        if wildcards is None:
+        if patterns is None:
             return True
         case_sensitive = self.getmeta().get('case_sensitive', True)
-        matcher = wildcard.get_matcher(wildcards, case_sensitive)
+        matcher = wildcard.get_matcher(patterns, case_sensitive)
         return matcher(name)
 
     def tree(self, **kwargs):

@@ -165,10 +165,12 @@ class WrapFS(FS):
         with unwrap_errors(path):
             _fs.touch(_path)
 
-    def copy(self, src_path, dst_path):
+    def copy(self, src_path, dst_path, overwrite=False):
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
+            if not overwrite and dst_fs.exists(_dst_path):
+                raise errors.DestinationExists(_dst_path)
             copy_file(src_fs, _src_path, dst_fs, _dst_path)
 
     def create(self, path, wipe=False):
@@ -195,8 +197,8 @@ class WrapFS(FS):
                   path,
                   exclude_dirs=False,
                   exclude_files=False,
-                  wildcards=None,
-                  dir_wildcards=None,
+                  files=None,
+                  dirs=None,
                   namespaces=None,
                   page=None):
         self.check()
@@ -205,8 +207,8 @@ class WrapFS(FS):
            _path,
            exclude_dirs=exclude_dirs,
            exclude_files=exclude_files,
-           wildcards=wildcards,
-           dir_wildcards=dir_wildcards,
+           files=files,
+           dirs=dirs,
            namespaces=namespaces,
            page=page
         ))

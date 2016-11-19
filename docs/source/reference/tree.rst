@@ -1,7 +1,7 @@
 fs.tree
 =======
 
-Render ASCII (or unicode) directory trees.
+Render a text tree view, with optional color in terminals.
 
 .. automodule:: fs.tree
     :members:

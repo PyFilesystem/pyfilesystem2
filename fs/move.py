@@ -61,7 +61,7 @@ def move_dir(src_fs, src_path, dst_fs, dst_path):
     :type src_path: str
     :param dst_fs: Destination filesystem.
     :type dst_fs: FS URL or instance
-    :param dst_path: A path to a directory on ``dst_fs``.
+    :param str dst_path: A path to a directory on ``dst_fs``.
 
     """
     with manage_fs(src_fs) as src_fs:

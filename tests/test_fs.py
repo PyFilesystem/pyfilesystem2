@@ -908,8 +908,16 @@ class FSTestCases(object):
 
         # Test copy over existing path
         self.fs.setbytes('baz', b'truncateme')
-        self.fs.copy('foo', 'baz')
+        self.fs.copy('foo', 'baz', overwrite=True)
         self.assert_bytes('foo', b'test')
+
+        # Test copying a file to a destination that exists
+        with self.assertRaises(errors.DestinationExists):
+            self.fs.copy('baz', 'foo')
+
+        # Test copying to a directory that doesn't exist
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.copy('baz', 'a/b/c/baz')
 
     def test_create(self):
         # Test create new file
@@ -1003,7 +1011,7 @@ class FSTestCases(object):
 
     def test_filterdir(self):
         self.assertEqual(
-            list(self.fs.filterdir('/', wildcards=['*.py'])),
+            list(self.fs.filterdir('/', files=['*.py'])),
             []
         )
 
@@ -1023,15 +1031,15 @@ class FSTestCases(object):
         self.assertEqual(set(names), {'foo.txt', 'foo.py', 'foo.pyc', 'bar'})
 
         # Check filtering by wildcard
-        dir_list = [info.name for info in self.fs.filterdir('/', wildcards=['*.py'])]
+        dir_list = [info.name for info in self.fs.filterdir('/', files=['*.py'])]
         self.assertEqual(set(dir_list), {'bar', 'foo.py'})
 
         # Check filtering by miltiple wildcard
-        dir_list = [info.name for info in self.fs.filterdir('/', wildcards=['*.py', '*.pyc'])]
+        dir_list = [info.name for info in self.fs.filterdir('/', files=['*.py', '*.pyc'])]
         self.assertEqual(set(dir_list), {'bar', 'foo.py', 'foo.pyc'})
 
         # Check excluding dirs
-        dir_list = [info.name for info in self.fs.filterdir('/', exclude_dirs=True, wildcards=['*.py', '*.pyc'])]
+        dir_list = [info.name for info in self.fs.filterdir('/', exclude_dirs=True, files=['*.py', '*.pyc'])]
         self.assertEqual(set(dir_list), {'foo.py', 'foo.pyc'})
 
         # Check excluding files
@@ -1040,14 +1048,14 @@ class FSTestCases(object):
 
         # Check wildcards must be a list
         with self.assertRaises(ValueError):
-            dir_list = [info.name for info in self.fs.filterdir('/', wildcards="*.py")]
+            dir_list = [info.name for info in self.fs.filterdir('/', files="*.py")]
 
         self.fs.makedir('baz')
-        dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=True, dir_wildcards=['??z'])]
+        dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=True, dirs=['??z'])]
         self.assertEqual(set(dir_list), {'baz'})
 
         with self.assertRaises(ValueError):
-            dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=True, dir_wildcards="*.py")]
+            dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=True, dirs="*.py")]
 
     def test_getbytes(self):
         """Test getbytes method."""

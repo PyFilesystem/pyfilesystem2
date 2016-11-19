@@ -40,7 +40,7 @@ class TestInfo(unittest.TestCase):
 
         print(repr(output_file.getvalue()))
 
-        expected = u'\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mbar\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mbaz\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mdeep\x1b[0m\n\x1b[32m\u2502   \u2570\u2500\u2500\x1b[0m \x1b[1;34mdeep1\x1b[0m\n\x1b[32m\u2502       \u2570\u2500\u2500\x1b[0m \x1b[1;34mdeep2\x1b[0m\n\x1b[32m\u2502           \u2570\u2500\u2500\x1b[0m \x1b[1;34mdeep3\x1b[0m\n\x1b[32m\u2502               \u2570\u2500\u2500\x1b[0m \x1b[1;34mdeep4\x1b[0m\n\x1b[32m\u2502                   \u2570\u2500\u2500\x1b[0m \x1b[1;34mdeep5\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mfoo\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[1;34megg1\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[1;34megg2\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[33m.hidden\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m test.txt\n\x1b[32m\u2502   \u2570\u2500\u2500\x1b[0m test2.txt\n\x1b[32m\u251c\u2500\u2500\x1b[0m root1\n\x1b[32m\u2570\u2500\u2500\x1b[0m root2\n'
+        expected = u'\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mbar\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mbaz\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mdeep\x1b[0m\n\x1b[32m\u2502   \u2514\u2500\u2500\x1b[0m \x1b[1;34mdeep1\x1b[0m\n\x1b[32m\u2502       \u2514\u2500\u2500\x1b[0m \x1b[1;34mdeep2\x1b[0m\n\x1b[32m\u2502           \u2514\u2500\u2500\x1b[0m \x1b[1;34mdeep3\x1b[0m\n\x1b[32m\u2502               \u2514\u2500\u2500\x1b[0m \x1b[1;34mdeep4\x1b[0m\n\x1b[32m\u2502                   \u2514\u2500\u2500\x1b[0m \x1b[1;34mdeep5\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mfoo\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[1;34megg1\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[1;34megg2\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[33m.hidden\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m test.txt\n\x1b[32m\u2502   \u2514\u2500\u2500\x1b[0m test2.txt\n\x1b[32m\u251c\u2500\u2500\x1b[0m root1\n\x1b[32m\u2514\u2500\u2500\x1b[0m root2\n'
         self.assertEqual(output_file.getvalue(), expected)
 
     def test_tree_bytes_no_dirs_first(self):
@@ -65,9 +65,11 @@ class TestInfo(unittest.TestCase):
         self.fs.filterdir = broken_filterdir
         tree.render(self.fs, file=output_file, with_color=True)
 
-        expected = u'\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mbar\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mbaz\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mdeep\x1b[0m\n\x1b[32m\u2502   \u2570\u2500\u2500\x1b[0m \x1b[1;34mdeep1\x1b[0m\n\x1b[32m\u2502       \u2570\u2500\u2500\x1b[0m \x1b[1;34mdeep2\x1b[0m\n\x1b[32m\u2502           \u2570\u2500\u2500\x1b[0m \x1b[31merror (integer division or modulo by zero)\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mfoo\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[1;34megg1\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[1;34megg2\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[33m.hidden\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m test.txt\n\x1b[32m\u2502   \u2570\u2500\u2500\x1b[0m test2.txt\n\x1b[32m\u251c\u2500\u2500\x1b[0m root1\n\x1b[32m\u2570\u2500\u2500\x1b[0m root2\n'
+        expected = u'\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mbar\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mbaz\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mdeep\x1b[0m\n\x1b[32m\u2502   \u2514\u2500\u2500\x1b[0m \x1b[1;34mdeep1\x1b[0m\n\x1b[32m\u2502       \u2514\u2500\u2500\x1b[0m \x1b[1;34mdeep2\x1b[0m\n\x1b[32m\u2502           \u2514\u2500\u2500\x1b[0m \x1b[31merror (integer division or modulo by zero)\x1b[0m\n\x1b[32m\u251c\u2500\u2500\x1b[0m \x1b[1;34mfoo\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[1;34megg1\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[1;34megg2\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m \x1b[33m.hidden\x1b[0m\n\x1b[32m\u2502   \u251c\u2500\u2500\x1b[0m test.txt\n\x1b[32m\u2502   \u2514\u2500\u2500\x1b[0m test2.txt\n\x1b[32m\u251c\u2500\u2500\x1b[0m root1\n\x1b[32m\u2514\u2500\u2500\x1b[0m root2\n'
+        tree_output = output_file.getvalue()
+        print(repr(tree_output))
 
-        self.assertEqual(expected, output_file.getvalue())
+        self.assertEqual(expected, tree_output)
 
         output_file = io.StringIO()
         tree.render(self.fs, file=output_file, with_color=False)

@@ -7,7 +7,6 @@ The machinery for walking a filesystem.
 from __future__ import unicode_literals
 
 import itertools
-import weakref
 
 from collections import deque
 
@@ -103,10 +102,10 @@ class Walker(WalkerBase):
         to re-raise it.
     :param str search: If ``'breadth'`` then the directory will be
         walked *top down*. Set to ``'depth'`` to walk *bottom up*.
-    :param list wildcards: If supplied, this parameter should be a
-        list of wildcards. Files will only be returned if the final
-        component matches one of the wildcards.
-    :param list exclude_dirs: A list of wildcards that will be used
+    :param list filter: If supplied, this parameter should be a list of
+        filename patterns, e.g. ``['*.py']``. Files will only be
+        returned if the final component matches one of the patterns.
+    :param list exclude_dirs: A list of patterns that will be used
         to filter out directories from the walk. e.g. ``['*.svn',
         '*.git']``.
 
@@ -116,7 +115,7 @@ class Walker(WalkerBase):
                  ignore_errors=False,
                  on_error=None,
                  search="breadth",
-                 wildcards=None,
+                 filter=None,
                  exclude_dirs=None):
         if search not in ('breadth', 'depth'):
             raise ValueError("search must be 'breadth' or 'depth'")
@@ -127,7 +126,7 @@ class Walker(WalkerBase):
             on_error = lambda path, error: True
         self.on_error = on_error or (lambda path, error: True)
         self.search = search
-        self.wildcards = wildcards
+        self.filter = filter
         self.exclude_dirs = exclude_dirs
         super(Walker, self).__init__()
 
@@ -143,7 +142,7 @@ class Walker(WalkerBase):
             >>> from fs.walk import Walker
             >>> home_fs = open_fs('~/')
             >>> walker = Walker.bind(home_fs)
-            >>> for path in walker.files(wildcards=['*.py']):
+            >>> for path in walker.files(filter=['*.py']):
             ...     print(path)
 
         Unless you have written a customized walker class, you will be
@@ -153,7 +152,7 @@ class Walker(WalkerBase):
 
             >>> from fs import open_fs
             >>> home_fs = open_fs('~/')
-            >>> for path in home_fs.walk.files(wildcards=['*.py']):
+            >>> for path in home_fs.walk.files(filter=['*.py']):
             ...     print(path)
 
         :param fs: A filesystem object.
@@ -169,7 +168,7 @@ class Walker(WalkerBase):
                 ('ignore_errors', self.ignore_errors, False),
                 ('on_error', self.on_error, None),
                 ('search', self.search, 'breadth'),
-                ('wildcards', self.wildcards, None),
+                ('filter', self.filter, None),
                 ('exclude_dirs', self.exclude_dirs, None)
             ]
         )
@@ -221,7 +220,7 @@ class Walker(WalkerBase):
         :rtype: bool
 
         """
-        return fs.match(self.wildcards, info.name)
+        return fs.match(self.filter, info.name)
 
     def _scan(self, fs, dir_path, namespaces):
         """
@@ -259,7 +258,7 @@ class Walker(WalkerBase):
         Here's an example::
 
             home_fs = open_fs('~/')
-            walker = Walker(wildcards=['*.py'])
+            walker = Walker(filter=['*.py'])
             for path, dirs, files in walker.walk(home_fs, namespaces=['details']):
                 print("[{}]".format(path))
                 print("{} directories".format(len(dirs)))
@@ -392,10 +391,11 @@ class BoundWalker(object):
             to re-raise it.
         :param str search: If ``'breadth'`` then the directory will be
             walked *top down*. Set to ``'depth'`` to walk *bottom up*.
-        :param list wildcards: If supplied, this parameter should be a
-            list of wildcards. Files will only be returned if the final
-            component matches one of the wildcards.
-        :param list exclude_dirs: A list of wildcards that will be used
+        :param list filter: If supplied, this parameter should be a list
+            of file name patterns, e.g. ``['*.py']``. Files will only be
+            returned if the final component matches one of the
+            patterns.
+        :param list exclude_dirs: A list of patterns that will be used
             to filter out directories from the walk, e.g. ``['*.svn',
             '*.git']``.
         :returns: An iterable of :class:`fs.info.Info` objects.
@@ -409,7 +409,7 @@ class BoundWalker(object):
         Here's an example::
 
             home_fs = open_fs('~/')
-            walker = Walker(wildcards=['*.py'])
+            walker = Walker(filter=['*.py'])
             for path, dirs, files in walker.walk(home_fs, namespaces=['details']):
                 print("[{}]".format(path))
                 print("{} directories".format(len(dirs)))
@@ -439,10 +439,11 @@ class BoundWalker(object):
             to re-raise it.
         :param str search: If ``'breadth'`` then the directory will be
             walked *top down*. Set to ``'depth'`` to walk *bottom up*.
-        :param list wildcards: If supplied, this parameter should be a
-            list of wildcards. Files will only be returned if the final
-            component matches one of the wildcards.
-        :param list exclude_dirs: A list of wildcards that will be used
+        :param list filter: If supplied, this parameter should be a list
+            of file name patterns, e.g. ``['*.py']``. Files will only be
+            returned if the final component matches one of the
+            patterns.
+        :param list exclude_dirs: A list of patterns that will be used
             to filter out directories from the walk, e.g. ``['*.svn',
             '*.git']``.
         :returns: An iterable of file paths (absolute from the
@@ -469,7 +470,7 @@ class BoundWalker(object):
             to re-raise it.
         :param str search: If ``'breadth'`` then the directory will be
             walked *top down*. Set to ``'depth'`` to walk *bottom up*.
-        :param list exclude_dirs: A list of wildcards that will be used
+        :param list exclude_dirs: A list of patterns that will be used
             to filter out directories from the walk, e.g. ``['*.svn',
             '*.git']``.
         :returns: An iterable of directory paths (absolute from the FS
@@ -497,10 +498,11 @@ class BoundWalker(object):
             to re-raise it.
         :param str search: If ``'breadth'`` then the directory will be
             walked *top down*. Set to ``'depth'`` to walk *bottom up*.
-        :param list wildcards: If supplied, this parameter should be a
-            list of wildcards. Files will only be returned if the final
-            component matches one of the wildcards.
-        :param list exclude_dirs: A list of wildcards that will be used
+        :param list filter: If supplied, this parameter should be a list
+            of file name patterns, e.g. ``['*.py']``. Files will only be
+            returned if the final component matches one of the
+            patterns.
+        :param list exclude_dirs: A list of patterns that will be used
             to filter out directories from the walk, e.g. ``['*.svn',
             '*.git']``.
         :returns: An iterable :class:`fs.info.Info` objects.

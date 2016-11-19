@@ -57,12 +57,12 @@ The opener system is particularly useful when you want to store the physical loc
 If you don't specify the protocol in the FS URL, then PyFilesystem will assume you want a OSFS relative from the current working directory. So the following would be an equivalent way of opening your home directory::
 
     >>> from fs import open_fs
-    >>> home_fs = open_fs('~/')
+    >>> home_fs = open_fs('.')
     >>> home_fs.listdir('/')
     ['world domination.doc', 'paella-recipe.txt', 'jokes.txt', 'projects']
 
-Tree
-%%%%
+Tree Printing
+~~~~~~~~~~~~~
 
 Calling :meth:`fs.base.FS.tree` on a FS object will print an ascii tree view of your filesystem. Here's an example::
 
@@ -70,20 +70,20 @@ Calling :meth:`fs.base.FS.tree` on a FS object will print an ascii tree view of 
     >>> my_fs = open_fs('.')
     >>> my_fs.tree()
     ├── locale
-    │   ╰── readme.txt
+    │   └── readme.txt
     ├── logic
     │   ├── content.xml
     │   ├── data.xml
     │   ├── mountpoints.xml
-    │   ╰── readme.txt
+    │   └── readme.txt
     ├── lib.ini
-    ╰── readme.txt
+    └── readme.txt
 
 This can be a useful debugging aid!
 
 
-Closing Filesystems
-~~~~~~~~~~~~~~~~~~~
+Closing
+~~~~~~~
 
 FS objects have a :meth:`fs.base.FS.close` methd which will perform any required clean-up actions. For many filesystems (notably :class:`fs.osfs.OSFS`), the ``close`` method does very little. Other filesystems may only finalize files or release resources once ``close()`` is called.
 
@@ -124,11 +124,11 @@ Info objects have a number of advantages over just a filename. For instance you 
 Additionally, FS objects have a :meth:`fs.base.FS.filterdir` method which extends ``scandir`` with the ability to filter directory contents by wildcard(s). Here's how you might find all the Python files in a directory:
 
     >>> code_fs = OSFS('~/projects/src')
-    >>> directory = list(code_fs.filterdir('/', wildcards=['*.py']))
+    >>> directory = list(code_fs.filterdir('/', files=['*.py']))
 
 By default, the resource information objects returned by ``scandir`` and ``listdir`` will contain only the file name and the ``is_dir`` flag. You can request additional information with the ``namespaces`` parameter. Here's how you can request additional details (such as file size and file modified times)::
 
-    >>> directory = code_fs.filterdir('/', wildcards=['*.py'], namespaces=['details'])
+    >>> directory = code_fs.filterdir('/', files=['*.py'], namespaces=['details'])
 
 This will add a ``size`` and ``modified`` property (and others) to the resource info objects. Which makes code such as this work::
 
@@ -164,22 +164,6 @@ The :class:`fs.base.FS.makedir` and :class:`fs.base.FS.makedirs` methods also re
 
 Working with ``SubFS`` objects means that you can generally avoid writing much path manipulation code, which tends to be error prone.
 
-Walking
-~~~~~~~
-
-Often you will need to scan the files in a given directory, and any sub-directories. This is known as *walking* the filesystem.
-
-Here's how you would print the paths to all your Python files in your home directory::
-
-    >>> from fs import open_fs
-    >>> home_fs = open_fs('~/')
-    >>> for path in home_fs.walk.files(wildcards=['*.py']):
-    ...     print(path)
-
-The ``walk`` attribute on FS objects is instance of a :class:`fs.walk.BoundWalker`, which should be able to handle most directory walking requirements.
-
-See :ref:`walking` for more information on walking directories.
-
 Working with Files
 ~~~~~~~~~~~~~~~~~~
 
@@ -192,9 +176,25 @@ You can open a file from a FS object with :meth:`fs.base.FS.open`, which is very
 
 In the case of a ``OSFS``, a standard file-like object will be returned. Other filesystems may return a different object supporting the same methods. For instance, :class:`fs.memoryfs.MemoryFS` will return a ``io.BytesIO`` object.
 
-PyFilesystem also offers a number of shortcuts for common file related operations. For example, :meth:`fs.base.FS.getbytes` will return the file contents as a bytes, and :meth:`fs.base.FS.gettext` will read unicode text. Using these methods is generally preferable to explicitly opening files, as the FS object may have an optimized implementation.
+PyFilesystem also offers a number of shortcuts for common file related operations. For instance, :meth:`fs.base.FS.getbytes` will return the file contents as a bytes, and :meth:`fs.base.FS.gettext` will read unicode text. These methods is generally preferable to explicitly opening files, as the FS object may have an optimized implementation.
 
 Other *shortcut* methods are :meth:`fs.base.FS.setbin`, :meth:`fs.base.FS.setbytes`, :meth:`fs.base.FS.settext`.
+
+Walking
+~~~~~~~
+
+Often you will need to scan the files in a given directory, and any sub-directories. This is known as *walking* the filesystem.
+
+Here's how you would print the paths to all your Python files in your home directory::
+
+    >>> from fs import open_fs
+    >>> home_fs = open_fs('~/')
+    >>> for path in home_fs.walk.files(filter=['*.py']):
+    ...     print(path)
+
+The ``walk`` attribute on FS objects is instance of a :class:`fs.walk.BoundWalker`, which should be able to handle most directory walking requirements.
+
+See :ref:`walking` for more information on walking directories.
 
 Moving and Copying
 ~~~~~~~~~~~~~~~~~~
@@ -219,5 +219,6 @@ The :func:`fs.copy.copy_fs` and :func:`fs.copy.copy_dir` functions also accept a
 
     >>> from fs.copy import copy_fs
     >>> from fs.walk import Walker
-    >>> copy_fs('~/projects', 'zip://projects.zip', walker=Walker(wildcards=['*.py']))
+    >>> copy_fs('~/projects', 'zip://projects.zip', walker=Walker(files=['*.py']))
+
 

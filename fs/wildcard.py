@@ -9,57 +9,54 @@ from functools import partial
 from .lrucache import LRUCache
 
 _MAXCACHE = 1000
-_cache = LRUCache(_MAXCACHE)
+_PATTERN_CACHE = LRUCache(_MAXCACHE)
 
 
 def match(pattern, name):
     """
-    Test whether `name` matches wildcard pattern `patter`.
+    Test whether ``name`` matches ``pattern`.
 
-    :param pattern: A wildcard pattern. e.g. "*.py"
-    :type pattern: str
-    :param name: A filename
-    :type name: str
+    :param str pattern: A wildcard pattern. e.g. ``"*.py"``
+    :param str name: A filename
+    :rtype: bool
 
     """
     try:
-        re_pat = _cache[(pattern, True)]
+        re_pat = _PATTERN_CACHE[(pattern, True)]
     except KeyError:
         res = _translate(pattern)
-        _cache[(pattern, True)] = re_pat = re.compile(res)
+        _PATTERN_CACHE[(pattern, True)] = re_pat = re.compile(res)
     return re_pat.match(name) is not None
 
 
 def imatch(pattern, name):
     """
-    Test whether `name` matches wildcard pattern `pattern`, ignoring
+    Test whether ``name`` matches ``pattern``, ignoring
     case differences.
 
-    :param pattern: A wildcard pattern. e.g. "*.py"
-    :type pattern: str
-    :param name: A filename
-    :type name: str
-    :rtype bool:
+    :param str pattern: A wildcard pattern. e.g. ``"*.py"``
+    :param str name: A filename
+    :rtype: bool
 
     """
     try:
-        re_pat = _cache[(pattern, False)]
+        re_pat = _PATTERN_CACHE[(pattern, False)]
     except KeyError:
         res = _translate(pattern, case_sensitive=False)
-        _cache[(pattern, False)] = re_pat =\
+        _PATTERN_CACHE[(pattern, False)] = re_pat =\
             re.compile(res, re.IGNORECASE)
     return re_pat.match(name) is not None
 
 
 def match_any(patterns, name):
     """
-    Test if a name matches at least one of a list of patterns.
+    Test if a name matches at least one of a list of patterns. Will
+    return ``True`` if ``patterns`` is an empty list.
 
-    :param patterns: A list of wildcard pattern. e.g. ["*.py", "*.pyc"]
-    :type pattern: list
-    :param name: A filename.
-    :type name: str
-    :rtype bool:
+    :param list patterns: A list of wildcard pattern. e.g. ``["*.py",
+        "*.pyc"]``
+    :param str name: A filename.
+    :rtype: bool
 
     """
     if not patterns:
@@ -70,13 +67,13 @@ def match_any(patterns, name):
 def imatch_any(patterns, name):
     """
     Test if a name matches at least one of a list of patterns, ignoring
-    case differences.
+    case differences. Will return ``True`` if ``patterns`` is an empty
+    list.
 
-    :param patterns: A list of wildcard pattern. e.g. ["*.py", "*.pyc"]
-    :type pattern: list
-    :param name: A filename.
-    :type name: str
-    :rtype bool:
+    :param list patterns: A list of wildcard pattern. e.g. ``["*.py",
+        "*.pyc"]``
+    :param str name: A filename.
+    :rtype: bool
 
     """
     if not patterns:
@@ -89,16 +86,23 @@ def get_matcher(patterns, case_sensitive):
     Get a callable that checks a list of names matches the given
     wildcard patterns.
 
-    :param patterns: A list of wildcard pattern. e.g. ["*.py", "*.pyc"]
-    :type pattern: list
-    :param case_sensitive: If True, then the callable will be case
+    :param list patterns: A list of wildcard pattern. e.g. ``["*.py",
+        "*.pyc"]``
+    :param bool case_sensitive: If True, then the callable will be case
         sensitive, otherwise it will be case insensitive.
-    :type case_sensitive: bool
-    :rtype callable:
+    :rtype: callable
 
+    Here's an example::
+
+    >>> import wildcard
+    >>> is_python = wildcard.get_macher(['*.py'])
+    >>> is_python('__init__.py')
+    >>> True
+    >>> is_python('foo.txt')
+    >>> False
 
     """
-    if not patterns or patterns == '*':
+    if not patterns:
         return lambda name: True
     if case_sensitive:
         return partial(match_any, patterns)

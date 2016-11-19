@@ -14,3 +14,4 @@ Reference
    reference/path.rst
    reference/tree.rst
    reference/walk.rst
+   reference/wildcard.rst

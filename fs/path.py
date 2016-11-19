@@ -144,7 +144,7 @@ def isabs(path):
     """
     Check if a path is an absolute path.
 
-    :param str path: A filesystem path.
+    :param str path: A PyFilesytem path.
     :rtype: bool
 
     """
@@ -160,8 +160,8 @@ def abspath(path):
     simply adds a leading ``/`` character if the path doesn't already have
     one.
 
-    :param str path: A PyFilesytem path
-    :returns: An absolute path
+    :param str path: A PyFilesytem path.
+    :returns: An absolute path.
     :rtype: str
 
     """
@@ -221,8 +221,8 @@ def combine(path1, path2):
     """
     Join two paths together.
 
-    :param str path1: A filesystem path.
-    :param str path2: A filesystem path.
+    :param str path1: A PyFilesytem path.
+    :param str path2: A PyFilesytem path.
     :rtype: str
 
     This is faster than ``pathjoin``, but only works when the second
@@ -313,7 +313,7 @@ def dirname(path):
     This is always equivalent to the 'head' component of the value
     returned by ``split(path)``.
 
-    :param str path: A FS path
+    :param str path: A PyFilesytem path.
     :rtype: str
 
     >>> dirname('foo/bar/baz')
@@ -334,7 +334,7 @@ def basename(path):
     This is always equivalent to the 'tail' component of the value
     returned by split(path).
 
-    :param str path: A FS path
+    :param str path: A PyFilesytem path.
     :rtype: str
 
     >>> basename('foo/bar/baz')
@@ -352,8 +352,8 @@ def issamedir(path1, path2):
     """
     Check if two paths reference a resource in the same directory.
 
-    :param str path1: A FS path.
-    :param str path2: A FS path.
+    :param str path1: A PyFilesytem path.
+    :param str path2: A PyFilesytem path.
     :rtype: bool
 
     >>> issamedir("foo/bar/baz.txt", "foo/bar/spam.txt")
@@ -369,8 +369,8 @@ def isbase(path1, path2):
     """
     Check if path1 is a base of path2.
 
-    :param str path1: A FS path.
-    :param str path2: A FS path.
+    :param str path1: A PyFilesytem path.
+    :param str path2: A PyFilesytem path.
     :rtype: bool
 
     """
@@ -383,8 +383,8 @@ def isparent(path1, path2):
     """
     Check if ``path1`` is a parent directory of ``path2``.
 
-    :param str path1: An FS path
-    :param str path2: An FS path
+    :param str path1: A PyFilesytem path.
+    :param str path2: A PyFilesytem path.
     :rtype: bool
 
     >>> isparent("foo/bar", "foo/bar/spam.txt")
@@ -413,7 +413,7 @@ def forcedir(path):
     """
     Ensure the path ends with a trailing forward slash
 
-    :param path: An FS path
+    :param path: A PyFilesytem path.
     :rtype: bool
 
     >>> forcedir("foo/bar")
@@ -432,8 +432,8 @@ def frombase(path1, path2):
     """
     Get the final path of ``path2`` that isn't in ``path1``.
 
-    :param str path1: An FS path
-    :param str path2: An FS path
+    :param str path1: A PyFilesytem path.
+    :param str path2: A PyFilesytem path.
     :rtype: str
 
     >>> frombase('foo/bar/', 'foo/bar/baz/egg')
@@ -461,15 +461,15 @@ def relativefrom(base, path):
     path = list(iteratepath(path))
 
     common = 0
-    for a, b in zip(base, path):
-        if a != b:
+    for component_a, component_b in zip(base, path):
+        if component_a != component_b:
             break
         common += 1
 
     return '/'.join(['..'] * (len(base) - common) + path[common:])
 
 
-_wild_chars = frozenset('*?[]!{}')
+_WILD_CHARS = frozenset('*?[]!{}')
 
 
 def iswildcard(path):
@@ -486,4 +486,4 @@ def iswildcard(path):
 
     """
     assert path is not None
-    return not _wild_chars.isdisjoint(path)
+    return not _WILD_CHARS.isdisjoint(path)

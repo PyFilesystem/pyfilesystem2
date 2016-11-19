@@ -38,6 +38,9 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
     """
     Copy a file from one filesystem to another.
 
+    If the destination exists, and is a file, it will be first
+    truncated.
+
     :param src_fs: Source filesystem.
     :type src_fs: FS URL or instance
     :param src_path: Path to a file on ``src_fs``.
@@ -52,7 +55,7 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
         with manage_fs(dst_fs, create=True) as dst_fs:
             if src_fs is dst_fs:
                 # Same filesystem, so we can do a potentially optimized copy
-                src_fs.copy(src_path, dst_path)
+                src_fs.copy(src_path, dst_path, overwrite=True)
             else:
                 # Standard copy
                 with src_fs.lock(), dst_fs.lock():
@@ -93,7 +96,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None):
     :type src_path: str
     :param dst_fs: Destination filesystem.
     :type dst_fs: FS URL or instance
-    :param dst_path: A path to a directory on ``dst_fs``.
+    :param str dst_path: A path to a directory on ``dst_fs``.
     :param walker: A walker object that will be used to scan for files
         in ``src_fs``. Set this if you only want to consider a sub-set
         of the resources in ``src_fs``.
