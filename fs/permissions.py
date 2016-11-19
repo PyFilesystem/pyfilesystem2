@@ -38,6 +38,33 @@ class Permissions(object):
     """
     An abstraction for file system permissions.
 
+    :param list names: A list of permissions.
+    :param int mode: A mode integer.
+    :param str user: A triplet of *user* permissions, e.g. ``"rwx"`` or
+        ``"r--"``
+    :param str group: A triplet of *group* permissions, e.g. ``"rwx"``
+        or ``"r--"``
+    :param str other: A triplet of *other* permissions, e.g. ``"rwx"``
+        or ``"r--"``
+    :param bool sticky: A boolean for the *sticky* bit.
+    :param bool setuid: A boolean for the *setuid* bit.
+    :param bool setguid: A boolean for the *setuid* bit.
+
+    Permissions objects store information regarding the permissions
+    on a resource. It supports Linux permissions, but is generic enough
+    to manage permission information from almost any filesystem.
+
+    >>> from fs.permissions import Permissions
+    >>> p = Permissions(user='rwx', group='rw-', other='r--')
+    >>> print(p)
+    rwxrw-r--
+    >>> p.mode
+    500
+    >>> oct(p.mode)
+    '0764'
+
+
+
     """
 
     _LINUX_PERMS = [
@@ -75,9 +102,9 @@ class Permissions(object):
             }
         else:
             perms = self._perms = set()
-            perms.update('u_' + p for p in user or '')
-            perms.update('g_' + p for p in group or '')
-            perms.update('o_' + p for p in other or '')
+            perms.update('u_' + p for p in user or '' if p != '-')
+            perms.update('g_' + p for p in group or '' if p != '-')
+            perms.update('o_' + p for p in other or '' if p != '-')
 
         if sticky:
             self._perms.add('sticky')
