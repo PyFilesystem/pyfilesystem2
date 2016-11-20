@@ -125,7 +125,7 @@ class OSFS(FS):
             'size': stat_result.st_size,
             'type': int(cls._get_type_from_stat(stat_result))
         }
-        if hasattr(stat, 'st_birthtime'):
+        if hasattr(stat_result, 'st_birthtime'):
             details['created'] = stat_result.st_birthtime
         ctime_key = (
             'created'

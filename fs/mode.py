@@ -15,10 +15,26 @@ import six
 class Mode(object):
     """
     A mode object provides properties that can be used to interrogate
-    the mode strings used when opening files.
+    the `mode
+    strings <https://docs.python.org/3/library/functions.html#open>`_ used
+    when opening files.
 
-    :param str mode: A *mode* as used by ``open``.
+    :param str mode: A *mode* string, as used by ``io.open``.
     :raises ValueError: If the mode string is invalid.
+
+
+    Here's an example of typical use::
+
+        >>> mode = Mode('rb')
+        >>> mode.reading
+        True
+        >>> mode.writing
+        False
+        >>> mode.binary
+        True
+        >>> mode.text
+        False
+
 
     """
 
