@@ -99,12 +99,15 @@ class OSFS(FS):
                 os.pathconf(_root_path, os.pathconf_names['PC_PATH_MAX'])
 
     def __repr__(self):
-        return "OSFS({!r}, encoding={!r})".format(self.root_path,
-                                                  self.encoding)
+        _fmt = "{}({!r}, encoding={!r})"
+        return _fmt.format(self.__class__.__name__,
+                           self.root_path,
+                           self.encoding)
 
     def __str__(self):
-        fmt = "<osfs '{}'>"
-        return fmt.format(self.root_path)
+        fmt = "<{} '{}'>"
+        return fmt.format(self.__class__.__name__.lower(),
+                          self.root_path)
 
     def _to_sys_path(self, path):
         """Convert a FS path to a path on the OS."""
@@ -113,23 +116,23 @@ class OSFS(FS):
         return sys_path
 
     @classmethod
-    def _make_details_from_stat(cls, stat):
+    def _make_details_from_stat(cls, stat_result):
         """Make an info dict from a stat_result object."""
         details = {
             '_write': ['accessed', 'modified'],
-            'accessed': stat.st_atime,
-            'modified': stat.st_mtime,
-            'size': stat.st_size,
+            'accessed': stat_result.st_atime,
+            'modified': stat_result.st_mtime,
+            'size': stat_result.st_size,
             'type': int(cls._get_type_from_stat(stat))
         }
         if hasattr(stat, 'st_birthtime'):
-            details['created'] = stat.st_birthtime
+            details['created'] = stat_result.st_birthtime
         ctime_key = (
             'created'
             if _WINDOWS_PLATFORM
             else 'metadata_changed'
         )
-        details[ctime_key] = stat.st_ctime
+        details[ctime_key] = stat_result.st_ctime
         return details
 
     @classmethod

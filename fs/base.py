@@ -178,13 +178,13 @@ class FS(object):
         The ``info`` dict should be in the same format as the raw
         info returned by ``getinfo(file).raw``. Here's an example::
 
-        details_info = {
-            "details":
-            {
-                "modified_time": time.time()
+            details_info = {
+                "details":
+                {
+                    "modified_time": time.time()
+                }
             }
-        }
-        my_fs.setinfo('file.txt', details_info)
+            my_fs.setinfo('file.txt', details_info)
 
         """
         raise NotImplementedError('setinfo')

@@ -25,7 +25,7 @@ def write_zip(src_fs,
               encoding="utf-8",
               walker=None):
     """
-    Write a filesystem to a zip file.
+    Write the contents of a filesystem to a zip file.
 
     :param file: Destination file, may be a file name or an open file
         object.
@@ -38,8 +38,9 @@ def write_zip(src_fs,
         desired.
     :type encoding: str
     :param walker: A :class:`fs.walk.Walker` instance, or None to use
-        default walker.
-    :type walker: walker or None
+        default walker. You can use this to specify which files you
+        want to compress.
+    :type walker: Walker or None
 
     """
     _zip = zipfile.ZipFile(

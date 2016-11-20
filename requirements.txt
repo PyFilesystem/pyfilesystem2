@@ -1,3 +1,4 @@
+appdirs
 enum34
 pytz
 scandir

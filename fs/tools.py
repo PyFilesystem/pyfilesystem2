@@ -1,4 +1,7 @@
-"""A collection of functions that operate on filesystems and tools."""
+"""
+A collection of functions that operate on filesystems and tools.
+
+"""
 
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -18,7 +21,7 @@ def remove_empty(fs, path):
     Remove all empty parents.
 
     :param fs: A filesystem object.
-    :param path: Path to a directory on the filesystem.
+    :param str path: Path to a directory on the filesystem.
 
     """
     path = abspath(normpath(path))
@@ -34,10 +37,10 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
     """
     Copy data from one file object to another.
 
-    :param file src_file: File open for reading.
-    :param file dst_file: File open for writing.
-    :param int chunk_size: Number of bytes to copy at a time (None to
-        use sensible default).
+    :param file-like src_file: File open for reading.
+    :param file-like dst_file: File open for writing.
+    :param int chunk_size: Number of bytes to copy at a time (or
+        ``None`` to use sensible default).
     :returns: Number of bytes copied.
     :rtype: int
 
@@ -64,7 +67,9 @@ def get_intermediate_dirs(fs, dir_path):
     :returns: A list of paths.
     :rtype: list
 
-    :raises:
+    :raises: :class:`fs.errors.DirectoryExpected` if a path component
+        references a file and not a directory.
+
 
     """
     intermediates = []

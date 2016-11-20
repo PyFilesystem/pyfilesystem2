@@ -14,7 +14,7 @@ _PATTERN_CACHE = LRUCache(_MAXCACHE)
 
 def match(pattern, name):
     """
-    Test whether ``name`` matches ``pattern`.
+    Test whether ``name`` matches ``pattern``.
 
     :param str pattern: A wildcard pattern. e.g. ``"*.py"``
     :param str name: A filename

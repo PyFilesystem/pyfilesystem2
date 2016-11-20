@@ -21,6 +21,7 @@ with open('README.txt', 'r') as f:
 
 # TODO: pin requirements
 install_requires = [
+    "appdirs",
     "enum34",
     "pytz",
     "scandir",

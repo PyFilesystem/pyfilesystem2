@@ -13,13 +13,11 @@ import six
 # https://docs.python.org/3/library/functions.html#open
 @six.python_2_unicode_compatible
 class Mode(object):
-
     """
-    Mode objects provide
+    A mode object provides properties that can be used to interrogate
+    the mode strings used when opening files.
 
-
-    :param mode: A *mode* as used by ``open``.
-    :type mode: str
+    :param str mode: A *mode* as used by ``open``.
     :raises ValueError: If the mode string is invalid.
 
     """
@@ -34,8 +32,9 @@ class Mode(object):
     def __str__(self):
         return self._mode
 
-    def __contains__(self, c):
-        return c in self._mode
+    def __contains__(self, character):
+        """Check if a mode contains a given character."""
+        return character in self._mode
 
     def to_platform(self):
         """
@@ -95,38 +94,47 @@ class Mode(object):
 
     @property
     def create(self):
+        """Check if the mode would create a file."""
         return 'w' in self or 'x' in self
 
     @property
     def reading(self):
+        """Check if the mode permits reading."""
         return 'r' in self or '+' in self
 
     @property
     def writing(self):
+        """Check if a mode permits writing."""
         return 'w' in self or 'a' in self or '+' in self or 'x' in self
 
     @property
     def appending(self):
+        """Check if a mode permits appending."""
         return 'a' in self
 
     @property
     def updating(self):
+        """Check if a mode permits updating (reading and writing)."""
         return '+' in self
 
     @property
     def truncate(self):
+        """Check if a mode would truncate the file."""
         return 'w' in self or 'x' in self
 
     @property
     def exclusive(self):
+        """Check if the mode require exclusive creation."""
         return 'x' in self
 
     @property
     def binary(self):
+        """Check if a mode specifies binary."""
         return 'b' in self
 
     @property
     def text(self):
+        """Check if a mode specifies text."""
         return 't' in self or 'b' not in self
 
 

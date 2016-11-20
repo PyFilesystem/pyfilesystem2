@@ -164,13 +164,11 @@ class Walker(WalkerBase):
     def __repr__(self):
         return make_repr(
             self.__class__.__name__,
-            [
-                ('ignore_errors', self.ignore_errors, False),
-                ('on_error', self.on_error, None),
-                ('search', self.search, 'breadth'),
-                ('filter', self.filter, None),
-                ('exclude_dirs', self.exclude_dirs, None)
-            ]
+            ignore_errors=(self.ignore_errors, False),
+            on_error=(self.on_error, None),
+            search=(self.search, 'breadth'),
+            filter=(self.filter, None),
+            exclude_dirs=(self.exclude_dirs, None)
         )
 
     def filter_files(self, fs, infos):
