@@ -111,7 +111,7 @@ class Mode(object):
     @property
     def create(self):
         """Check if the mode would create a file."""
-        return 'w' in self or 'x' in self
+        return 'a' in self or 'w' in self or 'x' in self
 
     @property
     def reading(self):

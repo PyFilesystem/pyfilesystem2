@@ -204,13 +204,13 @@ class WrapFS(FS):
         self.check()
         _fs, _path = self.delegate_path(path)
         iter_files = iter(_fs.filterdir(
-           _path,
-           exclude_dirs=exclude_dirs,
-           exclude_files=exclude_files,
-           files=files,
-           dirs=dirs,
-           namespaces=namespaces,
-           page=page
+            _path,
+            exclude_dirs=exclude_dirs,
+            exclude_files=exclude_files,
+            files=files,
+            dirs=dirs,
+            namespaces=namespaces,
+            page=page
         ))
         with unwrap_errors(path):
             for info in iter_files:

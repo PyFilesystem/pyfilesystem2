@@ -285,6 +285,19 @@ class FSTestCases(object):
         self.assertEqual(data, contents)
         self.assertIsInstance(data, text_type)
 
+
+    def test_appendbytes(self):
+        with self.assertRaises(ValueError):
+            self.fs.appendbytes('foo', 'bar')
+        self.fs.appendbytes('foo', b'bar')
+        self.assert_bytes('foo', b'bar')
+
+    def test_appendtext(self):
+        with self.assertRaises(ValueError):
+            self.fs.appendtext('foo', b'bar')
+        self.fs.appendtext('foo', 'bar')
+        self.assert_text('foo', 'bar')
+
     def test_basic(self):
         # Check str and repr don't break
         repr(self.fs)

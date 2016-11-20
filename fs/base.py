@@ -194,6 +194,42 @@ class FS(object):
     # Filesystems *may* implement these methods.                       #
     # ---------------------------------------------------------------- #
 
+    def appendbytes(self, path, data):
+        """
+        Append bytes to the end of a file. Creating the file if it
+        doesn't already exists.
+
+        :param str path: Path to a file.
+        :param bytes data: Bytes to append.
+        :raises: :class:`ValueError` if ``data`` is not bytes.
+        :raises: :class:`fs.errors.ResourceNotFound` if a parent
+            directory of ``path`` does not exist.
+
+        """
+        if not isinstance(data, bytes):
+            raise ValueError('must be bytes')
+        with self._lock:
+            with self.open(path, 'ab') as append_file:
+                append_file.write(data)
+
+    def appendtext(self, path, text):
+        """
+        Append text to a file. Creating the file if it doesn't already
+        exists.
+
+        :param str path: Path to a file.
+        :param str text: Text to append.
+        :raises: :class:`ValueError` if ``text`` is not bytes.
+        :raises: :class:`fs.errors.ResourceNotFound` if a parent
+            directory of ``path`` does not exist.
+
+        """
+        if not isinstance(text, six.text_type):
+            raise ValueError('must be unicode str')
+        with self._lock:
+            with self.open(path, 'at') as append_file:
+                append_file.write(text)
+
     def close(self):
         """
         Close the filesystem and release any resources.
@@ -641,9 +677,7 @@ class FS(object):
         :rtype: bool
 
         """
-        for info in self.scandir(path):
-            return False
-        return True
+        return next(iter(self.scandir(path)), None) is None
 
     def isfile(self, path):
         """Check a path exists and is a file."""
