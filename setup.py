@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 with open('fs/_version.py') as f:
     exec(f.read())
 
-classifiers = [
+CLASSIFIERS = [
     'Development Status :: 2 - Pre-Alpha',
     'Intended Audience :: Developers',
     'License :: OSI Approved :: BSD License',
@@ -17,26 +17,25 @@ classifiers = [
 ]
 
 with open('README.txt', 'r') as f:
-    long_desc = f.read()
+    DESCRIPTION = f.read()
 
-# TODO: pin requirements
-install_requires = [
+REQUIREMENTS = [
     "appdirs",
     "enum34",
     "pytz",
     "scandir",
     "setuptools",
-    "six==1.10.0",
+    "six>=1.10.0",
 ]
 
 setup(
     author="Will McGugan",
     author_email="will@willmcgugan.com",
-    classifiers=classifiers,
+    classifiers=CLASSIFIERS,
     description="Filesystem abstraction layer",
-    install_requires=install_requires,
+    install_requires=REQUIREMENTS,
     license="BSD",
-    long_description=long_desc,
+    long_description=DESCRIPTION,
     name='fs',
     packages=find_packages(),
     platforms=['any'],
