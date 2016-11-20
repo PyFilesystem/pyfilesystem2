@@ -85,8 +85,7 @@ class UserConfigFS(_AppFS):
     :param str version: Optional version string, if a unique location
         per version of the application is required.
     :param bool roaming: If ``True``, use a *roaming* profile on
-        Windows, see http://technet.microsoft.com/en-
-        us/library/cc766489(WS.10).aspx
+        Windows.
     :param bool create: If ``True`` (the default) the directory will
         be created if it does not exist.
 

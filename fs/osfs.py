@@ -123,7 +123,7 @@ class OSFS(FS):
             'accessed': stat_result.st_atime,
             'modified': stat_result.st_mtime,
             'size': stat_result.st_size,
-            'type': int(cls._get_type_from_stat(stat))
+            'type': int(cls._get_type_from_stat(stat_result))
         }
         if hasattr(stat, 'st_birthtime'):
             details['created'] = stat_result.st_birthtime
