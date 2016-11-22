@@ -92,8 +92,12 @@ class FTPFile(object):
         self._socket = None
         self.closed = False
 
+
         if 'a' in mode:
-            self.pos = self.fs.getsize(self.path)
+            try:
+                self.pos = self.fs.getsize(self.path)
+            except errors.ResourceNotFound:
+                self.pos = 0
 
     def __repr__(self):
         _repr = "FTPFile({!r}, {!r}, {!r})"
@@ -640,25 +644,6 @@ class FTPFS(FS):
             except:
                 pass
         super(FTPFS, self).close()
-
-
-# if __name__ == "__main__":  # pragma: no cover
-#     ftp_fs = FTPFS('127.0.0.1', port=2121)
-#     print(ftp_fs.features)
-#     ftp_fs.openbin('new.txt', 'w').write(b'test')
-#     #print(list(ftp_fs.scandir('foobar')))
-#     ftp_fs.makedirs('/foo/baz', recreate=True)
-#     print(ftp_fs.isfile('test.txt'))
-#     print(ftp_fs.isdir('test.txt'))
-#     print(ftp_fs.isdir('foo'))
-#     print(ftp_fs.isfile('foo'))
-#     print(ftp_fs.isdir('nope'))
-#     print(ftp_fs.isfile('nope'))
-#     print(ftp_fs.getinfo('test.txt').raw)
-#     print(ftp_fs.getinfo('foo').raw)
-
-#     print(list(ftp_fs.scandir('/foo')))
-#     print(ftp_fs.listdir('/foo'))
 
 
 if __name__ == "__main__":
