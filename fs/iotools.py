@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import io
 from io import SEEK_SET, SEEK_CUR
 
+from .mode import Mode
+
 
 class RawWrapper(object):
     """Convert a Python 2 style file-like object in to a IO object."""
@@ -33,17 +35,21 @@ class RawWrapper(object):
         return self._f.seek(offset, whence)
 
     def readable(self):
-        if hasattr(self._f, 'readable'):
-            return self._f.readable()
-        return 'r' in self.mode
+        return getattr(
+            self._f,
+            'readable',
+            Mode(self.mode).reading
+        )
 
     def writable(self):
-        if hasattr(self._f, 'writeable'):
-            return self._f.writeable()
-        return 'w' in self.mode
+        return getattr(
+            self._f,
+            'writable',
+            Mode(self.mode).writing
+        )
 
     def seekable(self):
-        if hasattr(self._f, 'seekable'):
+        if self.is_io:
             return self._f.seekable()
         try:
             self.seek(0, SEEK_CUR)
@@ -59,10 +65,8 @@ class RawWrapper(object):
         return self._f.truncate(size)
 
     def write(self, data):
-        if self.is_io:
-            return self._f.write(data)
-        self._f.write(data)
-        return len(data)
+        count = self._f.write(data)
+        return len(data) if count is None else count
 
     def read(self, n=-1):
         if n == -1:
@@ -105,7 +109,7 @@ class RawWrapper(object):
 
 
 def make_stream(name,
-                f,
+                bin_file,
                 mode='r',
                 buffering=-1,
                 encoding=None,
@@ -114,27 +118,27 @@ def make_stream(name,
                 line_buffering=False,
                 **kwargs):
     """Take a Python 2.x binary file and return an IO Stream."""
-    r = 'r' in mode
-    w = 'w' in mode
-    a = 'a' in mode
+    reading = 'r' in mode
+    writing = 'w' in mode
+    appending = 'a' in mode
     binary = 'b' in mode
     if '+' in mode:
-        r = True
-        w = True
+        reading = True
+        writing = True
 
-    io_object = RawWrapper(f, mode=mode, name=name)
+    io_object = RawWrapper(bin_file, mode=mode, name=name)
     if buffering >= 0:
-        if r and w:
+        if reading and writing:
             io_object = io.BufferedRandom(
                 io_object,
                 buffering or io.DEFAULT_BUFFER_SIZE
             )
-        elif r:
+        elif reading:
             io_object = io.BufferedReader(
                 io_object,
                 buffering or io.DEFAULT_BUFFER_SIZE
             )
-        elif w or a:
+        elif writing or appending:
             io_object = io.BufferedWriter(
                 io_object,
                 buffering or io.DEFAULT_BUFFER_SIZE
@@ -152,55 +156,24 @@ def make_stream(name,
     return io_object
 
 
-def decode_binary(data, encoding=None, errors=None, newline=None):
-    """Decode bytes as though read from a text file."""
-    return io.TextIOWrapper(
-        io.BytesIO(data),
-        encoding=encoding,
-        errors=errors,
-        newline=newline
-    ).read()
-
-
-def line_iterator(f, size=None):
+def line_iterator(readable_file, size=None):
     """A not terribly efficient char by char line iterator."""
-    read = f.read
+    read = readable_file.read
     line = []
-    append = line.append
-    c = True
-    join = b''.join
-    is_terminator = b'\n'.__contains__  # True for '\n' and also for ''
+    byte = b'1'
     if size is None or size < 0:
-        while c:
-            c = read(1)
-            append(c)
-            if is_terminator(c):
-                yield join(line)
+        while byte:
+            byte = read(1)
+            line.append(byte)
+            if byte in b'\n':
+                yield b''.join(line)
                 del line[:]
+
     else:
-        while c:
-            c = read(1)
-            append(c)
-            if is_terminator(c) or len(line) >= size:
-                yield join(line)
+        while byte and size:
+            byte = read(1)
+            size -= len(byte)
+            line.append(byte)
+            if byte in b'\n' or not size:
+                yield b''.join(line)
                 del line[:]
-
-
-if __name__ == "__main__":  # pragma: nocover
-    print("Reading a binary file")
-    bin_file = open('tests/data/UTF-8-demo.txt', 'rb')
-    with make_stream('UTF-8-demo.txt', bin_file, 'rb') as f:
-        print(repr(f))
-        print(type(f.read(200)))
-
-    print("Reading a text file")
-    bin_file = open('tests/data/UTF-8-demo.txt', 'rb')
-    with make_stream('UTF-8-demo.txt', bin_file, 'rt') as f:
-        print(repr(f))
-        print(type(f.read(200)))
-
-    print("Reading a buffered binary file")
-    bin_file = open('tests/data/UTF-8-demo.txt', 'rb')
-    with make_stream('UTF-8-demo.txt', bin_file, 'rb', buffering=0) as f:
-        print(repr(f))
-        print(type(f.read(200)))

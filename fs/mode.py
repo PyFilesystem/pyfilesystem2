@@ -22,7 +22,6 @@ class Mode(object):
     :param str mode: A *mode* string, as used by ``io.open``.
     :raises ValueError: If the mode string is invalid.
 
-
     Here's an example of typical use::
 
         >>> mode = Mode('rb')
@@ -135,7 +134,7 @@ class Mode(object):
 
     @property
     def truncate(self):
-        """Check if a mode would truncate the file."""
+        """Check if a mode would truncate an existing file."""
         return 'w' in self or 'x' in self
 
     @property
@@ -158,8 +157,7 @@ def check_readable(mode):
     """
     Check a mode string allows reading.
 
-    :param mode: A mode string, e.g. ``"rt"``
-    :type mode: str
+    :param str mode: A mode string, e.g. ``"rt"``
     :rtype: bool
 
     """
@@ -170,8 +168,7 @@ def check_writable(mode):
     """
     Check a mode string allows writing.
 
-    :param mode: A mode string, e.g. ``"wt"``
-    :type mode: str
+    :param str mode: A mode string, e.g. ``"wt"``
     :rtype: bool
 
     """
@@ -182,8 +179,7 @@ def validate_open_mode(mode):
     """
     Check ``mode`` parameter of :meth:`fs.base.FS.open` is valid.
 
-    :param mode: Mode parameter.
-    :type mode: str
+    :param str mode: Mode parameter.
     :raises: `ValueError` if mode is not valid.
 
     """

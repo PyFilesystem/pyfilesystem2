@@ -56,6 +56,10 @@ class FS(object):
 
     @property
     def walk(self):
+        """
+        Get a :class:`fs.walker.BoundWlker` object for this filesystem.
+
+        """
         return Walker.bind(self)
 
     # ---------------------------------------------------------------- #
@@ -225,7 +229,7 @@ class FS(object):
 
         """
         if not isinstance(text, six.text_type):
-            raise ValueError('must be unicode str')
+            raise ValueError('must be unicode string')
         with self._lock:
             with self.open(path, 'at') as append_file:
                 append_file.write(text)

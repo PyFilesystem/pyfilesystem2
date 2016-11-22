@@ -57,7 +57,7 @@ class _MemoryFile(object):
             yield
             self.pos = self._bytes_io.tell()
 
-    def _on_modify(self):
+    def on_modify(self):
         """Called when file data is modified."""
         self.modified_time = time.time()
         self._memory_fs._on_modify_file(
@@ -65,16 +65,13 @@ class _MemoryFile(object):
             self.modified_time
         )
 
-    def _on_access(self):
+    def on_access(self):
         """Called when file is accessed."""
         self.accessed_time = time.time()
         self._memory_fs._on_access_file(
             self._path,
             self.accessed_time
         )
-
-    # def fileno(self):
-    #     raise io.UnsupportedOperation('fileno')
 
     def flush(self):
         pass
@@ -92,7 +89,7 @@ class _MemoryFile(object):
 
     def readline(self, *args, **kwargs):
         with self._seek_lock():
-            self._on_access()
+            self.on_access()
             return self._bytes_io.readline(*args, **kwargs)
 
     def close(self):
@@ -105,7 +102,7 @@ class _MemoryFile(object):
         if size is None:
             size = -1
         with self._seek_lock():
-            self._on_access()
+            self.on_access()
             return self._bytes_io.read(size)
 
     def readlines(self):
@@ -114,7 +111,7 @@ class _MemoryFile(object):
 
     def seek(self, *args, **kwargs):
         with self._seek_lock():
-            self._on_access()
+            self.on_access()
             return self._bytes_io.seek(*args, **kwargs)
 
     def tell(self):
@@ -122,17 +119,17 @@ class _MemoryFile(object):
 
     def truncate(self, *args, **kwargs):
         with self._seek_lock():
-            self._on_modify()
+            self.on_modify()
             self._bytes_io.truncate(*args, **kwargs)
 
     def write(self, data):
         with self._seek_lock():
-            self._on_modify()
+            self.on_modify()
             self._bytes_io.write(data)
 
     def writelines(self, sequence):
         with self._seek_lock():
-            self._on_modify()
+            self.on_modify()
             self._bytes_io.writelines(sequence)
 
     def __enter__(self):
@@ -150,12 +147,12 @@ class _DirEntry(object):
         self._dir = OrderedDict()
         self._open_files = []
         self._bytes_file = None
-        self._lock = RLock()
+        self.lock = RLock()
 
-        _t = time.time()
-        self.created_time = _t
-        self.accessed_time = _t
-        self.modified_time = _t
+        current_time = time.time()
+        self.created_time = current_time
+        self.accessed_time = current_time
+        self.modified_time = current_time
 
         if not self.is_dir:
             self._bytes_file = io.BytesIO()
@@ -170,7 +167,7 @@ class _DirEntry(object):
 
     @property
     def size(self):
-        with self._lock:
+        with self.lock:
             if self.is_dir:
                 return 0
             else:
@@ -206,7 +203,11 @@ class _DirEntry(object):
 @six.python_2_unicode_compatible
 class MemoryFS(FS):
     """
-    An in-memory filesystem.
+    An filesystem that stores all file and directory information in
+    memory. This makes them very fast, but non-permanent.
+
+    Memory filesystems are useful for caches, temporary data stores,
+    unit testing, etc.
 
     """
 
@@ -226,8 +227,8 @@ class MemoryFS(FS):
 
         """
         self._meta = self._meta.copy()
-        self._lock = RLock()
         self.root = self._make_dir_entry(ResourceType.directory, '')
+        super(MemoryFS, self).__init__()
 
     def __repr__(self):
         return "MemoryFS()"
@@ -256,13 +257,13 @@ class MemoryFS(FS):
         if dir_entry is not None:
             dir_entry.remove_open_file(mem_file)
 
-    def _on_access_file(self, path, time):
+    def _on_access_file(self, path, _time):
         dir_entry = self._get_dir_entry(path)
-        dir_entry.accessed_time = time
+        dir_entry.accessed_time = _time
 
-    def _on_modify_file(self, path, time):
+    def _on_modify_file(self, path, _time):
         dir_entry = self._get_dir_entry(path)
-        dir_entry.accessed_time = dir_entry.modified_time = time
+        dir_entry.accessed_time = dir_entry.modified_time = _time
 
     def getinfo(self, path, namespaces=None):
         namespaces = namespaces or ()
@@ -356,8 +357,9 @@ class MemoryFS(FS):
                     memory_fs=self,
                     bytes_io=file_dir_entry.bytes_file,
                     mode=mode,
-                    lock=file_dir_entry._lock
+                    lock=file_dir_entry.lock
                 )
+
                 file_dir_entry.add_open_file(mem_file)
                 return mem_file
 
@@ -373,7 +375,7 @@ class MemoryFS(FS):
                 memory_fs=self,
                 bytes_io=file_dir_entry.bytes_file,
                 mode=mode,
-                lock=file_dir_entry._lock
+                lock=file_dir_entry.lock
             )
             file_dir_entry.add_open_file(mem_file)
             return mem_file
@@ -394,7 +396,7 @@ class MemoryFS(FS):
 
             parent_dir_entry.remove_entry(file_name)
 
-    def removedir(self, path, force=False):
+    def removedir(self, path):
         _path = self.validatepath(path)
 
         if _path == '/':

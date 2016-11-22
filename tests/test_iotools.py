@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import io
 import unittest
 
 import six
@@ -48,3 +49,73 @@ class TestIOTools(unittest.TestCase):
                 self.assertEqual(bytes_read, 3)
                 self.assertEqual(bytes(data), b'foo')
                 self.assertEqual(f.readline(1), b'f')
+
+        with self.fs.openbin('bytes.bin') as bin_file:
+            with iotools.make_stream('bytes.bin', bin_file, 'rb') as f:
+                f.is_io = False
+                data = bytearray(3)
+                bytes_read = f.readinto(data)
+                self.assertEqual(bytes_read, 3)
+                self.assertEqual(bytes(data), b'foo')
+                self.assertEqual(f.readline(1), b'f')
+
+    def test_isatty(self):
+        with self.fs.openbin('text.txt', 'wb') as f:
+            with iotools.make_stream("text.txt", f, 'wb') as f1:
+                self.assertFalse(f1.isatty())
+
+    def test_readlines(self):
+        self.fs.setbytes('foo', b'barbar\nline1\nline2')
+        with self.fs.open('foo', 'rb') as f:
+            f = iotools.make_stream('foo', f, 'rb')
+            self.assertEqual(
+                list(f),
+                ['barbar\n', 'line1\n', 'line2']
+            )
+        with self.fs.open('foo', 'rt') as f:
+            f = iotools.make_stream('foo', f, 'rb')
+            self.assertEqual(
+                f.readlines(),
+                ['barbar\n', 'line1\n', 'line2']
+            )
+
+    def test_readall(self):
+        self.fs.setbytes('foo', b'foobar')
+        with self.fs.open('foo', 'rt') as f:
+            self.assertEqual(f.read(), 'foobar')
+
+    def test_writelines(self):
+        with self.fs.open('foo', 'wb') as f:
+            f = iotools.make_stream('foo', f, 'rb')
+            f.writelines(['foo', 'bar', 'baz'])
+        self.assertEqual(self.fs.getbytes('foo'), 'foobarbaz')
+
+    def test_seekable(self):
+
+        f = io.BytesIO(b'HelloWorld')
+        raw_wrapper = iotools.RawWrapper(f)
+        self.assertTrue(raw_wrapper.seekable())
+
+        raw_wrapper.is_io = False
+
+        def seek(pos, whence):
+            raise IOError('no seek')
+
+        raw_wrapper.seek = seek
+
+        self.assertFalse(raw_wrapper.seekable())
+
+    def test_line_iterator(self):
+        f = io.BytesIO(b'Hello\nWorld\n\nfoo')
+        self.assertEqual(
+            list(iotools.line_iterator(f)),
+            [b'Hello\n', b'World\n', b'\n', b'foo']
+        )
+
+        f = io.BytesIO(b'Hello\nWorld\n\nfoo')
+        self.assertEqual(
+            list(iotools.line_iterator(f, 10)),
+            [b'Hello\n', b'Worl']
+        )
+
+
