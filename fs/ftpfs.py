@@ -46,7 +46,7 @@ def ftp_errors(fs, path=None):
                 msg="ftp error on resource '{}' ({})".format(path, e)
             )
         else:
-            raise errors.OperationFailed('ftp error ({})'.forma(e))
+            raise errors.OperationFailed('ftp error ({})'.format(e))
     except error_perm as e:
         code, message = parse_ftp_error(e)
         if code == 552:
