@@ -46,7 +46,7 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
     chunk_size = chunk_size or constants.DEFAULT_CHUNK_SIZE
     read = src_file.read
     write = dst_file.write
-    for chunk in iter(lambda: read(chunk_size), b''):
+    for chunk in iter(lambda: read(chunk_size) or None, None):
         write(chunk)
 
 
