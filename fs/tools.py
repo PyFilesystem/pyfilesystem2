@@ -41,20 +41,13 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
     :param file-like dst_file: File open for writing.
     :param int chunk_size: Number of bytes to copy at a time (or
         ``None`` to use sensible default).
-    :returns: Number of bytes copied.
-    :rtype: int
 
     """
     chunk_size = chunk_size or constants.DEFAULT_CHUNK_SIZE
-    count = 0
     read = src_file.read
     write = dst_file.write
-    chunk = read(chunk_size)
-    while chunk:
+    for chunk in iter(lambda: read(chunk_size), b''):
         write(chunk)
-        count += len(chunk)
-        chunk = read(chunk_size)
-    return count
 
 
 def get_intermediate_dirs(fs, dir_path):
