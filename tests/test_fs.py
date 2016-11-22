@@ -19,7 +19,7 @@ import time
 
 import fs.copy
 import fs.move
-from fs import ResourceType
+from fs import ResourceType, Seek
 from fs import errors
 from fs import walk
 from fs.opener import open_fs
@@ -707,10 +707,10 @@ class FSTestCases(object):
                 ['Hello\n', 'World\n', 'foo\n', 'bar\n', 'baz\n']
             )
 
-        with self.fs.open('text', 'r') as f:
+        with self.fs.open('text', 'rb') as f:
             self.assertEqual(
                 f.readlines(8),
-                ['Hello\n', 'World\n']
+                [b'Hello\n', b'World\n']
             )
 
         with self.fs.open('text', 'r') as f:
@@ -721,6 +721,28 @@ class FSTestCases(object):
 
         iter_lines = iter(self.fs.open('text'))
         self.assertEqual(next(iter_lines), 'Hello\n')
+
+        with self.fs.open('text', 'rb') as f:
+            self.assertEqual(f.read(1), b'H')
+            f.seek(3, Seek.set)
+            self.assertEqual(f.read(1), b'l')
+            f.seek(2, Seek.current)
+            self.assertEqual(f.read(1), b'W')
+            f.seek(-2, Seek.end)
+            self.assertEqual(f.read(1), b'z')
+            with self.assertRaises(ValueError):
+                f.seek(10, 77)
+
+        with self.fs.open('text', 'r+b') as f:
+            f.seek(5)
+            f.truncate()
+            f.seek(0)
+            self.assertEqual(f.read(), b'Hello')
+            f.truncate(10)
+            f.seek(0)
+            print(repr(self.fs))
+            print(repr(f))
+            self.assertEqual(f.read(), b'Hello\0\0\0\0\0')
 
     def test_openbin(self):
         # Write a binary file

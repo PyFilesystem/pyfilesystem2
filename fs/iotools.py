@@ -38,15 +38,15 @@ class RawWrapper(object):
         return getattr(
             self._f,
             'readable',
-            Mode(self.mode).reading
-        )
+            lambda: Mode(self.mode).reading
+        )()
 
     def writable(self):
         return getattr(
             self._f,
             'writable',
-            Mode(self.mode).writing
-        )
+            lambda: Mode(self.mode).writing
+        )()
 
     def seekable(self):
         if self.is_io:

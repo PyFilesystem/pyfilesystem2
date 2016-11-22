@@ -105,9 +105,9 @@ class _MemoryFile(object):
             self.on_access()
             return self._bytes_io.read(size)
 
-    def readlines(self):
+    def readlines(self, hint=-1):
         with self._seek_lock():
-            return self._bytes_io.readlines()
+            return self._bytes_io.readlines(hint)
 
     def seek(self, *args, **kwargs):
         with self._seek_lock():
@@ -117,10 +117,14 @@ class _MemoryFile(object):
     def tell(self):
         return self.pos
 
-    def truncate(self, *args, **kwargs):
+    def truncate(self, size):
         with self._seek_lock():
             self.on_modify()
-            self._bytes_io.truncate(*args, **kwargs)
+            self._bytes_io.truncate(size)
+            if size is not None and self._bytes_io.tell() < size:
+                self._bytes_io.seek(0, os.SEEK_END)
+                file_size = self._bytes_io.tell()
+                self._bytes_io.write(b'\0' * (size - file_size))
 
     def write(self, data):
         with self._seek_lock():

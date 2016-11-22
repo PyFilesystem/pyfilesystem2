@@ -43,10 +43,11 @@ def ftp_errors(fs, path=None):
     except error_temp as e:
         if path is not None:
             raise errors.ResourceError(
+                path,
                 msg="ftp error on resource '{}' ({})".format(path, e)
             )
         else:
-            raise errors.OperationFailed('ftp error ({})'.format(e))
+            raise errors.OperationFailed(msg='ftp error ({})'.format(e))
     except error_perm as e:
         code, message = parse_ftp_error(e)
         if code == 552:
@@ -69,9 +70,7 @@ def parse_ftp_error(e):
 
 
 def _encode(s):
-    if PY2 and isinstance(s, text_type):
-        return s.encode('utf-8')
-    return s
+    return s.encode() if PY2 and isinstance(s, text_type) else s
 
 
 class FTPFile(object):
@@ -129,14 +128,12 @@ class FTPFile(object):
         return next(line_iterator(self, size))
 
     def readlines(self, hint=-1):
-        if hint == -1:
-            return list(line_iterator(self))
         lines = []
         size = 0
         for line in line_iterator(self):
             lines.append(line)
             size += len(line)
-            if size > hint:
+            if hint != -1 and size > hint:
                 break
         return lines
 
@@ -179,12 +176,9 @@ class FTPFile(object):
         elif whence == Seek.current:
             self.pos = self.pos + pos
         elif whence == Seek.end:
-            self.pos = max(0, self.fs.getsize(self.path) - pos)
+            self.pos = max(0, self.fs.getsize(self.path) + pos)
         else:
-            raise ValueError('invalid value for seek')
-
-    def seekable(self):
-        return True
+            raise ValueError('invalid value for whence')
 
     def tell(self):
         return self.pos
@@ -199,7 +193,7 @@ class FTPFile(object):
             with self.fs.openbin(self.path, 'w') as f:
                 f.write(data)
                 if len(data) < size:
-                    f.write(b'\0' * size - len(data))
+                    f.write(b'\0' * (size - len(data)))
 
     def write(self, data):
 
@@ -646,6 +640,6 @@ class FTPFS(FS):
         super(FTPFS, self).close()
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
     fs = FTPFS('ftp.mirror.nl', 'anonymous', 'willmcgugan@gmail.com')
     print(list(fs.scandir('/')))

@@ -70,7 +70,7 @@ class TestIOTools(unittest.TestCase):
             f = iotools.make_stream('foo', f, 'rb')
             self.assertEqual(
                 list(f),
-                ['barbar\n', 'line1\n', 'line2']
+                [b'barbar\n', b'line1\n', b'line2']
             )
         with self.fs.open('foo', 'rt') as f:
             f = iotools.make_stream('foo', f, 'rb')
@@ -87,8 +87,8 @@ class TestIOTools(unittest.TestCase):
     def test_writelines(self):
         with self.fs.open('foo', 'wb') as f:
             f = iotools.make_stream('foo', f, 'rb')
-            f.writelines(['foo', 'bar', 'baz'])
-        self.assertEqual(self.fs.getbytes('foo'), 'foobarbaz')
+            f.writelines([b'foo', b'bar', b'baz'])
+        self.assertEqual(self.fs.getbytes('foo'), b'foobarbaz')
 
     def test_seekable(self):
 
@@ -117,5 +117,26 @@ class TestIOTools(unittest.TestCase):
             list(iotools.line_iterator(f, 10)),
             [b'Hello\n', b'Worl']
         )
+
+    def test_make_stream_writer(self):
+        f = io.BytesIO()
+        s = iotools.make_stream('foo', f, 'wb', buffering=1)
+        self.assertIsInstance(s, io.BufferedWriter)
+        s.write(b'Hello')
+        self.assertEqual(f.getvalue(), b'Hello')
+
+    def test_make_stream_reader(self):
+        f = io.BytesIO(b'Hello')
+        s = iotools.make_stream('foo', f, 'rb', buffering=1)
+        self.assertIsInstance(s, io.BufferedReader)
+        self.assertEqual(s.read(), b'Hello')
+
+    def test_make_stream_reader_writer(self):
+        f = io.BytesIO(b'Hello')
+        s = iotools.make_stream('foo', f, '+b', buffering=1)
+        self.assertIsInstance(s, io.BufferedRandom)
+        self.assertEqual(s.read(), b'Hello')
+        s.write(b' World')
+        self.assertEqual(f.getvalue(), b'Hello World')
 
 

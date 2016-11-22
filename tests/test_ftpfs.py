@@ -16,6 +16,9 @@ import time
 import unittest
 import uuid
 
+from ftplib import error_perm
+from ftplib import error_temp
+
 
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
@@ -24,6 +27,7 @@ from pyftpdlib.servers import FTPServer
 from fs import errors
 from fs.subfs import SubFS
 from fs.opener import open_fs
+from fs.ftpfs import ftp_errors
 
 from nose.plugins.attrib import attr
 
@@ -76,6 +80,38 @@ class TestFTPFSClass(unittest.TestCase):
         ftp_fs = open_fs('ftp://will:wfc@ftp.example.org')
         self.assertIsInstance(ftp_fs, FTPFS)
         self.assertEqual(ftp_fs.host, 'ftp.example.org')
+
+
+class TestFTPErrors(unittest.TestCase):
+    """Test the ftp_errors context manager."""
+
+    def test_manager(self):
+        mem_fs = open_fs('mem://')
+
+        with self.assertRaises(errors.ResourceError):
+            with ftp_errors(mem_fs, path='foo'):
+                raise error_temp
+
+        with self.assertRaises(errors.OperationFailed):
+            with ftp_errors(mem_fs):
+                raise error_temp
+
+        with self.assertRaises(errors.InsufficientStorage):
+            with ftp_errors(mem_fs):
+                raise error_perm('552 foo')
+
+        with self.assertRaises(errors.ResourceNotFound):
+            with ftp_errors(mem_fs):
+                raise error_perm('501 foo')
+
+        with self.assertRaises(errors.PermissionDenied):
+            with ftp_errors(mem_fs):
+                raise error_perm('999 foo')
+
+
+
+
+
 
 
 @attr('slow')
