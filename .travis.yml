@@ -11,6 +11,9 @@ before_install:
 install:
   - pip install -e .
 
+after_success:
+  - coveralls
+
 # command to run tests
 script:
   - nosetests --with-coverage --cover-package=fs tests
