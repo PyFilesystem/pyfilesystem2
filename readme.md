@@ -31,7 +31,7 @@ projects_fs = open_fs('~/projects')
 print(count_python_loc(projects_fs))
 ```
 
-The line ``project_fs = open_fs('~/projects')`` opens an FS object that maps to the ``projects`` directory in your home folder. That object is used by ``counts_python_loc`` when counting lines of code.
+The line ``project_fs = open_fs('~/projects')`` opens an FS object that maps to the ``projects`` directory in your home folder. That object is used by ``count_python_loc`` when counting lines of code.
 
 If we later want to count the lines of Python code in a zip file, then we can make the following change::
 
@@ -39,5 +39,5 @@ If we later want to count the lines of Python code in a zip file, then we can ma
 projects_fs = open_fs('zip://projects.zip')
 ```
 
-This works because PyFileystem provides a simple consistent interface to anything that resembles a collection of files and directories.
+No changes to ``count_python_loc`` are required, because PyFileystem provides a simple consistent interface to anything that resembles a collection of files and directories, including archives and network filesystems.
 
