@@ -64,7 +64,6 @@ class WrapCachedDir(WrapFS):
         return gen_scandir
 
     def getinfo(self, path, *namespaces):
-
         _path = abspath(normpath(path))
         if _path == '/':
             return Info({
@@ -86,10 +85,6 @@ class WrapCachedDir(WrapFS):
             raise ResourceNotFound(path)
         return info
 
-    # def gettype(self, path):
-    #     resource_type = self.getinfo(path, 'details').type
-    #     return resource_type
-
     def isdir(self, path):
         """Check a path exists and is a directory."""
         return self.getinfo(path).is_dir
@@ -100,8 +95,23 @@ class WrapCachedDir(WrapFS):
 
 
 class WrapReadOnly(WrapFS):
+    """
+    Makes a Filesystem read-only. Any call that would would write data
+    or modify the filesystem in any way will raise a
+    :class:`fs.errors.ResourceReadOnly` exception.
+
+    """
 
     wrap_name = 'read-only'
+
+    def appendbytes(self, path, data):
+        self.check()
+        raise ResourceReadOnly(path)
+
+    def appendtext(self, path, text,
+                   encoding='utf-8', errors=None, newline=None):
+        self.check()
+        raise ResourceReadOnly(path)
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
@@ -186,6 +196,10 @@ class WrapReadOnly(WrapFS):
         self.check()
         raise ResourceReadOnly(path)
 
+    def setbin(self, path, file):
+        self.check()
+        raise ResourceReadOnly(path)
+
     def setfile(self,
                 path,
                 file,
@@ -198,15 +212,3 @@ class WrapReadOnly(WrapFS):
     def touch(self, path):
         self.check()
         raise ResourceReadOnly(path)
-
-if __name__ == "__main__":
-    from fs.opener import open_fs
-
-    mem_fs = open_fs('mem://')
-    mem_fs.makedir('foo')
-    mem_fs = cache_directory(read_only(mem_fs))
-    print(mem_fs)
-    print(repr(mem_fs))
-    sub_fs = mem_fs.opendir('foo')
-    print(sub_fs)
-    print(repr(sub_fs))

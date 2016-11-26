@@ -70,6 +70,24 @@ class WrapFS(FS):
         """
         return self._wrap_fs
 
+
+    def appendbytes(self, path, data):
+        self.check()
+        _fs, _path = self.delegate_path(path)
+        with unwrap_errors(path):
+            return _fs.appendbytes(_path, data)
+
+    def appendtext(self, path, text,
+                   encoding='utf-8', errors=None, newline=None):
+        self.check()
+        _fs, _path = self.delegate_path(path)
+        with unwrap_errors(path):
+            return _fs.appendtext(_path,
+                                  text,
+                                  encoding=encoding,
+                                  errors=errors,
+                                  newline=newline)
+
     def getinfo(self, path, namespaces=None):
         self.check()
         _fs, _path = self.delegate_path(path)

@@ -216,7 +216,12 @@ class FS(object):
             with self.open(path, 'ab') as append_file:
                 append_file.write(data)
 
-    def appendtext(self, path, text):
+    def appendtext(self,
+                   path,
+                   text,
+                   encoding='utf-8',
+                   errors=None,
+                   newline=None):
         """
         Append text to a file. Creating the file if it doesn't already
         exists.
@@ -231,7 +236,11 @@ class FS(object):
         if not isinstance(text, six.text_type):
             raise ValueError('must be unicode string')
         with self._lock:
-            with self.open(path, 'at') as append_file:
+            with self.open(path,
+                           'at',
+                           encoding=encoding,
+                           errors=errors,
+                           newline=newline) as append_file:
                 append_file.write(text)
 
     def close(self):

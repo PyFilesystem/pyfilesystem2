@@ -42,6 +42,9 @@ class Info(object):
         else:
             return "<file '{}'>".format(self.name)
 
+    def __eq__(self, other):
+        return self.raw == other.raw
+
     def _make_datetime(self, t):
         if t is not None:
             return self._to_datetime(t)

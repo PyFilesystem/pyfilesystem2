@@ -8,7 +8,7 @@ from fs import wrapfs
 from fs.opener import open_fs
 
 
-class TestWrap(wrapfs.WrapFS):
+class WrappedFS(wrapfs.WrapFS):
     wrap_name = 'test'
 
 
@@ -16,7 +16,7 @@ class TestWrapFS(unittest.TestCase):
 
     def setUp(self):
         self.wrapped_fs = open_fs('mem://')
-        self.fs = TestWrap(self.wrapped_fs)
+        self.fs = WrappedFS(self.wrapped_fs)
 
     def test_encode(self):
         self.assertEqual((self.wrapped_fs, 'foo'), self.fs.delegate_path('foo'))
@@ -24,7 +24,7 @@ class TestWrapFS(unittest.TestCase):
         self.assertIs(self.wrapped_fs, self.fs.delegate_fs())
 
     def test_repr(self):
-        self.assertEqual(repr(self.fs), 'TestWrap(MemoryFS())')
+        self.assertEqual(repr(self.fs), 'WrappedFS(MemoryFS())')
 
     def test_str(self):
         self.assertEqual(
