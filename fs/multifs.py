@@ -277,7 +277,7 @@ class MultiFS(FS):
     def hasurl(self, path, purpose='download'):
         self.check()
         fs = self._delegate_required(path)
-        return fs.hasurl(path, purpose='download')
+        return fs.hasurl(path, purpose=purpose)
 
     def isdir(self, path):
         self.check()
