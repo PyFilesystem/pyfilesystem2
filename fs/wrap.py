@@ -53,11 +53,15 @@ class WrapCachedDir(WrapFS):
         super(WrapCachedDir, self).__init__(wrap_fs)
         self._cache = {}
 
-    def scandir(self, path, namespaces=None):
+    def scandir(self, path, namespaces=None, page=None):
         _path = abspath(normpath(path))
         cache_key = (_path, frozenset(namespaces or ()))
         if cache_key not in self._cache:
-            _scan_result = self._wrap_fs.scandir(path, namespaces=namespaces)
+            _scan_result = self._wrap_fs.scandir(
+                path,
+                namespaces=namespaces,
+                page=page
+            )
             _dir = {info.name: info for info in _scan_result}
             self._cache[cache_key] = _dir
         gen_scandir = iter(self._cache[cache_key].values())

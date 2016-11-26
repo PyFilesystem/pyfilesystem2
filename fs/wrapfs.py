@@ -290,11 +290,11 @@ class WrapFS(FS):
             has_sys_path = _fs.hassyspath(_path)
         return has_sys_path
 
-    def hasurl(self, path):
+    def hasurl(self, path, purpose='download'):
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            has_url = _fs.hasurl(_path)
+            has_url = _fs.hasurl(_path, purpose='download')
         return has_url
 
     def isdir(self, path):

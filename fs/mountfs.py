@@ -171,10 +171,10 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.geturl(path, purpose=purpose)
 
-    def hasurl(self, path):
+    def hasurl(self, path, purpose='download'):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.hasurl(_path)
+        return fs.hasurl(_path, purpose='download')
 
     def isdir(self, path):
         self.check()
