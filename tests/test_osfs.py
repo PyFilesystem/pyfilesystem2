@@ -11,7 +11,7 @@ from fs import osfs
 from fs.path import relpath
 from fs import errors
 
-from .test_fs import FSTestCases
+from fs.test import FSTestCases
 
 
 from six import text_type
@@ -62,6 +62,10 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             data = f.read()
         self.assertEqual(data, contents)
         self.assertIsInstance(data, text_type)
+
+    def test_not_exists(self):
+        with self.assertRaises(errors.CreateFailed):
+            fs = osfs.OSFS('/does/not/exists/')
 
     def test_create(self):
         """Test create=True"""

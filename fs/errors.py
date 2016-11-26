@@ -5,8 +5,8 @@ Defines the Exception classes thrown by PyFilesystem objects.
 Errors relating to the underlying filesystem are translated in to one of
 the following exceptions.
 
-All Exception classes are derived from `FSError` which can be used as a
-catch-all.
+All Exception classes are derived from :class:`fs.errors.FSError` which
+may be used as a catch-all filesystem exception.
 
 """
 

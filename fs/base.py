@@ -809,7 +809,7 @@ class FS(object):
             else:
                 try:
                     os.rename(src_sys_path, dst_sys_path)
-                except:
+                except OSError:
                     pass
                 else:
                     return

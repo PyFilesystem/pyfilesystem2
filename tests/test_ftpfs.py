@@ -50,7 +50,7 @@ if __name__ == "__main__":
     sys.exit(0)
 
 
-from .test_fs import FSTestCases
+from fs.test import FSTestCases
 
 ftp_port_offset = 0
 ftp_port = 30000 + (os.getpid() % 8)
@@ -107,10 +107,6 @@ class TestFTPErrors(unittest.TestCase):
         with self.assertRaises(errors.PermissionDenied):
             with ftp_errors(mem_fs):
                 raise error_perm('999 foo')
-
-
-
-
 
 
 

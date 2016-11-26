@@ -17,6 +17,7 @@ Contents:
    info.rst
    walking.rst
    builtin.rst
+   implementers.rst
    reference.rst
 
 

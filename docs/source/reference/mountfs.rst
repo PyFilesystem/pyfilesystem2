@@ -1,8 +1,8 @@
 Mount Filesystem
 ================
 
-A Mount FS is a *virtual* filesystem which can seemlessly map sub-
-directories on to other filesystems.
+A Mount FS is a *virtual* filesystem which can seamlessly map
+sub-directories on to other filesystems.
 
 For example, lets say we have two filesystems containing config files
 and resources respectively::

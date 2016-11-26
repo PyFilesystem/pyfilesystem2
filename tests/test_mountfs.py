@@ -5,8 +5,7 @@ import unittest
 from fs.mountfs import MountError, MountFS
 from fs.memoryfs import MemoryFS
 from fs.tempfs import TempFS
-
-from .test_fs import FSTestCases
+from fs.test import FSTestCases
 
 
 class TestMountFS(FSTestCases, unittest.TestCase):

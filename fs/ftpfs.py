@@ -77,6 +77,9 @@ class FTPFile(object):
     """
     A binary file object for an ftp file.
 
+    You won't need to create these manually. They will be returned by
+    ``FTPFS`` objects when you open a file.
+
     """
 
     def __init__(self, ftpfs, path, mode):
@@ -220,8 +223,8 @@ class FTPFS(FS):
 
     :param str host: A FTP host, e.g. ``'ftp.mirror.nl'``.
     :param str user: A username (default is ``'anonymous'``)
-    :param passwd: Password for the server, or None for anon.
-    :param acct: Account
+    :param passwd: Password for the server, or ``None`` for anon.
+    :param acct: FTP account.
     :param int timeout: Timeout for contacting server (in seconds).
     :param int port: Port number (default 21).
 
@@ -445,26 +448,6 @@ class FTPFS(FS):
                 info = directory[file_name]
                 return info
 
-    # def isdir(self, path):
-    #     self.check()
-    #     _path = self.validatepath(path)
-    #     try:
-    #         self.ftp.cwd(_path)
-    #     except error_perm:
-    #         return False
-    #     else:
-    #         return True
-
-    # def isfile(self, path):
-    #     self.check()
-    #     _path = self.validatepath(path)
-    #     try:
-    #         self.ftp.cwd(_path)
-    #     except error_perm:
-    #         return True
-    #     else:
-    #         return False
-
     def listdir(self, path):
         self.check()
         _path = self.validatepath(path)
@@ -538,7 +521,7 @@ class FTPFS(FS):
         self.validatepath(path)
         if _path == '/':
             raise errors.RemoveRootError()
-        dir_name, file_name = split(_path)
+        _dir_name, file_name = split(_path)
 
         with ftp_errors(self, path):
             try:
@@ -565,7 +548,6 @@ class FTPFS(FS):
                             _encode("MLSD {}".format(_path)), lines.append
                         )
                     except error_perm as e:
-                        code, _ = parse_ftp_error(e)
                         if not self.getinfo(path).is_dir:
                             raise errors.DirectoryExpected(path)
                         raise # pragma: no cover
@@ -635,7 +617,7 @@ class FTPFS(FS):
         if not self.isclosed():
             try:
                 self.ftp.quit()
-            except:
+            except Exception:
                 pass
         super(FTPFS, self).close()
 

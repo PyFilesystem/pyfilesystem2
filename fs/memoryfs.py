@@ -207,11 +207,16 @@ class _DirEntry(object):
 @six.python_2_unicode_compatible
 class MemoryFS(FS):
     """
-    An filesystem that stores all file and directory information in
+    A filesystem that stores all file and directory information in
     memory. This makes them very fast, but non-permanent.
 
     Memory filesystems are useful for caches, temporary data stores,
     unit testing, etc.
+
+    Memory filesystems require no parameters to their constructor. The
+    following is how you would create a ``MemoryFS`` instance::
+
+        mem_fs = MemoryFS()
 
     """
 

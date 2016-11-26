@@ -6,7 +6,6 @@ import tempfile
 
 from fs import osfs
 from fs.path import relpath
-
 from .test_osfs import TestOSFS
 
 

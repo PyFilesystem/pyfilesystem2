@@ -45,13 +45,22 @@ class OSFS(FS):
     :param root_path: An OS path to the location on your HD you
         wish to manage.
     :type root_path: str
-    :param create: Set to True to create the directory if it
-        does not already exist.
+    :param create: Set to ``True`` to create the root directory if it
+        does not already exist, otherwise the directory should exist
+        prior to creating the ``OSFS`` instance.
     :type create: bool
-    :param encoding: The encoding to use for paths (or ``None``) to
-        autodetect.
+    :param encoding: The encoding to use for paths, or ``None``
+        (default) to autodetect.
     :type encoding: str
+    :raises: :class:`fs.errors.CreateFailed` if ``root_path`` does not
+        exists, or could not be created.
 
+
+    Here are some examples of creating ``OSFS`` objects::
+
+        current_directory_fs = OSFS('.')
+        home_fs = OSFS('~/')
+        windows_system32_fs = OSFS('c://system32')
 
     """
 
@@ -77,6 +86,11 @@ class OSFS(FS):
                 raise errors.CreateFailed(
                     'unable to create {} ({})'.format(root_path, error)
                 )
+        else:
+            if not os.path.isdir(_root_path):
+                raise errors.CreateFailed(
+                    'root path does not exists'
+                )
 
         _meta = self._meta = {
             'case_insensitive': os.path.normcase('Aa') != 'aa',
@@ -90,7 +104,7 @@ class OSFS(FS):
 
         if _WINDOWS_PLATFORM:  # pragma: nocover
             _meta["invalid_path_chars"] =\
-                ''.join(six.unichr(n) for n in xrange(31)) + '\\:*?"<>|'
+                ''.join(six.unichr(n) for n in range(31)) + '\\:*?"<>|'
         else:
             _meta["invalid_path_chars"] = '\0'
 

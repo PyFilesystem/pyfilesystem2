@@ -5,7 +5,7 @@ from six import text_type
 from fs.opener import open_fs
 from fs import walk
 from fs import errors
-from .test_fs import UNICODE_TEXT
+from fs.test import UNICODE_TEXT
 
 
 class ArchiveTestCases(object):

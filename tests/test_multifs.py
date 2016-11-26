@@ -6,7 +6,7 @@ from fs.multifs import MultiFS
 from fs.memoryfs import MemoryFS
 from fs import errors
 
-from .test_fs import FSTestCases
+from fs.test import FSTestCases
 
 
 class TestMultiFS(FSTestCases, unittest.TestCase):
