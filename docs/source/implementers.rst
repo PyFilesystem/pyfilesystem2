@@ -1,7 +1,7 @@
 .. _implementers:
 
-A Guide For Filesystem Implementers
-===================================
+Implementing Filesystems
+========================
 
 With a little care, you can implement a PyFilesystem interface for any filesystem, which will allow it to work interchangeably with any of the built-in FS classes and tools.
 

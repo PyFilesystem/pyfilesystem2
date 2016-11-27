@@ -198,8 +198,7 @@ class Registry(object):
         object and a path. If there is no path in the FS URL, the path
         value will be ``None``.
 
-        :param fs_url: A filesystem URL
-        :type fs_url: str
+        :param str fs_url: A filesystem URL
         :param writeable: True if the filesystem must be writeable
         :type writeable: bool
         :param create: True if the filesystem should be created if it
@@ -207,7 +206,7 @@ class Registry(object):
         :type create: bool
         :param cwd: The current working directory
         :type cwd: str or None
-        :rtype: Tuple of (<filesystem>, <path from url>)
+        :rtype: Tuple of ``(<filesystem>, <path from url>)``
 
         """
 
