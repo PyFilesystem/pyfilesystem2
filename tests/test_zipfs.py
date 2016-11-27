@@ -7,8 +7,8 @@ import unittest
 from fs import zipfs
 from fs.compress import write_zip
 from fs.opener import open_fs
+from fs.test import FSTestCases
 
-from .test_fs import FSTestCases
 from .test_archives import ArchiveTestCases
 
 

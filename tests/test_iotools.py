@@ -8,7 +8,7 @@ import six
 from fs import iotools
 from fs import tempfs
 
-from .test_fs import UNICODE_TEXT
+from fs.test import UNICODE_TEXT
 
 
 class TestIOTools(unittest.TestCase):

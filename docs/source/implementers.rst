@@ -9,6 +9,12 @@ To create a PyFilesystem interface, derive a class from :class:`fs.base.FS` and 
 
 Take care to copy the method signatures *exactly*, including default values. It is also essential that you follow the same logic with regards to exceptions, and only raise exceptions in :mod:`fs.errors`.
 
+Constructor
+-----------
+
+There are no particular requirements regarding how a PyFilesystem class is constructed, but be sure to call the base class ``__init__`` method with no parameters.
+
+
 Testing Filesystems
 -------------------
 
@@ -39,9 +45,9 @@ The following methods MAY be implemented in a PyFilesystem interface.
 
 These methods have a default implementation, but may be overridden if you can supply a more optimal version. For instance the ``getbytes`` method opens a file and reads the contents in chunks. If you are able to write a version which retrieves the file data without opening a file, it *may* be faster.
 
-Exactly which methods you implement depends on how and where the data is stored. For network filesystems, a good candidate to implement, is the ``scandir`` methods which would otherwise call a combination of ``listdir`` and ``getinfo`` for each file.
+Exactly which methods you should implement depends on how and where the data is stored. For network filesystems, a good candidate to implement, is the ``scandir`` methods which would otherwise call a combination of ``listdir`` and ``getinfo`` for each file.
 
-In the general case, it is a good idea to look at how these methods are implemented in :class:`fs.base.FS`. Only implement the methods where you have a more efficient implementation.
+In the general case, it is a good idea to look at how these methods are implemented in :class:`fs.base.FS`, and only write a custom version if it would be more efficient than the default.
 
 * :meth:`fs.base.FS.appendbytes`
 * :meth:`fs.base.FS.appendtext`

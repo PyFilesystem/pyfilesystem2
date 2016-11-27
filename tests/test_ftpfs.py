@@ -19,7 +19,6 @@ import uuid
 from ftplib import error_perm
 from ftplib import error_temp
 
-
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
