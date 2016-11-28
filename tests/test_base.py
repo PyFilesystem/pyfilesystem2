@@ -14,9 +14,33 @@ from fs.base import FS
 from fs import errors
 
 
+class TestFS(FS):
+
+    def getinfo(self, path, namespaces=None):
+        pass
+
+    def listdir(self, path):
+        pass
+
+    def makedir(self, path, permissions=None, recreate=False):
+        pass
+
+    def openbin(self, path, mode="r", buffering=-1, **options):
+        pass
+
+    def remove(self, path):
+        pass
+
+    def removedir(self, path):
+        pass
+
+    def setinfo(self, path, info):
+        pass
+
+
 class TestBase(unittest.TestCase):
     def setUp(self):
-        self.fs = FS()
+        self.fs = TestFS()
 
     def test_validatepath(self):
         """Test validatepath method."""
@@ -45,24 +69,3 @@ class TestBase(unittest.TestCase):
 
         with self.assertRaises(errors.InvalidPath):
             self.fs.validatepath('0123456789A')
-
-
-class TestNotImplemented(unittest.TestCase):
-    def setUp(self):
-        self.fs = FS()
-
-    def test_not_implemented(self):
-        with self.assertRaises(NotImplementedError):
-            self.fs.getinfo('foo')
-        with self.assertRaises(NotImplementedError):
-            self.fs.listdir('foo')
-        with self.assertRaises(NotImplementedError):
-            self.fs.makedir('foo')
-        with self.assertRaises(NotImplementedError):
-            self.fs.openbin('foo')
-        with self.assertRaises(NotImplementedError):
-            self.fs.remove('foo')
-        with self.assertRaises(NotImplementedError):
-            self.fs.removedir('foo')
-        with self.assertRaises(NotImplementedError):
-            self.fs.setinfo('foo', {})

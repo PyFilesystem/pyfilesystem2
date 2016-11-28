@@ -57,6 +57,8 @@ class ArchiveTestCases(object):
             self.fs.removedir('foo/bar/baz')
         with self.assertRaises(errors.ResourceReadOnly):
             self.fs.create('foo.txt')
+        with self.assertRaises(errors.ResourceReadOnly):
+            self.fs.setinfo('foo.txt', {})
 
     def test_getinfo(self):
         root = self.fs.getinfo('/')

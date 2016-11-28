@@ -60,7 +60,7 @@ def get_intermediate_dirs(fs, dir_path):
     :returns: A list of paths.
     :rtype: list
 
-    :raises: :class:`fs.errors.DirectoryExpected` if a path component
+    :raises `fs.errors.DirectoryExpected`: If a path component
         references a file and not a directory.
 
 

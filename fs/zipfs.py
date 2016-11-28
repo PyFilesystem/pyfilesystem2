@@ -253,6 +253,10 @@ class ReadZipFS(FS):
 
         return Info(raw_info)
 
+    def setinfo(self, path, info):
+        self.check()
+        raise errors.ResourceReadOnly(path)
+
     def listdir(self, path):
         self.check()
         return self._directory.listdir(path)

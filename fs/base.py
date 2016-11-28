@@ -11,6 +11,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import abc
 import os
 import threading
 import time
@@ -35,6 +36,7 @@ from .time import datetime_to_epoch
 from .walk import Walker
 
 
+@six.add_metaclass(abc.ABCMeta)
 class FS(object):
     """Base class for FS objects."""
 
@@ -57,7 +59,7 @@ class FS(object):
     @property
     def walk(self):
         """
-        Get a :class:`fs.walker.BoundWlker` object for this filesystem.
+        Get a :class:`fs.walk.BoundWalker` object for this filesystem.
 
         """
         return Walker.bind(self)
@@ -67,6 +69,7 @@ class FS(object):
     # Filesystems must implement these methods.                        #
     # ---------------------------------------------------------------- #
 
+    @abc.abstractmethod
     def getinfo(self, path, namespaces=None):
         """
         Get information regarding a resource (file or directory) on a
@@ -84,8 +87,7 @@ class FS(object):
 
         """
 
-        raise NotImplementedError('getinfo')
-
+    @abc.abstractmethod
     def listdir(self, path):
         """
         Get a list of the resource names in a directory.
@@ -103,8 +105,8 @@ class FS(object):
         defined in :class:`fs.ResourceType`.
 
         """
-        raise NotImplementedError('listdir')
 
+    @abc.abstractmethod
     def makedir(self, path, permissions=None, recreate=False):
         """
         Make a directory.
@@ -120,8 +122,8 @@ class FS(object):
         :raises `fs.errors.ResourceNotFound`: if the path is not found.
 
         """
-        raise NotImplementedError('makedir')
 
+    @abc.abstractmethod
     def openbin(self, path, mode="r", buffering=-1, **options):
         """
         Open a binary file-like object.
@@ -137,8 +139,8 @@ class FS(object):
         :rtype: file object
 
         """
-        raise NotImplementedError('openbin')
 
+    @abc.abstractmethod
     def remove(self, path):
         """
         Remove a file.
@@ -150,25 +152,25 @@ class FS(object):
             exist.
 
         """
-        raise NotImplementedError('remove')
 
+    @abc.abstractmethod
     def removedir(self, path):
         """
         Remove a directory from the filesystem.
 
-        :param str path: Path of the directory to remove
+        :param str path: Path of the directory to remove.
 
-        :raises `fs.errors.DirectoryNotEmpty`: if the directory is not
-            empty and force is False
-        :raises `fs.errors.ParentDirectoryMissing`: if an intermediate
+        :raises `fs.errors.DirectoryNotEmpty`: If the directory is not
+            empty and force == ``False``
+        :raises `fs.errors.ParentDirectoryMissing`: If an intermediate
             directory is missing
-        :raises `fs.errors.DirectoryExpected`: if the path is not a
+        :raises `fs.errors.DirectoryExpected`: If the path is not a
             directory
-        :raises `fs.errors.ResourceNotFound`: if the path does not
+        :raises `fs.errors.ResourceNotFound`: If the path does not
             exist
         """
-        raise NotImplementedError('removedir')
 
+    @abc.abstractmethod
     def setinfo(self, path, info):
         """
         Set info on a resource.
@@ -191,7 +193,6 @@ class FS(object):
             my_fs.setinfo('file.txt', details_info)
 
         """
-        raise NotImplementedError('setinfo')
 
     # ---------------------------------------------------------------- #
     # Optional methods                                                 #
@@ -205,9 +206,9 @@ class FS(object):
 
         :param str path: Path to a file.
         :param bytes data: Bytes to append.
-        :raises: :class:`ValueError` if ``data`` is not bytes.
-        :raises: :class:`fs.errors.ResourceNotFound` if a parent
-            directory of ``path`` does not exist.
+        :raises: `ValueError` if ``data`` is not bytes.
+        :raises: `fs.errors.ResourceNotFound` if a parent directory of
+            ``path`` does not exist.
 
         """
         if not isinstance(data, bytes):
@@ -228,9 +229,9 @@ class FS(object):
 
         :param str path: Path to a file.
         :param str text: Text to append.
-        :raises: :class:`ValueError` if ``text`` is not bytes.
-        :raises: :class:`fs.errors.ResourceNotFound` if a parent
-            directory of ``path`` does not exist.
+        :raises: `ValueError` if ``text`` is not bytes.
+        :raises: `fs.errors.ResourceNotFound` if a parent directory of
+            ``path`` does not exist.
 
         """
         if not isinstance(text, six.text_type):
@@ -321,8 +322,8 @@ class FS(object):
         :rtype: bool
 
         The default behavior is to create a new file if one doesn't
-        already exist. If ``wipe`` is set to ``True``, any existing
-        file will be truncated.
+        already exist. If ``wipe == True`` an existing file will be
+        truncated.
 
         """
         with self._lock:
@@ -392,7 +393,7 @@ class FS(object):
         :type namespaces: list or None
         :param page: May be a tuple of ``(<start>, <end>)`` indexes to
             return an iterator of a subset of the resource info, or
-            ``None`` to iterator the entire directory. Paging a
+            ``None`` to iterate over the entire directory. Paging a
             directory scan may be necessary for very large directories.
         :type page: tuple or None
         :return: An iterator of :class:`fs.info.Info` objects.
@@ -459,8 +460,8 @@ class FS(object):
         :returns: file contents
         :rtype: bytes
 
-        :raises: :class:`fs.errors.ResourceNotFound` if ``path`` does
-            not exist.
+        :raises `fs.errors.ResourceNotFound`: If ``path`` does not
+            exist.
 
         """
         with closing(self.open(path, mode='rb')) as read_file:
@@ -477,6 +478,8 @@ class FS(object):
         :param str errors: Unicode errors parameter.
         :param str newline: Newlines parameter.
         :returns: file contents.
+        :raises `fs.errors.ResourceNotFound`: If ``path`` does not
+            exist.
 
         """
         with closing(
@@ -841,7 +844,7 @@ class FS(object):
         :type errors:
         :param newline:
         :type newline:
-        :rtype: file
+        :rtype: file object
         """
         validate_open_mode(mode)
         bin_mode = mode.replace('t', '')

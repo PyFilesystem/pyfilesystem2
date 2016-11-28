@@ -5,7 +5,7 @@ Implementing Filesystems
 
 With a little care, you can implement a PyFilesystem interface for any filesystem, which will allow it to work interchangeably with any of the built-in FS classes and tools.
 
-To create a PyFilesystem interface, derive a class from :class:`fs.base.FS` and implement the seven :ref:`essential-methods`. This should give you a working FS class.
+To create a PyFilesystem interface, derive a class from :class:`fs.base.FS` and implement the :ref:`essential-methods`. This should give you a working FS class.
 
 Take care to copy the method signatures *exactly*, including default values. It is also essential that you follow the same logic with regards to exceptions, and only raise exceptions in :mod:`fs.errors`.
 
@@ -15,8 +15,20 @@ Constructor
 There are no particular requirements regarding how a PyFilesystem class is constructed, but be sure to call the base class ``__init__`` method with no parameters.
 
 
+Thread Safety
+-------------
+
+All Filesystems should be *thread-safe*. The simplest way to achieve that is by using the ``_lock`` attribute supplied by the :class:`fs.base.FS` constructor. This is a ``RLock`` object from the standard library, which you can use as a context manager, so methods you implement will start something like this::
+
+    with self._lock:
+        do_something()
+
+You aren't *required* to use ``_lock``. Just as long as calling methods on the FS object from multiple threads doesn't break anything.
+
+
 Testing Filesystems
 -------------------
+
 
 
 
@@ -43,7 +55,7 @@ Non - Essential Methods
 
 The following methods MAY be implemented in a PyFilesystem interface.
 
-These methods have a default implementation, but may be overridden if you can supply a more optimal version. For instance the ``getbytes`` method opens a file and reads the contents in chunks. If you are able to write a version which retrieves the file data without opening a file, it *may* be faster.
+These methods have a default implementation in the base class, but may be overridden if you can supply a more optimal version.
 
 Exactly which methods you should implement depends on how and where the data is stored. For network filesystems, a good candidate to implement, is the ``scandir`` methods which would otherwise call a combination of ``listdir`` and ``getinfo`` for each file.
 
@@ -90,6 +102,10 @@ In the general case, it is a good idea to look at how these methods are implemen
 
 Helper Methods
 --------------
+
+These methods SHOULD NOT be implemented.
+
+Implementing these is highly unlikely to be worthwhile.
 
 * :meth:`fs.base.FS.getbasic`
 * :meth:`fs.base.FS.getdetails`

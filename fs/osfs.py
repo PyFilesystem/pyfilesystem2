@@ -52,7 +52,7 @@ class OSFS(FS):
     :param encoding: The encoding to use for paths, or ``None``
         (default) to autodetect.
     :type encoding: str
-    :raises: :class:`fs.errors.CreateFailed` if ``root_path`` does not
+    :raises `fs.errors.CreateFailed`: If ``root_path`` does not
         exists, or could not be created.
 
 
