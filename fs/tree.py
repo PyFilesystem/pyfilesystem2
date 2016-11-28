@@ -24,7 +24,7 @@ def render(fs,
     Render a directory structure in to a pretty tree.
 
     :param fs: A filesystem.
-    :type fs: A :class:`fs.base.FS` instance
+    :type fs: A :class:`~fs.base.FS` instance
     :param file: An open file-like object to render the tree, or
         ``None`` for stdout.
     :type file: file or None

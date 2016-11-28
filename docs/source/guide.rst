@@ -22,7 +22,7 @@ Opening Filesystems
 
 There are two ways you can open a filesystem. The first and most natural way is to import the appropriate filesystem class and construct it.
 
-Here's how you would open a :class:`fs.osfs.OSFS` (Operating System File System), which maps to the files and directories of your hard-drive::
+Here's how you would open a :class:`~fs.osfs.OSFS` (Operating System File System), which maps to the files and directories of your hard-drive::
 
     >>> from fs.osfs import OSFS
     >>> home_fs = OSFS("~/")
@@ -64,7 +64,7 @@ If you don't specify the protocol in the FS URL, then PyFilesystem will assume y
 Tree Printing
 ~~~~~~~~~~~~~
 
-Calling :meth:`fs.base.FS.tree` on a FS object will print an ascii tree view of your filesystem. Here's an example::
+Calling :meth:`~fs.base.FS.tree` on a FS object will print an ascii tree view of your filesystem. Here's an example::
 
     >>> from fs import open_fs
     >>> my_fs = open_fs('.')
@@ -85,7 +85,7 @@ This can be a useful debugging aid!
 Closing
 ~~~~~~~
 
-FS objects have a :meth:`fs.base.FS.close` methd which will perform any required clean-up actions. For many filesystems (notably :class:`fs.osfs.OSFS`), the ``close`` method does very little. Other filesystems may only finalize files or release resources once ``close()`` is called.
+FS objects have a :meth:`~fs.base.FS.close` methd which will perform any required clean-up actions. For many filesystems (notably :class:`~fs.osfs.OSFS`), the ``close`` method does very little. Other filesystems may only finalize files or release resources once ``close()`` is called.
 
 You can call ``close`` explicitly once you are finished using a filesystem. For example::
 
@@ -103,25 +103,25 @@ Using FS objects as a context manager is recommended as it will ensure every FS 
 Directory Information
 ~~~~~~~~~~~~~~~~~~~~~
 
-Filesystem objects have a :meth:`fs.base.FS.listdir` method which is similar to ``os.listdir``; it takes a path to a directory and returns a list of file names. Here's an example::
+Filesystem objects have a :meth:`~fs.base.FS.listdir` method which is similar to ``os.listdir``; it takes a path to a directory and returns a list of file names. Here's an example::
 
     >>> home_fs.listdir('/projects')
     ['fs', 'moya', 'README.md']
 
-An alternative method exists for listing directories; :meth:`fs.base.FS.scandir` returns an *iterable* of :ref:`info` objects. Here's an example::
+An alternative method exists for listing directories; :meth:`~fs.base.FS.scandir` returns an *iterable* of :ref:`info` objects. Here's an example::
 
     >>> directory = list(home_fs.scandir('/projects'))
     >>> directory
     [<dir 'fs'>, <dir 'moya'>, <file 'README.md'>]
 
-Info objects have a number of advantages over just a filename. For instance you can tell if an info object references a file or a directory with the :attr:`fs.info.Info.is_dir` attribute, without an additional system call. Info objects may also contain information such as size, modified time, etc. if you request it in the ``namespaces`` parameter.
+Info objects have a number of advantages over just a filename. For instance you can tell if an info object references a file or a directory with the :attr:`~fs.info.Info.is_dir` attribute, without an additional system call. Info objects may also contain information such as size, modified time, etc. if you request it in the ``namespaces`` parameter.
 
 
 .. note::
 
     The reason that ``scandir`` returns an iterable rather than a list, is that it can be more efficient to retrieve directory information in chunks if the directory is very large, or if the information must be retrieved over a network.
 
-Additionally, FS objects have a :meth:`fs.base.FS.filterdir` method which extends ``scandir`` with the ability to filter directory contents by wildcard(s). Here's how you might find all the Python files in a directory:
+Additionally, FS objects have a :meth:`~fs.base.FS.filterdir` method which extends ``scandir`` with the ability to filter directory contents by wildcard(s). Here's how you might find all the Python files in a directory:
 
     >>> code_fs = OSFS('~/projects/src')
     >>> directory = list(code_fs.filterdir('/', files=['*.py']))
@@ -141,7 +141,7 @@ Sub Directories
 
 PyFilesystem has no notion of a *current working directory*, so you won't find a ``chdir`` method on FS objects. Fortunately you won't miss it; working with sub-directories is a breeze with PyFilesystem.
 
-You can always specify a directory with methods which accept a path. For instance, ``home_fs.listdir('/projects')`` would get the directory listing for the `projects` directory. Alternatively, you can call :meth:`fs.base.FS.opendir` which returns a new FS object for the sub-directory.
+You can always specify a directory with methods which accept a path. For instance, ``home_fs.listdir('/projects')`` would get the directory listing for the `projects` directory. Alternatively, you can call :meth:`~fs.base.FS.opendir` which returns a new FS object for the sub-directory.
 
 For example, here's how you could list the directory contents of a `projects` folder in your home directory::
 
@@ -151,9 +151,9 @@ For example, here's how you could list the directory contents of a `projects` fo
     >>> projects_fs.listdir('/')
     ['fs', 'moya', 'README.md']
 
-When you call ``opendir``, the FS object returns an instance of a :class:`fs.subfs.SubFS`. If you call any of the methods on a ``SubFS`` object, it will be as though you called the same method on the parent filesystem with a path relative to the sub-directory.
+When you call ``opendir``, the FS object returns an instance of a :class:`~fs.subfs.SubFS`. If you call any of the methods on a ``SubFS`` object, it will be as though you called the same method on the parent filesystem with a path relative to the sub-directory.
 
-The :class:`fs.base.FS.makedir` and :class:`fs.base.FS.makedirs` methods also return ``SubFS`` objects for the newly create directory. Here's how you might create a new directory in ``~/projects`` and initialize it with a couple of files::
+The :class:`~fs.base.FS.makedir` and :class:`~fs.base.FS.makedirs` methods also return ``SubFS`` objects for the newly create directory. Here's how you might create a new directory in ``~/projects`` and initialize it with a couple of files::
 
     >>> home_fs = open_fs('~/')
     >>> game_fs = home_fs.makedirs('projects/game')
@@ -167,18 +167,18 @@ Working with ``SubFS`` objects means that you can generally avoid writing much p
 Working with Files
 ~~~~~~~~~~~~~~~~~~
 
-You can open a file from a FS object with :meth:`fs.base.FS.open`, which is very similar to ``io.open`` in the standard library. Here's how you might open a file called "reminder.txt" in your home directory::
+You can open a file from a FS object with :meth:`~fs.base.FS.open`, which is very similar to ``io.open`` in the standard library. Here's how you might open a file called "reminder.txt" in your home directory::
 
     >>> with open_fs('~/') as home_fs:
     ...     with home_fs.open('reminder.txt') as reminder_file:
     ...        print(reminder_file.read())
     buy coffee
 
-In the case of a ``OSFS``, a standard file-like object will be returned. Other filesystems may return a different object supporting the same methods. For instance, :class:`fs.memoryfs.MemoryFS` will return a ``io.BytesIO`` object.
+In the case of a ``OSFS``, a standard file-like object will be returned. Other filesystems may return a different object supporting the same methods. For instance, :class:`~fs.memoryfs.MemoryFS` will return a ``io.BytesIO`` object.
 
-PyFilesystem also offers a number of shortcuts for common file related operations. For instance, :meth:`fs.base.FS.getbytes` will return the file contents as a bytes, and :meth:`fs.base.FS.gettext` will read unicode text. These methods is generally preferable to explicitly opening files, as the FS object may have an optimized implementation.
+PyFilesystem also offers a number of shortcuts for common file related operations. For instance, :meth:`~fs.base.FS.getbytes` will return the file contents as a bytes, and :meth:`~fs.base.FS.gettext` will read unicode text. These methods is generally preferable to explicitly opening files, as the FS object may have an optimized implementation.
 
-Other *shortcut* methods are :meth:`fs.base.FS.setbin`, :meth:`fs.base.FS.setbytes`, :meth:`fs.base.FS.settext`.
+Other *shortcut* methods are :meth:`~fs.base.FS.setbin`, :meth:`~fs.base.FS.setbytes`, :meth:`~fs.base.FS.settext`.
 
 Walking
 ~~~~~~~
@@ -192,18 +192,18 @@ Here's how you would print the paths to all your Python files in your home direc
     >>> for path in home_fs.walk.files(filter=['*.py']):
     ...     print(path)
 
-The ``walk`` attribute on FS objects is instance of a :class:`fs.walk.BoundWalker`, which should be able to handle most directory walking requirements.
+The ``walk`` attribute on FS objects is instance of a :class:`~fs.walk.BoundWalker`, which should be able to handle most directory walking requirements.
 
 See :ref:`walking` for more information on walking directories.
 
 Moving and Copying
 ~~~~~~~~~~~~~~~~~~
 
-You can move and copy file contents with :meth:`fs.base.FS.move` and :meth:`fs.base.FS.copy` methods, and the equivalent :meth:`fs.base.FS.movedir` and :meth:`fs.base.FS.copydir` methods which operate on directories rather than files.
+You can move and copy file contents with :meth:`~fs.base.FS.move` and :meth:`~fs.base.FS.copy` methods, and the equivalent :meth:`~fs.base.FS.movedir` and :meth:`~fs.base.FS.copydir` methods which operate on directories rather than files.
 
 These move and copy methods are optimized where possible, and depending on the implementation, they may be more performant than reading and writing files.
 
-To move and/or copy files *between* filesystems (as apposed to within the same filesystem), use the :mod:`fs.move` and :mod:`fs.copy` modules. The methods in these modules accept both FS objects and FS URLS. For instance, the following will compress the contents of your projects folder::
+To move and/or copy files *between* filesystems (as apposed to within the same filesystem), use the :mod:`~fs.move` and :mod:`~fs.copy` modules. The methods in these modules accept both FS objects and FS URLS. For instance, the following will compress the contents of your projects folder::
 
     >>> from fs.copy import copy_fs
     >>> copy_fs('~/projects', 'zip://projects.zip')
@@ -215,7 +215,7 @@ Which is the equivalent to this, more verbose, code::
     >>> from fs.zipfs import ZipFS
     >>> copy_fs(OSFS('~/projects'), ZipFS('projects.zip'))
 
-The :func:`fs.copy.copy_fs` and :func:`fs.copy.copy_dir` functions also accept a :class:`fs.walk.Walker` parameter, which can you use to filter the files that will be copied. For instance, if you only wanted back up your python files, you could use something like this::
+The :func:`~fs.copy.copy_fs` and :func:`~fs.copy.copy_dir` functions also accept a :class:`~fs.walk.Walker` parameter, which can you use to filter the files that will be copied. For instance, if you only wanted back up your python files, you could use something like this::
 
     >>> from fs.copy import copy_fs
     >>> from fs.walk import Walker

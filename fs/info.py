@@ -14,14 +14,14 @@ class Info(object):
     """
     Container for :ref:`info`, returned by the following methods:
 
-     * :meth:`fs.base.FS.getinfo`
-     * :meth:`fs.base.FS.scandir`
-     * :meth:`fs.base.FS.filterfir`
+     * :meth:`~fs.base.FS.getinfo`
+     * :meth:`~fs.base.FS.scandir`
+     * :meth:`~fs.base.FS.filterfir`
 
     :param dict raw_info: A dict containing resource info.
     :param to_datetime: A callable that converts an epoch time to a
         datetime object. The default uses
-        :func:`fs.time.epoch_to_datetime`.
+        :func:`~fs.time.epoch_to_datetime`.
 
     """
 
@@ -73,7 +73,7 @@ class Info(object):
     def is_writeable(self, namespace, key):
         """
         Check if a given key in a namespace is writable (with
-        :meth:`fs.base.FS.setinfo`).
+        :meth:`~fs.base.FS.setinfo`).
 
         :param namespace: A namespace identifier.
         :type namespace: str
@@ -142,7 +142,7 @@ class Info(object):
 
         Requires the ``"details"`` namespace.
 
-        :type: :class:`fs.ResourceType`
+        :type: :class:`~fs.ResourceType`
 
         """
         return ResourceType(self.get('details', 'type', 0))

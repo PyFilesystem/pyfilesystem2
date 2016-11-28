@@ -24,9 +24,9 @@ class WalkerBase(object):
     The base class for a Walker.
 
     To create a custom walker, implement
-    :meth:`fs.walk.WalkerBase.walk` in a sub-class.
+    :meth:`~fs.walk.WalkerBase.walk` in a sub-class.
 
-    See :meth:`fs.walk.Walker` for a fully featured walker object that
+    See :meth:`~fs.walk.Walker` for a fully featured walker object that
     should be adequate for all but your most exotic directory walking
     needs.
 
@@ -80,7 +80,7 @@ class WalkerBase(object):
         :param str path: A path to a directory.
         :param list namespaces: A list of additional namespaces to add
             to the Info objects.
-        :returns: An iterable of :class:`fs.info.Info` objects.
+        :returns: An iterable of :class:`~fs.info.Info` objects.
 
         """
         _walk = self.walk(fs, path=path, namespaces=namespaces)
@@ -156,7 +156,7 @@ class Walker(WalkerBase):
             ...     print(path)
 
         :param fs: A filesystem object.
-        :returns: a :class:`fs.walk.BoundWalker`
+        :returns: a :class:`~fs.walk.BoundWalker`
 
         """
         return BoundWalker(fs)
@@ -176,11 +176,11 @@ class Walker(WalkerBase):
         Filters a sequence of resource Info objects.
 
         The default implementation filters those files for which
-        :meth:`fs.walk.Walker.check_file` returns True.
+        :meth:`~fs.walk.Walker.check_file` returns True.
 
         :param fs: A filesystem object.
-        :type fs: :class:`fs.base.FS`
-        :param infos: A list of :class:`fs.info.Info` instances.
+        :type fs: :class:`~fs.base.FS`
+        :param infos: A list of :class:`~fs.info.Info` instances.
         :type infos: list
         :rtype: list
 
@@ -198,8 +198,8 @@ class Walker(WalkerBase):
         directories from the walk.
 
         :param fs: A filesystem object.
-        :type fs: :class:`fs.base.FS`
-        :param info: A :class:`fs.info.Info` object.
+        :type fs: :class:`~fs.base.FS`
+        :param info: A :class:`~fs.info.Info` object.
         :rtype: bool
 
         """
@@ -213,8 +213,8 @@ class Walker(WalkerBase):
         exclude files from the walk.
 
         :param fs: A filesystem object.
-        :type fs: :class:`fs.base.FS`
-        :param info: A :class:`fs.info.Info` object.
+        :type fs: :class:`~fs.base.FS`
+        :param info: A :class:`~fs.info.Info` object.
         :rtype: bool
 
         """
@@ -222,11 +222,11 @@ class Walker(WalkerBase):
 
     def _scan(self, fs, dir_path, namespaces):
         """
-        Get an iterator of :class:`fs.info.Info` objects for a
+        Get an iterator of :class:`~fs.info.Info` objects for a
         directory path.
 
         :param fs: A filesystem object.
-        :type fs: :class:`fs.base.FS`
+        :type fs: :class:`~fs.base.FS`
         :param str dir_path: A path to a directory.
 
         """
@@ -250,7 +250,7 @@ class Walker(WalkerBase):
         The return value is an iterable of ``(<path>, <dirs>, <files>)``
         tuples,  where ``<path>`` is an absolute path to a directory,
         and ``<dirs>`` and ``<files>`` are a list of
-        :class:`fs.info.Info` objects for directories and files
+        :class:`~fs.info.Info` objects for directories and files
         in ``<path>``.
 
         Here's an example::
@@ -339,12 +339,12 @@ class Walker(WalkerBase):
 
 class BoundWalker(object):
     """
-    A class that binds a :class:`fs.walk.Walker` instance to a FS
+    A class that binds a :class:`~fs.walk.Walker` instance to a FS
     object.
 
     :param fs: A FS object.
-    :param walker_class: A :class:`fs.walk.WalkerBase` sub-class. The
-        default uses :class:`fs.walk.Walker`.
+    :param walker_class: A :class:`~fs.walk.WalkerBase` sub-class. The
+        default uses :class:`~fs.walk.Walker`.
 
     You will typically not need to create instances of this class
     explicitly. Filesystems have a ``walk`` property which returns a
@@ -356,7 +356,7 @@ class BoundWalker(object):
         BoundWalker(OSFS('/Users/will', encoding='utf-8'))
 
     A BoundWalker is callable. Calling it is an alias for
-    :meth:`fs.walk.BoundWalker.walk`.
+    :meth:`~fs.walk.BoundWalker.walk`.
 
     """
 
@@ -396,12 +396,12 @@ class BoundWalker(object):
         :param list exclude_dirs: A list of patterns that will be used
             to filter out directories from the walk, e.g. ``['*.svn',
             '*.git']``.
-        :returns: An iterable of :class:`fs.info.Info` objects.
+        :returns: An iterable of :class:`~fs.info.Info` objects.
 
         The return value is an iterable of ``(<path>, <dirs>, <files>)``
         tuples,  where ``<path>`` is an absolute path to a directory,
         and ``<dirs>`` and ``<files>`` are a list of
-        :class:`fs.info.Info` objects for directories and files
+        :class:`~fs.info.Info` objects for directories and files
         in ``<path>``.
 
         Here's an example::
@@ -414,7 +414,7 @@ class BoundWalker(object):
                 total = sum(info.size for info in files)
                 print("{} bytes {}".format(total))
 
-        This method invokes :meth:`fs.walk.Walker.walk` with bound FS
+        This method invokes :meth:`~fs.walk.Walker.walk` with bound FS
         object.
 
         """
@@ -447,7 +447,7 @@ class BoundWalker(object):
         :returns: An iterable of file paths (absolute from the
             filesystem root).
 
-        This method invokes :meth:`fs.walk.Walker.files` with the bound
+        This method invokes :meth:`~fs.walk.Walker.files` with the bound
         FS object.
 
         """
@@ -474,7 +474,7 @@ class BoundWalker(object):
         :returns: An iterable of directory paths (absolute from the FS
             root).
 
-        This method invokes :meth:`fs.walk.Walker.dirs` with the bound
+        This method invokes :meth:`~fs.walk.Walker.dirs` with the bound
         FS object.
 
         """
@@ -503,9 +503,9 @@ class BoundWalker(object):
         :param list exclude_dirs: A list of patterns that will be used
             to filter out directories from the walk, e.g. ``['*.svn',
             '*.git']``.
-        :returns: An iterable :class:`fs.info.Info` objects.
+        :returns: An iterable :class:`~fs.info.Info` objects.
 
-        This method invokes :meth:`fs.walk.Walker.info` with the bound
+        This method invokes :meth:`~fs.walk.Walker.info` with the bound
         FS object.
 
         """

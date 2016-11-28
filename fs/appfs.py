@@ -4,7 +4,7 @@ defined by the OS.
 
 These classes abstract away the different requirements for user data
 across platforms, which vary in their conventions. They are all
-subclasses of :class:`fs.osfs.OSFS`.
+subclasses of :class:`~fs.osfs.OSFS`.
 
 """
 # Thanks to authors of https://pypi.python.org/pypi/appdirs

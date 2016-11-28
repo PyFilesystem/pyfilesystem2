@@ -102,7 +102,7 @@ class WrapReadOnly(WrapFS):
     """
     Makes a Filesystem read-only. Any call that would would write data
     or modify the filesystem in any way will raise a
-    :class:`fs.errors.ResourceReadOnly` exception.
+    :class:`~fs.errors.ResourceReadOnly` exception.
 
     """
 

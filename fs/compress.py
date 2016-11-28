@@ -37,7 +37,7 @@ def write_zip(src_fs,
         ``"utf-8"``, use ``"CP437"`` if compatibility with WinZip is
         desired.
     :type encoding: str
-    :param walker: A :class:`fs.walk.Walker` instance, or None to use
+    :param walker: A :class:`~fs.walk.Walker` instance, or None to use
         default walker. You can use this to specify which files you
         want to compress.
     :type walker: Walker or None

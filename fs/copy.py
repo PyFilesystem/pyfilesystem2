@@ -28,7 +28,7 @@ def copy_fs(src_fs, dst_fs, walker=None):
     :param walker: A walker object that will be used to scan for files
         in ``src_fs``. Set this if you only want to consider a sub-set
         of the resources in ``src_fs``.
-    :type walker: :class:`fs.walk.Walker`
+    :type walker: :class:`~fs.walk.Walker`
 
     """
     copy_dir(src_fs, '/', dst_fs, '/', walker=walker)
@@ -75,7 +75,7 @@ def copy_structure(src_fs, dst_fs, walker=None):
     :param walker: A walker object that will be used to scan for files
         in ``src_fs``. Set this if you only want to consider a sub-set
         of the resources in ``src_fs``.
-    :type walker: :class:`fs.walk.Walker`
+    :type walker: :class:`~fs.walk.Walker`
 
     """
     walker = walker or Walker()
@@ -100,7 +100,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None):
     :param walker: A walker object that will be used to scan for files
         in ``src_fs``. Set this if you only want to consider a sub-set
         of the resources in ``src_fs``.
-    :type walker: :class:`fs.walk.Walker`
+    :type walker: :class:`~fs.walk.Walker`
 
     """
 

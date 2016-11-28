@@ -59,7 +59,7 @@ class FS(object):
     @property
     def walk(self):
         """
-        Get a :class:`fs.walk.BoundWalker` object for this filesystem.
+        Get a :class:`~fs.walk.BoundWalker` object for this filesystem.
 
         """
         return Walker.bind(self)
@@ -80,7 +80,7 @@ class FS(object):
             'basic').
         :type namespaces: list or None
         :returns: Resource information object.
-        :rtype: :class:`fs.info.Info`
+        :rtype: :class:`~fs.info.Info`
 
         For more information regarding resource information see
         :ref:`info`.
@@ -102,7 +102,7 @@ class FS(object):
 
         This method will return a list of the resources in a directory.
         A 'resource' is a file, directory, or one of the other types
-        defined in :class:`fs.ResourceType`.
+        defined in :class:`~fs.ResourceType`.
 
         """
 
@@ -112,7 +112,7 @@ class FS(object):
         Make a directory.
 
         :param str path: Path to directory from root.
-        :param permissions: :class:`fs.permissions.Permissions`
+        :param permissions: :class:`~fs.permissions.Permissions`
             instance.
         :type permissions: Permissions
         :param recreate: Do not raise an error if the directory exists.
@@ -178,7 +178,7 @@ class FS(object):
         :param str path: Path to a resource on the filesystem.
         :param dict info: Dict of resource info.
 
-        This method is the compliment to :class:`fs.base.getinfo` and is
+        This method is the compliment to :class:`~fs.base.getinfo` and is
         used to set info values on a resource.
 
         The ``info`` dict should be in the same format as the raw
@@ -264,7 +264,7 @@ class FS(object):
                 )
 
         If you attempt to use a filesystem that has been closed, a
-        :class:`fs.errors.FilesystemClosed` exception will be thrown.
+        :class:`~fs.errors.FilesystemClosed` exception will be thrown.
 
         """
         self._closed = True
@@ -396,10 +396,10 @@ class FS(object):
             ``None`` to iterate over the entire directory. Paging a
             directory scan may be necessary for very large directories.
         :type page: tuple or None
-        :return: An iterator of :class:`fs.info.Info` objects.
+        :return: An iterator of :class:`~fs.info.Info` objects.
         :rtype: iterator
 
-        This method enhances the :meth:`fs.base.FS.scandir` method with
+        This method enhances the :meth:`~fs.base.FS.scandir` method with
         additional filtering functionality.
 
         """
@@ -578,7 +578,7 @@ class FS(object):
         paths to have a system path, whereas others don't.
 
         If ``path`` doesn't have a system path,
-        a :class:`fs.errors.NoSysPath` exception will be thrown.
+        a :class:`~fs.errors.NoSysPath` exception will be thrown.
 
         .. note::
 
@@ -594,11 +594,11 @@ class FS(object):
         Get the type of a resource.
 
         :param path: A path in the filesystem.
-        :returns: :class:`fs.ResourceType`
+        :returns: :class:`~fs.ResourceType`
 
         A type of a resource is an integer that identifies the what
         the resource references. The standard type integers may be one
-        of the values in the :class:`fs.ResourceType` enumerations.
+        of the values in the :class:`~fs.ResourceType` enumerations.
 
         The most common resource types, supported by virtually all
         filesystems are ``directory`` (1) and ``file`` (2), but the
@@ -662,7 +662,7 @@ class FS(object):
 
         :param str path: A path on the filesystem
         :param str purpose: A purpose parameter, as given in
-            :meth:`fs.base.FS.geturl`.
+            :meth:`~fs.base.FS.geturl`.
         :rtype: bool
 
         """
@@ -761,7 +761,7 @@ class FS(object):
             `True` to allow directories to be re-created without errors.
         :param permissions: Initial permissions.
         :returns: A sub-directory filesystem.
-        :rtype: :class:`fs.subfs.SubFS`
+        :rtype: :class:`~fs.subfs.SubFS`
 
         :raises `fs.errors.DirectoryExists`: if the path is already
             a directory, and ``recreate`` is False.
@@ -866,7 +866,7 @@ class FS(object):
 
         :param str path: Path to a directory on the filesystem.
         :returns: A filesystem object representing a sub-directory.
-        :rtype: :class:`fs.subfs.SubFS`
+        :rtype: :class:`~fs.subfs.SubFS`
         :raises `fs.errors.DirectoryExpected`: If ``dst_path`` does not
             exist or is not a directory.
 
@@ -883,7 +883,7 @@ class FS(object):
         """
         Recursively remove the contents of a directory.
 
-        This method is similar to :meth:`fs.base.removedir`, but will
+        This method is similar to :meth:`~fs.base.removedir`, but will
         remove the contents of the directory if it is not empty.
 
         :param str dir_path: Path to a directory on the filesystem.
@@ -1099,13 +1099,13 @@ class FS(object):
         Many filesystems have restrictions on the format of paths they
         support. This method will check that ``path`` is valid on the
         underlaying storage mechanism and throw a
-        :class:`fs.errors.InvalidPath` exception if it is not.
+        :class:`~fs.errors.InvalidPath` exception if it is not.
 
         :param str path: A path
         :returns: A normalized, absolute path.
         :rtype str:
         :raises `fs.errors.InvalidPath`: If the path is invalid.
-        :raises: :class:`fs.errors.FilesystemClosed` if the filesystem
+        :raises: :class:`~fs.errors.FilesystemClosed` if the filesystem
             is closed.
 
         """
@@ -1147,7 +1147,7 @@ class FS(object):
 
         :param str path: A path on the filesystem.
         :returns: Resource information object for ``path``.
-        :rtype: :class:`fs.info.Info`
+        :rtype: :class:`~fs.info.Info`
 
         This method is shorthand for the following::
 
@@ -1162,7 +1162,7 @@ class FS(object):
 
         :param str path: A path on the filesystem.
         :returns: Resource information object for ``path``.
-        :rtype: :class:`fs.info.Info`
+        :rtype: :class:`~fs.info.Info`
 
         This method is shorthand for the following::
 
@@ -1175,11 +1175,11 @@ class FS(object):
         """
         Check a filesystem may be used.
 
-        Will throw a :class:`fs.errors.FilesystemClosed` if the
+        Will throw a :class:`~fs.errors.FilesystemClosed` if the
             filesystem is closed.
 
         :returns: None
-        :raises: :class:`fs.errors.FilesystemClosed` if the filesystem
+        :raises: :class:`~fs.errors.FilesystemClosed` if the filesystem
             is closed.
 
         """
@@ -1219,7 +1219,7 @@ class FS(object):
         """
         Render a tree view of the filesystem to stdout or a file.
 
-        The parameters are passed to :func:`fs.tree.render`.
+        The parameters are passed to :func:`~fs.tree.render`.
 
         """
         from .tree import render

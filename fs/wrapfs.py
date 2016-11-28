@@ -18,7 +18,7 @@ class WrapFS(FS):
 
     This class exposes an filesystem interface, where the data is
     stored on another filesystem(s), and is the basis for
-    :class:`fs.subfs.SubFS` and other *virtual* filesystems.
+    :class:`~fs.subfs.SubFS` and other *virtual* filesystems.
 
     """
 
@@ -65,7 +65,7 @@ class WrapFS(FS):
         Get the filesystem.
 
         This method should return a filesystem for methods not
-        associated with a path, e.g. :meth:`fs.base.FS.getmeta`.
+        associated with a path, e.g. :meth:`~fs.base.FS.getmeta`.
 
         """
         return self._wrap_fs

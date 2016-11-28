@@ -1,6 +1,6 @@
 """
-Tools for managing mode strings (as used in :meth:`fs.base.FS.open` and
-:meth:`fs.base.FS.openbin`).
+Tools for managing mode strings (as used in :meth:`~fs.base.FS.open` and
+:meth:`~fs.base.FS.openbin`).
 
 """
 
@@ -177,7 +177,7 @@ def check_writable(mode):
 
 def validate_open_mode(mode):
     """
-    Check ``mode`` parameter of :meth:`fs.base.FS.open` is valid.
+    Check ``mode`` parameter of :meth:`~fs.base.FS.open` is valid.
 
     :param str mode: Mode parameter.
     :raises: `ValueError` if mode is not valid.
@@ -188,7 +188,7 @@ def validate_open_mode(mode):
 
 def validate_openbin_mode(mode, _valid_chars=frozenset('rwxab+')):
     """
-    Check ``mode`` parameter of :meth:`fs.base.FS.openbin` is valid.
+    Check ``mode`` parameter of :meth:`~fs.base.FS.openbin` is valid.
 
     :param mode: Mode parameter.
     :type mode: str
