@@ -22,7 +22,7 @@ def remove_empty(fs, path):
     """
     Remove all empty parents.
 
-    :param fs: A filesystem object.
+    :param fs: A FS object.
     :param str path: Path to a directory on the filesystem.
 
     """
@@ -58,14 +58,13 @@ def get_intermediate_dirs(fs, dir_path):
     Get paths of intermediate directories required to create a new
     directory.
 
-    :param fs: A filesystem object.
-    :param dir_path: A path to a new directory on the filesystem.
+    :param fs: A FS object.
+    :param str dir_path: A path to a new directory on the filesystem.
     :returns: A list of paths.
     :rtype: list
 
     :raises `fs.errors.DirectoryExpected`: If a path component
         references a file and not a directory.
-
 
     """
     intermediates = []

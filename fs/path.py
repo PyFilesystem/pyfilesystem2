@@ -65,7 +65,7 @@ def normpath(path):
     IllegalBackReference: Too many backrefs in 'foo/../../bar'
 
     """
-    if path in ('', '/'):
+    if path in '/':
         return path
 
     # An early out if there is no need to normalize this path
@@ -119,7 +119,7 @@ def recursepath(path, reverse=False):
     ['/', '/a', '/a/b', '/a/b/c']
 
     """
-    if path in ('', '/'):
+    if path in '/':
         return ['/']
 
     path = abspath(normpath(path)) + '/'

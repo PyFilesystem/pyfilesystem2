@@ -7,8 +7,8 @@ Filesystem Constants
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from enum import IntEnum, unique
 import os
+from enum import IntEnum, unique
 
 
 @unique
@@ -46,7 +46,13 @@ class ResourceType(IntEnum):
 
 @unique
 class Seek(IntEnum):
-    """Constants used by ``file.seek``."""
+    """
+    Constants used by ``file.seek``.
+
+    These match ``os.SEEK_CUR``, ``os.SEEK_END``, and ``os.SEEK_SET``
+    from the standard library.
+
+    """
 
     #: Seek from the current file position.
     current = os.SEEK_CUR

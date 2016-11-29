@@ -36,7 +36,7 @@ class WalkerBase(object):
         """
         Walk the directory structure of a filesystem.
 
-        :param fs: A filesystem object.
+        :param fs: A FS object.
         :param str path: a path to a directory.
         :param list namespaces: A list of additional namespaces to add
             to the Info objects.
@@ -49,7 +49,7 @@ class WalkerBase(object):
         """
         Walk a filesystem, yielding absolute paths to files.
 
-        :param fs: A filesystem object.
+        :param fs: A FS object.
         :param str path: A path to a directory.
         :returns: An iterable of file paths.
 
@@ -63,7 +63,7 @@ class WalkerBase(object):
         """
         Walk a filesystem, yielding absolute paths to directories.
 
-        :param str fs: A filesystem object.
+        :param str fs: A FS object.
         :param str path: A path to a directory.
 
         """
@@ -76,7 +76,7 @@ class WalkerBase(object):
         Walk a filesystem, yielding tuples of (<absolute path>,
         <resource info).
 
-        :param str fs: A filesystem object.
+        :param str fs: A FS object.
         :param str path: A path to a directory.
         :param list namespaces: A list of additional namespaces to add
             to the Info objects.
@@ -130,7 +130,6 @@ class Walker(WalkerBase):
         self.exclude_dirs = exclude_dirs
         super(Walker, self).__init__()
 
-
     @classmethod
     def bind(cls, fs):
         """
@@ -178,7 +177,7 @@ class Walker(WalkerBase):
         The default implementation filters those files for which
         :meth:`~fs.walk.Walker.check_file` returns True.
 
-        :param fs: A filesystem object.
+        :param fs: A FS object.
         :type fs: :class:`~fs.base.FS`
         :param infos: A list of :class:`~fs.info.Info` instances.
         :type infos: list
@@ -197,7 +196,7 @@ class Walker(WalkerBase):
         Check if a directory should be opened. Override to exclude
         directories from the walk.
 
-        :param fs: A filesystem object.
+        :param fs: A FS object.
         :type fs: :class:`~fs.base.FS`
         :param info: A :class:`~fs.info.Info` object.
         :rtype: bool
@@ -212,7 +211,7 @@ class Walker(WalkerBase):
         Check if a filename should be included in the walk. Override to
         exclude files from the walk.
 
-        :param fs: A filesystem object.
+        :param fs: A FS object.
         :type fs: :class:`~fs.base.FS`
         :param info: A :class:`~fs.info.Info` object.
         :rtype: bool
@@ -225,7 +224,7 @@ class Walker(WalkerBase):
         Get an iterator of :class:`~fs.info.Info` objects for a
         directory path.
 
-        :param fs: A filesystem object.
+        :param fs: A FS object.
         :type fs: :class:`~fs.base.FS`
         :param str dir_path: A path to a directory.
 
@@ -241,7 +240,7 @@ class Walker(WalkerBase):
         """
         Walk the directory structure of a filesystem.
 
-        :param fs: A filesystem object.
+        :param fs: A FS object.
         :param str path: a path to a directory.
         :param list namespaces: A list of additional namespaces to add to
             the Info objects.

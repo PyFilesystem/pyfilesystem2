@@ -160,19 +160,15 @@ class Opener(object):
         """
         Open a filesystem object from a FS URL.
 
-        :param fs_url: A filesystem URL
-        :type fs_url: str
+        :param str fs_url: A filesystem URL
         :param parse_result: A parsed filesystem URL.
         :type parse_result: :class:`ParseResult`
-        :param writeable: True if the filesystem must be writeable.
-        :type writeable: bool
-        :param create: True if the filesystem should be created if it
-            does not exist.
-        :type create: bool
-        :param cwd: The current working directory (generally only
+        :param bool writeable: True if the filesystem must be writeable.
+        :param bool create: True if the filesystem should be created if
+            it does not exist.
+        :param str cwd: The current working directory (generally only
             relevant for OS filesystems).
-        :type cwd: str
-        :returns: :class:`~fs.base.FS`
+        :returns: :class:`~fs.base.FS` object
 
         """
 
@@ -229,11 +225,9 @@ class Registry(object):
         value will be ``None``.
 
         :param str fs_url: A filesystem URL
-        :param writeable: True if the filesystem must be writeable.
-        :type writeable: bool
-        :param create: True if the filesystem should be created if it
-            does not exist.
-        :type create: bool
+        :param bool writeable: True if the filesystem must be writeable.
+        :param bool create: True if the filesystem should be created if
+            it does not exist.
         :param cwd: The current working directory.
         :type cwd: str or None
         :rtype: Tuple of ``(<filesystem>, <path from url>)``
