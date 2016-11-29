@@ -243,9 +243,20 @@ class FSTestCases(object):
     """Basic FS tests."""
 
     def make_fs(self):
+        """
+        Return an FS instance.
+
+        """
         raise NotImplementedError('implement me')
 
     def destroy_fs(self, fs):
+        """
+        Destroy a FS object.
+
+        :param fs: A FS instance previously opened by
+            `~fs.test.FSTestCases.make_fs`.
+
+        """
         fs.close()
 
     def setUp(self):
@@ -256,30 +267,62 @@ class FSTestCases(object):
         del self.fs
 
     def assert_exists(self, path):
-        """Assert a path exists."""
+        """
+        Assert a path exists.
+
+        :param str path: A path on the filesystem.
+
+        """
         self.assertTrue(self.fs.exists(path))
 
     def assert_not_exists(self, path):
-        """Assert a path does not exist."""
+        """
+        Assert a path does not exist.
+
+        :param str path: A path on the filesystem.
+
+        """
         self.assertFalse(self.fs.exists(path))
 
     def assert_isfile(self, path):
-        """Assert a path is a file."""
+        """
+        Assert a path is a file.
+
+        :param str path: A path on the filesystem.
+
+        """
         self.assertTrue(self.fs.isfile(path))
 
     def assert_isdir(self, path):
-        """Assert a path is a directory."""
+        """
+        Assert a path is a directory.
+
+        :param str path: A path on the filesystem.
+
+        """
         self.assertTrue(self.fs.isdir(path))
 
     def assert_bytes(self, path, contents):
-        """Assert a file contains the given bytes."""
+        """
+        Assert a file contains the given bytes.
+
+        :param str path: A path on the filesystem.
+        :param bytes contents: Bytes to compare.
+
+        """
         assert isinstance(contents, bytes)
         data = self.fs.getbytes(path)
         self.assertEqual(data, contents)
         self.assertIsInstance(data, bytes)
 
     def assert_text(self, path, contents):
-        """Assert a file contains the given text."""
+        """
+        Assert a file contains the given text.
+
+        :param str path: A path on the filesystem.
+        :param str contents: Text to compare.
+
+        """
         assert isinstance(contents, text_type)
         with self.fs.open(path, 'rt') as f:
             data = f.read()
@@ -365,7 +408,7 @@ class FSTestCases(object):
             self.assertTrue(self.fs.hasurl('foo'))
 
     def test_invalid_chars(self):
-        """Test invalid path method."""
+        # Test invalid path method.
         with self.assertRaises(errors.InvalidCharsInPath):
             self.fs.open('invalid\0file', 'wb')
 
@@ -422,7 +465,7 @@ class FSTestCases(object):
         self.fs.getinfo('foo', namespaces=['access', 'stat', 'details'])
 
     def test_exists(self):
-        """Test exists method."""
+        # Test exists method.
         # Check root directory always exists
         self.assertTrue(self.fs.exists('/'))
         self.assertTrue(self.fs.exists(''))
@@ -690,7 +733,7 @@ class FSTestCases(object):
                 self.assertEqual(os.read(fn, 7), b'Goodbye')
 
     def test_open_files(self):
-        """Test file-like objects work as expected."""
+        # Test file-like objects work as expected.
 
         with self.fs.open('text', 'w') as f:
             repr(f)
@@ -1098,7 +1141,7 @@ class FSTestCases(object):
             dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=True, dirs="*.py")]
 
     def test_getbytes(self):
-        """Test getbytes method."""
+        # Test getbytes method.
         all_bytes = b''.join(six.int2byte(n) for n in range(256))
         with self.fs.open('foo', 'wb') as f:
             f.write(all_bytes)
@@ -1145,7 +1188,7 @@ class FSTestCases(object):
         self.assert_text('foo/unicode.txt', UNICODE_TEXT)
 
     def test_settext(self):
-        """Test settext method."""
+        # Test settext method.
         self.fs.settext('foo', 'bar')
         with self.fs.open('foo', 'rt') as f:
             foo = f.read()
@@ -1169,7 +1212,7 @@ class FSTestCases(object):
         self.assertEqual(data, b'bar')
 
     def test_bin_files(self):
-        """Check binary files."""
+        # Check binary files.
         with self.fs.openbin('foo1', 'wb') as f:
             text_type(f)
             repr(f)
@@ -1267,7 +1310,7 @@ class FSTestCases(object):
                 f.read(2)
 
     def test_copy_file(self):
-        """Test fs.copy.copy_file"""
+        # Test fs.copy.copy_file
         bytes_test = b'Hello, World'
         self.fs.setbytes('foo.txt', bytes_test)
         fs.copy.copy_file(self.fs, 'foo.txt', self.fs, 'bar.txt')
@@ -1296,7 +1339,7 @@ class FSTestCases(object):
         )
 
     def _test_copy_dir(self, protocol):
-        """Test copy.copy_dir."""
+        # Test copy.copy_dir.
 
         # Test copying to a another fs
         other_fs = open_fs(protocol)
@@ -1342,7 +1385,7 @@ class FSTestCases(object):
         )
 
     def _test_copy_dir_write(self, protocol):
-        """Test copying to this filesystem from another."""
+        # Test copying to this filesystem from another.
 
         other_fs = open_fs(protocol)
         other_fs.makedirs('foo/bar/baz')
@@ -1364,17 +1407,17 @@ class FSTestCases(object):
         self.assert_text('/foo/bar/baz/test.txt', 'Goodbye, World')
 
     def test_copy_dir_mem(self):
-        """Test copy_dir with a mem fs."""
+        # Test copy_dir with a mem fs.
         self._test_copy_dir('mem://')
         self._test_copy_dir_write('mem://')
 
     def test_copy_dir_temp(self):
-        """Test copy_dir with a temp fs."""
+        # Test copy_dir with a temp fs.
         self._test_copy_dir('temp://')
         self._test_copy_dir_write('temp://')
 
     def _test_move_dir_write(self, protocol):
-        """Test moving to this filesystem from another."""
+        # Test moving to this filesystem from another.
         other_fs = open_fs(protocol)
         other_fs.makedirs('foo/bar/baz')
         other_fs.makedir('egg')

@@ -39,11 +39,41 @@ _RE_FS_URL = re.compile(r'''
 
 @contextmanager
 def manage_fs(fs_url, create=False, writeable=True, cwd='.'):
-    """
+    '''
+    A context manager opens / closes a filesystem.
 
-    A context manager that auto-closes a filesytem if required.
+    :param fs_url: A FS instance or a FS URL.
+    :type fs_url: str or FS
+    :param bool create: If ``True``, then create the filesytem if it
+        doesn't already exist.
+    :param bool writeable: If ``True``, then the filesystem should be
+        writeable.
+    :param str cwd: The current working directory, if opening a
+        :class:`~fs.osfs.OSFS`.
 
-    """
+    Sometimes it is convenient to be able to pass either a FS object
+    *or* an FS URL to a function. This context manager handles the
+    required logic for that.
+
+    Here's an example::
+
+        def print_ls(list_fs):
+            """List a directory."""
+            with manage_fs(list_fs) as fs:
+                print(" ".join(fs.listdir()))
+
+    This function may be used in two ways. You may either pass either a
+    ``str``, as follows::
+
+        print_list('zip://projects.zip')
+
+    Or, an FS instance::
+
+        from fs.osfs import OSFS
+        projects_fs = OSFS('~/')
+        print_list(projects_fs)
+
+    '''
     from .base import FS
     if isinstance(fs_url, FS):
         yield fs_url
@@ -112,11 +142,11 @@ class Opener(object):
     """
     The opener base class.
 
-    An opener is an object responsible for opening filesystems from
-    one or more protocols. A list of supported protocols is supplied
-    in a class attribute called `protocols`.
+    An opener is responsible for opening a filesystems from one or more
+    protocols. A list of supported protocols is supplied in a class
+    attribute called `protocols`.
 
-    Openers must be registered with the :class:`fsopener.Registry`
+    Openers should be registered with a :class:`~fs.opener.Registry`
     object, which picks an appropriate opener object for a given FS URL.
 
     """
@@ -132,15 +162,15 @@ class Opener(object):
 
         :param fs_url: A filesystem URL
         :type fs_url: str
-        :param parse_result: A parsed filesystem URL
+        :param parse_result: A parsed filesystem URL.
         :type parse_result: :class:`ParseResult`
-        :param writeable: True if the filesystem must be writeable
+        :param writeable: True if the filesystem must be writeable.
         :type writeable: bool
         :param create: True if the filesystem should be created if it
-            does not exist
+            does not exist.
         :type create: bool
         :param cwd: The current working directory (generally only
-            relevant for OS filesystems)
+            relevant for OS filesystems).
         :type cwd: str
         :returns: :class:`~fs.base.FS`
 
@@ -199,12 +229,12 @@ class Registry(object):
         value will be ``None``.
 
         :param str fs_url: A filesystem URL
-        :param writeable: True if the filesystem must be writeable
+        :param writeable: True if the filesystem must be writeable.
         :type writeable: bool
         :param create: True if the filesystem should be created if it
-            does not exist
+            does not exist.
         :type create: bool
-        :param cwd: The current working directory
+        :param cwd: The current working directory.
         :type cwd: str or None
         :rtype: Tuple of ``(<filesystem>, <path from url>)``
 

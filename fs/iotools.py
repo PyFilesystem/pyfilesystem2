@@ -89,6 +89,14 @@ class RawWrapper(object):
         b[:len(data)] = data
         return bytes_read
 
+    def readinto1(self, b):
+        if self.is_io:
+            return self._f.readinto1(b)
+        data = self._f.read(len(b))
+        bytes_read = len(data)
+        b[:len(data)] = data
+        return bytes_read
+
     def readline(self, limit=-1):
         return self._f.readline(limit)
 

@@ -6,6 +6,8 @@ A collection of functions that operate on filesystems and tools.
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import io
+
 from . import constants
 from . import errors
 from .errors import DirectoryNotEmpty
@@ -43,9 +45,10 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
         ``None`` to use sensible default).
 
     """
-    chunk_size = chunk_size or constants.DEFAULT_CHUNK_SIZE
+    chunk_size = chunk_size or io.DEFAULT_BUFFER_SIZE
     read = src_file.read
     write = dst_file.write
+    # The 'or None' is so that it works with binary and text files
     for chunk in iter(lambda: read(chunk_size) or None, None):
         write(chunk)
 

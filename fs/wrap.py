@@ -12,7 +12,7 @@ def read_only(fs):
     """
     Make a read-only filesystem.
 
-    :param fs: A filesystem object.
+    :param fs: A FS object.
     :returns: A read only version of ``fs``.
 
     """
@@ -23,7 +23,7 @@ def cache_directory(fs):
     """
     Make a filesystem that caches directory information.
 
-    :param fs: A filesystem object.
+    :param fs: A FS object.
     :returns: A filesystem that caches results of ``scandir``, ``isdir``
         and other methods which read directory information.
 
@@ -90,11 +90,9 @@ class WrapCachedDir(WrapFS):
         return info
 
     def isdir(self, path):
-        """Check a path exists and is a directory."""
         return self.getinfo(path).is_dir
 
     def isfile(self, path):
-        """Check a path exists and is a file."""
         return not self.getinfo(path).is_dir
 
 

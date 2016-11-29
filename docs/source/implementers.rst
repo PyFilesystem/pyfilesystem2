@@ -25,12 +25,34 @@ All Filesystems should be *thread-safe*. The simplest way to achieve that is by 
 
 You aren't *required* to use ``_lock``. Just as long as calling methods on the FS object from multiple threads doesn't break anything.
 
+Python Versions
+---------------
+
+PyFilesystem itself supports Python2.7 and Python3.X. If you add ``from __future__ import unicode_literals`` to the top of your files, and handle the differences between versions with the ``six`` library, then supporting both versions requires minimal effort.
+
+Of course, you aren't obligated to support the same versions of Python that PyFilesystem does, but it is recommended if your project is for general use.
+
 
 Testing Filesystems
 -------------------
 
+To test your implementation, you can borrow the test suite used to test the built in filesystems. If your code passes these tests, then you can be confident your implementation will work seamlessly.
+
+Here's the simplest possible example to test a filesystem class called ``MyFS``::
+
+    from fs.test import FSTestCases
+
+    class TestMyFS(FSTestCases):
+
+        def make_fs(self):
+            # Return an instance of your FS object here
+            return MyFS()
 
 
+You may also want to override some of the methods in the test suite for more targeted testing:
+
+.. autoclass:: fs.test.FSTestCases
+    :members:
 
 
 .. _essential-methods:

@@ -19,3 +19,5 @@ Reference
    reference/tree.rst
    reference/walk.rst
    reference/wildcard.rst
+   reference/wrap.rst
+   reference/wrapfs.rst
