@@ -74,17 +74,17 @@ def normpath(path):
 
     prefix = '/' if path.startswith('/') else ''
     components = []
-    append = components.append
-    special = ('..', '.', '').__contains__
     try:
         for component in path.split('/'):
-            if special(component):
+            if component in '..':  # True for '..', '.', and ''
                 if component == '..':
                     components.pop()
             else:
-                append(component)
+                components.append(component)
     except IndexError:
-        raise IllegalBackReference('Too many backrefs in \'%s\'' % path)
+        raise IllegalBackReference(
+            "Too many backrefs in '{}'".format(path)
+        )
     return prefix + '/'.join(components)
 
 
@@ -374,9 +374,9 @@ def isbase(path1, path2):
     :rtype: bool
 
     """
-    p1 = forcedir(abspath(path1))
-    p2 = forcedir(abspath(path2))
-    return p1 == p2 or p1.startswith(p2)
+    _path1 = forcedir(abspath(path1))
+    _path2 = forcedir(abspath(path2))
+    return _path1.startswith(_path2)
 
 
 def isparent(path1, path2):
