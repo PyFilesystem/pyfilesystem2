@@ -12,7 +12,6 @@ class RawWrapper(object):
 
     def __init__(self, f, mode=None, name=None):
         self._f = f
-        self.is_io = isinstance(f, io.IOBase)
         self.mode = mode or getattr(f, 'mode', None)
         self.name = name
         self.closed = False
@@ -49,14 +48,15 @@ class RawWrapper(object):
         )()
 
     def seekable(self):
-        if self.is_io:
-            return self._f.seekable()
         try:
-            self.seek(0, SEEK_CUR)
-        except IOError:
-            return False
-        else:
-            return True
+            return self._f.seekable()
+        except AttributeError:
+            try:
+                self.seek(0, SEEK_CUR)
+            except IOError:
+                return False
+            else:
+                return True
 
     def tell(self):
         return self._f.tell()
@@ -74,7 +74,7 @@ class RawWrapper(object):
         return self._f.read(n)
 
     def read1(self, n=-1):
-        if self.is_io:
+        if hasattr(self._f, 'read1'):
             return self._f.read1(n)
         return self.read(n)
 
@@ -82,20 +82,22 @@ class RawWrapper(object):
         return self._f.read()
 
     def readinto(self, b):
-        if self.is_io:
+        try:
             return self._f.readinto(b)
-        data = self._f.read(len(b))
-        bytes_read = len(data)
-        b[:len(data)] = data
-        return bytes_read
+        except AttributeError:
+            data = self._f.read(len(b))
+            bytes_read = len(data)
+            b[:len(data)] = data
+            return bytes_read
 
     def readinto1(self, b):
-        if self.is_io:
+        try:
             return self._f.readinto1(b)
-        data = self._f.read(len(b))
-        bytes_read = len(data)
-        b[:len(data)] = data
-        return bytes_read
+        except AttributeError:
+            data = self._f.read1(len(b))
+            bytes_read = len(data)
+            b[:len(data)] = data
+            return bytes_read
 
     def readline(self, limit=-1):
         return self._f.readline(limit)

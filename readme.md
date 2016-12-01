@@ -1,9 +1,18 @@
 PyFilesystem2
 =============
 
-Python Filesystem abstraction layer.
+Python's Filesystem abstraction layer.
 
 [![PyPI version](https://badge.fury.io/py/fs.svg)](https://badge.fury.io/py/fs) [![PyPI](https://img.shields.io/pypi/pyversions/fs.svg)]() ![tests](https://travis-ci.org/PyFilesystem/pyfilesystem2.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/PyFilesystem/pyfilesystem2/badge.svg)](https://coveralls.io/github/PyFilesystem/pyfilesystem2) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PyFilesystem/pyfilesystem2&amp;utm_campaign=Badge_Grade)
+
+
+Documentation
+-------------
+
+https://pyfilesystem2.readthedocs.io/en/latest/
+
+Brief
+-----
 
 Think of PyFilesystem's ``FS`` objects as the next logical step to
 Python's ``file`` objects. In the same way that file objects abstract a
@@ -24,7 +33,7 @@ def count_python_loc(fs):
     return count
 ```
 
-We can call that function as follows::
+We can call `count_python_loc` as follows:
 
 ```python
 from fs import open_fs
@@ -32,23 +41,30 @@ projects_fs = open_fs('~/projects')
 print(count_python_loc(projects_fs))
 ```
 
-The line ``project_fs = open_fs('~/projects')`` opens an FS object that
+The line `project_fs = open_fs('~/projects')` opens an FS object that
 maps to the ``projects`` directory in your home folder. That object is
-used by ``count_python_loc`` when counting lines of code.
+used by `count_python_loc` when counting lines of code.
 
-If we later want to count the lines of Python code in a zip file, then
-we can make the following change::
+To count the lines of Python code in a *zip file*, we can make the
+following change:
 
 ```python
 projects_fs = open_fs('zip://projects.zip')
 ```
 
-No changes to ``count_python_loc`` are required, because PyFileystem
-provides a simple consistent interface to anything that resembles a
-collection of files and directories, including archives and network
-filesystems.
+Or to count the Python lines on an FTP server:
 
-Contrast that with a version that purely uses the standard library.
+```python
+projects_fs = open_fs('ftp://ftp.example.org/projects')
+```
+
+No changes to `count_python_loc` are necessary, because PyFileystem
+provides a simple consistent interface to anything that resembles a
+collection of files and directories. Essentially, it allows you to write
+code that is independent of where and how the files are physically
+stored.
+
+Contrast that with a version that purely uses the standard library:
 
 ```python
 def count_py_loc(path):
@@ -56,12 +72,11 @@ def count_py_loc(path):
     for root, dirs, files in os.walk(path):
         for name in files:
             if name.endswith('.py'):
-                with open(os.path.join(root, name)) as python_file:
+                with open(os.path.join(root, name), 'rt') as python_file:
                     count += sum(1 for line in python_file if line.strip())
 ```
 
-The code is similar to the PyFilesystem version, but this code would
-only work with the OS filesystem. Counting the lines of Python code in a
-zip file would require a complete re-write since the API is quite
-different. We would also have to re-implement the directory walking
-provided by ``os.walk``
+This version is similar to the PyFilesystem code above, but would only
+work with the OS filesystem. Any other filesystem would require an
+entirely different API, and you would likely have to re-implement the
+directory walking functionality of `os.walk`.

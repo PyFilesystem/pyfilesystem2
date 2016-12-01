@@ -28,9 +28,9 @@ You aren't *required* to use ``_lock``. Just as long as calling methods on the F
 Python Versions
 ---------------
 
-PyFilesystem itself supports Python2.7 and Python3.X. If you add ``from __future__ import unicode_literals`` to the top of your files, and handle the differences between versions with the ``six`` library, then supporting both versions requires minimal effort.
+PyFilesystem supports Python2.7 and Python3.X. The differences between the two major Python versions are largely managed by the ``six`` library.
 
-Of course, you aren't obligated to support the same versions of Python that PyFilesystem does, but it is recommended if your project is for general use.
+You aren't obligated to support the same versions of Python that PyFilesystem, when writing a new FS class, but it is recommended if your project is for general use.
 
 
 Testing Filesystems

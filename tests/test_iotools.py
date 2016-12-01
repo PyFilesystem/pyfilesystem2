@@ -50,11 +50,39 @@ class TestIOTools(unittest.TestCase):
                 self.assertEqual(bytes(data), b'foo')
                 self.assertEqual(f.readline(1), b'f')
 
+        def no_readinto(size):
+            raise AttributeError
+
         with self.fs.openbin('bytes.bin') as bin_file:
+            bin_file.readinto = no_readinto
             with iotools.make_stream('bytes.bin', bin_file, 'rb') as f:
-                f.is_io = False
                 data = bytearray(3)
                 bytes_read = f.readinto(data)
+                self.assertEqual(bytes_read, 3)
+                self.assertEqual(bytes(data), b'foo')
+                self.assertEqual(f.readline(1), b'f')
+
+
+    def test_readinto1(self):
+
+        self.fs.setbytes('bytes.bin', b'foofoobarbar')
+
+        with self.fs.openbin('bytes.bin') as bin_file:
+            with iotools.make_stream('bytes.bin', bin_file, 'rb') as f:
+                data = bytearray(3)
+                bytes_read = f.readinto1(data)
+                self.assertEqual(bytes_read, 3)
+                self.assertEqual(bytes(data), b'foo')
+                self.assertEqual(f.readline(1), b'f')
+
+        def no_readinto(size):
+            raise AttributeError
+
+        with self.fs.openbin('bytes.bin') as bin_file:
+            bin_file.readinto = no_readinto
+            with iotools.make_stream('bytes.bin', bin_file, 'rb') as f:
+                data = bytearray(3)
+                bytes_read = f.readinto1(data)
                 self.assertEqual(bytes_read, 3)
                 self.assertEqual(bytes(data), b'foo')
                 self.assertEqual(f.readline(1), b'f')
@@ -96,7 +124,10 @@ class TestIOTools(unittest.TestCase):
         raw_wrapper = iotools.RawWrapper(f)
         self.assertTrue(raw_wrapper.seekable())
 
-        raw_wrapper.is_io = False
+        def no_seekable():
+            raise AttributeError('seekable')
+
+        f.seekable = no_seekable
 
         def seek(pos, whence):
             raise IOError('no seek')

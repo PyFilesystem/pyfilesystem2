@@ -26,12 +26,12 @@ Note that the ``files`` method above doesn't require a ``fs`` parameter. This is
 Walk Methods
 ~~~~~~~~~~~~
 
-If you call the ``walk`` attribute on a :class:`~fs.walk.BoundWalker` it will return an iterable of tuples with three values; a path to the directory, a list of :class:`~fs.info.Info` objects for directories, and a list of :class:`~fs.info.Info` objects for the files: Here's an example::
+If you call the ``walk`` attribute on a :class:`~fs.walk.BoundWalker` it will return an iterable of :class:`~fs.walk.Step` named tuples with three values; a path to the directory, a list of :class:`~fs.info.Info` objects for directories, and a list of :class:`~fs.info.Info` objects for the files. Here's an example::
 
-    for dir_path, dirs, files in home_fs.walk(wildcards=['*.py']):
-        print('In dir {}'.format(dir_path))
-        print('sub-directories: {!r}'.format(dirs))
-        print('files: {!r}'.format(files))
+    for step in home_fs.walk(wildcards=['*.py']):
+        print('In dir {}'.format(step.path))
+        print('sub-directories: {!r}'.format(step.dirs))
+        print('files: {!r}'.format(step.files))
 
 .. note ::
     Methods of  :class:`~fs.walk.BoundWalker` invoke a corresponding method on a :class:`~fs.walk.Walker` object, with the *bound* filesystem.
@@ -69,6 +69,3 @@ Search Algorithms
 There are two general algorithms for searching a directory tree. The first method is `"breadth"`, which yields resources in the top of the directory tree first, before moving on to sub-directories. The second is `"depth"` which yields the most deeply nested resources, and works backwards to the top-most directory.
 
 Generally speaking, you will only need the a *depth* search if you will be deleting resources as you walk through them. The default *breadth* search is a generally more efficient way of looking through a filesystem. You can specify which method you want with the ``search`` parameter on most ``Walker`` methods.
-
-Custom Walkers
-~~~~~~~~~~~~~~

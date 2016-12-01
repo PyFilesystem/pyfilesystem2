@@ -1,6 +1,6 @@
 """
 
-The machinery for walking a filesystem.
+The machinery for walking a filesystem. See :ref:`walking` for details.
 
 """
 
@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import itertools
 
 from collections import deque
+from collections import namedtuple
 
 import six
 
@@ -17,6 +18,10 @@ from .errors import FSError
 from .path import abspath
 from .path import join
 from .path import normpath
+
+
+"""A 'step' in a directory walk."""
+Step = namedtuple('Step', 'path, dirs, files')
 
 
 class WalkerBase(object):
@@ -40,7 +45,7 @@ class WalkerBase(object):
         :param str path: a path to a directory.
         :param list namespaces: A list of additional namespaces to add
             to the Info objects.
-        :returns: Iterator of tuples.
+        :returns: Iterator of :class:`~fs.walk.Step` named tuples.
 
         """
         raise NotImplementedError
@@ -73,8 +78,8 @@ class WalkerBase(object):
 
     def info(self, fs, path='/', namespaces=None):
         """
-        Walk a filesystem, yielding tuples of (<absolute path>,
-        <resource info).
+        Walk a filesystem, yielding tuples of ``(<absolute path>,
+        <resource info>)``.
 
         :param str fs: A FS object.
         :param str path: A path to a directory.
@@ -242,13 +247,13 @@ class Walker(WalkerBase):
 
         :param fs: A FS object.
         :param str path: a path to a directory.
-        :param list namespaces: A list of additional namespaces to add to
-            the Info objects.
-        :returns: Iterator of tuples.
+        :param list namespaces: A list of additional namespaces to add
+            to the Info objects.
+        :returns: :class:`~fs.walk.Step` iterator.
 
-        The return value is an iterable of ``(<path>, <dirs>, <files>)``
-        tuples,  where ``<path>`` is an absolute path to a directory,
-        and ``<dirs>`` and ``<files>`` are a list of
+        The return value is an iterator of ``(<path>, <dirs>, <files>)``
+        named tuples,  where ``<path>`` is an absolute path to a
+        directory, and ``<dirs>`` and ``<files>`` are a list of
         :class:`~fs.info.Info` objects for directories and files
         in ``<path>``.
 
@@ -395,11 +400,11 @@ class BoundWalker(object):
         :param list exclude_dirs: A list of patterns that will be used
             to filter out directories from the walk, e.g. ``['*.svn',
             '*.git']``.
-        :returns: An iterable of :class:`~fs.info.Info` objects.
+        :returns: :class:`~fs.walk.Step` iterator.
 
-        The return value is an iterable of ``(<path>, <dirs>, <files>)``
-        tuples,  where ``<path>`` is an absolute path to a directory,
-        and ``<dirs>`` and ``<files>`` are a list of
+        The return value is an iterator of ``(<path>, <dirs>, <files>)``
+        named tuples,  where ``<path>`` is an absolute path to a
+        directory, and ``<dirs>`` and ``<files>`` are a list of
         :class:`~fs.info.Info` objects for directories and files
         in ``<path>``.
 

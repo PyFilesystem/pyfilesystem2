@@ -1,6 +1,6 @@
 """
 Useful functions for working with PyFilesystem paths.
-
+sdsd
 This is broadly similar to the standard ``os.path`` module but works
 with paths in the canonical format expected by all FS objects (that is,
 separated by forward slashes and with an optional leading slash).
@@ -157,8 +157,8 @@ def abspath(path):
     Convert the given path to an absolute path.
 
     Since FS objects have no concept of a *current directory*, this
-    simply adds a leading ``/`` character if the path doesn't already have
-    one.
+    simply adds a leading ``/`` character if the path doesn't already
+    have one.
 
     :param str path: A PyFilesytem path.
     :returns: An absolute path.
