@@ -268,6 +268,18 @@ class Registry(object):
         Open a filesystem object from a FS URL (ignoring the path
         component).
 
+        :param str fs_url: A filesystem URL
+        :param parse_result: A parsed filesystem URL.
+        :type parse_result: :class:`ParseResult`
+        :param bool writeable: True if the filesystem must be writeable.
+        :param bool create: True if the filesystem should be created if
+            it does not exist.
+        :param str cwd: The current working directory (generally only
+            relevant for OS filesystems).
+        :param str default_protocol: The protocol to use if one is not
+            supplied in the FS URL (defaults to ``"osfs"``).
+        :returns: :class:`~fs.base.FS` object
+
         """
         from .base import FS
         if isinstance(fs_url, FS):

@@ -10,7 +10,7 @@ To walk a filesystem (or directory) you can construct a :class:`~fs.walk.Walker`
     >>> from fs import open_fs
     >>> from fs.walk import Walker
     >>> home_fs = open_fs('~/projects')
-    >>> walker = Walker(wildcards=['*.py'])
+    >>> walker = Walker(filter=['*.py'])
     >>> for path in walker.files(home_fs):
     ...     print(path)
 
@@ -18,7 +18,7 @@ Generally speaking, however, you will only need to construct a Walker object if 
 
     >>> from fs import open_fs
     >>> home_fs = open_fs('~/projects')
-    >>> for path in home_fs.walk.files(wildcards=['*.py']):
+    >>> for path in home_fs.walk.files(filter=['*.py']):
     ...     print(path)
 
 Note that the ``files`` method above doesn't require a ``fs`` parameter. This is because the ``walk`` attribute is a property which returns a :class:`~fs.walk.BoundWalker` object, which associates the filesystem with a walker.
@@ -28,7 +28,7 @@ Walk Methods
 
 If you call the ``walk`` attribute on a :class:`~fs.walk.BoundWalker` it will return an iterable of :class:`~fs.walk.Step` named tuples with three values; a path to the directory, a list of :class:`~fs.info.Info` objects for directories, and a list of :class:`~fs.info.Info` objects for the files. Here's an example::
 
-    for step in home_fs.walk(wildcards=['*.py']):
+    for step in home_fs.walk(filter=['*.py']):
         print('In dir {}'.format(step.path))
         print('sub-directories: {!r}'.format(step.dirs))
         print('files: {!r}'.format(step.files))
@@ -38,7 +38,7 @@ If you call the ``walk`` attribute on a :class:`~fs.walk.BoundWalker` it will re
 
 The ``walk`` attribute may appear to be a method, but is in fact a callable object. It supports other convenient methods that supply different information from the walk. For instance, :meth:`~fs.walk.BoundWalker.files`, which returns an iterable of file paths. Here's an example::
 
-    for path in home_fs.walk.files(wildcards['*.py']):
+    for path in home_fs.walk.files(filter=['*.py']):
         print('Python file: {}'.format(path))
 
 The compliment to ``files`` is :meth:`~fs.walk.BoundWalker.dirs` which returns paths to just the directories (and ignoring the files). Here's an example::

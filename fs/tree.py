@@ -30,8 +30,8 @@ def render(fs,
     :type file: file or None
     :type encoding: Unicode encoding, or None to auto-detect.
     :type encoding: str or None
-    :param int max_levels: Maximum number of levels to display, or None for
-        no maximum.
+    :param int max_levels: Maximum number of levels to display, or None
+        for no maximum.
     :param bool with_color: Enable terminal color output, or None to
         auto-detect terminal.
     :param bool dirs_first: Show directories first.

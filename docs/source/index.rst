@@ -15,6 +15,7 @@ Contents:
    guide.rst
    concepts.rst
    info.rst
+   openers.rst
    walking.rst
    builtin.rst
    implementers.rst

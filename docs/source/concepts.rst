@@ -61,6 +61,7 @@ path, it will raise a :meth:`~fs.errors.NoSysPath` exception. If you
 prefer a *look before you leap* approach, you can check if a resource
 has a system path by calling :meth:`~fs.base.FS.hassyspath`
 
+
 Sandboxing
 ----------
 

@@ -9,10 +9,13 @@ Python's Filesystem abstraction layer.
 Documentation
 -------------
 
-https://pyfilesystem2.readthedocs.io/en/latest/
+* [PyFilesytem Docs](https://pyfilesystem2.readthedocs.io/en/latest/)
+* [Blog](https://www.willmcgugan.com/tag/fs/)
 
-Brief
------
+
+
+Introduction
+------------
 
 Think of PyFilesystem's ``FS`` objects as the next logical step to
 Python's ``file`` objects. In the same way that file objects abstract a
