@@ -20,36 +20,6 @@ Or to upgrade to the most recent version::
 
     pip install fs --upgrade
 
-
-You should now have the ``fs`` module on your path (version number may
-vary)::
-
-    >>> import fs
-    >>> fs.__version__
-    '2.0.0'
-
-
-Blog
-----
-
-See `Will McGugan's blog <http://www.willmcgugan.com/tag/fs/>`_ for posts on PyFilesystem.
-
-
-Need Help?
-----------
-
-If you have any problems or questions, please contact the developers
-through one of the following channels:
-
-Bugs
-####
-
-If you find a bug in PyFilesystem, please file an issue:
-http://code.google.com/p/pyfilesystem/issues/list
-
-Discussion Group
-################
-
-There is also a discussion group for PyFilesystem:
-http://groups.google.com/group/pyfilesystem-discussion
-
+Alternatively, if you would like to install from source, you can check
+out [the code from
+Github](https://github.com/PyFilesystem/pyfilesystem2).
