@@ -314,11 +314,12 @@ class OSFS(FS):
         with convert_os_errors('open', path):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise FileExists(path)
+            _encoding = encoding or 'utf-8'
             return io.open(
                 sys_path,
                 mode=_mode.to_platform(),
                 buffering=buffering,
-                encoding=encoding or 'utf-8',
+                encoding=None if _mode.binary else _encoding,
                 errors=errors,
                 newline=newline,
                 **options
