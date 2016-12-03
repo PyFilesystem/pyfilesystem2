@@ -12,9 +12,9 @@ CLASSIFIERS = [
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 2.7',
-    'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
+    'Programming Language :: Python :: 3.5',
     'Topic :: System :: Filesystems',
 ]
 
@@ -22,12 +22,12 @@ with open('README.txt', 'r') as f:
     DESCRIPTION = f.read()
 
 REQUIREMENTS = [
-    "appdirs",
-    "enum34",
+    "appdirs~=1.4.0",
+    "enum34~=1.1.6",
     "pytz",
-    "scandir",
+    "scandir~=1.3",
     "setuptools",
-    "six>=1.10.0",
+    "six~=1.10.0",
 ]
 
 setup(
