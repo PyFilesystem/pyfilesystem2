@@ -854,7 +854,7 @@ class FS(object):
             bin_file,
             mode=mode,
             buffering=buffering,
-            encoding=encoding,
+            encoding=encoding or 'utf-8',
             errors=errors,
             newline=newline,
             **options

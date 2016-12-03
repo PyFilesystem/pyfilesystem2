@@ -318,7 +318,7 @@ class OSFS(FS):
                 sys_path,
                 mode=_mode.to_platform(),
                 buffering=buffering,
-                encoding=encoding,
+                encoding=encoding or 'utf-8',
                 errors=errors,
                 newline=newline,
                 **options
