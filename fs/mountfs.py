@@ -222,10 +222,10 @@ class MountFS(FS):
             **options
         )
 
-    def setbin(self, path, file):
+    def setbinfile(self, path, file):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.setbin(path, file)
+        return fs.setbinfile(path, file)
 
     def setbytes(self, path, contents):
         self.check()

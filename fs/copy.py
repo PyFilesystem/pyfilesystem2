@@ -61,7 +61,7 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
                 with src_fs.lock(), dst_fs.lock():
                     with src_fs.open(src_path, 'rb') as read_file:
                         # There may be an optimized copy available on dst_fs
-                        dst_fs.setbin(dst_path, read_file)
+                        dst_fs.setbinfile(dst_path, read_file)
 
 
 def copy_structure(src_fs, dst_fs, walker=None):

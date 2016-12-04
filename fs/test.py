@@ -1204,9 +1204,9 @@ class FSTestCases(object):
             data = f.read()
         self.assertEqual(data, b'bar')
 
-    def test_setbin(self):
+    def test_setbinfile(self):
         bytes_file = io.BytesIO(b'bar')
-        self.fs.setbin('foo', bytes_file)
+        self.fs.setbinfile('foo', bytes_file)
         with self.fs.open('foo', 'rb') as f:
             data = f.read()
         self.assertEqual(data, b'bar')

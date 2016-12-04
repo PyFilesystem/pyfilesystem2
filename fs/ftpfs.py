@@ -567,7 +567,7 @@ class FTPFS(FS):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def setbin(self, path, file):
+    def setbinfile(self, path, file):
         _path = abspath(normpath(path))
         self.validatepath(path)
         with self._lock:

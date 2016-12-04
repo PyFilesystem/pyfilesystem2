@@ -62,7 +62,7 @@ class TestWrap(unittest.TestCase):
             fs.touch('foo')
 
         with self.assertRaises(errors.ResourceReadOnly):
-            fs.setbin('foo', None)
+            fs.setbinfile('foo', None)
 
         with self.assertRaises(errors.ResourceReadOnly):
             fs.setfile('foo', None)

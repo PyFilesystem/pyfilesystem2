@@ -334,9 +334,9 @@ class MultiFS(FS):
             **kwargs
         )
 
-    def setbin(self, path, file):
+    def setbinfile(self, path, file):
         self._require_writable(path)
-        self.write_fs.setbin(path, file)
+        self.write_fs.setbinfile(path, file)
 
     def setbytes(self, path, contents):
         self._require_writable(path)

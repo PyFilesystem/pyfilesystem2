@@ -287,7 +287,7 @@ class FS(object):
             if not overwrite and self.exists(dst_path):
                 raise errors.DestinationExists(dst_path)
             with closing(self.open(src_path, 'rb')) as read_file:
-                self.setbin(dst_path, read_file)
+                self.setbinfile(dst_path, read_file)
 
     def copydir(self, src_path, dst_path, create=False):
         """
@@ -818,7 +818,7 @@ class FS(object):
                     return
         with self._lock:
             with self.open(src_path, 'rb') as read_file:
-                self.setbin(dst_path, read_file)
+                self.setbinfile(dst_path, read_file)
             self.remove(src_path)
 
     def open(self,
@@ -945,7 +945,7 @@ class FS(object):
         with closing(self.open(path, mode='wb')) as write_file:
             write_file.write(contents)
 
-    def setbin(self, path, file):
+    def setbinfile(self, path, file):
         """
         Set a file to the contents of a binary file object.
 
@@ -962,7 +962,7 @@ class FS(object):
         (ideally with a context manager). For example::
 
             with open('myfile.bin') as read_file:
-                my_fs.setbin('myfile.bin', read_file)
+                my_fs.setbinfile('myfile.bin', read_file)
 
         """
 

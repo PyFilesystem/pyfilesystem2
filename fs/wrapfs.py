@@ -359,11 +359,11 @@ class WrapFS(FS):
         with unwrap_errors(path):
             _fs.setbytes(_path, contents)
 
-    def setbin(self, path, file):
+    def setbinfile(self, path, file):
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            _fs.setbin(_path, file)
+            _fs.setbinfile(_path, file)
 
     def setfile(self,
                 path,

@@ -198,7 +198,7 @@ class WrapReadOnly(WrapFS):
         self.check()
         raise ResourceReadOnly(path)
 
-    def setbin(self, path, file):
+    def setbinfile(self, path, file):
         self.check()
         raise ResourceReadOnly(path)
 
