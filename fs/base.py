@@ -15,6 +15,7 @@ import abc
 import os
 import threading
 import time
+from functools import partial
 
 from contextlib import closing
 import itertools
@@ -370,27 +371,26 @@ class FS(object):
 
     def filterdir(self,
                   path,
-                  exclude_dirs=False,
-                  exclude_files=False,
                   files=None,
                   dirs=None,
+                  exclude_dirs=None,
+                  exclude_files=None,
                   namespaces=None,
                   page=None):
         """
-        Get an iterator of resource info, filtered by wildcards.
+        Get an iterator of resource info, filtered by file patterns.
 
         :param str path: A path to a directory on the filesystem.
-        :param bool exclude_dirs: Exclude directories.
-        :param bool exclude_files: Exclude files.
-        :param files: A list of unix shell-style patterns to filter
+        :param list files: A list of unix shell-style patterns to filter
             file names, e.g. ``['*.py']``.
-        :type wildcards: list or None
-        :param dirs: A list of unix shell-style wildcards to
+        :param list dirs: A list of unix shell-style wildcards to
             filter directory names.
-        :type dirs: list or None
-        :param namespaces: A list of info namespaces to include in
-            results.
-        :type namespaces: list or None
+        :param list exclude_dirs: An optional list of patterns used to
+            exclude directories
+        :param list exclude_files: An optional list of patterns used to
+            exclude files.
+        :param list namespaces: A list of namespaces to include in
+            the resource information.
         :param page: May be a tuple of ``(<start>, <end>)`` indexes to
             return an iterator of a subset of the resource info, or
             ``None`` to iterate over the entire directory. Paging a
@@ -399,51 +399,44 @@ class FS(object):
         :return: An iterator of :class:`~fs.info.Info` objects.
         :rtype: iterator
 
-        This method enhances the :meth:`~fs.base.FS.scandir` method with
-        additional filtering functionality.
+        This method enhances :meth:`~fs.base.FS.scandir` with additional
+        filtering functionality.
 
         """
 
-        case_sensitive = self.getmeta().get('case_sensitive', True)
-
         resources = self.scandir(path, namespaces=namespaces)
+        filters = []
 
+        def match_dir(patterns, info):
+            """Pattern match info.name"""
+            return info.is_file or self.match(patterns, info.name)
+
+        def match_file(patterns, info):
+            """Pattern match info.name"""
+            return info.is_dir or self.match(patterns, info.name)
+
+        def exclude_dir(patterns, info):
+            """Pattern match info.name"""
+            return info.is_file or not self.match(patterns, info.name)
+
+        def exclude_file(patterns, info):
+            """Pattern match info.name"""
+            return info.is_dir or not self.match(patterns, info.name)
+
+        if files:
+            filters.append(partial(match_file, files))
+        if dirs:
+            filters.append(partial(match_dir, dirs))
         if exclude_dirs:
-            resources = (
-                info
-                for info in resources
-                if not info.is_dir
-            )
-
+            filters.append(partial(exclude_dir, exclude_dirs))
         if exclude_files:
-            resources = (
-                info
-                for info in resources
-                if info.is_dir
-            )
+            filters.append(partial(exclude_file, exclude_files))
 
-        if files is not None:
-            if isinstance(files, six.text_type):
-                raise ValueError(
-                    'wildcards must be a sequence, not a string'
-                )
-            match = wildcard.get_matcher(files, case_sensitive)
+        if filters:
             resources = (
                 info
                 for info in resources
-                if info.is_dir or match(info.name)
-            )
-
-        if dirs is not None:
-            if isinstance(dirs, six.text_type):
-                raise ValueError(
-                    'dir_wildcards must be a sequence, not a string'
-                )
-            match = wildcard.get_matcher(dirs, case_sensitive)
-            resources = (
-                info
-                for info in resources
-                if not info.is_dir or match(info.name)
+                if all(_filter(info) for _filter in filters)
             )
 
         iter_info = iter(resources)
@@ -1211,6 +1204,8 @@ class FS(object):
         """
         if patterns is None:
             return True
+        if isinstance(patterns, six.text_type):
+            raise ValueError('patterns must be a list or sequence')
         case_sensitive = self.getmeta().get('case_sensitive', True)
         matcher = wildcard.get_matcher(patterns, case_sensitive)
         return matcher(name)

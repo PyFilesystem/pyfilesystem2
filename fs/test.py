@@ -1122,11 +1122,11 @@ class FSTestCases(object):
         self.assertEqual(set(dir_list), {'bar', 'foo.py', 'foo.pyc'})
 
         # Check excluding dirs
-        dir_list = [info.name for info in self.fs.filterdir('/', exclude_dirs=True, files=['*.py', '*.pyc'])]
+        dir_list = [info.name for info in self.fs.filterdir('/', exclude_dirs=['*'], files=['*.py', '*.pyc'])]
         self.assertEqual(set(dir_list), {'foo.py', 'foo.pyc'})
 
         # Check excluding files
-        dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=True)]
+        dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=['*'])]
         self.assertEqual(set(dir_list), {'bar'})
 
         # Check wildcards must be a list
@@ -1134,11 +1134,11 @@ class FSTestCases(object):
             dir_list = [info.name for info in self.fs.filterdir('/', files="*.py")]
 
         self.fs.makedir('baz')
-        dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=True, dirs=['??z'])]
+        dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=['*'], dirs=['??z'])]
         self.assertEqual(set(dir_list), {'baz'})
 
         with self.assertRaises(ValueError):
-            dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=True, dirs="*.py")]
+            dir_list = [info.name for info in self.fs.filterdir('/', exclude_files=['*'], dirs="*.py")]
 
     def test_getbytes(self):
         # Test getbytes method.

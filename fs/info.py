@@ -136,6 +136,16 @@ class Info(object):
         return self.get('basic', 'is_dir')
 
     @property
+    def is_file(self):
+        """
+        Check if a resource references a file.
+
+        :rtype: bool
+
+        """
+        return not self.get('basic', 'is_dir')
+
+    @property
     def type(self):
         """
         Get the resource type enumeration.

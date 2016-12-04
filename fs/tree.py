@@ -19,7 +19,9 @@ def render(fs,
            encoding=None,
            max_levels=5,
            with_color=None,
-           dirs_first=True):
+           dirs_first=True,
+           exclude=None,
+           filter=None):
     """
     Render a directory structure in to a pretty tree.
 
@@ -35,6 +37,10 @@ def render(fs,
     :param bool with_color: Enable terminal color output, or None to
         auto-detect terminal.
     :param bool dirs_first: Show directories first.
+    :param list exclude: Option list of directory patterns to exclude
+        from the tree render.
+    :param filter: Optional list of files patterns to match in the tree
+        render.
     :rtype: tuple
     :returns: A tuple of ``(<directory count>, <file count>)``.
 
@@ -106,7 +112,7 @@ def render(fs,
         """Recursive directory function."""
         try:
             directory = sorted(
-                fs.filterdir(path),
+                fs.filterdir(path, exclude_dirs=exclude, files=filter),
                 key=sort_key_dirs_first if dirs_first else sort_key
             )
         except Exception as error:
