@@ -24,7 +24,7 @@ class _ConvertOSErrors(object):
         #errno.ENOTDIR: errors.DirectoryExpected,
         errno.ENOTDIR: errors.ResourceNotFound,
         errno.EISDIR: errors.FileExpected,
-        errno.EINVAL: errors.DirectoryExpected,
+        errno.EINVAL: errors.FileExpected,
         errno.ENOSPC: errors.InsufficientStorage,
         errno.EPERM: errors.PermissionDenied,
         errno.ENETDOWN: errors.RemoteConnectionError,
@@ -37,7 +37,7 @@ class _ConvertOSErrors(object):
     DIR_ERRORS = FILE_ERRORS.copy()
     DIR_ERRORS[errno.ENOTDIR] = errors.DirectoryExpected
     DIR_ERRORS[errno.EEXIST] = errors.DirectoryExists
-    DIR_ERRORS[errno.EINVAL] = errors.FileExpected
+    DIR_ERRORS[errno.EINVAL] = errors.DirectoryExpected
 
     def __init__(self, opname, path, directory=False):
         self._opname = opname
