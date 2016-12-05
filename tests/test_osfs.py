@@ -58,7 +58,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
     def assert_text(self, path, contents):
         assert isinstance(contents, text_type)
         _path = self._get_real_path(path)
-        with io.open(_path, 'rt') as f:
+        with io.open(_path, 'rt', encoding='utf-8') as f:
             data = f.read()
         self.assertEqual(data, contents)
         self.assertIsInstance(data, text_type)
