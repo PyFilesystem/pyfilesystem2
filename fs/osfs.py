@@ -106,9 +106,13 @@ class OSFS(FS):
         else:
             _meta["invalid_path_chars"] = '\0'
 
-        if 'PC_PATH_MAX' in os.pathconf_names:
-            _meta['max_sys_path_length'] =\
-                os.pathconf(_root_path, os.pathconf_names['PC_PATH_MAX'])
+            if 'PC_PATH_MAX' in os.pathconf_names:
+                _meta['max_sys_path_length'] = (
+                    os.pathconf(
+                        _root_path,
+                        os.pathconf_names['PC_PATH_MAX']
+                    )
+                )
 
     def __repr__(self):
         _fmt = "{}({!r}, encoding={!r})"
