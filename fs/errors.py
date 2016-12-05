@@ -118,7 +118,7 @@ class InvalidCharsInPath(InvalidPath):
 class OperationFailed(FSError):
     """Base exception class for errors associated with a specific operation."""
 
-    default_message = "operation {opname} failed, {details}"
+    default_message = "operation failed, {details}"
 
     def __init__(self, path=None, exc=None, msg=None):
         self.path = path
