@@ -825,18 +825,18 @@ class FS(object):
         """
         Open a file.
 
-        :param path: A path on the filesystem.
-        :type path: str
-        :param mode: Mode to open file object.
-        :type mode: str
-        :param buffering:
-        :type buffering: int
-        :param encoding:
-        :type encoding:
-        :param errors:
-        :type errors:
-        :param newline:
-        :type newline:
+        :param str path: A path to a file on the filesystem.
+        :param str mode: Mode to open file object.
+        :param int buffering: Buffering policy: ``0`` to switch
+            buffering off, ``1`` to select line buffering, ``>1`` to
+            select a fixed-size buffer, ``-1`` to auto-detect.
+        :param str encoding: Encoding for text files (defaults to
+            ``utf-9``)
+        :param str errors: What to do with unicode decode errors (see
+            https://docs.python.org/3/library/codecs.html#error-
+            handlers)
+        :param str newline: New line parameter (See
+            https://docs.python.org/3/library/functions.html#open).
         :rtype: file object
         """
         validate_open_mode(mode)

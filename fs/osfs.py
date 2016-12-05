@@ -3,13 +3,11 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import errno
-import grp
 import io
 import itertools
 import logging
 import os
 import platform
-import pwd
 import stat
 import sys
 
@@ -157,15 +155,18 @@ class OSFS(FS):
         ).dump()
         access['gid'] = stat_result.st_gid
         access['uid'] = stat_result.st_uid
-        try:
-            access['group'] = grp.getgrgid(access['gid']).gr_name
-        except KeyError:  # pragma: nocover
-            pass
+        if not _WINDOWS_PLATFORM:
+            import grp
+            import pwd
+            try:
+                access['group'] = grp.getgrgid(access['gid']).gr_name
+            except KeyError:  # pragma: nocover
+                pass
 
-        try:
-            access['user'] = pwd.getpwuid(access['uid']).pw_name
-        except KeyError:  # pragma: nocover
-            pass
+            try:
+                access['user'] = pwd.getpwuid(access['uid']).pw_name
+            except KeyError:  # pragma: nocover
+                pass
         return access
 
     STAT_TO_RESOURCE_TYPE = {
