@@ -239,7 +239,7 @@ class MultiFS(FS):
             raise errors.ResourceNotFound(path)
         return fs.getbytes(path)
 
-    def gettext(self, path, encoding=None, errors=None, newline=None):
+    def gettext(self, path, encoding=None, errors=None, newline=''):
         self.check()
         fs = self._delegate_required(path)
         return fs.gettext(
@@ -316,7 +316,7 @@ class MultiFS(FS):
              buffering=-1,
              encoding=None,
              errors=None,
-             newline=None,
+             newline='',
              **kwargs):
         self.check()
         if check_writable(mode):
@@ -347,7 +347,7 @@ class MultiFS(FS):
                 contents,
                 encoding='utf-8',
                 errors=None,
-                newline=None):
+                newline=''):
         self._require_writable(path)
         return self.write_fs.settext(
             path,

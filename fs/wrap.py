@@ -111,7 +111,7 @@ class WrapReadOnly(WrapFS):
         raise ResourceReadOnly(path)
 
     def appendtext(self, path, text,
-                   encoding='utf-8', errors=None, newline=None):
+                   encoding='utf-8', errors=None, newline=''):
         self.check()
         raise ResourceReadOnly(path)
 
@@ -151,7 +151,7 @@ class WrapReadOnly(WrapFS):
                 contents,
                 encoding='utf-8',
                 errors=None,
-                newline=None):
+                newline=''):
         self.check()
         raise ResourceReadOnly(path)
 
@@ -177,7 +177,7 @@ class WrapReadOnly(WrapFS):
              buffering=-1,
              encoding=None,
              errors=None,
-             newline=None,
+             newline='',
              line_buffering=False,
              **options):
         self.check()
@@ -207,7 +207,7 @@ class WrapReadOnly(WrapFS):
                 file,
                 encoding=None,
                 errors=None,
-                newline=None):
+                newline=''):
         self.check()
         raise ResourceReadOnly(path)
 

@@ -78,7 +78,7 @@ class WrapFS(FS):
             return _fs.appendbytes(_path, data)
 
     def appendtext(self, path, text,
-                   encoding='utf-8', errors=None, newline=None):
+                   encoding='utf-8', errors=None, newline=''):
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
@@ -241,7 +241,7 @@ class WrapFS(FS):
             _bytes = _fs.getbytes(_path)
         return _bytes
 
-    def gettext(self, path, encoding=None, errors=None, newline=None):
+    def gettext(self, path, encoding=None, errors=None, newline=''):
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
@@ -326,7 +326,7 @@ class WrapFS(FS):
              buffering=-1,
              encoding=None,
              errors=None,
-             newline=None,
+             newline='',
              line_buffering=False,
              **options):
         self.check()
@@ -370,7 +370,7 @@ class WrapFS(FS):
                 file,
                 encoding=None,
                 errors=None,
-                newline=None):
+                newline=''):
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):

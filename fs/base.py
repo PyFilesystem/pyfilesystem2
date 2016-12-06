@@ -223,7 +223,7 @@ class FS(object):
                    text,
                    encoding='utf-8',
                    errors=None,
-                   newline=None):
+                   newline=''):
         """
         Append text to a file. Creating the file if it doesn't already
         exists.
@@ -461,7 +461,7 @@ class FS(object):
             contents = read_file.read()
         return contents
 
-    def gettext(self, path, encoding=None, errors=None, newline=None):
+    def gettext(self, path, encoding=None, errors=None, newline=''):
         """
         Get the contents of a file as a string.
 
@@ -820,7 +820,7 @@ class FS(object):
              buffering=-1,
              encoding=None,
              errors=None,
-             newline=None,
+             newline='',
              **options):
         """
         Open a file.
@@ -1041,7 +1041,7 @@ class FS(object):
                 contents,
                 encoding='utf-8',
                 errors=None,
-                newline=None):
+                newline=''):
         """
         Create or replace a file with text.
 

@@ -124,7 +124,7 @@ def make_stream(name,
                 buffering=-1,
                 encoding=None,
                 errors=None,
-                newline=None,
+                newline='',
                 line_buffering=False,
                 **kwargs):
     """Take a Python 2.x binary file and return an IO Stream."""

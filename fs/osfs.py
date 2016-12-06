@@ -308,7 +308,7 @@ class OSFS(FS):
              buffering=-1,
              encoding=None,
              errors=None,
-             newline=None,
+             newline='',
              line_buffering=False,
              **options):
         _mode = Mode(mode)
@@ -326,7 +326,7 @@ class OSFS(FS):
                 buffering=buffering,
                 encoding=None if _mode.binary else _encoding,
                 errors=errors,
-                newline=newline,
+                newline=None if _mode.binary else newline,
                 **options
             )
 

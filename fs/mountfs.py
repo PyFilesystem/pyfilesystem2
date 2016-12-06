@@ -207,7 +207,7 @@ class MountFS(FS):
              buffering=-1,
              encoding=None,
              errors=None,
-             newline=None,
+             newline='',
              **options):
         validate_open_mode(mode)
         self.check()
@@ -237,7 +237,7 @@ class MountFS(FS):
                 contents,
                 encoding='utf-8',
                 errors=None,
-                newline=None):
+                newline=''):
         fs, _path = self._delegate(path)
         return fs.settext(
             _path,
