@@ -136,6 +136,8 @@ def make_stream(name,
         reading = True
         writing = True
 
+    encoding = None if binary else (encoding or 'utf-8')
+
     io_object = RawWrapper(bin_file, mode=mode, name=name)
     if buffering >= 0:
         if reading and writing:
