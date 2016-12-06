@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import ftplib
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -27,6 +28,10 @@ from fs.opener import open_fs
 from fs.ftpfs import ftp_errors
 
 from nose.plugins.attrib import attr
+
+
+_WINDOWS_PLATFORM = platform.system() == 'Windows'
+
 
 if __name__ == "__main__":
     # Run an ftp server that exposes a given directory
@@ -132,6 +137,10 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
             env=env
         )
         server.stdout.readline()
+
+        if _WINDOWS_PLATFORM:
+            # Don't know why this is necessary on Windows
+            time.sleep(0.1)
 
         # Poll until a connection can be made
         start_time = time.time()
