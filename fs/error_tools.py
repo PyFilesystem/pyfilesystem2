@@ -38,6 +38,7 @@ class _ConvertOSErrors(object):
     DIR_ERRORS[errno.ENOTDIR] = errors.DirectoryExpected
     DIR_ERRORS[errno.EEXIST] = errors.DirectoryExists
     DIR_ERRORS[errno.EINVAL] = errors.DirectoryExpected
+    DIR_ERRORS[267] = errors.DirectoryExpected
 
     def __init__(self, opname, path, directory=False):
         self._opname = opname
