@@ -2,10 +2,6 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from six import text_type
-
-from six.moves.urllib.request import urlopen
-
 import ftplib
 import os
 import shutil
@@ -15,6 +11,9 @@ import tempfile
 import time
 import unittest
 import uuid
+
+from six import text_type, PY2
+from six.moves.urllib.request import urlopen
 
 from ftplib import error_perm
 from ftplib import error_temp
@@ -121,10 +120,16 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
 
         os.mkdir(temp_path)
         env = os.environ.copy()
-        env['PYTHONPATH'] = os.path.join(
-            os.getcwd(),
-            env.get('PYTHONPATH', '')
-        )
+        if PY2:
+            env['PYTHONPATH'] = os.path.join(
+                os.getcwd(),
+                env.get('PYTHONPATH', '')
+            )
+        else:
+            env[b'PYTHONPATH'] = os.path.join(
+                os.getcwd(),
+                env.get('PYTHONPATH', '')
+            ).encode()
         server = subprocess.Popen(
             [
                 sys.executable,

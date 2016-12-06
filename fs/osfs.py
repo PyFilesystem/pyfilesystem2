@@ -352,13 +352,6 @@ class OSFS(FS):
         _path = abspath(normpath(path))
         sys_path = self._to_sys_path(_path)
         with convert_os_errors('scandir', path, directory=True):
-            try:
-                scan_iter = scandir(sys_path)
-            except OSError as error:
-                if error.errno == 267:
-                    # Translate Windows 267 error
-                    raise errors.DirectoryExpected(path)
-                raise
             for dir_entry in scandir(sys_path):
                 info = {
                     "basic": {
