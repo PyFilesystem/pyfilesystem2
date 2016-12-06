@@ -4,10 +4,14 @@ from __future__ import unicode_literals
 import errno
 from contextlib import contextmanager
 import sys
+import platform
 
 from . import errors
 
 from six import reraise
+
+
+_WINDOWS_PLATFORM = platform.system() == 'Windows'
 
 
 class _ConvertOSErrors(object):
@@ -31,14 +35,18 @@ class _ConvertOSErrors(object):
         errno.ECONNRESET: errors.RemoteConnectionError,
         errno.ENAMETOOLONG: errors.PathError,
         errno.EOPNOTSUPP: errors.Unsupported,
-        errno.ENOSYS: errors.Unsupported
+        errno.ENOSYS: errors.Unsupported,
     }
 
     DIR_ERRORS = FILE_ERRORS.copy()
     DIR_ERRORS[errno.ENOTDIR] = errors.DirectoryExpected
     DIR_ERRORS[errno.EEXIST] = errors.DirectoryExists
     DIR_ERRORS[errno.EINVAL] = errors.DirectoryExpected
-    DIR_ERRORS[267] = errors.DirectoryExpected
+
+    if _WINDOWS_PLATFORM:
+        DIR_ERRORS[13] = errors.DirectoryExpected
+        DIR_ERRORS[267] = errors.DirectoryExpected
+        FILE_ERRORS[13] = errors.FileExpected
 
     def __init__(self, opname, path, directory=False):
         self._opname = opname
