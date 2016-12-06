@@ -8,7 +8,6 @@ python:
 
 os:
   - linux
-  - osx
 
 before_install:
   - pip install -r testrequirements.txt

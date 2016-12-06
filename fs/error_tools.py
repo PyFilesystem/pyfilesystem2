@@ -43,7 +43,7 @@ class _ConvertOSErrors(object):
     DIR_ERRORS[errno.EEXIST] = errors.DirectoryExists
     DIR_ERRORS[errno.EINVAL] = errors.DirectoryExpected
 
-    if _WINDOWS_PLATFORM:
+    if _WINDOWS_PLATFORM:  # pragma: no cover
         DIR_ERRORS[13] = errors.DirectoryExpected
         DIR_ERRORS[267] = errors.DirectoryExpected
         FILE_ERRORS[13] = errors.FileExpected
