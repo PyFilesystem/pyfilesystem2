@@ -121,15 +121,15 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         os.mkdir(temp_path)
         env = os.environ.copy()
         if PY2:
-            env['PYTHONPATH'] = os.path.join(
-                os.getcwd(),
-                env.get('PYTHONPATH', '')
-            )
-        else:
             env[b'PYTHONPATH'] = os.path.join(
                 os.getcwd(),
                 env.get('PYTHONPATH', '')
             ).encode()
+        else:
+            env['PYTHONPATH'] = os.path.join(
+                os.getcwd(),
+                env.get('PYTHONPATH', '')
+            )
         server = subprocess.Popen(
             [
                 sys.executable,
