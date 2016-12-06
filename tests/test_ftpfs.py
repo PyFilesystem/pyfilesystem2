@@ -12,7 +12,7 @@ import time
 import unittest
 import uuid
 
-from six import text_type, PY2
+from six import text_type
 from six.moves.urllib.request import urlopen
 
 from ftplib import error_perm
