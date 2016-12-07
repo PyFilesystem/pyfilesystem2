@@ -10,9 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 
-## [2.0.0] - 2016-12-02
-### Added
+## [2.0.0] - 2016-12-07
 
-### Changed
+New version of the PyFilesystem API.
 
 

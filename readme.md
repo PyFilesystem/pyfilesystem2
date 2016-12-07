@@ -13,7 +13,6 @@ Documentation
 * [Blog](https://www.willmcgugan.com/tag/fs/)
 
 
-
 Introduction
 ------------
 
@@ -83,3 +82,18 @@ This version is similar to the PyFilesystem code above, but would only
 work with the OS filesystem. Any other filesystem would require an
 entirely different API, and you would likely have to re-implement the
 directory walking functionality of `os.walk`.
+
+Credits
+-------
+
+* [Will McGugan](https://www.willmcgugan.com)
+
+PyFilesystem2 owes a massive debt of gratitude to the following
+developers who contributed code and ideas to the original version.
+
+* Ryan Kelly
+* Andrew Scheller
+* Ben Timby
+
+Apologies if I missed anyone, feel free to prompt me if your name is
+missing here.

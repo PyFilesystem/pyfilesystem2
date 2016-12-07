@@ -219,7 +219,7 @@ class MultiFS(FS):
         self.check()
         seen = set()
         exists = False
-        for fs_name, fs in self.iterate_fs():
+        for _name, fs in self.iterate_fs():
             try:
                 for info in fs.scandir(path, namespaces=namespaces, page=page):
                     if info.name not in seen:
