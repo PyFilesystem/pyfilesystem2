@@ -86,7 +86,7 @@ directory walking functionality of `os.walk`.
 Credits
 -------
 
-* [Will McGugan](https://www.willmcgugan.com)
+* [Will McGugan](https://github.com/willmcgugan)
 
 PyFilesystem2 owes a massive debt of gratitude to the following
 developers who contributed code and ideas to the original version.
