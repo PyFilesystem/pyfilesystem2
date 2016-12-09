@@ -106,5 +106,3 @@ drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub
 
         parsed = ftp_parse.parse(directory.splitlines())
         self.assertEqual(parsed, expected)
-
-
