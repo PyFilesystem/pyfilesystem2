@@ -3,7 +3,11 @@ PyFilesystem2
 
 Python's Filesystem abstraction layer.
 
-[![PyPI version](https://badge.fury.io/py/fs.svg)](https://badge.fury.io/py/fs) [![PyPI](https://img.shields.io/pypi/pyversions/fs.svg)]() ![tests](https://travis-ci.org/PyFilesystem/pyfilesystem2.svg?branch=master) [![Coverage Status](https://coveralls.io/repos/github/PyFilesystem/pyfilesystem2/badge.svg)](https://coveralls.io/github/PyFilesystem/pyfilesystem2) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PyFilesystem/pyfilesystem2&amp;utm_campaign=Badge_Grade)
+[![PyPI version](https://badge.fury.io/py/fs.svg)](https://badge.fury.io/py/fs)
+[![PyPI](https://img.shields.io/pypi/pyversions/fs.svg)](https://pypi.python.org/pypi/fs/)
+[![Build Status](https://travis-ci.org/PyFilesystem/pyfilesystem2.svg?branch=master)](https://travis-ci.org/PyFilesystem/pyfilesystem2)
+[![Coverage Status](https://coveralls.io/repos/github/PyFilesystem/pyfilesystem2/badge.svg)](https://coveralls.io/github/PyFilesystem/pyfilesystem2)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PyFilesystem/pyfilesystem2&amp;utm_campaign=Badge_Grade)
 
 
 Documentation
@@ -86,7 +90,7 @@ directory walking functionality of `os.walk`.
 Credits
 -------
 
-* [Will McGugan](https://www.willmcgugan.com)
+* [Will McGugan](https://github.com/willmcgugan)
 
 PyFilesystem2 owes a massive debt of gratitude to the following
 developers who contributed code and ideas to the original version.
