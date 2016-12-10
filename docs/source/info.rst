@@ -4,7 +4,7 @@ Resource Info
 =============
 
 Resource information (or *info*) describes standard file details such as
-name, type, size etc., and potentially other less-common information
+name, type, size, etc., and potentially other less-common information
 associated with a file or directory.
 
 You can retrieve resource info for a single resource by calling

@@ -27,7 +27,7 @@ Here's how you would open a :class:`~fs.osfs.OSFS` (Operating System File System
     >>> from fs.osfs import OSFS
     >>> home_fs = OSFS("~/")
 
-This constructs an FS object which manages the files an directories under a given system path. In this case, ``'~/'``, which is a shortcut for your home directory.
+This constructs an FS object which manages the files and directories under a given system path. In this case, ``'~/'``, which is a shortcut for your home directory.
 
 Here's how you would list the files/directories in your home directory::
 
