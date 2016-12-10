@@ -47,8 +47,11 @@ class OSFS(FS):
         does not already exist, otherwise the directory should exist
         prior to creating the ``OSFS`` instance.
     :type create: bool
+    :param int create_mode: The permissions that will be used to create
+        the directory if ``create`` is True and the path doesn't exist,
+        defaults to ``0o777``.
     :param encoding: The encoding to use for paths, or ``None``
-        (default) to autodetect.
+        (default) to auto-detect.
     :type encoding: str
     :raises `fs.errors.CreateFailed`: If ``root_path`` does not
         exists, or could not be created.
