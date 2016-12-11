@@ -428,6 +428,7 @@ class FSTestCases(object):
 
         # Check basic namespace
         info = self.fs.getinfo('foo').raw
+        self.assertIsInstance(info['basic']['name'], text_type)
         self.assertEqual(info['basic']['name'], 'foo')
         self.assertFalse(info['basic']['is_dir'])
 

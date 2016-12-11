@@ -130,8 +130,10 @@ class OSFS(FS):
 
     def _to_sys_path(self, path):
         """Convert a FS path to a path on the OS."""
-        path = normpath(path).lstrip('/').replace('/', os.sep)
-        sys_path = os.path.join(self.root_path, path)
+        sys_path = os.path.join(
+            self.root_path,
+            path.lstrip('/').replace('/', os.sep)
+        )
         return sys_path
 
     @classmethod
@@ -200,13 +202,14 @@ class OSFS(FS):
     def getinfo(self, path, namespaces=None):
         self.check()
         namespaces = namespaces or ()
-        sys_path = self.getsyspath(path)
+        _path = self.validatepath(path)
+        sys_path = self.getsyspath(_path)
         with convert_os_errors('getinfo', path):
             _stat = os.stat(sys_path)
 
         info = {
             'basic': {
-                'name': basename(path),
+                'name': basename(_path),
                 'is_dir': stat.S_ISDIR(_stat.st_mode)
             }
         }
@@ -224,7 +227,8 @@ class OSFS(FS):
 
     def listdir(self, path):
         self.check()
-        sys_path = self._to_sys_path(path)
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
         with convert_os_errors('listdir', path, directory=True):
             names = os.listdir(sys_path)
         return names
@@ -232,8 +236,8 @@ class OSFS(FS):
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
         mode = Permissions.get_mode(permissions)
-        self.validatepath(path)
-        sys_path = self._to_sys_path(path)
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
         with convert_os_errors('makedir', path, directory=True):
             try:
                 os.mkdir(sys_path, mode)
@@ -244,14 +248,14 @@ class OSFS(FS):
                     pass
                 else:
                     raise
-            return self.opendir(path)
+            return self.opendir(_path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
         _mode = Mode(mode)
         _mode.validate_bin()
         self.check()
-        self.validatepath(path)
-        sys_path = self._to_sys_path(path)
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
         with convert_os_errors('openbin', path):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise errors.FileExists(path)
@@ -265,7 +269,8 @@ class OSFS(FS):
 
     def remove(self, path):
         self.check()
-        sys_path = self._to_sys_path(path)
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
         with convert_os_errors('remove', path):
             try:
                 os.remove(sys_path)
@@ -282,7 +287,7 @@ class OSFS(FS):
 
     def removedir(self, path):
         self.check()
-        _path = abspath(normpath(path))
+        _path = self.validatepath(path)
         if _path == '/':
             raise errors.RemoveRootError()
         sys_path = self._to_sys_path(path)
@@ -317,8 +322,8 @@ class OSFS(FS):
         _mode = Mode(mode)
         validate_open_mode(mode)
         self.check()
-        self.validatepath(path)
-        sys_path = self._to_sys_path(path)
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
         with convert_os_errors('open', path):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise FileExists(path)
@@ -335,7 +340,8 @@ class OSFS(FS):
 
     def setinfo(self, path, info):
         self.check()
-        sys_path = self._to_sys_path(path)
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
         if not os.path.exists(sys_path):
             raise errors.ResourceNotFound(path)
         if 'details' in info:
@@ -352,7 +358,7 @@ class OSFS(FS):
     def _scandir(self, path, namespaces=None):
         self.check()
         namespaces = namespaces or ()
-        _path = abspath(normpath(path))
+        _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
         with convert_os_errors('scandir', path, directory=True):
             for dir_entry in scandir(sys_path):
