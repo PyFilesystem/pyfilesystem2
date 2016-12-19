@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 import re
 import time
+import calendar
 
 from .enums import ResourceType
 from .permissions import Permissions
@@ -70,9 +71,9 @@ def _parse_time(t):
         # Unknown time format
         return None
 
-    epoch_time = time.mktime((
+    epoch_time = calendar.timegm((
         _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year,
-        _t.tm_mon, _t.tm_mday - 1, _t.tm_hour, _t.tm_min, 0, 0, 0, 0
+        _t.tm_mon, _t.tm_mday - 1, _t.tm_hour, _t.tm_min, 0, 0, 0, 0, 'UTC'
     ))
 
     return epoch_time
