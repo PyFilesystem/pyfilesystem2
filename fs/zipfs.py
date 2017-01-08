@@ -11,6 +11,7 @@ from .base import FS
 from .compress import write_zip
 from .enums import ResourceType
 from .info import Info
+from .iotools import RawWrapper
 from .memoryfs import MemoryFS
 from .opener import open_fs
 from .path import dirname, normpath, relpath
@@ -275,7 +276,7 @@ class ReadZipFS(FS):
 
         zip_name = self._path_to_zip_name(path)
         bin_file = self._zip.open(zip_name, 'r')
-        return bin_file
+        return RawWrapper(bin_file)
 
     def remove(self, path):
         self.check()

@@ -11,14 +11,14 @@ class TestFTPParse(unittest.TestCase):
 
     def test_parse_time(self):
         self.assertEqual(
-             ftp_parse._parse_time('JUL 05 1974'),
-            142128000.0
+            ftp_parse._parse_time('JUL 05 1974'),
+            142214400.0
         )
 
         year = time.localtime().tm_year
         self.assertEqual(
             ftp_parse._parse_time('JUL 05 02:00'),
-            1467597600.0
+            1499220000.0
         )
 
         self.assertEqual(
@@ -53,7 +53,7 @@ drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub
                                u'u_x'],
               u'user': u'0'},
   u'basic': {u'is_dir': True, u'name': u'debian'},
-  u'details': {u'modified': 1137456000.0, u'size': 19, u'type': 1},
+  u'details': {u'modified': 1137542400.0, u'size': 19, u'type': 1},
   u'ftp': {u'ls': u'lrwxrwxrwx    1 0        0              19 Jan 18  2006 debian -> ./pub/mirror/debian'}},
  {u'access': {u'group': u'0',
               u'permissions': [u'g_r',
@@ -65,7 +65,7 @@ drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub
                                u'u_x'],
               u'user': u'0'},
   u'basic': {u'is_dir': True, u'name': u'debian-archive'},
-  u'details': {u'modified': 1470129660.0, u'size': 4096, u'type': 1},
+  u'details': {u'modified': 1501752060.0, u'size': 4096, u'type': 1},
   u'ftp': {u'ls': u'drwxr-xr-x   10 0        0            4096 Aug 03 09:21 debian-archive'}},
  {u'access': {u'group': u'0',
               u'permissions': [u'g_r',
@@ -79,11 +79,10 @@ drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub
                                u'u_x'],
               u'user': u'0'},
   u'basic': {u'is_dir': True, u'name': u'debian-backports'},
-  u'details': {u'modified': 1448755200.0, u'size': 27, u'type': 1},
+  u'details': {u'modified': 1448841600.0, u'size': 27, u'type': 1},
   u'ftp': {u'ls': u'lrwxrwxrwx    1 0        0              27 Nov 30  2015 debian-backports -> pub/mirror/debian-backports'}},
  {u'access': {u'group': u'0',
-              u'permissions': [
-                               u'g_r',
+              u'permissions': [u'g_r',
                                u'g_x',
                                u'o_r',
                                u'o_x',
@@ -92,16 +91,13 @@ drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub
                                u'u_x'],
               u'user': u'0'},
   u'basic': {u'is_dir': True, u'name': u'pub'},
-  u'details': {u'modified': 1475068380.0, u'size': 4096, u'type': 1},
+  u'details': {u'modified': 1506690780.0, u'size': 4096, u'type': 1},
   u'ftp': {u'ls': u'drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub'}},
  {u'access': {u'group': u'0',
-              u'permissions': [u'g_r',
-                               u'o_r',
-                               u'u_r',
-                               u'u_w'],
+              u'permissions': [u'g_r', u'o_r', u'u_r', u'u_w'],
               u'user': u'0'},
   u'basic': {u'is_dir': False, u'name': u'robots.txt'},
-  u'details': {u'modified': 1267574400.0, u'size': 26, u'type': 2},
+  u'details': {u'modified': 1267660800.0, u'size': 26, u'type': 2},
   u'ftp': {u'ls': u'-rw-r--r--    1 0        0              26 Mar 04  2010 robots.txt'}}]
 
         parsed = ftp_parse.parse(directory.splitlines())

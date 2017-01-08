@@ -2,11 +2,17 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import datetime
 import re
 import time
 
+from pytz import UTC
+
 from .enums import ResourceType
 from .permissions import Permissions
+
+
+epoch_dt = datetime.datetime.fromtimestamp(0, UTC)
 
 
 re_linux = re.compile(
@@ -70,10 +76,19 @@ def _parse_time(t):
         # Unknown time format
         return None
 
-    epoch_time = time.mktime((
-        _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year,
-        _t.tm_mon, _t.tm_mday - 1, _t.tm_hour, _t.tm_min, 0, 0, 0, 0
-    ))
+    year = _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year
+    month = _t.tm_mon
+    day = _t.tm_mday
+    hour = _t.tm_hour
+    minutes = _t.tm_min
+    dt = datetime.datetime(
+        year, month, day,
+        hour, minutes,
+        tzinfo=UTC
+    )
+
+    epoch_time = (dt - epoch_dt).total_seconds()
+    print(t, epoch_time)
 
     return epoch_time
 

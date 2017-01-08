@@ -8,7 +8,6 @@ from __future__ import unicode_literals
 
 import io
 
-from . import constants
 from . import errors
 from .errors import DirectoryNotEmpty
 from .errors import ResourceNotFound

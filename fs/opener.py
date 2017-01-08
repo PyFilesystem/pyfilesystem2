@@ -306,7 +306,7 @@ class OSFSOpener(Opener):
 
     def open_fs(self, fs_url, parse_result, writeable, create, cwd):
         from .osfs import OSFS
-        _path = os.path.join(cwd, parse_result.resource)
+        _path = os.path.abspath(os.path.join(cwd, parse_result.resource))
         path = os.path.normpath(_path)
         osfs = OSFS(path, create=create)
         return osfs
