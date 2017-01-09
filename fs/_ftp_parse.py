@@ -64,9 +64,7 @@ def parse_line(line):
 
 
 def _parse_time(t):
-
     t = ' '.join(token.strip() for token in t.lower().split(' '))
-
     try:
         try:
             _t = time.strptime(t, '%b %d %Y')
@@ -88,8 +86,6 @@ def _parse_time(t):
     )
 
     epoch_time = (dt - epoch_dt).total_seconds()
-    print(t, epoch_time)
-
     return epoch_time
 
 
