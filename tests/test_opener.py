@@ -91,6 +91,20 @@ class TestRegistry(unittest.TestCase):
         finally:
             os.remove(zip_name)
 
+    def test_open_tarfs(self):
+        fh, tar_name = tempfile.mkstemp(suffix='.tar.gz')
+        os.close(fh)
+        try:
+            # Test creating tar
+            with opener.open_fs('tar://' + tar_name, create=True) as make_tar:
+                self.assertEqual(make_tar.compression, 'gz')
+                make_tar.settext('foo.txt', 'foofoo')
+            # Test opening tar
+            with opener.open_fs('tar://' + tar_name) as tar_fs:
+                self.assertEqual(tar_fs.gettext('foo.txt'), 'foofoo')
+        finally:
+            os.remove(tar_name)
+
     def test_open_fs(self):
         mem_fs = opener.open_fs("mem://")
         mem_fs_2 = opener.open_fs(mem_fs)
