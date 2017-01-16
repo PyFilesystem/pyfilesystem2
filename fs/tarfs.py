@@ -5,7 +5,6 @@ from datetime import datetime
 import tarfile
 
 import six
-import re
 
 from . import errors
 from .base import FS
@@ -13,10 +12,8 @@ from .compress import write_tar
 from .enums import ResourceType
 from .info import Info
 from .iotools import RawWrapper
-from .memoryfs import MemoryFS
 from .opener import open_fs
 from .path import dirname, normpath, relpath, basename
-from .time import datetime_to_epoch
 from .wrapfs import WrapFS
 from .permissions import Permissions
 
@@ -306,7 +303,8 @@ class ReadTarFS(FS):
         rw = RawWrapper(self._tar.extractfile(member))
 
         if six.PY2: # Patch nonexistent file.flush in Python2
-            def _flush(*args, **kwargs): pass
+            def _flush():
+                pass
             rw.flush = _flush
 
         return rw
