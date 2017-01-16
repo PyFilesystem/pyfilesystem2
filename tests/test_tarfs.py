@@ -23,7 +23,8 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
     """
 
     def make_fs(self):
-        _tar_file = tempfile.TemporaryFile()
+        fh, _tar_file = tempfile.mkstemp()
+        os.close(fh)
         fs = tarfs.TarFS(_tar_file, write=True)
         fs._tar_file = _tar_file
         return fs
@@ -35,7 +36,8 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
 class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
 
     def make_fs(self):
-        _tar_file = tempfile.TemporaryFile()
+        fh, _tar_file = tempfile.mkstemp()
+        os.close(fh)
         fs = tarfs.TarFS(_tar_file, write=True, compression="gz")
         fs._tar_file = _tar_file
         return fs
@@ -58,7 +60,8 @@ class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
 class TestWriteXZippedTarFS(FSTestCases, unittest.TestCase):
 
     def make_fs(self):
-        _tar_file = tempfile.TemporaryFile()
+        fh, _tar_file = tempfile.mkstemp()
+        os.close(fh)
         fs = tarfs.TarFS(_tar_file, write=True, compression="xz")
         fs._tar_file = _tar_file
         return fs
@@ -80,7 +83,8 @@ class TestWriteXZippedTarFS(FSTestCases, unittest.TestCase):
 class TestWriteBZippedTarFS(FSTestCases, unittest.TestCase):
 
     def make_fs(self):
-        _tar_file = tempfile.TemporaryFile()
+        fh, _tar_file = tempfile.mkstemp()
+        os.close(fh)
         fs = tarfs.TarFS(_tar_file, write=True, compression="gz")
         fs._tar_file = _tar_file
         return fs
