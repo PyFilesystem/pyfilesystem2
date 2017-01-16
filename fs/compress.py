@@ -133,16 +133,11 @@ def write_tar(src_fs,
         ResourceType.unknown: tarfile.AREGTYPE,  # no type for unknown
     }
 
-    if isinstance(file, (six.text_type, six.binary_type)):
-        _tar = tarfile.open(
-            name=file,
-            mode="w:{}".format(compression or ''),
-        )
-    else:
-        _tar = tarfile.open(
-            fileobj=file,
-            mode="w:{}".format(compression or '')
-        )
+    try:
+        _tar = tarfile.open(fileobj=file, mode='w')
+    except (TypeError, AttributeError):
+        _tar = tarfile.open(file, mode='w')
+
     walker = walker or Walker()
     with _tar:
         gen_walk = walker.info(src_fs, namespaces=["details", "stat", "access"])

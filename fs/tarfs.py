@@ -80,8 +80,9 @@ class TarFS(WrapFS):
                 encoding="utf-8",
                 temp_fs="temp://__tartemp__"):
 
+        filename = str(getattr(file, 'name', file))
+
         if write and compression is None:
-            filename = str(getattr(file, 'name', file))
             compression = None
             for comp, extensions in six.iteritems(cls._compression_formats):
                 if filename.endswith(extensions):
@@ -193,7 +194,10 @@ class ReadTarFS(FS):
         super(ReadTarFS, self).__init__()
         self._file = file
         self.encoding = encoding
-        self._tar = tarfile.open(file, mode='r')
+        try:
+            self._tar = tarfile.open(fileobj=file, mode='r')
+        except (TypeError, AttributeError):
+            self._tar = tarfile.open(file, mode='r')
         self._directory_fs = None
 
     def __repr__(self):

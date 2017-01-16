@@ -18,7 +18,7 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
     """
     Test TarFS implementation.
 
-    When writing, a ZipFS is essentially a TempFS.
+    When writing, a TarFS is essentially a TempFS.
 
     """
 
@@ -32,6 +32,26 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
     def destroy_fs(self, fs):
         fs.close()
         del fs._tar_file
+
+class TestWriteTarFSToFileobj(FSTestCases, unittest.TestCase):
+    """
+    Test TarFS implementation.
+
+    When writing, a TarFS is essentially a TempFS.
+
+    """
+
+    def make_fs(self):
+        _tar_file = six.BytesIO()
+        fs = tarfs.TarFS(_tar_file, write=True)
+        fs._tar_file = _tar_file
+        return fs
+
+    def destroy_fs(self, fs):
+        fs.close()
+        del fs._tar_file
+
+
 
 class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
 
@@ -118,6 +138,18 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
 
     def remove_archive(self):
         os.remove(self._temp_path)
+
+    def test_read_from_fileobject(self):
+        try:
+            tarfs.TarFS(open(self._temp_path, 'rb'))
+        except:
+            self.fail("Couldn't open tarfs from fileobject")
+
+    def test_read_from_filename(self):
+        try:
+            tarfs.TarFS(self._temp_path)
+        except:
+            self.fail("Couldn't open tarfs from fileobject")
 
 class TestReadTarFSMem(TestReadTarFS):
 
