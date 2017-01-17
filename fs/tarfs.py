@@ -63,9 +63,10 @@ class TarFS(WrapFS):
     """
 
     _compression_formats = {
-        'xz': ('.tar.xz'),
-        'bz2': ('.tar.bz2'),
-        'gz': ('.tar.gz', '.tgz'),
+        #FMT    #UNIX      #MSDOS
+        'xz':  ('.tar.xz',  '.txz'),
+        'bz2': ('.tar.bz2', '.tbz'),
+        'gz':  ('.tar.gz',  '.tgz'),
     }
 
     def __new__(cls,
