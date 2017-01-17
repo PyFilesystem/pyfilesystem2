@@ -1,9 +1,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from datetime import datetime
 import tarfile
-
 import six
 
 from . import errors

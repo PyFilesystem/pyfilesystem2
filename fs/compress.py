@@ -133,10 +133,11 @@ def write_tar(src_fs,
         ResourceType.unknown: tarfile.AREGTYPE,  # no type for unknown
     }
 
+    mode = 'w:{}'.format(compression or '')
     try:
-        _tar = tarfile.open(fileobj=file, mode='w')
+        _tar = tarfile.open(fileobj=file, mode=mode)
     except (TypeError, AttributeError):
-        _tar = tarfile.open(file, mode='w')
+        _tar = tarfile.open(file, mode=mode)
 
     walker = walker or Walker()
     with _tar:
