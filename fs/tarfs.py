@@ -271,10 +271,11 @@ class ReadTarFS(FS):
             try:
                 member = self._tar.getmember(path)
             except KeyError:
-                raise errors.ResourceNotFound(path)
+                six.raise_from(errors.ResourceNotFound(path), None)
             else:
                 if not member.isdir():
-                    raise errors.DirectoryExpected(path)
+                    six.raise_from(errors.DirectoryExpected(path), None)
+
         return [
             basename(member.name)
             for member in self._tar
@@ -295,7 +296,7 @@ class ReadTarFS(FS):
         try:
             member = self._tar.getmember(path)
         except KeyError:
-            raise errors.ResourceNotFound(path)
+            six.raise_from(errors.ResourceNotFound(path), None)
 
         if not member.isfile():
             raise errors.FileExpected(path)

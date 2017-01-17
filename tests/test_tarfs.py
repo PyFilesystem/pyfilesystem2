@@ -3,10 +3,12 @@ from __future__ import unicode_literals
 import os
 import six
 import gzip
+import tarfile
 import tempfile
 import unittest
 
 from fs import tarfs
+from fs import errors
 from fs.compress import write_tar
 from fs.opener import open_fs
 from fs.test import FSTestCases
@@ -19,7 +21,6 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
     Test TarFS implementation.
 
     When writing, a TarFS is essentially a TempFS.
-
     """
 
     def make_fs(self):
@@ -50,8 +51,6 @@ class TestWriteTarFSToFileobj(FSTestCases, unittest.TestCase):
     def destroy_fs(self, fs):
         fs.close()
         del fs._tar_file
-
-
 
 class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
 
