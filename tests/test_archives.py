@@ -74,6 +74,10 @@ class ArchiveTestCases(object):
             sorted(self.source_fs.listdir('/')),
             sorted(self.fs.listdir('/'))
         )
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.listdir('top.txt')
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.listdir('nothere')
 
     def test_open(self):
         with self.fs.open('top.txt') as f:
@@ -89,6 +93,9 @@ class ArchiveTestCases(object):
             )
         with self.assertRaises(errors.ResourceNotFound):
             with self.fs.open('nothere.txt') as f:
+                pass
+        with self.assertRaises(errors.FileExpected):
+            with self.fs.open('foo') as f:
                 pass
 
     def test_gets(self):
