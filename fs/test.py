@@ -720,6 +720,10 @@ class FSTestCases(object):
             f.write(text)
         self.assert_bytes('foo/hello', text)
 
+        # Test FileExpected raised
+        with self.assertRaises(errors.FileExpected):
+            self.fs.openbin('foo') #directory
+
         # Open from missing dir
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.openbin('/foo/bar/test.txt')
