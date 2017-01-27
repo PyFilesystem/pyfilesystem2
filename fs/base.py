@@ -110,14 +110,15 @@ class FS(object):
     @abc.abstractmethod
     def makedir(self, path, permissions=None, recreate=False):
         """
-        Make a directory.
+        Make a directory, and return a :class:`~fs.subfs.SubFS` for
+        the new directory.
 
         :param str path: Path to directory from root.
         :param permissions: :class:`~fs.permissions.Permissions`
             instance.
         :type permissions: Permissions
-        :param recreate: Do not raise an error if the directory exists.
-        :type recreate: bool
+        :param bool recreate: Do not raise an error if the directory exists.
+        :rtype: :class:`~fs.subfs.SubFS`
 
         :raises `fs.errors.DirectoryExists`: if the path already exists.
         :raises `fs.errors.ResourceNotFound`: if the path is not found.
