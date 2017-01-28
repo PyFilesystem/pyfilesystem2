@@ -141,7 +141,7 @@ class WriteTarFS(WrapFS):
         """
         Write tar to a file.
 
-        ..note ::
+        .. note::
             This is called automatically when the TarFS is closed.
 
         :param file: Destination file, may be a file name or an open
