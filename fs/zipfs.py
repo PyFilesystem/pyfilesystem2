@@ -271,8 +271,10 @@ class ReadZipFS(FS):
         if 'w' in mode or '+' in mode or 'a' in mode:
             raise errors.ResourceReadOnly(path)
 
-        if not self._directory.isfile(path):
+        if not self._directory.exists(path):
             raise errors.ResourceNotFound(path)
+        elif self._directory.isdir(path):
+            raise errors.FileExpected(path)
 
         zip_name = self._path_to_zip_name(path)
         bin_file = self._zip.open(zip_name, 'r')
@@ -316,4 +318,3 @@ if __name__ == "__main__":  # pragma: nocover
         zip_fs.settext('foo/bar/baz.txt', 'Hello, World')
         print(zip_fs)
         print(repr(zip_fs))
-

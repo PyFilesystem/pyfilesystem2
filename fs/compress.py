@@ -11,10 +11,13 @@ from __future__ import unicode_literals
 from datetime import datetime
 import time
 import zipfile
+import tarfile
 
 import six
 
+from .enums import ResourceType
 from .path import relpath
+from .time import datetime_to_epoch
 from .errors import NoSysPath
 from .walk import Walker
 
@@ -93,3 +96,88 @@ def write_zip(src_fs,
                     # Write from a file which is (presumably)
                     # more memory efficient
                     _zip.write(sys_path, zip_name)
+
+
+
+def write_tar(src_fs,
+              file,
+              compression=None,
+              encoding="utf-8",
+              walker=None):
+    """
+    Write the contents of a filesystem to a zip file.
+
+    :param file: Destination file, may be a file name or an open file
+        object.
+    :type file: str or file-like.
+    :param compression: Compression to use.
+    :type compression: str
+    :param encoding: The encoding to use for filenames. The default is
+        ``"utf-8"``.
+    :type encoding: str
+    :param walker: A :class:`~fs.walk.Walker` instance, or None to use
+        default walker. You can use this to specify which files you
+        want to compress.
+    :type walker: Walker or None
+
+    """
+
+    type_map = {
+        ResourceType.block_special_file: tarfile.BLKTYPE,
+        ResourceType.character: tarfile.CHRTYPE,
+        ResourceType.directory: tarfile.DIRTYPE,
+        ResourceType.fifo: tarfile.FIFOTYPE,
+        ResourceType.file: tarfile.REGTYPE,
+        ResourceType.socket: tarfile.AREGTYPE,   # no type for socket
+        ResourceType.symlink: tarfile.SYMTYPE,
+        ResourceType.unknown: tarfile.AREGTYPE,  # no type for unknown
+    }
+
+    mode = 'w:{}'.format(compression or '')
+    try:
+        _tar = tarfile.open(fileobj=file, mode=mode)
+    except (TypeError, AttributeError):
+        _tar = tarfile.open(file, mode=mode)
+
+    walker = walker or Walker()
+    with _tar:
+        gen_walk = walker.info(src_fs, namespaces=["details", "stat", "access"])
+        for path, info in gen_walk:
+            # Tar names must be relative
+            tar_name = relpath(path)
+            if not six.PY3:
+                # Python2 expects bytes filenames
+                tar_name = tar_name.encode(encoding, 'replace')
+
+            tar_info = tarfile.TarInfo(tar_name)
+
+            if info.has_namespace('stat'):
+                mtime = info.get('stat', 'st_mtime', None)\
+                                    or time.time()
+            else:
+                mtime = info.modified or time.time()
+
+            if isinstance(mtime, datetime):
+                mtime = datetime_to_epoch(mtime)
+            if isinstance(mtime, float):
+                mtime = int(mtime)
+            tar_info.mtime = mtime
+
+            for tarattr,infoattr in {'uid':'uid',
+                                     'gid':'gid',
+                                     'uname':'user',
+                                     'gname':'group'}.items():
+                if getattr(info, infoattr) is not None:
+                    setattr(tar_info, tarattr,
+                            getattr(info, infoattr))
+
+            tar_info.mode = getattr(info.permissions, 'mode', 420)
+
+            if info.is_dir:
+                tar_info.type = tarfile.DIRTYPE
+                _tar.addfile(tar_info)
+            else:
+                tar_info.type = type_map.get(info.type, tarfile.REGTYPE)
+                tar_info.size = info.size
+                with src_fs.openbin(path) as bin_file:
+                    _tar.addfile(tar_info, bin_file)
