@@ -511,7 +511,7 @@ class FTPFS(FS):
         dir_name, file_name = split(_path)
         with self._lock:
             if self.isdir(path):
-                raise errors.DirectoryExpected(path=path)
+                raise errors.FileExpected(path=path)
             with ftp_errors(self, path):
                 self.ftp.delete(_encode(_path))
 
