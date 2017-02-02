@@ -132,7 +132,8 @@ class FS(object):
 
         :param str path: A path on the filesystem.
         :param str mode: Mode to open file (must be a valid non-text
-            mode).
+            mode). Since this method only opens binary files, the `b` in
+            the mode string is implied.
         :param buffering: Buffering policy (-1  to use default
             buffering, 0 to disable buffering, or positive integer to
             indicate buffer size).
