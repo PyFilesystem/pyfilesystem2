@@ -843,8 +843,7 @@ class FS(object):
         :param str encoding: Encoding for text files (defaults to
             ``utf-8``)
         :param str errors: What to do with unicode decode errors (see
-            `stdlib docs<https://docs.python.org/3/library/codecs.html#error-
-            handlers>`_)
+            `stdlib docs <https://docs.python.org/3/library/codecs.html#error-handlers>`_)
         :param str newline: New line parameter (See `stdlib docs
             <https://docs.python.org/3/library/functions.html#open>`_)
         :param options: Additional keyword parameters to set
