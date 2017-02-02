@@ -131,7 +131,8 @@ class FS(object):
         Open a binary file-like object.
 
         :param str path: A path on the filesystem.
-        :param str mode: Mode to open file.
+        :param str mode: Mode to open file (must be a valid non-text
+            mode).
         :param buffering: Buffering policy (-1  to use default
             buffering, 0 to disable buffering, or positive integer to
             indicate buffer size).
@@ -139,6 +140,11 @@ class FS(object):
         :param options: Keyword parameters for any additional
             information required by the filesystem (if any).
         :rtype: file object
+
+        :raises `fs.errors.FileExpected`: If the path is not a file.
+        :raises `fs.errors.FileExists`: If the file exists, and
+            *exclusive mode* is specified (`x` in the mode).
+        :raises `fs.errors.ResourceNotFound`: If `path` does not exist.
 
         """
 
@@ -163,13 +169,13 @@ class FS(object):
         :param str path: Path of the directory to remove.
 
         :raises `fs.errors.DirectoryNotEmpty`: If the directory is not
-            empty and force == ``False``
-        :raises `fs.errors.ParentDirectoryMissing`: If an intermediate
-            directory is missing
+            empty and force == ``False``.
         :raises `fs.errors.DirectoryExpected`: If the path is not a
-            directory
+            directory.
         :raises `fs.errors.ResourceNotFound`: If the path does not
-            exist
+            exist.
+        :raises `fs.errors.RemoveRootError`: If an attempt is made to
+            remove the root directory (i.e. `'/'`).
         """
 
     @abc.abstractmethod
@@ -179,6 +185,9 @@ class FS(object):
 
         :param str path: Path to a resource on the filesystem.
         :param dict info: Dict of resource info.
+
+        :raises `fs.errors.ResourceNotFound`: If `path` does not exist
+            on the filesystem.
 
         This method is the compliment to :class:`~fs.base.getinfo` and is
         used to set info values on a resource.
@@ -832,12 +841,16 @@ class FS(object):
             buffering off, ``1`` to select line buffering, ``>1`` to
             select a fixed-size buffer, ``-1`` to auto-detect.
         :param str encoding: Encoding for text files (defaults to
-            ``utf-9``)
+            ``utf-8``)
         :param str errors: What to do with unicode decode errors (see
-            https://docs.python.org/3/library/codecs.html#error-
-            handlers)
-        :param str newline: New line parameter (See
-            https://docs.python.org/3/library/functions.html#open).
+            `stdlib docs<https://docs.python.org/3/library/codecs.html#error-
+            handlers>`_)
+        :param str newline: New line parameter (See `stdlib docs
+            <https://docs.python.org/3/library/functions.html#open>`_)
+        :param options: Additional keyword parameters to set
+            implementation specific options (if required). See
+            implementation docs for details.
+
         :rtype: file object
         """
         validate_open_mode(mode)

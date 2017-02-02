@@ -882,7 +882,7 @@ class FSTestCases(object):
             self.fs.remove('bar')
 
         self.fs.makedir('dir')
-        with self.assertRaises(errors.ResourceInvalid):
+        with self.assertRaises(errors.FileExpected):
             self.fs.remove('dir')
 
         self.fs.makedirs('foo/bar/baz/')
