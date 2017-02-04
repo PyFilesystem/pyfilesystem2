@@ -146,6 +146,7 @@ def write_tar(src_fs,
     except (TypeError, AttributeError):
         _tar = tarfile.open(file, mode=mode)
 
+    current_time = time.time()
     walker = walker or Walker()
     with _tar:
         gen_walk = walker.info(src_fs, namespaces=["details", "stat", "access"])
@@ -159,9 +160,9 @@ def write_tar(src_fs,
             tar_info = tarfile.TarInfo(tar_name)
 
             if info.has_namespace('stat'):
-                mtime = info.get('stat', 'st_mtime', time.time())
+                mtime = info.get('stat', 'st_mtime', current_time)
             else:
-                mtime = info.modified or time.time()
+                mtime = info.modified or current_time
 
             if isinstance(mtime, datetime):
                 mtime = datetime_to_epoch(mtime)
