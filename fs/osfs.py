@@ -302,6 +302,9 @@ class OSFS(FS):
         sys_path = self._to_sys_path(path)
         return sys_path
 
+    def geturl(self, path, purpose='download'):
+        return "file://" + self.getsyspath(path)
+
     def gettype(self, path):
         self.check()
         sys_path = self._to_sys_path(path)

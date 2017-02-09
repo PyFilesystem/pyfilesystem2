@@ -272,7 +272,7 @@ class FTPFS(FS):
 
     def _open_ftp(self):
         _ftp = FTP()
-        #_ftp.set_debuglevel(2)
+        _ftp.set_debuglevel(0)
         with ftp_errors(self):
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
