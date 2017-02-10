@@ -33,6 +33,7 @@ def copy_fs(src_fs, dst_fs, walker=None, copy_if_newer=False):
     sources are newer then destination files. Directories are always copied. In case time of modification for destination
     files cannot be determined files are safely copied.
     :type copy_if_newer: boolean
+    :returns: a list with the copied files dst_path.
 
     """
     return copy_dir(src_fs, '/', dst_fs, '/', walker=walker, copy_if_newer=copy_if_newer)
@@ -84,6 +85,8 @@ def copy_file(src_fs, src_path, dst_fs, dst_path, copy_if_newer=False):
     source is newer then destination file. In case time of modification for destination file cannot be determined file
     is safely copied.
     :type copy_if_newer: boolean
+    :returns: a the copied file dst_path or None.
+
 
     """
     with manage_fs(src_fs, writeable=False) as src_fs:
@@ -151,6 +154,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None, copy_if_newer=Fals
     sources are newer then destination files. Directories are always copied. In case time of modification for destination
     files cannot be determined files are safely copied.
     :type copy_if_newer: boolean
+    :returns: a list with the copied files dst_path.
 
     """
 
