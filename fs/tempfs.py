@@ -62,10 +62,10 @@ class TempFS(OSFS):
 
         try:
             shutil.rmtree(self._temp_dir)
-        except Exception as e:
+        except Exception as error:
             if not self._ignore_clean_errors:
                 raise errors.OperationFailed(
                     msg="failed to remove temporary directory",
-                    exc=e
+                    exc=error
                 )
         self._cleaned = True

@@ -133,12 +133,20 @@ def write_tar(src_fs,
         ResourceType.unknown: tarfile.AREGTYPE,  # no type for unknown
     }
 
+    tar_attr = [
+        ('uid', 'uid'),
+        ('gid', 'gid'),
+        ('uname', 'user'),
+        ('gname', 'group'),
+    ]
+
     mode = 'w:{}'.format(compression or '')
     try:
         _tar = tarfile.open(fileobj=file, mode=mode)
     except (TypeError, AttributeError):
         _tar = tarfile.open(file, mode=mode)
 
+    current_time = time.time()
     walker = walker or Walker()
     with _tar:
         gen_walk = walker.info(src_fs, namespaces=["details", "stat", "access"])
@@ -152,10 +160,9 @@ def write_tar(src_fs,
             tar_info = tarfile.TarInfo(tar_name)
 
             if info.has_namespace('stat'):
-                mtime = info.get('stat', 'st_mtime', None)\
-                                    or time.time()
+                mtime = info.get('stat', 'st_mtime', current_time)
             else:
-                mtime = info.modified or time.time()
+                mtime = info.modified or current_time
 
             if isinstance(mtime, datetime):
                 mtime = datetime_to_epoch(mtime)
@@ -163,15 +170,11 @@ def write_tar(src_fs,
                 mtime = int(mtime)
             tar_info.mtime = mtime
 
-            for tarattr,infoattr in {'uid':'uid',
-                                     'gid':'gid',
-                                     'uname':'user',
-                                     'gname':'group'}.items():
+            for tarattr, infoattr in tar_attr:
                 if getattr(info, infoattr) is not None:
-                    setattr(tar_info, tarattr,
-                            getattr(info, infoattr))
+                    setattr(tar_info, tarattr, getattr(info, infoattr))
 
-            tar_info.mode = getattr(info.permissions, 'mode', 420)
+            tar_info.mode = getattr(info.permissions, 'mode', 0o420)
 
             if info.is_dir:
                 tar_info.type = tarfile.DIRTYPE
