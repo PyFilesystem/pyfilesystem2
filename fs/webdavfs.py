@@ -1,78 +1,89 @@
 # from six.moves import http_cookiejar, http_client
 # from six.moves.urllib import parse as urllib_parse
 import six
-import threading
+
+import webdav.client as wc
+import webdav.exceptions as we
 
 from .base import FS
-from .errors import ResourceNotFound, PermissionDenied, RemoteConnectionError
+from .enums import ResourceType
+from .errors import ResourceNotFound
+from .info import Info
+
+basics = frozenset(['name'])
+details = frozenset(('type', 'accessed', 'modified', 'created',
+                     'metadata_changed', 'size'))
+access = frozenset(('permissions', 'user', 'uid', 'group', 'gid'))
 
 
 class WebDAVFS(FS):
-    connection_classes = {
-        'http': six.moves.http_client.HTTPConnection,
-        'https': six.moves.http_client.HTTPSConnection,
-    }
-
-    _DEFAULT_PORT_NUMBERS = {
-        'http': 80,
-        'https': 443,
-    }
-
-    _meta = {
-        'virtual': False,
-        'read_only': False,
-        'unicode_paths': True,
-        'case_insensitive_paths': False,
-        'network': True
-     }
-
-    def __init__(self, url, credentials=None, get_credentials=None,
-                 connection_classes=None, timeout=None):
+    def __init__(self, url, credentials=None, root=None):
         if not url.endswith("/"):
             url += "/"
         self.url = url
-        self.timeout = timeout
         self.credentials = credentials
-        self.get_credentials = get_credentials
-        if connection_classes is not None:
-            self.connection_classes = self.connection_classes.copy()
-            self.connection_classes.update(connection_classes)
-        self._connections = []
-        self._free_connections = {}
-        self._connection_lock = threading.Lock()
-        self._cookiejar = six.moves.http_cookiejar.CookieJar()
+        self.root = root
         super(WebDAVFS, self).__init__()
 
-        # resp = self._check_server_speaks_webdav()
-        # self.url = resp.request_url
-        self._url_p = six.moves.urllib.parse.urlparse(self.url)
+        options = {
+            'webdav_hostname': self.url,
+            'webdav_login': self.credentials["login"],
+            'webdav_password': self.credentials["password"],
+            'root': self.root
+        }
+        self.client = wc.Client(options)
 
-    # def _check_server_speaks_webdav(self):
-    #     pf = propfind(prop="<prop xmlns='DAV:'><resourcetype /></prop>")
-    #     resp = self._request("/", "PROPFIND", pf.render(), {"Depth": "0"})
-    #     try:
-    #         if resp.status == 404:
-    #             raise ResourceNotFound("/", msg="root url gives 404")
-    #         if resp.status in (401, 403):
-    #             raise PermissionDenied("listdir (http %s)" % resp.status)
-    #         if resp.status != 207:
-    #             msg = "server at %s doesn't speak WebDAV" % (self.url,)
-    #             raise RemoteConnectionError(exc=resp.read(), msg=msg)
-    #     finally:
-    #         resp.close()
-    #     return resp
+    @staticmethod
+    def _create_info_dict(info):
+        info_dict = {'basic': {"is_dir": False}, 'details': {}, 'access': {}}
+
+        for key, val in six.iteritems(info):
+            if key in basics:
+                info_dict['basic'][key] = val
+            elif key in details:
+                info_dict['details'][key] = val
+            elif key in access:
+                info_dict['access'][key] = val
+            else:
+                info_dict['other'][key] = val
+
+        return info_dict
 
     def getinfo(self, path, namespaces=None):
-        pass
+        self.check()
+        _path = self.validatepath(path)
+        namespaces = namespaces or ()
+
+        if _path == '/':
+            return Info({
+                "basic":
+                {
+                    "name": "",
+                    "is_dir": True
+                },
+                "details":
+                {
+                    "type": int(ResourceType.directory)
+                }
+            })
+
+        try:
+            info = self.client.info(path)
+            info_dict = self._create_info_dict(info)
+            if self.client.is_dir(path):
+                info_dict['basic']['is_dir'] = True
+            return Info(info_dict)
+        except we.RemoteResourceNotFound:
+            raise ResourceNotFound(path)
 
     def listdir(self, path):
-        pass
+        return self.client.list(path)
 
     def makedir(self, path, permissions=None, recreate=False):
-        pass
+        self.client.mkdir(path)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
-        pass
+        return open(path, mode, buffering, **options)
 
     def remove(self, path):
         pass
