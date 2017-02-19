@@ -41,7 +41,7 @@ setup(
     license="BSD",
     long_description=DESCRIPTION,
     name='fs',
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests",)),
     platforms=['any'],
     test_suite="nose.collector",
     tests_require=['appdirs', 'mock', 'pytz', 'pyftpdlib'],
