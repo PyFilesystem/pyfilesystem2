@@ -25,7 +25,6 @@ REQUIREMENTS = [
     "appdirs~=1.4.0",
     "enum34~=1.1.6",
     "pytz",
-    "scandir~=1.3",
     "setuptools",
     "six~=1.10.0",
 ]
@@ -36,6 +35,9 @@ setup(
     classifiers=CLASSIFIERS,
     description="Filesystem abstraction layer",
     install_requires=REQUIREMENTS,
+    extras_require={
+        ':python_version=="2.7"': ['scandir~=1.3'],
+    },
     license="BSD",
     long_description=DESCRIPTION,
     name='fs',
