@@ -37,42 +37,42 @@ class TestFilesize(unittest.TestCase):
         )
 
         self.assertEqual(
-            filesize.traditional(1024 * 1024 + 65536),
-            '1.0 MB'
+            filesize.traditional(1.5 * 1024 * 1024),
+            '1.5 MB'
         )
 
     def test_decimal(self):
 
         self.assertEqual(
-            filesize.traditional(0),
+            filesize.decimal(0),
             '0 bytes'
         )
         self.assertEqual(
-            filesize.traditional(1),
+            filesize.decimal(1),
             '1 byte'
         )
         self.assertEqual(
-            filesize.traditional(2),
+            filesize.decimal(2),
             '2 bytes'
         )
         self.assertEqual(
-            filesize.traditional(1024),
-            '1.0 KB'
+            filesize.decimal(1000),
+            '1.0 kbit'
         )
 
         self.assertEqual(
-            filesize.traditional(1024 * 1024),
-            '1.0 MB'
+            filesize.decimal(1000 * 1000),
+            '1.0 Mbit'
         )
 
         self.assertEqual(
-            filesize.traditional(1024 * 1024 + 1),
-            '1.0 MB'
+            filesize.decimal(1000 * 1000 + 1),
+            '1.0 Mbit'
         )
 
         self.assertEqual(
-            filesize.traditional(1024 * 1024 + 65536),
-            '1.0 MB'
+            filesize.decimal(1200 * 1000),
+            '1.2 Mbit'
         )
 
     def test_errors(self):

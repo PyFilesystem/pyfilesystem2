@@ -73,7 +73,7 @@ def manage_ftp(ftp):
     finally:
         try:
             ftp.quit()
-        except:
+        except:  # pragma: nocover
             pass
 
 def parse_ftp_error(e):
@@ -142,12 +142,6 @@ class FTPFile(object):
     def __iter__(self):
         return line_iterator(self)
 
-    def _ftp_cmd(self, cmd):
-        self.ftp.sendcmd(_encode(cmd))
-
-    def _ftp_voidcmd(self, cmd):
-        self.ftp.voidcmd(_encode(cmd))
-
     def flush(self):
         pass
 
@@ -170,15 +164,6 @@ class FTPFile(object):
 
     def tell(self):
         return self.pos
-
-    def _open(self, pos=None):
-        with self._lock:
-            self._ftp_voidcmd('TYPE I')
-            conn = self.ftp.transfercmd(
-                _encode('RETR ' + self.path),
-                pos
-            )
-            return conn
 
     def read(self, size=None):
         if not self.mode.reading:
