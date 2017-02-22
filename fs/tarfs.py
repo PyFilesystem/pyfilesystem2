@@ -151,6 +151,7 @@ class WriteTarFS(WrapFS):
             defined in the tarfile module in the stdlib).
 
         """
+        print(type(file or self._file))
         if not self.isclosed():
             write_tar(
                 self._temp_fs,
@@ -190,11 +191,10 @@ class ReadTarFS(FS):
         super(ReadTarFS, self).__init__()
         self._file = file
         self.encoding = encoding
-        try:
+        if hasattr(file, 'read'):
             self._tar = tarfile.open(fileobj=file, mode='r')
-        except (TypeError, AttributeError):
+        else:
             self._tar = tarfile.open(file, mode='r')
-        self._directory_fs = None
 
     def __repr__(self):
         return "ReadTarFS({!r})".format(self._file)

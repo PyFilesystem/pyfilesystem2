@@ -87,9 +87,11 @@ class TestWriteXZippedTarFS(FSTestCases, unittest.TestCase):
 
     def destroy_fs(self, fs):
         fs.close()
+        self.assert_is_xz(fs)
+        os.remove(fs._tar_file)
         del fs._tar_file
 
-    def assert_is_xz(self):
+    def assert_is_xz(self, fs):
         try:
             tarfile.open(fs._tar_file, 'r:xz')
         except tarfile.ReadError:
@@ -104,20 +106,22 @@ class TestWriteBZippedTarFS(FSTestCases, unittest.TestCase):
     def make_fs(self):
         fh, _tar_file = tempfile.mkstemp()
         os.close(fh)
-        fs = tarfs.TarFS(_tar_file, write=True, compression="gz")
+        fs = tarfs.TarFS(_tar_file, write=True, compression="bz2")
         fs._tar_file = _tar_file
         return fs
 
     def destroy_fs(self, fs):
         fs.close()
+        self.assert_is_bzip(fs)
+        os.remove(fs._tar_file)
         del fs._tar_file
 
-    def assert_is_bzip(self):
+    def assert_is_bzip(self, fs):
         try:
             tarfile.open(fs._tar_file, 'r:bz2')
         except tarfile.ReadError:
             self.fail("{} is not a valid bz2 archive".format(fs._tar_file))
-        for other_comps in ['xz', 'gz', '']:
+        for other_comps in ['gz', '']:
             with self.assertRaises(tarfile.ReadError):
                 tarfile.open(fs._tar_file,
                              'r:{}'.format(other_comps))

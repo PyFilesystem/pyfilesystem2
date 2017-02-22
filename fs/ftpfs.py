@@ -112,7 +112,6 @@ class FTPFile(object):
                 _encode('RETR ' + self.path),
                 self.pos
             )
-
         return self._read_conn
 
     @property
@@ -156,9 +155,14 @@ class FTPFile(object):
                 try:
                     if self._write_conn is not None:
                         self._write_conn.close()
+                        self._write_conn = None
                     if self._read_conn is not None:
                         self._read_conn.close()
-                    self.ftp.quit()
+                        self._read_conn = None
+                    try:
+                        self.ftp.quit()
+                    except error_temp:  # pragma: nocover
+                        pass
                 finally:
                     self._closed = True
 
@@ -168,9 +172,6 @@ class FTPFile(object):
     def read(self, size=None):
         if not self.mode.reading:
             raise IOError('File not open for reading')
-
-        if size == 0:
-            return b''
 
         chunks = []
         remaining = size
@@ -184,7 +185,7 @@ class FTPFile(object):
                     read_size = min(DEFAULT_CHUNK_SIZE, remaining)
                 try:
                     chunk = conn.recv(read_size)
-                except socket.error:
+                except socket.error:  # pragma: nocover
                     break
                 if not chunk:
                     break
@@ -250,9 +251,7 @@ class FTPFile(object):
             elif whence == Seek.end:
                 file_size = self.fs.getsize(self.path)
                 new_pos = file_size + pos
-            if new_pos < 0:
-                raise ValueError("Can't seek before start of file")
-            self.pos = new_pos
+            self.pos = max(0, new_pos)
 
             self.ftp.quit()
             self.ftp = self._open_ftp()
@@ -262,7 +261,7 @@ class FTPFile(object):
                 self._read_conn = None
             if self._write_conn:
                 self._write_conn.close()
-                self.write_conn = None
+                self._write_conn = None
 
 
 class FTPFS(FS):
@@ -332,10 +331,12 @@ class FTPFS(FS):
 
     @property
     def ftp_url(self):
-        if self.port == 21:
-            return "ftp://{}".format(self.host)
-        else:
-            return "ftp://{}:{}".format(self.host, self.port)
+        url = (
+            "ftp://{}".format(self.host)
+            if self.port == 21
+            else "ftp://{}:{}".format(self.host, self.port)
+        )
+        return url
 
     @property
     def ftp(self):
