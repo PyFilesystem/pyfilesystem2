@@ -21,3 +21,8 @@ class TestWebDAVFS(FSTestCases, unittest.TestCase):
                  'password': conf['password']}
         root = conf['root']
         return webdavfs.WebDAVFS(url, creds, root)
+
+    def destroy_fs(self, fs):
+        for item in fs.client.list('/'):
+            fs.client.clean(item)
+        super(TestWebDAVFS, self).destroy_fs(fs)
