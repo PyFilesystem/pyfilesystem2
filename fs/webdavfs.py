@@ -1,3 +1,4 @@
+from contextlib import closing
 import io
 # from six.moves import http_cookiejar, http_client
 # from six.moves.urllib import parse as urllib_parse
@@ -204,7 +205,6 @@ class WebDAVFS(FS):
         _mode.validate_bin()
         self.check()
         self.validatepath(path)
-        buf = io.BytesIO()
 
         with self._lock:
             try:
@@ -257,3 +257,11 @@ class WebDAVFS(FS):
 
     def setinfo(self, path, info):
         pass
+
+    def create(self, path, wipe=False):
+        with self._lock:
+            if not wipe and self.exists(path):
+                return False
+            with closing(self.open(path, 'wb')) as new_file:
+                new_file.write(b'')
+            return True
