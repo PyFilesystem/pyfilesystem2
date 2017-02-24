@@ -30,16 +30,28 @@ class WebDAVFile(object):
         self.path = path
         self.res = self.fs.get_resource(self.path)
         self.mode = mode
+        self.data = self._get_file_data()
 
         self._lock = threading.RLock()
         self.pos = 0
         self.closed = False
 
         if 'a' in mode:
-            try:
-                self.pos = self.fs.getsize(self.path)
-            except errors.ResourceNotFound:
-                self.pos = 0
+            self.pos = self._get_data_size()
+
+    def _get_file_data(self):
+        data = io.BytesIO()
+        try:
+            self.res.write_to(data)
+            if not 'a' in self.mode:
+                data.seek(io.SEEK_SET)
+        except we.RemoteResourceNotFound:
+            data.write(b'')
+
+        return data
+
+    def _get_data_size(self):
+        return self.data.getbuffer().nbytes
 
     def __repr__(self):
         _repr = "WebDAVFile({!r}, {!r}, {!r})"
@@ -55,6 +67,9 @@ class WebDAVFile(object):
         return line_iterator(self)
 
     def close(self):
+        self.data.seek(io.SEEK_SET)
+        self.res.read_from(self.data)
+        self.data.close()
         if not self.closed:
             self.closed = True
 
@@ -80,13 +95,9 @@ class WebDAVFile(object):
         return lines
 
     def read(self, size=None):
-        with self._lock:
-            data_file = io.BytesIO()
-
-            self.res.write_to(data_file)
-
-            data_bytes = data_file.getvalue()
-            return data_bytes
+        if size:
+            self.pos += size
+        return self.data.read(size)
 
     def seek(self, pos, whence=Seek.set):
         if whence == Seek.set:
@@ -94,25 +105,24 @@ class WebDAVFile(object):
         elif whence == Seek.current:
             self.pos = self.pos + pos
         elif whence == Seek.end:
-            self.pos = max(0, self.fs.getsize(self.path) + pos)
+            self.pos = max(0, self._get_data_size() + pos)
         else:
             raise ValueError('invalid value for whence')
+
+        self.data.seek(self.pos)
 
     def tell(self):
         return self.pos
 
-    def write(self, data):
-        if self.pos > 0:
-            previous_data = self.read()
-            data_file = io.BytesIO(previous_data)
-            data_file.seek(self.pos)
-            data_file.write(data)
-            data_file.seek(io.SEEK_SET)
-        else:
-            data_file = io.BytesIO(data)
+    def truncate(self, size=None):
+        self.data.truncate(size)
+        data_size = self._get_data_size()
+        if size and data_size < size:
+            self.data.write(b'\0' * (size - data_size))
 
-        self.seek(1, Seek.current)
-        self.res.read_from(data_file)
+    def write(self, data):
+        self.data.write(data)
+        self.seek(len(data), Seek.current)
 
     def writelines(self, lines):
         self.write(b''.join(lines))
@@ -265,5 +275,5 @@ class WebDAVFS(FS):
             if not wipe and self.exists(path):
                 return False
             with closing(self.open(path, 'wb')) as new_file:
-                new_file.write(b'')
+                new_file.truncate(0)
             return True
