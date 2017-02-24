@@ -79,7 +79,7 @@ class WebDAVFile(object):
                 break
         return lines
 
-    def read(self):
+    def read(self, size=None):
         with self._lock:
             data_file = io.BytesIO()
 
@@ -111,6 +111,7 @@ class WebDAVFile(object):
         else:
             data_file = io.BytesIO(data)
 
+        self.seek(1, Seek.current)
         self.res.read_from(data_file)
 
     def writelines(self, lines):
@@ -256,7 +257,8 @@ class WebDAVFS(FS):
             resource.read_from(bin_file)
 
     def setinfo(self, path, info):
-        pass
+        if not self.exists(path):
+            raise errors.ResourceNotFound(path)
 
     def create(self, path, wipe=False):
         with self._lock:
