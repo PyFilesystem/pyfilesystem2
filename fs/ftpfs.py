@@ -141,6 +141,9 @@ class FTPFile(object):
     def __iter__(self):
         return line_iterator(self)
 
+    def __del__(self):
+        self.close()
+
     def flush(self):
         pass
 
@@ -679,6 +682,7 @@ class FTPFS(FS):
                 self.ftp.quit()
             except Exception:
                 pass
+            self._ftp = None
         super(FTPFS, self).close()
 
 

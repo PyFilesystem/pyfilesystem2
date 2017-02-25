@@ -111,7 +111,6 @@ class TestFTPErrors(unittest.TestCase):
                 raise error_perm('999 foo')
 
 
-
 @attr('slow')
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
@@ -127,7 +126,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
 
         server = subprocess.Popen(
             [
-                sys.executable,
+                "python2.7",
                 os.path.abspath(__file__),
                 temp_path,
                 text_type(_ftp_port)
