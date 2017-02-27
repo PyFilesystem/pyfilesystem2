@@ -45,7 +45,7 @@ class WebDAVFile(object):
             data = io.BytesIO()
             try:
                 self.res.write_to(data)
-                if not 'a' in self.mode:
+                if 'a' not in self.mode:
                     data.seek(io.SEEK_SET)
             except we.RemoteResourceNotFound:
                 data.write(b'')
@@ -53,7 +53,10 @@ class WebDAVFile(object):
             return data
 
     def _get_data_size(self):
-        return self.data.getbuffer().nbytes
+        if six.PY2:
+            return len(self.data.getvalue())
+        else:
+            return self.data.getbuffer().nbytes
 
     def __repr__(self):
         _repr = "WebDAVFile({!r}, {!r}, {!r})"
@@ -175,15 +178,17 @@ class WebDAVFS(FS):
 
         for key, val in six.iteritems(info):
             if key in basics:
-                info_dict['basic'][key] = val
+                info_dict['basic'][key] = six.u(val)
             elif key in details:
                 if key == 'size' and val:
                     val = int(val)
+                elif val:
+                    val = six.u(val)
                 info_dict['details'][key] = val
             elif key in access:
-                info_dict['access'][key] = val
+                info_dict['access'][key] = six.u(val)
             else:
-                info_dict['other'][key] = val
+                info_dict['other'][key] = six.u(val)
 
         return info_dict
 
@@ -233,7 +238,11 @@ class WebDAVFS(FS):
         if not self.isdir(_path):
             raise errors.DirectoryExpected(path)
 
-        return self.client.list(_path)
+        dir_list = self.client.list(_path)
+        if six.PY2:
+            dir_list = [six.u(item) for item in dir_list]
+
+        return dir_list
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
