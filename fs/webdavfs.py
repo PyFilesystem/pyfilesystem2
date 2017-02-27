@@ -1,8 +1,6 @@
 from contextlib import closing
 import io
 import os
-# from six.moves import http_cookiejar, http_client
-# from six.moves.urllib import parse as urllib_parse
 import six
 import threading
 
