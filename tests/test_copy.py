@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import time
 import unittest
 import tempfile
 import shutil
@@ -69,12 +70,86 @@ class TestCopy(unittest.TestCase):
             f.write('1' * write_chars)
         return filepath
 
+    def test_copy_file_if_newer_dst_older(self):
+        try:
+            #create first dst ==> dst is older the src ==> file should be copied
+            dst_dir = self._create_sandbox_dir()
+            dst_file1 = self._touch(dst_dir, "file1.txt")
+            self._write_file(dst_file1)
+
+            time.sleep(1) #sleep 1 sec to ensure dst_file1 is older
+
+            src_dir = self._create_sandbox_dir()
+            src_file1 = self._touch(src_dir, "file1.txt")
+            self._write_file(src_file1)
+
+            src_fs = open_fs('osfs://' + src_dir)
+            dst_fs = open_fs('osfs://' + dst_dir)
+
+            self.assertTrue(dst_fs.exists("/file1.txt"))
+
+            copied = fs.copy.copy_file_if_newer(src_fs, "/file1.txt", dst_fs, "/file1.txt")
+
+            self.assertEqual(copied, "/file1.txt")
+            self.assertTrue(dst_fs.exists("/file1.txt"))
+        finally:
+            shutil.rmtree(src_dir)
+            shutil.rmtree(dst_dir)
+
+    def test_copy_file_if_newer_dst_doesnt_exists(self):
+        try:
+            src_dir = self._create_sandbox_dir()
+            src_file1 = self._touch(src_dir, "file1.txt")
+            self._write_file(src_file1)
+
+            dst_dir = self._create_sandbox_dir()
+
+            src_fs = open_fs('osfs://' + src_dir)
+            dst_fs = open_fs('osfs://' + dst_dir)
+
+
+            copied = fs.copy.copy_file_if_newer(src_fs, "/file1.txt", dst_fs, "/file1.txt")
+
+            self.assertEqual(copied, "/file1.txt")
+            self.assertTrue(dst_fs.exists("/file1.txt"))
+        finally:
+            shutil.rmtree(src_dir)
+            shutil.rmtree(dst_dir)
+
+    def test_copy_file_if_newer_dst_is_newer(self):
+        try:
+            src_dir = self._create_sandbox_dir()
+            src_file1 = self._touch(src_dir, "file1.txt")
+            self._write_file(src_file1)
+
+            time.sleep(1) #sleep 1 sec to ensure src_file1 is older
+
+            dst_dir = self._create_sandbox_dir()
+            dst_file1 = self._touch(dst_dir, "file1.txt")
+            self._write_file(dst_file1)
+
+            src_fs = open_fs('osfs://' + src_dir)
+            dst_fs = open_fs('osfs://' + dst_dir)
+
+
+            self.assertTrue(dst_fs.exists("/file1.txt"))
+
+            copied = fs.copy.copy_file_if_newer(src_fs, "/file1.txt", dst_fs, "/file1.txt")
+
+            self.assertEqual(copied, None)
+        finally:
+            shutil.rmtree(src_dir)
+            shutil.rmtree(dst_dir)
+
+
     def test_copy_fs_if_newer_dst_older(self):
         try:
             #create first dst ==> dst is older the src ==> file should be copied
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
+
+            time.sleep(1) #sleep 1 sec to ensure dst_file1 is older
 
             src_dir = self._create_sandbox_dir()
             src_file1 = self._touch(src_dir, "file1.txt")
@@ -132,6 +207,8 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
 
+            time.sleep(1) #sleep 1 sec to ensure src_file1 is older
+
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
@@ -162,6 +239,8 @@ class TestCopy(unittest.TestCase):
 
             src_file2 = self._touch(src_dir, "one_level_down" + os.sep + "file2.txt")
             self._write_file(src_file2)
+
+            time.sleep(1) #sleep 1 sec to ensure src_file1 is older
 
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
