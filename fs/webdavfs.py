@@ -1,5 +1,6 @@
 from contextlib import closing
 import io
+import os
 # from six.moves import http_cookiejar, http_client
 # from six.moves.urllib import parse as urllib_parse
 import six
@@ -322,3 +323,38 @@ class WebDAVFS(FS):
             with closing(self.open(path, 'wb')) as new_file:
                 new_file.truncate(0)
             return True
+
+    def copy(self, src_path, dst_path, overwrite=False):
+        with self._lock:
+            if not overwrite and self.exists(dst_path):
+                raise errors.DestinationExists(dst_path)
+            try:
+                self.client.copy(src_path, dst_path)
+            except we.RemoteResourceNotFound:
+                raise errors.ResourceNotFound(src_path)
+            except we.RemoteParentNotFound:
+                raise errors.ResourceNotFound(dst_path)
+
+    def move(self, src_path, dst_path, overwrite=False):
+        if not overwrite and self.exists(dst_path):
+            raise errors.DestinationExists(dst_path)
+        if self.getmeta().get('supports_rename', False):
+            try:
+                src_sys_path = self.getsyspath(src_path)
+                dst_sys_path = self.getsyspath(dst_path)
+            except errors.NoSysPath:  # pragma: no cover
+                pass
+            else:
+                try:
+                    os.rename(src_sys_path, dst_sys_path)
+                except OSError:
+                    pass
+                else:
+                    return
+        with self._lock:
+            try:
+                self.client.move(src_path, dst_path)
+            except we.RemoteResourceNotFound:
+                raise errors.ResourceNotFound(src_path)
+            except we.RemoteParentNotFound:
+                raise errors.ResourceNotFound(dst_path)
