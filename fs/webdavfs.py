@@ -30,9 +30,9 @@ class WebDAVFile(object):
         self.path = path
         self.res = self.fs.get_resource(self.path)
         self.mode = mode
+        self._lock = threading.RLock()
         self.data = self._get_file_data()
 
-        self._lock = threading.RLock()
         self.pos = 0
         self.closed = False
 
@@ -40,15 +40,16 @@ class WebDAVFile(object):
             self.pos = self._get_data_size()
 
     def _get_file_data(self):
-        data = io.BytesIO()
-        try:
-            self.res.write_to(data)
-            if not 'a' in self.mode:
-                data.seek(io.SEEK_SET)
-        except we.RemoteResourceNotFound:
-            data.write(b'')
+        with self._lock:
+            data = io.BytesIO()
+            try:
+                self.res.write_to(data)
+                if not 'a' in self.mode:
+                    data.seek(io.SEEK_SET)
+            except we.RemoteResourceNotFound:
+                data.write(b'')
 
-        return data
+            return data
 
     def _get_data_size(self):
         return self.data.getbuffer().nbytes
@@ -67,9 +68,10 @@ class WebDAVFile(object):
         return line_iterator(self)
 
     def close(self):
-        self.data.seek(io.SEEK_SET)
-        self.res.read_from(self.data)
-        self.data.close()
+        with self._lock:
+            self.data.seek(io.SEEK_SET)
+            self.res.read_from(self.data)
+            self.data.close()
         if not self.closed:
             self.closed = True
 
@@ -129,6 +131,17 @@ class WebDAVFile(object):
 
 
 class WebDAVFS(FS):
+
+    _meta = {
+        'case_insensitive': False,
+        'invalid_path_chars': '\0',
+        'network': True,
+        'read_only': False,
+        'thread_safe': True,
+        'unicode_paths': True,
+        'virtual': False,
+    }
+
     def __init__(self, url, credentials=None, root=None):
         self.url = url
         self.credentials = credentials
@@ -173,6 +186,15 @@ class WebDAVFS(FS):
 
         return info_dict
 
+    def isdir(self, path):
+        try:
+            return self.client.is_dir(path)
+        except we.RemoteResourceNotFound:
+            return False
+
+    def exists(self, path):
+        return self.client.check(path)
+
     def getinfo(self, path, namespaces=None):
         self.check()
         _path = self.validatepath(path)
@@ -194,7 +216,7 @@ class WebDAVFS(FS):
         try:
             info = self.client.info(path)
             info_dict = self._create_info_dict(info)
-            if self.client.is_dir(path):
+            if self.isdir(path):
                 info_dict['basic']['is_dir'] = True
                 info_dict['details']['type'] = int(ResourceType.directory)
             return Info(info_dict)
@@ -202,14 +224,37 @@ class WebDAVFS(FS):
             raise errors.ResourceNotFound(path)
 
     def listdir(self, path):
-        if not self.client.check(path):
+        self.check()
+        _path = self.validatepath(path)
+
+        if not self.exists(_path):
             raise errors.ResourceNotFound(path)
-        if path in ('.', './'):
-            return self.client.list('/')
-        return self.client.list(path)
+        if not self.isdir(_path):
+            raise errors.DirectoryExpected(path)
+
+        return self.client.list(_path)
 
     def makedir(self, path, permissions=None, recreate=False):
-        self.client.mkdir(path)
+        self.check()
+        self.validatepath(path)
+        _path = abspath(normpath(path))
+
+        if _path == '/':
+            if recreate:
+                return self.opendir(path)
+            else:
+                raise errors.DirectoryExists(path)
+
+        if not (recreate and self.isdir(path)):
+            if self.exists(_path):
+                raise errors.DirectoryExists(path)
+
+            try:
+                self.client.mkdir(_path)
+            except we.RemoteParentNotFound:
+                raise errors.ResourceNotFound(path)
+
+        return self.opendir(path)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
         _mode = Mode(mode)
@@ -232,10 +277,10 @@ class WebDAVFS(FS):
         return wdfile
 
     def remove(self, path):
-        if not self.client.check(path):
+        if not self.exists(path):
             raise errors.ResourceNotFound(path)
 
-        if self.client.is_dir(path):
+        if self.isdir(path):
             raise errors.FileExpected(path)
 
         self.client.clean(path)
@@ -244,10 +289,10 @@ class WebDAVFS(FS):
         if path == '/':
             raise errors.RemoveRootError
 
-        if not self.client.check(path):
+        if not self.exists(path):
             raise errors.ResourceNotFound(path)
 
-        if not self.client.is_dir(path):
+        if not self.isdir(path):
             raise errors.DirectoryExpected(path)
 
         checklist = self.client.list(path)
