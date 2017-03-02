@@ -10,7 +10,7 @@ os:
   - linux
 
 before_install:
-  - pip install pip -U
+  - pip install setuptools pip -U
   - pip install -r testrequirements.txt
 
 install:
