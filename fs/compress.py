@@ -141,9 +141,9 @@ def write_tar(src_fs,
     ]
 
     mode = 'w:{}'.format(compression or '')
-    try:
+    if hasattr(file, 'write'):
         _tar = tarfile.open(fileobj=file, mode=mode)
-    except (TypeError, AttributeError):
+    else:
         _tar = tarfile.open(file, mode=mode)
 
     current_time = time.time()

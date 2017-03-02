@@ -747,6 +747,12 @@ class FSTestCases(object):
             f.write('Hello\nWorld\n')
             self.assertEqual(f.tell(), 12)
             f.writelines(['foo\n', 'bar\n', 'baz\n'])
+            with self.assertRaises(IOError):
+                f.read(1)
+
+        with self.fs.open('bin', 'wb') as f:
+            with self.assertRaises(IOError):
+                f.read(1)
 
         with self.fs.open('text', 'r') as f:
             repr(f)
@@ -755,12 +761,16 @@ class FSTestCases(object):
                 f.readlines(),
                 ['Hello\n', 'World\n', 'foo\n', 'bar\n', 'baz\n']
             )
+            with self.assertRaises(IOError):
+                f.write('no')
 
         with self.fs.open('text', 'rb') as f:
             self.assertEqual(
                 f.readlines(8),
                 [b'Hello\n', b'World\n']
             )
+            with self.assertRaises(IOError):
+                f.write('no')
 
         with self.fs.open('text', 'r') as f:
             self.assertEqual(
@@ -792,6 +802,10 @@ class FSTestCases(object):
             print(repr(self.fs))
             print(repr(f))
             self.assertEqual(f.read(), b'Hello\0\0\0\0\0')
+            f.seek(4)
+            f.write(b'O')
+            f.seek(4)
+            self.assertEqual(f.read(1), b'O')
 
     def test_openbin(self):
         # Write a binary file

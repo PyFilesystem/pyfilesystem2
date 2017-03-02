@@ -119,6 +119,9 @@ class RawWrapper(object):
     def __iter__(self):
         return iter(self._f)
 
+    def __del__(self):
+        self.close()
+
 
 def make_stream(name,
                 bin_file,

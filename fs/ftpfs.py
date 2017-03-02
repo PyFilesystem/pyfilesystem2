@@ -10,6 +10,7 @@ import threading
 
 from contextlib import contextmanager
 from ftplib import FTP
+from ftplib import error_reply
 from ftplib import error_perm
 from ftplib import error_temp
 
@@ -29,6 +30,9 @@ from .path import basename
 from .path import normpath
 from .path import split
 from . import _ftp_parse as ftp_parse
+
+
+__all__ = ['FTPFS']
 
 
 @contextmanager
@@ -62,6 +66,16 @@ def ftp_errors(fs, path=None):
         )
 
 
+@contextmanager
+def manage_ftp(ftp):
+    try:
+        yield ftp
+    finally:
+        try:
+            ftp.quit()
+        except:  # pragma: nocover
+            pass
+
 def parse_ftp_error(e):
     code, _, message = text_type(e).partition(' ')
     if code.isdigit():
@@ -74,36 +88,49 @@ def _encode(s):
 
 
 class FTPFile(object):
-    """
-    A binary file object for an ftp file.
-
-    You won't need to create these manually. They will be returned by
-    ``FTPFS`` objects when you open a file.
-
-    """
 
     def __init__(self, ftpfs, path, mode):
         self.fs = ftpfs
         self.path = path
-        self.mode = mode
-
-        self._lock = threading.RLock()
-        self.ftp = ftpfs._open_ftp()
-        self.ftp.voidcmd(_encode('TYPE I'))
+        self.mode = Mode(mode)
         self.pos = 0
-        self._socket = None
-        self.closed = False
+        self._lock = threading.Lock()
+        self.ftp = self._open_ftp()
+        self._read_conn = None
+        self._write_conn = None
+        self._closed = False
 
+    def _open_ftp(self):
+        ftp = self.fs._open_ftp()
+        ftp.voidcmd(_encode('TYPE I'))
+        return ftp
 
-        if 'a' in mode:
-            try:
-                self.pos = self.fs.getsize(self.path)
-            except errors.ResourceNotFound:
-                self.pos = 0
+    @property
+    def read_conn(self):
+        if self._read_conn is None:
+            self._read_conn = self.ftp.transfercmd(
+                _encode('RETR ' + self.path),
+                self.pos
+            )
+        return self._read_conn
+
+    @property
+    def write_conn(self):
+        if self._write_conn is None:
+            if self.mode.appending:
+                self._write_conn = self.ftp.transfercmd(
+                    _encode('APPE ' + self.path)
+                )
+            else:
+                self._write_conn = self.ftp.transfercmd(
+                    _encode('STOR ' + self.path),
+                    self.pos
+                )
+        return self._write_conn
 
     def __repr__(self):
-        _repr = "FTPFile({!r}, {!r}, {!r})"
-        return _repr.format(self.fs, self.path, self.mode)
+        _repr = "<ftpfile {!r} {!r} {!r}>"
+        return _repr.format(self.fs.ftp_url, self.path, self.mode)
 
     def __enter__(self):
         return self
@@ -114,10 +141,8 @@ class FTPFile(object):
     def __iter__(self):
         return line_iterator(self)
 
-    def close(self):
-        if not self.closed:
-            self.ftp.quit()
-            self.closed = True
+    def __del__(self):
+        self.close()
 
     def flush(self):
         pass
@@ -126,6 +151,52 @@ class FTPFile(object):
         return self.readline()
 
     __next__ = next
+
+    def close(self):
+        with self._lock:
+            if not self._closed:
+                try:
+                    if self._write_conn is not None:
+                        self._write_conn.close()
+                        self._write_conn = None
+                    if self._read_conn is not None:
+                        self._read_conn.close()
+                        self._read_conn = None
+                    try:
+                        self.ftp.quit()
+                    except error_temp:  # pragma: nocover
+                        pass
+                finally:
+                    self._closed = True
+
+    def tell(self):
+        return self.pos
+
+    def read(self, size=None):
+        if not self.mode.reading:
+            raise IOError('File not open for reading')
+
+        chunks = []
+        remaining = size
+
+        conn = self.read_conn
+        with self._lock:
+            while remaining is None or remaining:
+                if remaining is None:
+                    read_size = DEFAULT_CHUNK_SIZE
+                else:
+                    read_size = min(DEFAULT_CHUNK_SIZE, remaining)
+                try:
+                    chunk = conn.recv(read_size)
+                except socket.error:  # pragma: nocover
+                    break
+                if not chunk:
+                    break
+                chunks.append(chunk)
+                self.pos += len(chunk)
+                if remaining is not None:
+                    remaining -= len(chunk)
+        return b''.join(chunks)
 
     def readline(self, size=None):
         return next(line_iterator(self, size))
@@ -140,51 +211,24 @@ class FTPFile(object):
                 break
         return lines
 
-    def read(self, size=None):
+    def write(self, data):
+        if not self.mode.writing:
+            raise IOError('File not open for writing')
+
         with self._lock:
-            ftp = self.ftp
-            data_file = io.BytesIO()
-            bytes_remaining = size
+            conn = self.write_conn
+            data_pos = 0
+            remaining_data = len(data)
 
-            sock = self.ftp.transfercmd(
-                _encode('RETR {}'.format(self.path)),
-                self.pos
-            )
-            try:
-                while 1:
-                    chunk_size = (
-                        DEFAULT_CHUNK_SIZE
-                        if size is None
-                        else
-                        min(DEFAULT_CHUNK_SIZE, bytes_remaining)
-                    )
-                    chunk_bytes = sock.recv(chunk_size)
-                    if not chunk_bytes:
-                        break
-                    data_file.write(chunk_bytes)
-                    self.pos += len(chunk_bytes)
-                    if bytes_remaining is not None:
-                        bytes_remaining -= len(chunk_bytes)
-                        if not bytes_remaining:
-                            break
-                data_bytes = data_file.getvalue()
-                return data_bytes
-            finally:
-                ftp.voidresp()
-                sock.close()
+            while remaining_data:
+                chunk_size = min(remaining_data, DEFAULT_CHUNK_SIZE)
+                sent_size = conn.send(data[data_pos:data_pos + chunk_size])
+                data_pos += sent_size
+                remaining_data -= sent_size
+                self.pos += sent_size
 
-    def seek(self, pos, whence=Seek.set):
-        if whence == Seek.set:
-            self.pos = pos
-        elif whence == Seek.current:
-            self.pos = self.pos + pos
-        elif whence == Seek.end:
-            self.pos = max(0, self.fs.getsize(self.path) + pos)
-        else:
-            raise ValueError('invalid value for whence')
-
-    def tell(self):
-        return self.pos
+    def writelines(self, lines):
+        self.write(b''.join(lines))
 
     def truncate(self, size=None):
         # Inefficient, but I don't know if truncate is possible with ftp
@@ -198,23 +242,29 @@ class FTPFile(object):
                 if len(data) < size:
                     f.write(b'\0' * (size - len(data)))
 
-    def write(self, data):
 
-        def on_write(chunk):
-            self.pos += len(chunk)
+    def seek(self, pos, whence=Seek.set):
+        if whence not in (Seek.set, Seek.current, Seek.end):
+            raise ValueError('invalid value for whence')
+        with self._lock:
+            if whence == Seek.set:
+                new_pos = pos
+            elif whence == Seek.current:
+                new_pos = self.pos + pos
+            elif whence == Seek.end:
+                file_size = self.fs.getsize(self.path)
+                new_pos = file_size + pos
+            self.pos = max(0, new_pos)
 
-        data_file = io.BytesIO(data)
-        with ftp_errors(self.fs, self.path):
-            self.ftp.storbinary(
-                _encode('STOR {}'.format(self.path)),
-                data_file,
-                DEFAULT_CHUNK_SIZE,
-                on_write,
-                self.pos or None
-            )
+            self.ftp.quit()
+            self.ftp = self._open_ftp()
 
-    def writelines(self, lines):
-        self.write(b''.join(lines))
+            if self._read_conn:
+                self._read_conn.close()
+                self._read_conn = None
+            if self._write_conn:
+                self._write_conn.close()
+                self._write_conn = None
 
 
 class FTPFS(FS):
@@ -277,6 +327,19 @@ class FTPFS(FS):
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
         return _ftp
+
+    def _manage_ftp(self):
+        ftp = self._open_ftp()
+        return manage_ftp(ftp)
+
+    @property
+    def ftp_url(self):
+        url = (
+            "ftp://{}".format(self.host)
+            if self.port == 21
+            else "ftp://{}:{}".format(self.host, self.port)
+        )
+        return url
 
     @property
     def ftp(self):
@@ -571,12 +634,12 @@ class FTPFS(FS):
         _path = abspath(normpath(path))
         self.validatepath(path)
         with self._lock:
-            ftp = self._open_ftp()
-            with ftp_errors(self, path):
-                ftp.storbinary(
-                    "STOR {}".format(_encode(_path)),
-                    file
-                )
+            with self._manage_ftp() as ftp:
+                with ftp_errors(self, path):
+                    ftp.storbinary(
+                        "STOR {}".format(_encode(_path)),
+                        file
+                    )
 
     def setbytes(self, path, contents):
         if not isinstance(contents, bytes):
@@ -585,12 +648,12 @@ class FTPFS(FS):
         self.validatepath(path)
         bin_file = io.BytesIO(contents)
         with self._lock:
-            ftp = self._open_ftp()
-            with ftp_errors(self, path):
-                ftp.storbinary(
-                    "STOR {}".format(_encode(_path)),
-                    bin_file
-                )
+            with self._manage_ftp() as ftp:
+                with ftp_errors(self, path):
+                    ftp.storbinary(
+                        "STOR {}".format(_encode(_path)),
+                        bin_file
+                    )
 
     def setinfo(self, path, info):
         if not self.exists(path):
@@ -600,15 +663,15 @@ class FTPFS(FS):
         _path = abspath(normpath(path))
         data = io.BytesIO()
         with ftp_errors(self, path):
-            ftp = self._open_ftp()
-            try:
-                ftp.retrbinary("RETR {}".format(_path), data.write)
-            except error_perm as e:
-                code, _ = parse_ftp_error(e)
-                if code == 550:
-                    if self.isdir(path):
-                        raise errors.FileExpected(path)
-                raise
+            with self._manage_ftp() as ftp:
+                try:
+                    ftp.retrbinary("RETR {}".format(_path), data.write)
+                except error_perm as e:
+                    code, _ = parse_ftp_error(e)
+                    if code == 550:
+                        if self.isdir(path):
+                            raise errors.FileExpected(path)
+                    raise
 
         data_bytes = data.getvalue()
         return data_bytes
@@ -619,6 +682,7 @@ class FTPFS(FS):
                 self.ftp.quit()
             except Exception:
                 pass
+            self._ftp = None
         super(FTPFS, self).close()
 
 

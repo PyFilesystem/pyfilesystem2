@@ -99,6 +99,8 @@ class _MemoryFile(object):
             self.closed = True
 
     def read(self, size=None):
+        if not self._mode.reading:
+            raise IOError('File not open for reading')
         if size is None:
             size = -1
         with self._seek_lock():
@@ -127,6 +129,8 @@ class _MemoryFile(object):
                 self._bytes_io.write(b'\0' * (size - file_size))
 
     def write(self, data):
+        if not self._mode.writing:
+            raise IOError('File not open for writing')
         with self._seek_lock():
             self.on_modify()
             self._bytes_io.write(data)

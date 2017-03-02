@@ -5,12 +5,16 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
 
 os:
   - linux
 
 before_install:
+  - pip install setuptools pip -U
+  - pip --version
   - pip install -r testrequirements.txt
+  - pip freeze
 
 install:
   - pip install -e .
@@ -20,4 +24,4 @@ after_success:
 
 # command to run tests
 script:
-  - nosetests --with-coverage --cover-package=fs tests
+  - nosetests -v --with-coverage --cover-package=fs tests
