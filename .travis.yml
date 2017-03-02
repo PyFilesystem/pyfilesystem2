@@ -12,7 +12,7 @@ os:
 
 before_install:
   - pip install setuptools pip -U
-  - pip -v
+  - pip --version
   - pip install -r testrequirements.txt
   - pip freeze
 
@@ -24,4 +24,4 @@ after_success:
 
 # command to run tests
 script:
-  - nosetests --with-coverage --cover-package=fs tests
+  - nosetests -v --with-coverage --cover-package=fs tests
