@@ -126,7 +126,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
 
         server = subprocess.Popen(
             [
-                "python2.7",
+                sys.executable,
                 os.path.abspath(__file__),
                 temp_path,
                 text_type(_ftp_port)
