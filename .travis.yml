@@ -5,13 +5,16 @@ python:
   - "3.3"
   - "3.4"
   - "3.5"
+  - "3.6"
 
 os:
   - linux
 
 before_install:
   - pip install setuptools pip -U
+  - pip -v
   - pip install -r testrequirements.txt
+  - pip freeze
 
 install:
   - pip install -e .
