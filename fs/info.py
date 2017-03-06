@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 
+from . import filesize
 from .path import join
 from .enums import ResourceType
 from .permissions import Permissions

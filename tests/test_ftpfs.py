@@ -111,7 +111,6 @@ class TestFTPErrors(unittest.TestCase):
                 raise error_perm('999 foo')
 
 
-
 @attr('slow')
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
@@ -177,9 +176,14 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
             if sys.platform == 'win32':
                 os.popen('TASKKILL /PID {} /F'.format(server.pid))
             else:
-                os.system('kill {}'.format(server.pid))
+                server.terminate()
+                server.wait()
+                #os.system('kill {}'.format(server.pid))
         shutil.rmtree(self._temp_dir)
         super(TestFTPFS, self).tearDown()
+
+    def test_ftp_url(self):
+        self.assertTrue(self.fs.ftp_url.startswith('ftp://127.0.0.1'))
 
     def test_connection_error(self):
         from fs.ftpfs import FTPFS

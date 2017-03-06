@@ -15,6 +15,7 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.3',
     'Programming Language :: Python :: 3.4',
     'Programming Language :: Python :: 3.5',
+    'Programming Language :: Python :: 3.6',
     'Topic :: System :: Filesystems',
 ]
 
@@ -25,7 +26,6 @@ REQUIREMENTS = [
     "appdirs~=1.4.0",
     "enum34~=1.1.6",
     "pytz",
-    "scandir~=1.3",
     "setuptools",
     "six~=1.10.0",
 ]
@@ -36,10 +36,13 @@ setup(
     classifiers=CLASSIFIERS,
     description="Filesystem abstraction layer",
     install_requires=REQUIREMENTS,
+    extras_require={
+        ":python_version<'3.5'": ['scandir~=1.5'],
+    },
     license="BSD",
     long_description=DESCRIPTION,
     name='fs',
-    packages=find_packages(),
+    packages=find_packages(exclude=("tests",)),
     platforms=['any'],
     test_suite="nose.collector",
     tests_require=['appdirs', 'mock', 'pytz', 'pyftpdlib'],

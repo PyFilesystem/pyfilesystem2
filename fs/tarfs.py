@@ -64,9 +64,9 @@ class TarFS(WrapFS):
 
     _compression_formats = {
         #FMT    #UNIX      #MSDOS
-        'xz':  ('.tar.xz',  '.txz'),
+        'xz': ('.tar.xz', '.txz'),
         'bz2': ('.tar.bz2', '.tbz'),
-        'gz':  ('.tar.gz',  '.tgz'),
+        'gz': ('.tar.gz', '.tgz'),
     }
 
     def __new__(cls,
@@ -151,6 +151,7 @@ class WriteTarFS(WrapFS):
             defined in the tarfile module in the stdlib).
 
         """
+        print(type(file or self._file))
         if not self.isclosed():
             write_tar(
                 self._temp_fs,
@@ -190,11 +191,10 @@ class ReadTarFS(FS):
         super(ReadTarFS, self).__init__()
         self._file = file
         self.encoding = encoding
-        try:
+        if hasattr(file, 'read'):
             self._tar = tarfile.open(fileobj=file, mode='r')
-        except (TypeError, AttributeError):
+        else:
             self._tar = tarfile.open(file, mode='r')
-        self._directory_fs = None
 
     def __repr__(self):
         return "ReadTarFS({!r})".format(self._file)
@@ -225,10 +225,9 @@ class ReadTarFS(FS):
                 raise errors.ResourceNotFound(path)
 
 
-            raw_tar_info = member.get_info(
-                *([self.encoding, None]
-                if six.PY2 else [])
-            )
+            raw_tar_info = member.get_info(*(
+                [self.encoding, None] if six.PY2 else []
+            ))
 
             raw_tar_info.update({
                 k.replace('is', 'is_'):getattr(member, k)()
@@ -247,11 +246,11 @@ class ReadTarFS(FS):
                     "type": int(self.type_map[member.type]),
                     "modified": member.mtime,
                 },
-                "access": {
+                "access":
+                {
                     "gid": member.gid,
                     "group": member.gname,
-                    "permissions":\
-                        Permissions.create(member.mode).dump(),
+                    "permissions": Permissions(mode=member.mode).dump(),
                     "uid": member.uid,
                     "user": member.uname,
                 },
@@ -278,14 +277,14 @@ class ReadTarFS(FS):
         return [
             basename(member.name)
             for member in self._tar
-            if dirname(member.path)==path
+            if dirname(member.path) == path
         ]
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
         raise errors.ResourceReadOnly(path)
 
-    def openbin(self, path, mode="r", buffering=-1, **kwargs):
+    def openbin(self, path, mode="r", buffering=-1, **options):
         self.check()
         path = relpath(normpath(path))
 
