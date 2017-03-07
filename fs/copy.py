@@ -13,9 +13,10 @@ from .path import abspath
 from .path import combine
 from .path import frombase
 from .path import normpath
+from .errors import FSError
 
 
-def copy_fs(src_fs, dst_fs, walker=None):
+def copy_fs(src_fs, dst_fs, walker=None, callback=None):
     """
     Copy the contents of one filesystem to another.
 
@@ -32,11 +33,11 @@ def copy_fs(src_fs, dst_fs, walker=None):
     :returns: a list with the copied files dst_path.
 
     """
-    return copy_dir(src_fs, '/', dst_fs, '/', walker=walker)
+    return copy_dir(src_fs, '/', dst_fs, '/', walker=walker, callback=callback)
 
 
-def copy_fs_if_newer(src_fs, dst_fs, walker=None):
-    return copy_dir_if_newer(src_fs, '/', dst_fs, '/', walker=walker)
+def copy_fs_if_newer(src_fs, dst_fs, walker=None, callback=None):
+    return copy_dir_if_newer(src_fs, '/', dst_fs, '/', walker=walker, callback=callback)
 
 
 def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
@@ -59,9 +60,18 @@ def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
         if not dst_fs.exists(dst_path):
             return True
         else:
-            nmsp = ('details', 'modified')
-            return src_fs.getinfo(src_path, nmsp).modified > dst_fs.getinfo(dst_path, nmsp).modified
-    except Exception as ex:
+            namespace = ('details', 'modified')
+
+            src_modified = src_fs.getinfo(src_path, namespace).modified
+            if src_modified is None:
+                return True
+
+            dst_modified = dst_fs.getinfo(dst_path, namespace).modified
+            if dst_modified is None:
+                return True
+
+            return src_modified > dst_modified
+    except FSError:
         #todo: should log something here
         #log.error("cannot determine if source file " + src_path + " is newer than destination file " + dst_path + ", thus safely copy the file')
         return True
@@ -83,40 +93,58 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
     :type dst_path: str
 
     """
-    with manage_fs(src_fs, writeable=False) as src_fs:
-        with manage_fs(dst_fs, create=True) as dst_fs:
-            if src_fs is dst_fs:
-                # Same filesystem, so we can do a potentially optimized copy
-                src_fs.copy(src_path, dst_path, overwrite=True)
-                return dst_path
-            else:
-                # Standard copy
-                with src_fs.lock(), dst_fs.lock():
-                    with src_fs.open(src_path, 'rb') as read_file:
-                        # There may be an optimized copy available on dst_fs
-                        dst_fs.setbinfile(dst_path, read_file)
-                        return dst_path
-
-def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
-    with manage_fs(src_fs, writeable=False) as src_fs:
-        with manage_fs(dst_fs, create=True) as dst_fs:
-            if src_fs is dst_fs:
-                # Same filesystem, so we can do a potentially optimized copy
-                if _source_is_newer(src_fs, src_path, dst_fs, dst_path):
+    try:
+        with manage_fs(src_fs, writeable=False) as src_fs:
+            with manage_fs(dst_fs, create=True) as dst_fs:
+                if src_fs is dst_fs:
+                    # Same filesystem, so we can do a potentially optimized copy
                     src_fs.copy(src_path, dst_path, overwrite=True)
-                    return dst_path
+                    return True
                 else:
-                    return None
-            else:
-                # Standard copy
-                with src_fs.lock(), dst_fs.lock():
-                    if _source_is_newer(src_fs, src_path, dst_fs, dst_path):
+                    # Standard copy
+                    with src_fs.lock(), dst_fs.lock():
                         with src_fs.open(src_path, 'rb') as read_file:
                             # There may be an optimized copy available on dst_fs
                             dst_fs.setbinfile(dst_path, read_file)
-                            return dst_path
+                            return True
+    except IOError:
+        #todo: should log something here?
+        return False
+    except FSError:
+        #todo: should log something here?
+        return False
+    return False
+
+
+def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
+    try:
+        with manage_fs(src_fs, writeable=False) as src_fs:
+            with manage_fs(dst_fs, create=True) as dst_fs:
+                if src_fs is dst_fs:
+                    # Same filesystem, so we can do a potentially optimized copy
+                    if _source_is_newer(src_fs, src_path, dst_fs, dst_path):
+                        src_fs.copy(src_path, dst_path, overwrite=True)
+                        return True
                     else:
-                        return None
+                        return False
+                else:
+                    # Standard copy
+                    with src_fs.lock(), dst_fs.lock():
+                        if _source_is_newer(src_fs, src_path, dst_fs, dst_path):
+                            with src_fs.open(src_path, 'rb') as read_file:
+                                # There may be an optimized copy available on dst_fs
+                                dst_fs.setbinfile(dst_path, read_file)
+                                return True
+                        else:
+                            return False
+    except IOError:
+        #todo: should log something here?
+        return False
+    except FSError:
+        #todo: should log something here?
+        return False
+    return False
+
 
 def copy_structure(src_fs, dst_fs, walker=None):
     """
@@ -140,7 +168,7 @@ def copy_structure(src_fs, dst_fs, walker=None):
                     dst_fs.makedir(dir_path, recreate=True)
 
 
-def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None):
+def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None, callback=None):
     """
     Copy a directory from one filesystem to another.
 
@@ -162,7 +190,6 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None):
     walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
-    files_copied = []
     with manage_fs(src_fs, writeable=False) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
@@ -184,22 +211,28 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None):
                             dst_fs,
                             info.make_path(copy_path)
                         )
-                        if file_copied is not None:
-                            files_copied.append(file_copied)
-    return files_copied
+                        if file_copied:
+                            if callback is not None:
+                                callback(src_fs, dir_path, dst_fs, copy_path)
 
-def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path, walker=None):
+
+def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path, walker=None, callback=None):
     walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
-    files_copied = []
     with manage_fs(src_fs, writeable=False) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
                 dst_fs.makedir(_dst_path, recreate=True)
-                nmsp = ('details', 'modified')
-                dst_state = {fp: i for fp, i in walker.info(dst_fs, _dst_path, nmsp) if i.is_file}
-                src_state = [(fp, i) for fp, i in walker.info(src_fs, _src_path, nmsp)]
+                namespace = ('details', 'modified')
+                dst_state = {
+                    filepath: info
+                    for filepath, info in walker.info(dst_fs, _dst_path, namespace)
+                    if info.is_file
+                }
+                src_state = [
+                    (filepath, info) for filepath, info in walker.info(src_fs, _src_path, namespace)
+                ]
                 for dir_path, copy_info in src_state:
                     copy_path = combine(
                         _dst_path,
@@ -208,19 +241,33 @@ def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path, walker=None):
                     if copy_info.is_dir:
                         dst_fs.makedir(copy_path, recreate=True)
                     if copy_info.is_file:
-                        if dir_path in dst_state:
-                            if copy_info.modified <= dst_state[dir_path].modified:
-                                #src not newer than dst => nothing to do
-                                continue
-                        #copy file, because src is newer or dst doesn't exist
-                        file_copied = copy_file(
-                            src_fs,
-                            dir_path,
-                            dst_fs,
-                            copy_path
-                        )
-                        if file_copied is not None:
-                            files_copied.append(file_copied)
-    return files_copied
+                        do_copy = False
+                        if dir_path not in dst_state:
+                            #dst file is not present
+                            do_copy = True
+                        else:
+                            #dst file is present, try to figure out if copy is necessary
+                            src_modified = copy_info.modified
+                            if src_modified is None:
+                                #cannot retrieve src modified timestamp => file will be copied
+                                do_copy = True
+                            dst_modified = dst_state[dir_path].modified
+                            if dst_modified is None:
+                                #cannot retrieve dst modified timestamp => file will be copied
+                                do_copy = True
+                            if src_modified > dst_modified:
+                                #src file is newer than dst file => file will be copied
+                                do_copy = True
+                        if do_copy:
+                            file_copied = copy_file(
+                                src_fs,
+                                dir_path,
+                                dst_fs,
+                                copy_path
+                            )
+                            if file_copied:
+                                if callback is not None:
+                                    callback(src_fs, dir_path, dst_fs, copy_path)
+
 
 

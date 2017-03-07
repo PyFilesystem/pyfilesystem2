@@ -77,8 +77,6 @@ class TestCopy(unittest.TestCase):
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
 
-            time.sleep(1) #sleep 1 sec to ensure dst_file1 is older
-
             src_dir = self._create_sandbox_dir()
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
@@ -90,7 +88,7 @@ class TestCopy(unittest.TestCase):
 
             copied = fs.copy.copy_file_if_newer(src_fs, "/file1.txt", dst_fs, "/file1.txt")
 
-            self.assertEqual(copied, "/file1.txt")
+            self.assertTrue(copied)
             self.assertTrue(dst_fs.exists("/file1.txt"))
         finally:
             shutil.rmtree(src_dir)
@@ -110,7 +108,7 @@ class TestCopy(unittest.TestCase):
 
             copied = fs.copy.copy_file_if_newer(src_fs, "/file1.txt", dst_fs, "/file1.txt")
 
-            self.assertEqual(copied, "/file1.txt")
+            self.assertTrue(copied)
             self.assertTrue(dst_fs.exists("/file1.txt"))
         finally:
             shutil.rmtree(src_dir)
@@ -121,8 +119,6 @@ class TestCopy(unittest.TestCase):
             src_dir = self._create_sandbox_dir()
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
-
-            time.sleep(1) #sleep 1 sec to ensure src_file1 is older
 
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
@@ -136,7 +132,7 @@ class TestCopy(unittest.TestCase):
 
             copied = fs.copy.copy_file_if_newer(src_fs, "/file1.txt", dst_fs, "/file1.txt")
 
-            self.assertEqual(copied, None)
+            self.assertEqual(copied, False)
         finally:
             shutil.rmtree(src_dir)
             shutil.rmtree(dst_dir)
@@ -149,8 +145,6 @@ class TestCopy(unittest.TestCase):
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
 
-            time.sleep(1) #sleep 1 sec to ensure dst_file1 is older
-
             src_dir = self._create_sandbox_dir()
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
@@ -160,7 +154,11 @@ class TestCopy(unittest.TestCase):
 
             self.assertTrue(dst_fs.exists("/file1.txt"))
 
-            copied = fs.copy.copy_fs_if_newer(src_fs, dst_fs)
+            copied = []
+            def callback(src_fs, src_path, dst_fs, dst_path):
+                copied.append(dst_path)
+
+            fs.copy.copy_fs_if_newer(src_fs, dst_fs, callback=callback)
 
             self.assertEqual(copied, ["/file1.txt"])
             self.assertTrue(dst_fs.exists("/file1.txt"))
@@ -186,8 +184,11 @@ class TestCopy(unittest.TestCase):
             src_fs = open_fs('osfs://' + src_dir)
             dst_fs = open_fs('osfs://' + dst_dir)
 
+            copied = []
+            def callback(src_fs, src_path, dst_fs, dst_path):
+                copied.append(dst_path)
 
-            copied = fs.copy.copy_fs_if_newer(src_fs, dst_fs)
+            fs.copy.copy_fs_if_newer(src_fs, dst_fs, callback=callback)
 
             self.assertEqual(copied, ["/file1.txt", "/one_level_down/file2.txt"])
             self.assertTrue(dst_fs.exists("/file1.txt"))
@@ -207,8 +208,6 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
 
-            time.sleep(1) #sleep 1 sec to ensure src_file1 is older
-
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
@@ -218,7 +217,11 @@ class TestCopy(unittest.TestCase):
 
             self.assertTrue(dst_fs.exists("/file1.txt"))
 
-            copied = fs.copy.copy_fs_if_newer(src_fs, dst_fs)
+            copied = []
+            def callback(src_fs, src_path, dst_fs, dst_path):
+                copied.append(dst_path)
+
+            fs.copy.copy_fs_if_newer(src_fs, dst_fs, callback=callback)
 
             self.assertEqual(copied, [])
             self.assertTrue(dst_fs.exists("/file1.txt"))
@@ -240,8 +243,6 @@ class TestCopy(unittest.TestCase):
             src_file2 = self._touch(src_dir, "one_level_down" + os.sep + "file2.txt")
             self._write_file(src_file2)
 
-            time.sleep(1) #sleep 1 sec to ensure src_file1 is older
-
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
@@ -249,7 +250,11 @@ class TestCopy(unittest.TestCase):
             src_fs = open_fs('osfs://' + src_dir)
             dst_fs = open_fs('osfs://' + dst_dir)
 
-            copied = fs.copy.copy_dir_if_newer(src_fs, "/", dst_fs, "/")
+            copied = []
+            def callback(src_fs, src_path, dst_fs, dst_path):
+                copied.append(dst_path)
+
+            fs.copy.copy_dir_if_newer(src_fs, "/", dst_fs, "/", callback=callback)
 
             self.assertEqual(copied, ["/one_level_down/file2.txt"])
             self.assertTrue(dst_fs.exists("/one_level_down/file2.txt"))
@@ -271,7 +276,11 @@ class TestCopy(unittest.TestCase):
             src_fs = open_fs('osfs://' + src_dir)
             # dst_fs = open_fs('osfs://' + dst_dir)
 
-            copied = fs.copy.copy_dir_if_newer(src_fs, "/src", src_fs, "/dst")
+            copied = []
+            def callback(src_fs, src_path, dst_fs, dst_path):
+                copied.append(dst_path)            
+
+            fs.copy.copy_dir_if_newer(src_fs, "/src", src_fs, "/dst", callback=callback)
 
             self.assertEqual(copied, ["/dst/file1.txt"])
             self.assertTrue(src_fs.exists("/dst/file1.txt"))
