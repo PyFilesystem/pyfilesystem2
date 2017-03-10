@@ -5,3 +5,4 @@ pyftpdlib==1.5.1
 python-coveralls
 pytz==2016.7
 nose
+webdavclient==1.0.8
