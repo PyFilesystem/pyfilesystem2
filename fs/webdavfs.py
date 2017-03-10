@@ -69,16 +69,18 @@ class WebDAVFile(object):
     def __iter__(self):
         return line_iterator(self)
 
+    def __del__(self):
+        self.close()
+
     def close(self):
-        with self._lock:
-            self.data.seek(io.SEEK_SET)
-            self.res.read_from(self.data)
-            self.data.close()
         if not self.closed:
+            self.flush()
+            self.data.close()
             self.closed = True
 
     def flush(self):
-        pass
+        self.data.seek(io.SEEK_SET)
+        self.res.read_from(self.data)
 
     def next(self):
         return self.readline()
