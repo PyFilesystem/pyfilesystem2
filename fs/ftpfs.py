@@ -436,7 +436,7 @@ class FTPFS(FS):
     @classmethod
     def _parse_mlsx(cls, lines):
         for line in lines:
-            name, facts = cls._parse_facts(line)
+            name, facts = cls._parse_facts(line.strip())
             if name is None:
                 continue
             is_dir = facts.get('type', None) in ('dir', 'cdir', 'pdir')
@@ -494,22 +494,17 @@ class FTPFS(FS):
                     )
                 if PY2:
                     response = response.decode('utf-8')
-                lines = [
-                    line[1:]
-                    for line in response.splitlines()
-                    if line.startswith(' ')
-                ]
+                lines = response.splitlines()[1:-1]
                 for raw_info in self._parse_mlsx(lines):
-                    break
-            return Info(raw_info)
-        else:
-            with ftp_errors(self, path=path):
-                dir_name, file_name = split(_path)
-                directory = self._read_dir(dir_name)
-                if file_name not in directory:
-                    raise errors.ResourceNotFound(path)
-                info = directory[file_name]
-                return info
+                    return Info(raw_info)
+
+        with ftp_errors(self, path=path):
+            dir_name, file_name = split(_path)
+            directory = self._read_dir(dir_name)
+            if file_name not in directory:
+                raise errors.ResourceNotFound(path)
+            info = directory[file_name]
+            return info
 
     def listdir(self, path):
         self.check()
@@ -614,12 +609,13 @@ class FTPFS(FS):
                         if not self.getinfo(path).is_dir:
                             raise errors.DirectoryExpected(path)
                         raise # pragma: no cover
-                for raw_info in self._parse_mlsx(lines):
-                    yield Info(raw_info)
-            else:
-                with self._lock:
-                    for info in self._read_dir(_path).values():
-                        yield info
+                if lines:
+                    for raw_info in self._parse_mlsx(lines):
+                        yield Info(raw_info)
+                    return
+            with self._lock:
+                for info in self._read_dir(_path).values():
+                    yield info
 
     def scandir(self, path, namespaces=None, page=None):
         if not self.supports_mlst and not self.getinfo(path).is_dir:
