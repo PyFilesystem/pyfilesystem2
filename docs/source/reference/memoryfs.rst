@@ -1,7 +1,7 @@
-Memory Filesystem
+内存文件系统
 =================
 
-Create and manage an in-memory filesystems.
+创建和管理内存文件系统。
 
 .. automodule:: fs.memoryfs
     :members:

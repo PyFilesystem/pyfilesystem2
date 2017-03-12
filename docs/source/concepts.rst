@@ -1,84 +1,56 @@
 ..  _concepts:
 
-Concepts
+概念
 ========
 
-The following describes some core concepts when working with
-PyFilesystem. If you are skimming this documentation, pay particular
-attention to the first section on paths.
+下面介绍使用PyFilesystem时的一些核心概念。 如果你在阅读本文档，请特别注意路径的第一部分。
 
 ..  _paths:
 
-Paths
+路径
 -----
 
-With the possible exception of the constructor, all paths in a
-filesystem are *PyFilesystem paths*, which have the following
-properties:
+除了构造函数可能例外，文件系统中的所有路径都是 *PyFilesystem paths* ，它们具有以下属性：
 
- * Paths are ``str`` type in Python3, and ``unicode`` in Python2
- * Path components are separated by a forward slash (``/``)
- * Paths beginning with a ``/`` are *absolute*
- * Paths not beginning with a forward slash are *relative*
- * A single dot (``.``) means 'current directory'
- * A double dot (``..``) means 'previous directory'
+ * 路径在Python3中是 ``str`` 类型，在Python2中是 ``unicode``
+ * 路径组件由正斜杠（ ``/`` ）分隔
+ * 以 ``/`` 开头的路径是 *绝对路径*
+ * 不以正斜杠开头的路径是 *相对路径*
+ * 单个点（ ``.`` ）意味着 ``当前目录``
+ * 双点（ ``..`` ）意味着 ``上级目录``
 
-Note that paths used by the FS interface will use this format, but the
-constructor may not. Notably the :class:`~fs.osfs.OSFS` constructor which
-requires an OS path -- the format of which is platform-dependent.
+请注意，FS接口使用的路径将使用此格式，但构造函数可能不使用。 值得注意的是 :class:`~fs.osfs.OSFS` 构造函数，它需要一个操作系统路径 - 其格式是平台相关的。
 
 .. note::
-    There are many helpful functions for working with paths in the
-    :mod:`~fs.path` module.
+    在 :mod:`~fs.path` 模块中有许多有用的函数用于处理路径。
 
-PyFilesystem paths are platform-independent, and will be automatically
-converted to the format expected by your operating system -- so you
-won't need to make any modifications to your filesystem code to make it
-run on other platforms.
+PyFilesystem路径是与平台无关的，并且会自动转换为操作系统预期的格式 - 因此您不需要对文件系统代码进行任何修改，以使其在其他平台上运行。
 
-System Paths
+系统路径
 ------------
 
-Not all Python modules can use file-like objects, especially those which
-interface with C libraries. For these situations you will need to
-retrieve the *system path*. You can do this with the
-:meth:`~fs.base.FS.getsyspath` method which converts a valid path in the
-context of the FS object to an absolute path that would be understood by
-your OS.
+不是所有的Python模块都可以使用类似文件的对象，特别是那些与C库接口的对象。 对于这些情况，您将需要检索 *系统路径* 。您可以使用 :meth:`~fs.base.FS.getsyspath` 方法，将FS对象上下文中的有效路径转换为操作系统可以理解的绝对路径。
 
-For example::
+例如::
 
     >>> from fs.osfs import OSFS
     >>> home_fs = OSFS('~/')
     >>> home_fs.getsyspath('test.txt')
     '/home/will/test.txt'
 
-Not all filesystems map to a system path (for example, files in a
-:meth:`~fs.memoryfs.MemoryFS` will only ever exists in memory).
+不是所有的文件系统都映射到系统路径（例如： :class:`~fs.memoryfs.MemoryFS` 中的文件将只存在于内存中）。
 
-If you call ``getsyspath`` on a filesystem which doesn't map to a system
-path, it will raise a :meth:`~fs.errors.NoSysPath` exception. If you
-prefer a *look before you leap* approach, you can check if a resource
-has a system path by calling :meth:`~fs.base.FS.hassyspath`
+如果你在一个不映射到系统路径的文件系统上调用 ``getsyspath`` ，它将引发一个 :meth:`~fs.errors.NoSysPath` 异常。如果你喜欢跳回之前看的内容，你可以通过调用 :meth:`~fs.base.FS.hassyspath` 来检查资源是否有系统路径。
 
 
-Sandboxing
+沙盒
 ----------
 
-FS objects are not permitted to work with any files outside of their
-*root*. If you attempt to open a file or directory outside the
-filesystem instance (with a backref such as ``"../foo.txt"``), a
-:class:`~fs.errors.IllegalBackReference` exception will be thrown. This
-ensures that any code using a FS object won't be able to read or modify
-anything you didn't intend it to, thus limiting the scope of any bugs.
+FS对象不允许使用其 *root* 之外的任何文件。如果你试图打开文件系统实例之外的文件或目录（带有一个上级引用，如 ``"../ foo.txt"`` ），那么将抛出 :class:`~fs.errors.IllegalBackReference` 异常。这确保任何使用FS对象的代码将无法读取或修改您不想要的任何内容，从而限制任何出错范围。
 
-Unlike your OS, there is no concept of a current working directory in
-PyFilesystem. If you want to work with a sub-directory of an FS object,
-you can use the :meth:`~fs.base.FS.opendir` method which returns another
-FS object representing the contents of that sub-directory.
+与您的操作系统不同，PyFilesystem中没有当前工作目录的概念。如果要使用FS对象的子目录，可以使用 :meth:`~fs.base.FS.opendir` 方法，该方法返回表示该子目录的内容的另一个FS对象。
 
-For example, consider the following directory structure. The directory
-``foo`` contains two sub-directories; ``bar`` and ``baz``::
+例如，考虑以下目录结构。目录 ``foo`` 包含两个子目录; ``bar`` 和 ``baz`` ::
 
      --foo
        |--bar
@@ -88,37 +60,25 @@ For example, consider the following directory structure. The directory
           |--private.txt
           `--dontopen.jpg
 
-We can open the ``foo`` directory with the following code::
+我们可以用下面的代码打开 ``foo`` 目录::
 
     from fs.osfs import OSFS
     foo_fs = OSFS('foo')
 
-The ``foo_fs`` object can work with any of the contents of ``bar`` and
-``baz``, which may not be desirable if we are passing ``foo_fs`` to a
-function that has the potential to delete files. Fortunately we can
-isolate a single sub-directory with the :meth:`~fs.base.FS.opendir`
-method::
+如果我们传递 ``foo_fs`` 一个有可能会删除文件的函数,``foo_fs`` 对象可以使用 ``bar`` 和 ``baz`` 的任何内容可能不是所期望的。幸运的是我们可以用一个子目录 :meth:`~fs.base.FS.opendir` 方法::
 
     bar_fs = foo_fs.opendir('bar')
 
-This creates a completely new FS object that represents everything in
-the ``foo/bar`` directory. The root directory of ``bar_fs`` has been re-
-position, so that from ``bar_fs``'s point of view, the readme.txt and
-photo.jpg files are in the root::
+这将创建一个全新的FS对象，代表 ``foo / bar`` 目录中的所有内容。 ``bar_fs`` 的根目录已经被重新定位，所以从 ``bar_fs`` 的角度来看，readme.txt和photo.jpg文件在根目录下::
 
     --bar
       |--readme.txt
       `--photo.jpg
 
 .. note::
-    This *sandboxing* only works if your code uses the filesystem
-    interface exclusively. It won't prevent code using standard OS level
-    file manipulation.
+    *沙箱* 只在你的代码使用本模块的文件系统接口时才有效。 它不会阻止使用标准操作系统级别文件操作的代码。
 
-
-Errors
+错误
 ------
 
-PyFilesystem converts errors in to a common exception hierarchy. This
-ensures that error handling code can be written once, regardless of the
-filesystem being used. See :mod:`~fs.errors` for details.
+PyFilesystem将错误转换为公共异常层次结构。 这确保错误处理代码可以写入一次，而不管使用的文件系统。 有关详细信息，请参阅 :mod:`~fs.errors` 。

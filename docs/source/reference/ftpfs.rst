@@ -1,7 +1,7 @@
-FTP Filesystem
+FTP 文件系统
 ==============
 
-Manage resources on a FTP server.
+管理FTP服务器上的资源。
 
 .. automodule:: fs.ftpfs
     :members:

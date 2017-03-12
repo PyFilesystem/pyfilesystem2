@@ -1,9 +1,9 @@
-OS Filesystem
-=============
+操作系统文件系统
+=================
 
-Manage the filesystem provided by your OS.
+管理操作系统提供的文件系统。
 
-In essence an ``OSFS`` is a thin layer over the ``io`` and ``os`` modules in the Python library.
+本质上， ``OSFS`` 是Python库中的 ``io`` 和 ``os`` 模块的一个兼容层。
 
 .. automodule:: fs.osfs
     :members:

@@ -1,70 +1,68 @@
-Guide
-=====
+指南
+==============
 
-The PyFilesytem interface simplifies most aspects of working with files and directories. This guide covers what you need to know about working with FS objects.
+PyFilesytem 接口简化了处理文件和目录的大多数方面。本指南涵盖了使用 FS 对象所需的知识。
 
-Why use PyFilesystem?
-~~~~~~~~~~~~~~~~~~~~~
+为什么要使用PyFilesystem？
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you are comfortable using the Python standard library, you may be wondering; *why learn another API for working with files?*
+如果你很习惯使用Python标准库，你可能会想： *为什么要学习另一个API来处理文件？*
 
-The PyFilesystem API is generally simpler than the ``os`` and ``io`` modules -- there are fewer edge cases and less ways to shoot yourself in the foot. This may be reason alone to use it, but there are other compelling reasons you should use ``import fs`` for even straightforward filesystem code.
+PyFilesystem API通常比 ``os`` 和 ``io`` 模块更简单 - 有更少的边缘情况和更少的方法来拍摄自己在脚。这可能是使用它的原因，但还有其他令人信服的理由，你应该使用 ``import fs`` 甚至直接的文件系统代码。
 
-The abstraction offered by FS objects means that you can write code that is agnostic to where your files are physically located. For instance, if you wrote a function that searches a directory for duplicates files, it will work unaltered with a directory on your hard-drive, or in a zip file, on an FTP server, on Amazon S3, etc.
+FS对象提供的抽象意味着您可以编写与您的文件物 理位置无关的代码。例如，如果您编写了一个函数来搜索目录中的重复文件，它将在硬盘驱动器上的目录，zip文件，FTP服务器，Amazon S3等上正常工作。
 
-As long as an FS object exists for your chosen filesystem (or any data store that resembles a filesystem), you can use the same API. This means that you can defer the decision regarding where you store data to later. If you decide to store configuration in the *cloud*, it could be a single line change and not a major refactor.
+只要所选文件系统（或类似于文件系统的任何数据存储）存在FS对象，就可以使用相同的API。这意味着您可以将有关将数据存储在何处的决定推迟到以后。如果你决定将配置存储在 *cloud* 中，它可能是一个单行更改，而不是主要的重构。
 
+PyFilesystem也可以有益于单元测试; 通过将OS文件系统与内存文件系统交换，您可以编写测试而无需管理（或模拟）文件IO。 您可以确保您的代码将在Linux，MacOS和Windows上工作。
 
-PyFilesystem can also be beneficial for unit-testing; by swapping the OS filesystem with an in-memory filesystem, you can write tests without having to manage (or mock) file IO. And you can be sure that your code will work on Linux, MacOS, and Windows.
-
-Opening Filesystems
+打开文件系统
 ~~~~~~~~~~~~~~~~~~~
 
-There are two ways you can open a filesystem. The first and most natural way is to import the appropriate filesystem class and construct it.
+有两种方法可以打开文件系统。 第一种也是最自然的方法是导入合适的文件系统类并构造它。
 
-Here's how you would open a :class:`~fs.osfs.OSFS` (Operating System File System), which maps to the files and directories of your hard-drive::
+下面是如何打开一个 :class:`~fs.osfs.OSFS` （操作系统文件系统），它映射到硬盘驱动器的文件和目录::
 
     >>> from fs.osfs import OSFS
     >>> home_fs = OSFS("~/")
 
-This constructs an FS object which manages the files and directories under a given system path. In this case, ``'~/'``, which is a shortcut for your home directory.
+这构造了一个FS对象，它管理给定系统路径下的文件和目录。 在这种情况下， ```〜/'`` ，这是你的主目录的快捷方式。
 
-Here's how you would list the files/directories in your home directory::
+下面是如何列出主目录中的文件/目录::
 
     >>> home_fs.listdir('/')
     ['world domination.doc', 'paella-recipe.txt', 'jokes.txt', 'projects']
 
-Notice that the parameter to ``listdir`` is a single forward slash, indicating that we want to list the *root* of the filesystem. This is because from the point of view of ``home_fs``, the root is the directory we used to construct the ``OSFS``.
+请注意， ``listdir`` 的参数是一个单斜线，表示我们想要列出文件系统的 *root* 。 这是因为从 ``home_fs`` 的角度来看，根目录是我们用来构建 ``OSFS`` 的目录。
 
-Also note that it is a forward slash, even on Windows. This is because FS paths are in a consistent format regardless of the platform. Details such as the separator and encoding are abstracted away. See :ref:`paths` for details.
-
-Other filesystems interfaces may have other requirements for their constructor. For instance, here is how you would open a FTP filesystem::
+还要注意，它是一个正斜杠，即使在Windows上。 这是因为FS路径以一致的格式而与平台无关。 诸如分隔符和编码的细节被抽象化。 有关详细信息，请参阅 :ref:`paths` 。
+其他文件系统接口可能对其构造函数有其他要求。 例如，这里是如何打开一个FTP文件系统::
 
     >>> from ftpfs import FTPFS
     >>> debian_fs = FTPFS('ftp.mirror.nl')
     >>> debian_fs.listdir('/')
     ['debian-archive', 'debian-backports', 'debian', 'pub', 'robots.txt']
 
-The second, and more general way of opening filesystems objects, is via an *opener* which opens a filesystem from a URL-like syntax. Here's an alternative way of opening your home directory::
+打开文件系统对象的第二种更通用的方法是通过 *opener* ，它从类似URL的语法中打开文件系统。 这里有一个替代方法来打开你的主目录::
 
     >>> from fs import open_fs
     >>> home_fs = open_fs('osfs://~/')
     >>> home_fs.listdir('/')
     ['world domination.doc', 'paella-recipe.txt', 'jokes.txt', 'projects']
 
-The opener system is particularly useful when you want to store the physical location of your application's files in a configuration file.
+当您想要将应用程序文件的物理位置存储在配置文件中时，*opener* 系统特别有用。
 
-If you don't specify the protocol in the FS URL, then PyFilesystem will assume you want a OSFS relative from the current working directory. So the following would be an equivalent way of opening your home directory::
+如果不在FS URL中指定协议，那么PyFilesystem将假设您想要从当前工作目录获得OSFS相对路径。 所以下面是一个等效的打开你的主目录的方法::
 
     >>> from fs import open_fs
     >>> home_fs = open_fs('.')
     >>> home_fs.listdir('/')
     ['world domination.doc', 'paella-recipe.txt', 'jokes.txt', 'projects']
 
-Tree Printing
+树结构打印
 ~~~~~~~~~~~~~
 
-Calling :meth:`~fs.base.FS.tree` on a FS object will print an ascii tree view of your filesystem. Here's an example::
+调用FS对象上的 :meth:`~fs.base.FS.tree` 将打印文件系统的ascii树视图。 下面是一个例子::
 
     >>> from fs import open_fs
     >>> my_fs = open_fs('.')
@@ -79,81 +77,78 @@ Calling :meth:`~fs.base.FS.tree` on a FS object will print an ascii tree view of
     ├── lib.ini
     └── readme.txt
 
-This can be a useful debugging aid!
+这是一个有用的调试助手！
 
 
-Closing
+关闭
 ~~~~~~~
 
-FS objects have a :meth:`~fs.base.FS.close` methd which will perform any required clean-up actions. For many filesystems (notably :class:`~fs.osfs.OSFS`), the ``close`` method does very little. Other filesystems may only finalize files or release resources once ``close()`` is called.
+FS对象有一个 :meth:`~fs.base.FS.close` 方法，它将执行任何所需的清除操作。 对于许多文件系统（值得注意的是 :class:`~fs.osfs.OSFS` ），``close`` 方法很少。 其他文件系统只有在调用 ``close()`` 时才能完成文件或释放资源。
 
-You can call ``close`` explicitly once you are finished using a filesystem. For example::
+一旦使用完文件系统，你可以显式地调用 ``close`` 。 例如::
 
     >>> home_fs = open_fs('osfs://~/')
     >>> home_fs.settext('reminder.txt', 'buy coffee')
     >>> home_fs.close()
 
-If you use FS objects as a context manager, ``close`` will be called automatically. The following is equivalent to the previous example::
+如果使用FS对象作为上下文管理器，将自动调用 ``close`` 。 以下等同于前面的示例::
 
     >>> with open_fs('osfs://~/') as home_fs:
     ...    home_fs.settext('reminder.txt', 'buy coffee')
 
-Using FS objects as a context manager is recommended as it will ensure every FS is closed.
+建议使用FS对象作为上下文管理器，因为它将确保每个FS都关闭。
 
-Directory Information
+目录信息
 ~~~~~~~~~~~~~~~~~~~~~
 
-Filesystem objects have a :meth:`~fs.base.FS.listdir` method which is similar to ``os.listdir``; it takes a path to a directory and returns a list of file names. Here's an example::
+文件系统对象有一个 :meth:`~fs.base.FS.listdir` 方法，类似于 ``os.listdir`` ; 它需要一个目录的路径并返回文件名列表。 下面是一个例子::
 
     >>> home_fs.listdir('/projects')
     ['fs', 'moya', 'README.md']
 
-An alternative method exists for listing directories; :meth:`~fs.base.FS.scandir` returns an *iterable* of :ref:`info` objects. Here's an example::
+存在列出目录的替代方法; :meth:`~fs.base.FS.scandir` 返回一个 *iterable* 的 :ref:`info` 对象。 这里有一个例子::
 
     >>> directory = list(home_fs.scandir('/projects'))
     >>> directory
     [<dir 'fs'>, <dir 'moya'>, <file 'README.md'>]
 
-Info objects have a number of advantages over just a filename. For instance you can tell if an info object references a file or a directory with the :attr:`~fs.info.Info.is_dir` attribute, without an additional system call. Info objects may also contain information such as size, modified time, etc. if you request it in the ``namespaces`` parameter.
+信息对象比文件名具有许多优点。 例如，你可以知道 info 对象是否引用一个文件或一个目录 :attr:`~fs.info.Info.is_dir` 属性，而不需要额外的系统调用。 如果在 ``namespaces`` 参数中请求它，Info对象也可能包含诸如大小，修改时间等信息。
 
 
 .. note::
 
-    The reason that ``scandir`` returns an iterable rather than a list, is that it can be more efficient to retrieve directory information in chunks if the directory is very large, or if the information must be retrieved over a network.
+    ``scandir`` 返回一个可迭代而不是一个列表的原因是，如果目录非常大，或者如果必须通过网络检索信息，那么在块中检索目录信息可能更有效。
 
-Additionally, FS objects have a :meth:`~fs.base.FS.filterdir` method which extends ``scandir`` with the ability to filter directory contents by wildcard(s). Here's how you might find all the Python files in a directory:
+此外，FS对象有一个 :meth:`~fs.base.FS.filterdir` 方法扩展 ``scandir`` ，能够通过通配符过滤目录内容。 以下是如何在目录中找到所有Python文件的方法::
 
     >>> code_fs = OSFS('~/projects/src')
     >>> directory = list(code_fs.filterdir('/', files=['*.py']))
 
-By default, the resource information objects returned by ``scandir`` and ``listdir`` will contain only the file name and the ``is_dir`` flag. You can request additional information with the ``namespaces`` parameter. Here's how you can request additional details (such as file size and file modified times)::
+默认情况下，``scandir`` 和 ``listdir`` 返回的资源信息对象只包含文件名和 ``is_dir`` 标志。您可以使用 ``namespaces`` 参数请求其他信息。以下是如何请求其他详细信息（例如文件大小和文件修改时间）::
 
     >>> directory = code_fs.filterdir('/', files=['*.py'], namespaces=['details'])
 
-This will add a ``size`` and ``modified`` property (and others) to the resource info objects. Which makes code such as this work::
+这将向资源信息对象添加一个``size`` 和 ``modified`` 属性（和其他）。这使得像这样的代码::
 
     >>> sum(info.size for info in directory)
 
-See :ref:`info` for more information.
+有关详细信息，请参阅 :ref:`info` 。
 
-Sub Directories
+子目录
 ~~~~~~~~~~~~~~~
 
-PyFilesystem has no notion of a *current working directory*, so you won't find a ``chdir`` method on FS objects. Fortunately you won't miss it; working with sub-directories is a breeze with PyFilesystem.
+PyFilesystem没有 *当前工作目录* 的概念，所以你不会在FS对象上找到一个 ``chdir`` 方法。幸运的是你不会错过它;使用子目录是一个微风与PyFilesystem。
 
-You can always specify a directory with methods which accept a path. For instance, ``home_fs.listdir('/projects')`` would get the directory listing for the `projects` directory. Alternatively, you can call :meth:`~fs.base.FS.opendir` which returns a new FS object for the sub-directory.
+您可以随时使用接受路径的方法指定目录。例如， ``home_fs.listdir（'/ projects'）`` 会获得 `projects` 目录的目录列表。或者，您可以调用 :meth:`~fs.base.FS.opendir` ，它为子目录返回一个新的FS对象。
 
-For example, here's how you could list the directory contents of a `projects` folder in your home directory::
-
+例如，以下是如何列出主目录中的`projects`文件夹的目录内容::
 
     >>> home_fs = open_fs('~/')
     >>> projects_fs = home_fs.opendir('/projects')
     >>> projects_fs.listdir('/')
     ['fs', 'moya', 'README.md']
 
-When you call ``opendir``, the FS object returns an instance of a :class:`~fs.subfs.SubFS`. If you call any of the methods on a ``SubFS`` object, it will be as though you called the same method on the parent filesystem with a path relative to the sub-directory.
-
-The :class:`~fs.base.FS.makedir` and :class:`~fs.base.FS.makedirs` methods also return ``SubFS`` objects for the newly create directory. Here's how you might create a new directory in ``~/projects`` and initialize it with a couple of files::
+当你调用 ``opendir`` 时，FS对象返回一个 :class:`~fs.subfs.SubFS` 的实例。 如果你调用一个 ``SubFS`` 对象的任何方法，它就好像你在父文件系统上调用了相对于子目录的路径相同的方法。 :class:`~fs.base.FS.makedir` 和 :class:`~fs.base.FS.makedirs` 方法也为新创建的目录返回 ``SubFS`` 对象。 下面是如何在 ``~/projects`` 中创建一个新目录，并用几个文件初始化::
 
     >>> home_fs = open_fs('~/')
     >>> game_fs = home_fs.makedirs('projects/game')
@@ -162,63 +157,61 @@ The :class:`~fs.base.FS.makedir` and :class:`~fs.base.FS.makedirs` methods also 
     >>> game_fs.listdir('/')
     ['__init__.py', 'README.md']
 
-Working with ``SubFS`` objects means that you can generally avoid writing much path manipulation code, which tends to be error prone.
+使用 ``SubFS`` 对象意味着你通常可以避免编写很多路径处理代码，这往往容易出错。
 
-Working with Files
+使用文件
 ~~~~~~~~~~~~~~~~~~
 
-You can open a file from a FS object with :meth:`~fs.base.FS.open`, which is very similar to ``io.open`` in the standard library. Here's how you might open a file called "reminder.txt" in your home directory::
+您可以从FS对象打开一个文件 :meth:`~fs.base.FS.open` ，这与标准库中的 `io.open` 非常相似。 以下是如何在主目录中打开一个名为 ``reminder.txt`` 的文件::
 
     >>> with open_fs('~/') as home_fs:
     ...     with home_fs.open('reminder.txt') as reminder_file:
     ...        print(reminder_file.read())
     buy coffee
 
-In the case of a ``OSFS``, a standard file-like object will be returned. Other filesystems may return a different object supporting the same methods. For instance, :class:`~fs.memoryfs.MemoryFS` will return a ``io.BytesIO`` object.
+在 ``OSFS`` 的情况下，将返回标准的类文件对象。 其他文件系统可以返回支持相同方法的不同对象。 例如 :class:`~fs.memoryfs.MemoryFS` 将返回一个 ``io.BytesIO`` 对象。
 
-PyFilesystem also offers a number of shortcuts for common file related operations. For instance, :meth:`~fs.base.FS.getbytes` will return the file contents as a bytes, and :meth:`~fs.base.FS.gettext` will read unicode text. These methods is generally preferable to explicitly opening files, as the FS object may have an optimized implementation.
+PyFilesystem还提供了许多常见文件相关操作的快捷方式。 例如 :meth:`~fs.base.FS.getbytes` 将以字节形式返回文件内容，而且 :class:`~fs.base.FS.gettext` 将读取unicode文本。 这些方法通常优于明确打开文件，因为FS对象可能具有优化的实现。
 
-Other *shortcut* methods are :meth:`~fs.base.FS.setbin`, :meth:`~fs.base.FS.setbytes`, :meth:`~fs.base.FS.settext`.
+其他 *快捷方式* 是 :meth:`~fs.base.FS.setbin` ， :meth:`~fs.base.FS.setbytes` ， :meth:`~fs.base.FS.settext` 。
 
 Walking
 ~~~~~~~
 
-Often you will need to scan the files in a given directory, and any sub-directories. This is known as *walking* the filesystem.
+通常，您将需要扫描给定目录中的文件和任何子目录。 这被称为 *walking* 文件系统。
 
-Here's how you would print the paths to all your Python files in your home directory::
+以下是如何打印主目录中所有Python文件的路径::
 
     >>> from fs import open_fs
     >>> home_fs = open_fs('~/')
     >>> for path in home_fs.walk.files(filter=['*.py']):
     ...     print(path)
 
-The ``walk`` attribute on FS objects is instance of a :class:`~fs.walk.BoundWalker`, which should be able to handle most directory walking requirements.
+FS对象的 ``walk`` 属性是一个 :class:`~fs.walk.BoundWalker` 的实例，它应该能够处理大多数目录漫游需求。
 
-See :ref:`walking` for more information on walking directories.
+参见 :ref:`walking` 有关walk目录的更多信息。
 
-Moving and Copying
+移动和复制
 ~~~~~~~~~~~~~~~~~~
 
-You can move and copy file contents with :meth:`~fs.base.FS.move` and :meth:`~fs.base.FS.copy` methods, and the equivalent :meth:`~fs.base.FS.movedir` and :meth:`~fs.base.FS.copydir` methods which operate on directories rather than files.
+您可以使用 :meth:`~fs.base.FS.move` 和 :meth:`~fs.base.FS.copy` 方法移动和复制文件内容，并且等效 :meth:`~fs.base.FS .movedir` 和 :meth:`~fs.base.FS.copydir` 方法对目录而不是文件进行操作。
 
-These move and copy methods are optimized where possible, and depending on the implementation, they may be more performant than reading and writing files.
+这些移动和复制方法在可能的情况下被优化，并且取决于实现，它们可以比读取和写入文件更高性能。
 
-To move and/or copy files *between* filesystems (as apposed to within the same filesystem), use the :mod:`~fs.move` and :mod:`~fs.copy` modules. The methods in these modules accept both FS objects and FS URLS. For instance, the following will compress the contents of your projects folder::
+要在 *文件系统之间移动和/或复制文件* （使用同一个文件系统），请使用 :mod:`~fs.move` 和 :mod:`~fs.copy` 模块。 这些模块中的方法接受FS对象和FS URLS。 例如，以下将压缩项目文件夹的内容::
 
     >>> from fs.copy import copy_fs
     >>> copy_fs('~/projects', 'zip://projects.zip')
 
-Which is the equivalent to this, more verbose, code::
+这相当于下面这个例子，更冗长，代码::
 
     >>> from fs.copy import copy_fs
     >>> from fs.osfs import OSFS
     >>> from fs.zipfs import ZipFS
     >>> copy_fs(OSFS('~/projects'), ZipFS('projects.zip'))
 
-The :func:`~fs.copy.copy_fs` and :func:`~fs.copy.copy_dir` functions also accept a :class:`~fs.walk.Walker` parameter, which can you use to filter the files that will be copied. For instance, if you only wanted back up your python files, you could use something like this::
+:func:`~fs.copy.copy_fs` 和 :func:`~fs.copy.copy_dir` 函数也接受 :class:`~fs.walk.Walker` 参数，可以用来过滤将被复制的文件。 例如，如果你只想备份你的python文件，你可以使用像这样::
 
     >>> from fs.copy import copy_fs
     >>> from fs.walk import Walker
     >>> copy_fs('~/projects', 'zip://projects.zip', walker=Walker(files=['*.py']))
-
-
