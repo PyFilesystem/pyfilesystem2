@@ -84,3 +84,13 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             with self.assertRaises(errors.CreateFailed):
                 # Trying to create a dir that exists as a file
                 osfs.OSFS(tmp_file.name, create=True)
+
+    def test_unicode_paths(self):
+        dir_path = tempfile.mkdtemp()
+        try:
+            fs_dir = os.path.join(dir_path, u'te\u0161t_\u00fanicod\u0113')
+            os.mkdir(fs_dir)
+            with osfs.OSFS(fs_dir):
+                self.assertTrue(os.path.isdir(fs_dir))
+        finally:
+            shutil.rmtree(dir_path)
