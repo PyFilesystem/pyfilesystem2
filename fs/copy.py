@@ -93,57 +93,43 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
     :type dst_path: str
 
     """
-    try:
-        with manage_fs(src_fs, writeable=False) as src_fs:
-            with manage_fs(dst_fs, create=True) as dst_fs:
-                if src_fs is dst_fs:
-                    # Same filesystem, so we can do a potentially optimized copy
+    with manage_fs(src_fs, writeable=False) as src_fs:
+        with manage_fs(dst_fs, create=True) as dst_fs:
+            if src_fs is dst_fs:
+                # Same filesystem, so we can do a potentially optimized copy
+                src_fs.copy(src_path, dst_path, overwrite=True)
+                return True
+            else:
+                # Standard copy
+                with src_fs.lock(), dst_fs.lock():
+                    with src_fs.open(src_path, 'rb') as read_file:
+                        # There may be an optimized copy available on dst_fs
+                        dst_fs.setbinfile(dst_path, read_file)
+                        return True
+
+
+
+def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
+    with manage_fs(src_fs, writeable=False) as src_fs:
+        with manage_fs(dst_fs, create=True) as dst_fs:
+            if src_fs is dst_fs:
+                # Same filesystem, so we can do a potentially optimized copy
+                if _source_is_newer(src_fs, src_path, dst_fs, dst_path):
                     src_fs.copy(src_path, dst_path, overwrite=True)
                     return True
                 else:
-                    # Standard copy
-                    with src_fs.lock(), dst_fs.lock():
+                    return False
+            else:
+                # Standard copy
+                with src_fs.lock(), dst_fs.lock():
+                    if _source_is_newer(src_fs, src_path, dst_fs, dst_path):
                         with src_fs.open(src_path, 'rb') as read_file:
                             # There may be an optimized copy available on dst_fs
                             dst_fs.setbinfile(dst_path, read_file)
                             return True
-    except IOError:
-        #todo: should log something here?
-        return False
-    except FSError:
-        #todo: should log something here?
-        return False
-    return False
-
-
-def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
-    try:
-        with manage_fs(src_fs, writeable=False) as src_fs:
-            with manage_fs(dst_fs, create=True) as dst_fs:
-                if src_fs is dst_fs:
-                    # Same filesystem, so we can do a potentially optimized copy
-                    if _source_is_newer(src_fs, src_path, dst_fs, dst_path):
-                        src_fs.copy(src_path, dst_path, overwrite=True)
-                        return True
                     else:
                         return False
-                else:
-                    # Standard copy
-                    with src_fs.lock(), dst_fs.lock():
-                        if _source_is_newer(src_fs, src_path, dst_fs, dst_path):
-                            with src_fs.open(src_path, 'rb') as read_file:
-                                # There may be an optimized copy available on dst_fs
-                                dst_fs.setbinfile(dst_path, read_file)
-                                return True
-                        else:
-                            return False
-    except IOError:
-        #todo: should log something here?
-        return False
-    except FSError:
-        #todo: should log something here?
-        return False
-    return False
+
 
 
 def copy_structure(src_fs, dst_fs, walker=None):
