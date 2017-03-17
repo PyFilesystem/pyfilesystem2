@@ -155,10 +155,10 @@ class TestCopy(unittest.TestCase):
             self.assertTrue(dst_fs.exists("/file1.txt"))
 
             copied = []
-            def callback(src_fs, src_path, dst_fs, dst_path):
+            def on_copy(src_fs, src_path, dst_fs, dst_path):
                 copied.append(dst_path)
 
-            fs.copy.copy_fs_if_newer(src_fs, dst_fs, callback=callback)
+            fs.copy.copy_fs_if_newer(src_fs, dst_fs, on_copy=on_copy)
 
             self.assertEqual(copied, ["/file1.txt"])
             self.assertTrue(dst_fs.exists("/file1.txt"))
@@ -185,10 +185,10 @@ class TestCopy(unittest.TestCase):
             dst_fs = open_fs('osfs://' + dst_dir)
 
             copied = []
-            def callback(src_fs, src_path, dst_fs, dst_path):
+            def on_copy(src_fs, src_path, dst_fs, dst_path):
                 copied.append(dst_path)
 
-            fs.copy.copy_fs_if_newer(src_fs, dst_fs, callback=callback)
+            fs.copy.copy_fs_if_newer(src_fs, dst_fs, on_copy=on_copy)
 
             self.assertEqual(copied, ["/file1.txt", "/one_level_down/file2.txt"])
             self.assertTrue(dst_fs.exists("/file1.txt"))
@@ -218,10 +218,10 @@ class TestCopy(unittest.TestCase):
             self.assertTrue(dst_fs.exists("/file1.txt"))
 
             copied = []
-            def callback(src_fs, src_path, dst_fs, dst_path):
+            def on_copy(src_fs, src_path, dst_fs, dst_path):
                 copied.append(dst_path)
 
-            fs.copy.copy_fs_if_newer(src_fs, dst_fs, callback=callback)
+            fs.copy.copy_fs_if_newer(src_fs, dst_fs, on_copy=on_copy)
 
             self.assertEqual(copied, [])
             self.assertTrue(dst_fs.exists("/file1.txt"))
@@ -251,10 +251,10 @@ class TestCopy(unittest.TestCase):
             dst_fs = open_fs('osfs://' + dst_dir)
 
             copied = []
-            def callback(src_fs, src_path, dst_fs, dst_path):
+            def on_copy(src_fs, src_path, dst_fs, dst_path):
                 copied.append(dst_path)
 
-            fs.copy.copy_dir_if_newer(src_fs, "/", dst_fs, "/", callback=callback)
+            fs.copy.copy_dir_if_newer(src_fs, "/", dst_fs, "/", on_copy=on_copy)
 
             self.assertEqual(copied, ["/one_level_down/file2.txt"])
             self.assertTrue(dst_fs.exists("/one_level_down/file2.txt"))
@@ -277,10 +277,10 @@ class TestCopy(unittest.TestCase):
             # dst_fs = open_fs('osfs://' + dst_dir)
 
             copied = []
-            def callback(src_fs, src_path, dst_fs, dst_path):
+            def on_copy(src_fs, src_path, dst_fs, dst_path):
                 copied.append(dst_path)            
 
-            fs.copy.copy_dir_if_newer(src_fs, "/src", src_fs, "/dst", callback=callback)
+            fs.copy.copy_dir_if_newer(src_fs, "/src", src_fs, "/dst", on_copy=on_copy)
 
             self.assertEqual(copied, ["/dst/file1.txt"])
             self.assertTrue(src_fs.exists("/dst/file1.txt"))

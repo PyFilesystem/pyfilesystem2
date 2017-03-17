@@ -16,7 +16,7 @@ from .path import normpath
 from .errors import FSError
 
 
-def copy_fs(src_fs, dst_fs, walker=None, callback=None):
+def copy_fs(src_fs, dst_fs, walker=None, on_copy=None):
     """
     Copy the contents of one filesystem to another.
 
@@ -33,11 +33,11 @@ def copy_fs(src_fs, dst_fs, walker=None, callback=None):
     :returns: a list with the copied files dst_path.
 
     """
-    return copy_dir(src_fs, '/', dst_fs, '/', walker=walker, callback=callback)
+    return copy_dir(src_fs, '/', dst_fs, '/', walker=walker, on_copy=on_copy)
 
 
-def copy_fs_if_newer(src_fs, dst_fs, walker=None, callback=None):
-    return copy_dir_if_newer(src_fs, '/', dst_fs, '/', walker=walker, callback=callback)
+def copy_fs_if_newer(src_fs, dst_fs, walker=None, on_copy=None):
+    return copy_dir_if_newer(src_fs, '/', dst_fs, '/', walker=walker, on_copy=on_copy)
 
 
 def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
@@ -154,7 +154,7 @@ def copy_structure(src_fs, dst_fs, walker=None):
                     dst_fs.makedir(dir_path, recreate=True)
 
 
-def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None, callback=None):
+def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None, on_copy=None):
     """
     Copy a directory from one filesystem to another.
 
@@ -198,11 +198,11 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None, callback=None):
                             info.make_path(copy_path)
                         )
                         if file_copied:
-                            if callback is not None:
-                                callback(src_fs, dir_path, dst_fs, copy_path)
+                            if on_copy is not None:
+                                on_copy(src_fs, dir_path, dst_fs, copy_path)
 
 
-def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path, walker=None, callback=None):
+def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path, walker=None, on_copy=None):
     walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
@@ -252,8 +252,8 @@ def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path, walker=None, callback=
                                 copy_path
                             )
                             if file_copied:
-                                if callback is not None:
-                                    callback(src_fs, dir_path, dst_fs, copy_path)
+                                if on_copy is not None:
+                                    on_copy(src_fs, dir_path, dst_fs, copy_path)
 
 
 
