@@ -30,13 +30,32 @@ def copy_fs(src_fs, dst_fs, walker=None, on_copy=None):
         in ``src_fs``. Set this if you only want to consider a sub-set
         of the resources in ``src_fs``.
     :type walker: :class:`~fs.walk.Walker`
-    :returns: a list with the copied files dst_path.
-
+    :param on_copy: A function callback called after a single file copy is executed.
+    :type on_copy: Function, with signature ``(src_fs, src_path, dst_fs, dst_path)``.
     """
     return copy_dir(src_fs, '/', dst_fs, '/', walker=walker, on_copy=on_copy)
 
 
 def copy_fs_if_newer(src_fs, dst_fs, walker=None, on_copy=None):
+    """
+    Copy the contents of one filesystem to another. If both source and destination files exist,
+    the copy is executed only if the source file is newer than the destination file.
+    In case modification times of source or destination files are not available,
+    copy file is always executed.
+
+    :param src_fs: Source filesystem.
+    :type src_fs: :type src_fs: FS URL or instance
+    :param src_path: A path to a directory on ``src_fs``.
+    :type src_path: str
+    :param dst_fs: Destination filesystem.
+    :type dst_fs: FS URL or instance
+    :param walker: A walker object that will be used to scan for files
+        in ``src_fs``. Set this if you only want to consider a sub-set
+        of the resources in ``src_fs``.
+    :type walker: :class:`~fs.walk.Walker`
+    :param on_copy: A function callback called after a single file copy is executed.
+    :type on_copy: Function, with signature ``(src_fs, src_path, dst_fs, dst_path)``.
+    """
     return copy_dir_if_newer(src_fs, '/', dst_fs, '/', walker=walker, on_copy=on_copy)
 
 
@@ -50,11 +69,8 @@ def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
        :type src_path: str
        :param dst_fs: Destination filesystem.
        :type dst_fs: FS URL or instance
-       :param walker: A walker object that will be used to scan for files
-           in ``src_fs``. Set this if you only want to consider a sub-set
-           of the resources in ``src_fs``.
-       :type walker: :class:`~fs.walk.Walker`
-
+       :returns: True if source file is newer than destination file or
+            file modification time cannot be determined. False otherwise.
        """
     try:
         if not dst_fs.exists(dst_path):
@@ -79,9 +95,7 @@ def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
 def copy_file(src_fs, src_path, dst_fs, dst_path):
     """
     Copy a file from one filesystem to another.
-
-    If the destination exists, and is a file, it will be first
-    truncated.
+    If the destination exists, and is a file, it will be first truncated.
 
     :param src_fs: Source filesystem.
     :type src_fs: FS URL or instance
@@ -91,6 +105,7 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
     :type dst_fs: FS URL or instance
     :param dst_path: Path to a file on ``dst_fs``.
     :type dst_path: str
+    :returns: True if the file copy was executed, False otherwise.
 
     """
     with manage_fs(src_fs, writeable=False) as src_fs:
@@ -110,6 +125,25 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
 
 
 def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
+    """
+    Copy a file from one filesystem to another.
+    If the destination exists, and is a file, it will be first truncated.
+    If both source and destination files exist,
+    the copy is executed only if the source file is newer than the destination file.
+    In case modification times of source or destination files are not available,
+    copy is always executed.
+
+    :param src_fs: Source filesystem.
+    :type src_fs: FS URL or instance
+    :param src_path: Path to a file on ``src_fs``.
+    :type src_path: str
+    :param dst_fs: Destination filesystem.
+    :type dst_fs: FS URL or instance
+    :param dst_path: Path to a file on ``dst_fs``.
+    :type dst_path: str
+    :returns: True if the file copy was executed, False otherwise.
+
+    """
     with manage_fs(src_fs, writeable=False) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             if src_fs is dst_fs:
@@ -169,7 +203,8 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None, on_copy=None):
         in ``src_fs``. Set this if you only want to consider a sub-set
         of the resources in ``src_fs``.
     :type walker: :class:`~fs.walk.Walker`
-    :returns: a list with the copied files dst_path.
+    :param on_copy: A function callback called after a single file copy is executed.
+    :type on_copy: Function, with signature ``(src_fs, src_path, dst_fs, dst_path)``.
 
     """
 
@@ -203,6 +238,27 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path, walker=None, on_copy=None):
 
 
 def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path, walker=None, on_copy=None):
+    """
+    Copy a directory from one filesystem to another. If both source and destination files exist,
+    the copy is executed only if the source file is newer than the destination file.
+    In case modification times of source or destination files are not available,
+    copy is always executed.
+
+    :param src_fs: Source filesystem.
+    :type src_fs: FS URL or instance
+    :param src_path: A path to a directory on ``src_fs``.
+    :type src_path: str
+    :param dst_fs: Destination filesystem.
+    :type dst_fs: FS URL or instance
+    :param str dst_path: A path to a directory on ``dst_fs``.
+    :param walker: A walker object that will be used to scan for files
+        in ``src_fs``. Set this if you only want to consider a sub-set
+        of the resources in ``src_fs``.
+    :type walker: :class:`~fs.walk.Walker`
+    :param on_copy: A function callback called after a single file copy is executed.
+    :type on_copy: Function, with signature ``(src_fs, src_path, dst_fs, dst_path)``.
+
+    """
     walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
