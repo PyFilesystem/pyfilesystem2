@@ -110,9 +110,12 @@ class OSFS(FS):
             _meta["invalid_path_chars"] = '\0'
 
             if 'PC_PATH_MAX' in os.pathconf_names:
+                root_path_safe = _root_path.encode(self.encoding) \
+                    if six.PY2 and isinstance(_root_path, six.text_type) \
+                    else _root_path
                 _meta['max_sys_path_length'] = (
                     os.pathconf(
-                        _root_path,
+                        root_path_safe,
                         os.pathconf_names['PC_PATH_MAX']
                     )
                 )
