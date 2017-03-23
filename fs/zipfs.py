@@ -224,33 +224,45 @@ class ReadZipFS(FS):
         else:
             basic_info = self._directory.getinfo(_path)
             zip_name = self._path_to_zip_name(path)
-            zip_info = self._zip.getinfo(zip_name)
-            modified_epoch = datetime_to_epoch(
-                datetime(*zip_info.date_time)
-            )
-            raw_zip_info = {
-                k: getattr(zip_info, k)
-                for k in dir(zip_info)
-                if not k.startswith('_') and not callable(getattr(zip_info, k))
-            }
-            raw_info = {
-                "basic":
-                {
-                    "name": basic_info.name,
-                    "is_dir": basic_info.is_dir,
-                },
-                "details":
-                {
-                    "size": zip_info.file_size,
-                    "type": int(
-                        ResourceType.directory
-                        if basic_info.is_dir else
-                        ResourceType.file
-                    ),
-                    "modified": modified_epoch
-                },
-                "zip": raw_zip_info
-            }
+            try:
+                zip_info = self._zip.getinfo(zip_name)
+            except KeyError:
+                # Can occur if there is an implied directory in the zip
+                raw_info = {
+                    "basic":
+                    {
+                        "name": basic_info.name,
+                        "is_dir": basic_info.is_dir
+                    }
+                }
+            else:
+                modified_epoch = datetime_to_epoch(
+                    datetime(*zip_info.date_time)
+                )
+                raw_zip_info = {
+                    k: getattr(zip_info, k)
+                    for k in dir(zip_info)
+                    if (not k.startswith('_') and
+                        not callable(getattr(zip_info, k)))
+                }
+                raw_info = {
+                    "basic":
+                    {
+                        "name": basic_info.name,
+                        "is_dir": basic_info.is_dir,
+                    },
+                    "details":
+                    {
+                        "size": zip_info.file_size,
+                        "type": int(
+                            ResourceType.directory
+                            if basic_info.is_dir else
+                            ResourceType.file
+                        ),
+                        "modified": modified_epoch
+                    },
+                    "zip": raw_zip_info
+                }
 
         return Info(raw_info)
 
