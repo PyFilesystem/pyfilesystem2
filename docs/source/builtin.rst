@@ -13,3 +13,4 @@ Builtin Filesystems
    reference/subfs.rst
    reference/tarfs.rst
    reference/tempfs.rst
+   reference/zipfs.rst
