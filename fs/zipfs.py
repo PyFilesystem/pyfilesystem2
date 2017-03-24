@@ -129,7 +129,7 @@ class WriteZipFS(WrapFS):
         """
         Write zip to a file.
 
-        ..note ::
+        .. note ::
             This is called automatically when the ZipFS is closed.
 
         :param file: Destination file, may be a file name or an open
