@@ -126,3 +126,8 @@ class ArchiveTestCases(object):
             source_files,
             archive_files
         )
+
+    def test_implied_dir(self):
+        self.fs.getinfo('foo/bar')
+        self.fs.getinfo('foo')
+

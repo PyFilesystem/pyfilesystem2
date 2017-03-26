@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 import os
 import tempfile
 import unittest
+import zipfile
 
 from fs import zipfs
 from fs.compress import write_zip
@@ -52,3 +53,25 @@ class TestReadZipFSMem(TestReadZipFS):
 
     def make_source_fs(self):
         return open_fs('mem://')
+
+
+class TestDirsZipFS(unittest.TestCase):
+
+    def test_implied(self):
+        """Test zipfs creates intermediate directories."""
+        fh, path = tempfile.mkstemp('testzip.zip')
+        try:
+            os.close(fh)
+            _zip_file = zipfile.ZipFile(path, mode='w')
+            _zip_file.writestr('foo/bar/baz/egg', b'hello')
+            _zip_file.close()
+            zip_fs = zipfs.ZipFS(path)
+            zip_fs.getinfo('foo')
+            zip_fs.getinfo('foo/bar')
+            zip_fs.getinfo('foo/bar/baz')
+            self.assertTrue(zip_fs.isdir('foo/bar/baz'))
+            self.assertTrue(zip_fs.isfile('foo/bar/baz/egg'))
+        finally:
+            os.remove(path)
+
+
