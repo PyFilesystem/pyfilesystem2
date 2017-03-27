@@ -83,7 +83,7 @@ class TestCopy(unittest.TestCase):
         file_access_mod_time = int(calendar.timegm(datetime.now().timetuple())) + delta_sec
         times = (file_access_mod_time, file_access_mod_time)
         os.utime(filepath, times)
-        
+
     def test_copy_file_if_newer_dst_older(self):
         try:
             #create first dst ==> dst is older the src ==> file should be copied
@@ -91,11 +91,10 @@ class TestCopy(unittest.TestCase):
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
 
-            #time.sleep(3) #wait before create src file, to ensure src is older
-
             src_dir = self._create_sandbox_dir()
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
+            #ensure src file is newer than dst, changing its modification time
             self._delay_file_utime(src_file1, delta_sec=60)
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -137,8 +136,6 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
 
-            #time.sleep(3) #wait before create dst file, to ensure dst is older
-
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
@@ -164,11 +161,10 @@ class TestCopy(unittest.TestCase):
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
 
-            #time.sleep(3) #wait before create src file, to ensure src is older
-
             src_dir = self._create_sandbox_dir()
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
+            #ensure src file is newer than dst, changing its modification time
             self._delay_file_utime(src_file1, delta_sec=60)
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -200,7 +196,7 @@ class TestCopy(unittest.TestCase):
 
             src_file2 = self._touch(src_dir, "one_level_down" + os.sep + "file2.txt")
             self._write_file(src_file2)
-            
+
             dst_dir = self._create_sandbox_dir()
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -230,11 +226,10 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
 
-            #time.sleep(3) #wait before create dst file, to ensure dst is older
-
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
+            #ensure dst file is newer than src, changing its modification time
             self._delay_file_utime(dst_file1, delta_sec=60)
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -271,6 +266,7 @@ class TestCopy(unittest.TestCase):
             dst_dir = self._create_sandbox_dir()
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
+            #ensure dst file is newer than src, changing its modification time
             self._delay_file_utime(dst_file1, delta_sec=60)
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -300,7 +296,6 @@ class TestCopy(unittest.TestCase):
             dst_dir = self._create_sandbox_dir(home=src_dir)
 
             src_fs = open_fs('osfs://' + src_dir)
-            # dst_fs = open_fs('osfs://' + dst_dir)
 
             copied = []
             def on_copy(src_fs, src_path, dst_fs, dst_path):
