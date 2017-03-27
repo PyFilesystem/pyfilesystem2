@@ -170,7 +170,8 @@ class FS(object):
         :param str path: Path of the directory to remove.
 
         :raises `fs.errors.DirectoryNotEmpty`: If the directory is not
-            empty and force == ``False``.
+            empty (see :meth:`~fs.base.removetree` if you want to
+            remove the directory contents).
         :raises `fs.errors.DirectoryExpected`: If the path is not a
             directory.
         :raises `fs.errors.ResourceNotFound`: If the path does not
