@@ -1,10 +1,13 @@
 from __future__ import unicode_literals
 
+import errno
 import os
 import time
 import unittest
 import tempfile
 import shutil
+from six import PY2
+
 import fs.copy
 from fs import open_fs
 
@@ -39,30 +42,42 @@ class TestCopy(unittest.TestCase):
         self.assertTrue(dst_fs.isdir('empty'))
         self.assertTrue(dst_fs.isfile('bar/baz.txt'))
 
+    def mkdirp(self, path):
+        if PY2:
+            try:
+                os.makedirs(path)
+            except OSError as exc:
+                if exc.errno == errno.EEXIST and os.path.isdir(path):
+                    pass
+                else:
+                    raise
+        else:
+            os.makedirs(path, exist_ok=True)
+
     def _create_sandbox_dir(self, prefix='pyfilesystem2_sandbox_', home=None):
         if home is None:
             return tempfile.mkdtemp(prefix=prefix)
         else:
             sandbox_path = os.path.join(home, prefix)
-            os.makedirs(sandbox_path, exist_ok=True)
+            self.mkdirp(sandbox_path)
             return sandbox_path
 
-    def _touch(self, root, filepath):
+    def _touch(self, root, filepath, delta_secs=None):
         #create abs filename
         abs_filepath = os.path.join(root, filepath)
-        #ensure dir exists, caution: exist_ok works only for python>=3.2
-        #os.makedirs(os.path.dirname(abs_filepath), exist_ok=True)
+        #create dir
         dirname = os.path.dirname(abs_filepath)
-        try:
-            os.makedirs(dirname)
-        except OSError:
-            if os.path.exists(dirname):
-                pass
-            else:
-                raise
+        self.mkdirp(dirname)
         #touch file
         with open(abs_filepath, 'a'):
-            os.utime(abs_filepath, None) #update the mtime in case the file exists, same as touch
+            if delta_secs is None:
+                os.utime(abs_filepath) #update the mtime in case the file exists, same as touch
+            else:
+                import calendar
+                from datetime import datetime
+                file_access_mod_time = int(calendar.timegm(datetime.now().timetuple())) + delta_secs
+                times = (file_access_mod_time, file_access_mod_time)
+                os.utime(abs_filepath, times)
         return abs_filepath
 
     def _write_file(self, filepath, write_chars=1024):
@@ -77,9 +92,11 @@ class TestCopy(unittest.TestCase):
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
 
+            #time.sleep(3) #wait before create src file, to ensure src is older
+
             src_dir = self._create_sandbox_dir()
-            src_file1 = self._touch(src_dir, "file1.txt")
-            self._write_file(src_file1)
+            src_file1 = self._touch(src_dir, "file1.txt", delta_secs=10)
+            self._write_file(src_file1) #this should modify file's utime
 
             src_fs = open_fs('osfs://' + src_dir)
             dst_fs = open_fs('osfs://' + dst_dir)
@@ -120,8 +137,10 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
 
+            #time.sleep(3) #wait before create dst file, to ensure dst is older
+
             dst_dir = self._create_sandbox_dir()
-            dst_file1 = self._touch(dst_dir, "file1.txt")
+            dst_file1 = self._touch(dst_dir, "file1.txt", delta_secs=10)
             self._write_file(dst_file1)
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -145,8 +164,10 @@ class TestCopy(unittest.TestCase):
             dst_file1 = self._touch(dst_dir, "file1.txt")
             self._write_file(dst_file1)
 
+            #time.sleep(3) #wait before create src file, to ensure src is older
+
             src_dir = self._create_sandbox_dir()
-            src_file1 = self._touch(src_dir, "file1.txt")
+            src_file1 = self._touch(src_dir, "file1.txt", delta_secs=10)
             self._write_file(src_file1)
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -176,7 +197,7 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
 
-            src_file2 = self._touch(src_dir, "one_level_down" + os.sep + "file2.txt")
+            src_file2 = self._touch(src_dir, "one_level_down" + os.sep + "file2.txt", delta_secs=10)
             self._write_file(src_file2)
 
             dst_dir = self._create_sandbox_dir()
@@ -208,8 +229,11 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
 
+            #time.sleep(3) #wait before create dst file, to ensure dst is older
+
+
             dst_dir = self._create_sandbox_dir()
-            dst_file1 = self._touch(dst_dir, "file1.txt")
+            dst_file1 = self._touch(dst_dir, "file1.txt", delta_secs=10)
             self._write_file(dst_file1)
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -240,11 +264,11 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "file1.txt")
             self._write_file(src_file1)
 
-            src_file2 = self._touch(src_dir, "one_level_down" + os.sep + "file2.txt")
+            src_file2 = self._touch(src_dir, "one_level_down" + os.sep + "file2.txt", delta_secs=10)
             self._write_file(src_file2)
 
             dst_dir = self._create_sandbox_dir()
-            dst_file1 = self._touch(dst_dir, "file1.txt")
+            dst_file1 = self._touch(dst_dir, "file1.txt", delta_secs=10)
             self._write_file(dst_file1)
 
             src_fs = open_fs('osfs://' + src_dir)
@@ -278,7 +302,7 @@ class TestCopy(unittest.TestCase):
 
             copied = []
             def on_copy(src_fs, src_path, dst_fs, dst_path):
-                copied.append(dst_path)            
+                copied.append(dst_path)
 
             fs.copy.copy_dir_if_newer(src_fs, "/src", src_fs, "/dst", on_copy=on_copy)
 
