@@ -27,7 +27,7 @@ from .path import abspath, basename, normpath
 from .permissions import Permissions
 from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
-
+from .errors import NoURL
 
 log = logging.getLogger('fs.osfs')
 
@@ -304,6 +304,11 @@ class OSFS(FS):
     def getsyspath(self, path):
         sys_path = self._to_sys_path(path)
         return sys_path
+
+    def geturl(self, path, purpose='download'):
+        if purpose != 'download':
+            raise NoURL(path, purpose)
+        return "file://" + self.getsyspath(path)
 
     def gettype(self, path):
         self.check()
