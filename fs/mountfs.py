@@ -154,12 +154,12 @@ class MountFS(FS):
     def getsize(self, path):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.getsize(path)
+        return fs.getsize(_path)
 
     def getsyspath(self, path):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.getsyspath(path)
+        return fs.getsyspath(_path)
 
     def gettype(self, path):
         self.check()
@@ -194,7 +194,7 @@ class MountFS(FS):
     def setinfo(self, path, info):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.setinfo(path, info)
+        return fs.setinfo(_path, info)
 
     def validatepath(self, path):
         self.check()
@@ -225,12 +225,12 @@ class MountFS(FS):
     def setbinfile(self, path, file):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.setbinfile(path, file)
+        return fs.setbinfile(_path, file)
 
     def setbytes(self, path, contents):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.setbytes(path, contents)
+        return fs.setbytes(_path, contents)
 
     def settext(self,
                 path,

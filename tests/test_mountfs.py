@@ -18,6 +18,16 @@ class TestMountFS(FSTestCases, unittest.TestCase):
         return fs
 
 
+class TestMountFS2(FSTestCases, unittest.TestCase):
+    """Test OSFS implementation."""
+
+    def make_fs(self):
+        fs = MountFS()
+        mem_fs = MemoryFS()
+        fs.mount('/foo', mem_fs)
+        return fs.opendir('foo')
+
+
 class TestMountFSBehaviours(unittest.TestCase):
 
     def test_listdir(self):
