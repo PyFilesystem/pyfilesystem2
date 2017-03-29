@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
 import errno
+import datetime
 import os
-import time
 import unittest
 import tempfile
 import shutil
+import datetime
 from six import PY2
 
 import fs.copy
@@ -41,6 +42,22 @@ class TestCopy(unittest.TestCase):
         self.assertTrue(dst_fs.isdir('bar'))
         self.assertTrue(dst_fs.isdir('empty'))
         self.assertTrue(dst_fs.isfile('bar/baz.txt'))
+
+    def test_copy_dir_on_copy(self):
+        src_fs = open_fs('mem://')
+        src_fs.touch('baz.txt')
+
+        on_copy_calls = []
+        def on_copy(*args):
+            on_copy_calls.append(args)
+
+        dst_fs = open_fs('mem://')
+        fs.copy.copy_dir(src_fs, '/', dst_fs, '/', on_copy=on_copy)
+        print(on_copy_calls)
+        self.assertEqual(
+            on_copy_calls,
+            [(src_fs, '/baz.txt', dst_fs, '/baz.txt')]
+        )
 
     def mkdirp(self, path):
         #os.makedirs(path, exist_ok=True) only for python3.?
@@ -83,6 +100,15 @@ class TestCopy(unittest.TestCase):
         file_access_mod_time = int(calendar.timegm(datetime.now().timetuple())) + delta_sec
         times = (file_access_mod_time, file_access_mod_time)
         os.utime(filepath, times)
+
+    def test_copy_file_if_newer_same_fs(self):
+        src_fs = open_fs('mem://')
+        src_fs.makedir('foo2').touch('exists')
+        src_fs.makedir('foo1').touch('test1.txt')
+        src_fs.settimes('foo2/exists', datetime.datetime.utcnow() + datetime.timedelta(hours=1))
+        self.assertTrue(fs.copy.copy_file_if_newer(src_fs, 'foo1/test1.txt', src_fs, 'foo2/test1.txt.copy'))
+        self.assertFalse(fs.copy.copy_file_if_newer(src_fs, 'foo1/test1.txt', src_fs, 'foo2/exists'))
+        self.assertTrue(src_fs.exists('foo2/test1.txt.copy'))
 
     def test_copy_file_if_newer_dst_older(self):
         try:
