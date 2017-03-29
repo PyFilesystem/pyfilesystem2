@@ -1,44 +1,44 @@
 .. _implementers:
 
-Implementing Filesystems
+实现文件系统
 ========================
 
-With a little care, you can implement a PyFilesystem interface for any filesystem, which will allow it to work interchangeably with any of the built-in FS classes and tools.
+有一点小心，你可以为任何文件系统实现一个PyFilesystem接口，这将允许它与任何内置的FS类和工具互换工作。
 
-To create a PyFilesystem interface, derive a class from :class:`~fs.base.FS` and implement the :ref:`essential-methods`. This should give you a working FS class.
+要创建一个PyFilesystem接口，从 :class:`~fs.base.FS` 派生一个类，并实现：ref：`essential-methods`。这应该给你一个工作的FS类。
 
-Take care to copy the method signatures *exactly*, including default values. It is also essential that you follow the same logic with regards to exceptions, and only raise exceptions in :mod:`~fs.errors`.
+注意复制方法签名，包括默认值。还必须遵循关于异常的相同逻辑，并且只在以下内容中引发异常 :mod:`~fs.errors` 。
 
-Constructor
+构造函数
 -----------
 
-There are no particular requirements regarding how a PyFilesystem class is constructed, but be sure to call the base class ``__init__`` method with no parameters.
+对于如何构造PyFilesystem类没有特别的要求，但是一定要调用没有参数的基类 ``__init__`` 方法。
 
 
-Thread Safety
+线程安全
 -------------
 
-All Filesystems should be *thread-safe*. The simplest way to achieve that is by using the ``_lock`` attribute supplied by the :class:`~fs.base.FS` constructor. This is a ``RLock`` object from the standard library, which you can use as a context manager, so methods you implement will start something like this::
+所有文件系统应该是 *线程安全* 。实现它的最简单的方法是使用 ``_lock`` 属性，它由 :class:`~fs.base.FS` 构造函数提供。这是一个来自标准库的 ``RLock`` 对象，可以用作上下文管理器，因此实现的方法将启动如下::
 
     with self._lock:
         do_something()
 
-You aren't *required* to use ``_lock``. Just as long as calling methods on the FS object from multiple threads doesn't break anything.
+你不是 *必需* 使用 ``_lock`` 。只要在多线程的FS对象上调用方法不会破坏任何东西。
 
-Python Versions
+Python版本
 ---------------
 
-PyFilesystem supports Python2.7 and Python3.X. The differences between the two major Python versions are largely managed by the ``six`` library.
+PyFilesystem支持Python2.7和Python3.X。 两个主要Python版本之间的差异主要由 ``six`` 库管理。
 
-You aren't obligated to support the same versions of Python that PyFilesystem, when writing a new FS class, but it is recommended if your project is for general use.
+在编写新的FS类时，您没有义务支持PyFilesystem的相同版本的Python，但是如果您的项目是一般使用的，则建议使用。
 
 
-Testing Filesystems
+测试文件系统
 -------------------
 
-To test your implementation, you can borrow the test suite used to test the built in filesystems. If your code passes these tests, then you can be confident your implementation will work seamlessly.
+要测试您的实现，可以借用用于测试内置文件系统的测试套件。如果你的代码通过这些测试，那么你可以相信你的实现将无缝工作。
 
-Here's the simplest possible example to test a filesystem class called ``MyFS``::
+这里是测试一个名为 ``MyFS`` 的文件系统类的最简单的例子::
 
     from fs.test import FSTestCases
 
@@ -49,39 +49,38 @@ Here's the simplest possible example to test a filesystem class called ``MyFS``:
             return MyFS()
 
 
-You may also want to override some of the methods in the test suite for more targeted testing:
+您可能还想覆盖测试套件中的一些方法以进行更有针对性的测试:
 
 .. autoclass:: fs.test.FSTestCases
     :members:
 
-
 .. _essential-methods:
 
-Essential Methods
+基本方法
 -----------------
 
-The following methods MUST be implemented in a PyFilesystem interface.
+以下方法必须在PyFilesystem接口中实现。
 
-* :meth:`~fs.base.FS.getinfo` Get info regarding a file or directory.
-* :meth:`~fs.base.FS.listdir` Get a list of resources in a directory.
-* :meth:`~fs.base.FS.makedir` Make a directory.
-* :meth:`~fs.base.FS.openbin` Open a binary file.
-* :meth:`~fs.base.FS.remove` Remove a file.
-* :meth:`~fs.base.FS.removedir` Remove a directory.
-* :meth:`~fs.base.FS.setinfo` Set resource information.
+* :meth:`~fs.base.FS.getinfo` 获取有关文件或目录的信息。
+* :meth:`~fs.base.FS.listdir` 获取目录中的资源列表。
+* :meth:`~fs.base.FS.makedir` 创建一个目录。
+* :meth:`~fs.base.FS.openbin` 打开一个二进制文件。
+* :meth:`~fs.base.FS.remove` 删除文件。
+* :meth:`~fs.base.FS.removedir` 删除目录。
+* :meth:`~fs.base.FS.setinfo` 设置资源信息。
 
 .. _non-essential-methods:
 
-Non - Essential Methods
+非基本方法
 -----------------------
 
-The following methods MAY be implemented in a PyFilesystem interface.
+以下方法可以在PyFilesystem接口中实现。
 
-These methods have a default implementation in the base class, but may be overridden if you can supply a more optimal version.
+这些方法在基类中具有默认实现，但是如果您可以提供更优化的版本，则可以覆盖这些方法。
 
-Exactly which methods you should implement depends on how and where the data is stored. For network filesystems, a good candidate to implement, is the ``scandir`` method which would otherwise call a combination of ``listdir`` and ``getinfo`` for each file.
+应该实现哪些方法取决于数据的存储方式和位置。 对于网络文件系统，一个好的候选实现，是 ``scandir`` 方法，否则为每个文件调用 ``listdir`` 和 ``getinfo`` 的组合。
 
-In the general case, it is a good idea to look at how these methods are implemented in :class:`~fs.base.FS`, and only write a custom version if it would be more efficient than the default.
+在一般情况下，最好看看这些方法是如何实现的 :class:`~fs.base.FS` ，并且只写一个自定义版本，如果它比默认的更有效率。
 
 * :meth:`~fs.base.FS.appendbytes`
 * :meth:`~fs.base.FS.appendtext`
@@ -122,12 +121,12 @@ In the general case, it is a good idea to look at how these methods are implemen
 
 .. _helper-methods:
 
-Helper Methods
+辅助方法
 --------------
 
-These methods SHOULD NOT be implemented.
+这些方法不应该实现。
 
-Implementing these is highly unlikely to be worthwhile.
+实现这些可能不太值得的。
 
 * :meth:`~fs.base.FS.getbasic`
 * :meth:`~fs.base.FS.getdetails`

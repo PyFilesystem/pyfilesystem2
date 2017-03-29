@@ -1,7 +1,7 @@
-Tar Filesystem
+Tar 文件系统
 ==============
 
-A filesystem implementation for .tar files.
+.tar文件的文件系统实现
 
 .. automodule:: fs.tarfs
     :members:

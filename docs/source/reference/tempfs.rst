@@ -1,9 +1,9 @@
-Temporary Filesystem
+临时文件系统
 ====================
 
-A temporary filesytem is stored in a location defined by your OS (``/tmp`` on linux). The contents are deleted when the filesystem is closed.
+临时文件系统存储在您的操作系统定义的位置（linux上的``/ tmp``）。 当文件系统关闭时，内容被删除。
 
-A ``TempFS`` is a good way of preparing a directory structure in advance, that you can later copy. It can also be used as a temporary data store.
+TempFS是提前准备目录结构的好方法，以便以后复制。它也可以用作临时数据存储。
 
 .. automodule:: fs.tempfs
     :members:

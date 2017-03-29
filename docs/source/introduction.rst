@@ -1,24 +1,20 @@
-Introduction
+介绍
 ============
 
-PyFilesystem is a Python module that provides a common interface to any
-filesystem.
+PyFilesystem是一个Python模块，为任何文件系统提供一个通用接口。
 
-Think of PyFilesystem ``FS`` objects as the next logical step to
-Python's ``file`` objects. In the same way that file objects abstract a
-single file, FS objects abstract an entire filesystem.
+将PyFilesystem ``FS`` 对象视为Python的 ``file`` 对象的下一个逻辑步骤。 以同样的方式，文件对象抽象单个文件，FS 对象抽象整个文件系统。
 
 
-Installing
+安装
 ----------
 
-You can install PyFilesystem with ``pip`` as follows::
+你可以使用 ``pip`` 安装PyFilesystem如下::
 
     pip install fs
 
-Or to upgrade to the most recent version::
+或升级到最新版本::
 
     pip install fs --upgrade
 
-Alternatively, if you would like to install from source, you can check
-out `the code from Github <https://github.com/PyFilesystem/pyfilesystem2>`_.
+或者，如果你想从源代码安装，你可以查看 `Github上的代码 <https://github.com/PyFilesystem/pyfilesystem2>`_。

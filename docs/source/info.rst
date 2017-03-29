@@ -1,19 +1,13 @@
 ..  _info:
 
-Resource Info
+资源信息
 =============
 
-Resource information (or *info*) describes standard file details such as
-name, type, size, etc., and potentially other less-common information
-associated with a file or directory.
+资源信息（或 *info* ）描述标准文件详细信息，例如名称，类型，大小等，以及潜在的其他不太常见的信息与文件或目录相关联。
 
-You can retrieve resource info for a single resource by calling
-:meth:`~fs.base.FS.getinfo`, or by calling  :meth:`~fs.base.FS.scandir`
-which returns an iterator of resource information for the contents of
-a directory. Additionally, :meth:`~fs.base.FS.filterdir` can filter the
-resources in a directory by type and wildcard.
+您可以通过调用检索单个资源的资源信息 :meth:`~fs.base.FS.getinfo` ，或者通过调用 :meth:`~fs.base.FS.scandir` 它返回一个资源信息的迭代器的内容一个目录。 另外， :meth:`~fs.base.FS.filterdir` 可以在目录中按类型和通配符过滤资源。
 
-Here's an example of retrieving file information::
+以下是检索文件信息的示例::
 
     >>> from fs.osfs import OSFS
     >>> fs = OSFS('.')
@@ -26,138 +20,101 @@ Here's an example of retrieving file information::
     >>> info.size
     13
 
-Info Objects
+
+info 对象
 ------------
 
-PyFilesystem exposes the resource information via properties of
-:class:`~fs.info.Info` objects.
+PyFilesystem通过属性 :class:`~fs.info.Info` 对象来公开资源信息。
 
 
-Namespaces
+命名空间
 ----------
 
-All resource information is contained within one of a number of
-potential *namespaces*, which are logical key/value groups.
+所有资源信息都包含在许多潜在的 *命名空间* 之中，这是逻辑 key/value 组。
 
-You can specify which namespace(s) you are interested in as positional
-arguments to :meth:`~fs.base.FS.getinfo`. For example, the following
-retrieves the ``details`` and ``access`` namespaces for a file::
+你可以指定你感兴趣的命名空间作为位置参数 :meth:`~fs.base.FS.getinfo` 。 例如，以下检索文件的 ``details`` 和 ``access`` 命名空间::
 
     resource_info = fs.getinfo('myfile.txt', 'details', 'access')
 
-In addition to the specified namespaces, the fileystem will also return
-the ``basic`` namespace, which contains the name of the resource, and a
-flag which indicates if the resource is a directory.
+除了指定的命名空间之外，文件系统还将返回包含资源名称的 ``basic`` 命名空间，以及指示资源是否为目录的标志。
 
-Basic Namespace
+基本命名空间
 ~~~~~~~~~~~~~~~
 
-The ``basic`` namespace is always returned. It contains the following
-keys:
+始终返回 ``basic`` 命名空间。 它包含以下键：
 
 =============== =================== ===========================================
-Name            Type                Description
+名字            类型                 描述
 --------------- ------------------- -------------------------------------------
-name            str                 Name of the resource.
-is_dir          bool                A boolean that indicates if the resource
-                                    is a directory.
+name            str                 资源名称
+is_dir          bool                一个布尔值，指示资源是否为目录
 =============== =================== ===========================================
 
-The keys in this namespace can generally be retrieved very quickly. In
-the case of :class:`~fs.osfs.OSFS` the namespace can be retrieved without
-a potentially expensive system call.
 
-Details Namespace
+通常可以非常快速地检索此命名空间中的键。在 :class:`~fs.osfs.OSFS` 的情况下，可以检索命名空间而不需要可能昂贵的系统调用。
+
+详细命名空间
 ~~~~~~~~~~~~~~~~~
 
-The ``details`` namespace contains the following keys.
+``details`` 命名空间包含以下键。
 
 ================ =================== ==========================================
-Name             type                Description
+名字             类型                 描述
 ---------------- ------------------- ------------------------------------------
-accessed         datetime            The time the file was last accessed.
-created          datetime            The time the file was created.
-metadata_changed datetime            The time of the last *metadata* (e.g.
-                                     owner, group) change.
-modified         datetime            The time file data was last changed.
-size             int                 Number of bytes used to store the
-                                     resource. In the case of files,
-                                     this is the number of bytes in the
-                                     file. For directories, the *size* is
-                                     the overhead (in bytes) used to store
-                                     the directory entry.
-type             ResourceType        Resource type, one of the values
-                                     defined in :class:`~fs.ResourceType`.
+accessed         datetime            文件上次访问的时间
+created          datetime            文件创建的时间
+metadata_changed datetime            *元数据* （e.g 所有者，组）的时间最近更改时间
+modified         datetime            最近更改文件数据时间
+size             int                 用于存储资源的字节数。对象是文件时表示文件数据字节数，如果是目录 *size* 是用于存储目录条目的开销（以字节为单位）
+type             ResourceType        资源类型，其定义在 :class:`~fs.ResourceType`
 ================ =================== ==========================================
 
-The time values (``accessed_time``, ``created_time`` etc.) may be
-``None`` if the filesystem doesn't store that information. The ``size``
-and ``type`` keys are guaranteed to be available, although ``type`` may
-be :attr:`~fs.ResourceType.unknown` if the filesystem is unable to
-retrieve the resource type.
+如果文件系统不存储该信息，则时间值（ ``accessible_time`` ， ``created_time`` 等）可以是 ``None`` 。如果文件系统无法检索资源类型, ``size`` 和 ``type`` 键保证可用，虽然 ``type`` 可能是 :attr:`~fs.ResourceType.unknown` 。
 
-Access Namespace
+访问命名空间
 ~~~~~~~~~~~~~~~~
 
-The ``access`` namespace reports permission and ownership information,
-and contains the following keys.
+``access`` 命名空间报告权限和所有权信息，并包含以下键。
 
 ================ =================== ==========================================
-Name             type                Description
+名字             类型                 描述
 ---------------- ------------------- ------------------------------------------
-gid              int                 The group ID.
-group            str                 The group name.
-permissions      Permissions         An instance of
-                                     :class:`~fs.permissions.Permissions`, which
-                                     contains the permissions for the resource.
-uid              int                 The user ID.
-user             str                 The user name of the owner.
+gid              int                 组ID
+group            str                 组名
+permissions      Permissions         一个实例 :class:`~fs.permissions.Permissions` ，它包含资源的权限
+uid              int                 用户ID
+user             str                 所有者的用户名
 ================ =================== ==========================================
 
-This namespace is optional, as not all filesystems have a concept of
-ownership or permissions. It is supported by :class:`~fs.osfs.OSFS`. Some
-values may be ``None`` if the aren't supported by the filesystem.
+此命名空间是可选的，因为并非所有文件系统都具有所有权或权限的概念。 它支持 :class:`~fs.osfs.OSFS` 。 如果文件系统不支持，某些值可能是 ``None`` 。
 
-Stat Namespace
+Stat命名空间
 ~~~~~~~~~~~~~~
 
-The ``stat`` namespace contains information reported by a call to
-`os.stat <https://docs.python.org/3.5/library/stat.html>`_. This
-namespace is supported by :class:`~fs.osfs.OSFS` and potentially other
-filesystems which map directly to the OS filesystem. Most other
-filesystems will not support this namespace.
+``stat`` 命名空间包含调用 `os.stat <https://docs.python.org/3.5/library/stat.html>`_ 报告的信息。 这个命名空间支持 :class:`~fs.osfs.OSFS` 和可能的其他文件系统，它们直接映射到操作系统文件系统。 大多数其他文件系统将不支持此命名空间。
 
 
-Other Namespaces
+其他命名空间
 ~~~~~~~~~~~~~~~~
 
-Some filesystems may support other namespaces not covered here. See the
-documentation for the specific filesystem for information on what
-namespaces are supported.
+某些文件系统可能支持本文未涉及的其他命名空间。 有关支持哪些命名空间的信息，请参阅特定文件系统的文档。
 
-You can retrieve such implementation specific resource information
-with the :meth:`~fs.info.Info.get` method.
+您可以使用 :meth:`~fs.info.Info.get` 方法检索这种实现特定的资源信息。
 
 .. note::
 
-    It is not an error to request a namespace (or namespaces) that the
-    filesystem does *not* support. Any unknown namespaces will be
-    ignored.
+    请求文件系统不支持的命名空间（或命名空间）不是错误。 任何未知的命名空间将被忽略。
 
-Raw Info
+原始信息
 --------
 
-The :class:`~fs.info.Info` class is a wrapper around a simple data
-structure containing the *raw* info. You can access this raw info with
-the ``info.raw`` property.
+ :class:`~fs.info.Info` 类是一个包含 *原始信息* 的简单数据结构的包装器。 您可以使用 ``info.raw`` 属性访问此原始信息。
 
 .. note::
 
-    The following is probably only of interest if you intend to
-    implement a filesystem yourself.
+    如果你打算自己实现一个文件系统，以下是可能只有兴趣。
 
-Raw info data consists of a dictionary that maps the namespace name on
-to a dictionary of information. Here's an example::
+原始信息数据包括将命名空间名称映射到信息字典的字典。 下面是一个例子::
 
     {
         'access': {
@@ -180,14 +137,6 @@ to a dictionary of information. Here's an example::
     }
 
 
-Raw resource information contains basic types only (strings, numbers,
-lists, dict, None). This makes the resource information simple to
-send over a network as it can be trivially serialized as JSON or other
-data format.
+原始资源信息仅包含基本类型（字符串，数字，列表，字典，None）。这使得资源信息简单地通过网络发送，因为它可以被简单地串行化为JSON或其他数据格式。
 
-Because of this requirement, times are stored as
-`epoch times <https://en.wikipedia.org/wiki/Unix_time>`_. The Info object
-will convert these to datetime objects from the standard library.
-Additionally, the Info object will convert permissions from a list of
-strings in to a `class`:fs.permissions.Permissions` objects.
-
+由于这个要求，时间被存储为 `epoch times <https://en.wikipedia.org/wiki/Unix_time>`_ 。 Info对象将把这些对象转换为来自标准库的datetime对象。 此外，Info对象会将权限从一个字符串列表转换为一个 :class:`fs.permissions.Permissions` 对象。
