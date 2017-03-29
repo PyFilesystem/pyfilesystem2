@@ -407,6 +407,12 @@ class FSTestCases(object):
         else:
             self.assertTrue(self.fs.hasurl('foo'))
 
+    def test_geturl_purpose(self):
+        """Check an unknown purpose raises a NoURL error"""
+        self.fs.create('foo')
+        with self.assertRaises(errors.NoURL):
+            self.fs.geturl('foo', purpose='__nosuchpurpose__')
+
     def test_invalid_chars(self):
         # Test invalid path method.
         with self.assertRaises(errors.InvalidCharsInPath):
