@@ -108,8 +108,8 @@ class MountFS(FS):
 
     def listdir(self, path):
         self.check()
-        fs, delegate_path = self._delegate(path)
-        return fs.listdir(delegate_path)
+        fs, _path = self._delegate(path)
+        return fs.listdir(_path)
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
@@ -169,7 +169,7 @@ class MountFS(FS):
     def geturl(self, path, purpose='download'):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.geturl(path, purpose=purpose)
+        return fs.geturl(_path, purpose=purpose)
 
     def hasurl(self, path, purpose='download'):
         self.check()
