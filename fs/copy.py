@@ -104,7 +104,6 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
     :type dst_fs: FS URL or instance
     :param dst_path: Path to a file on ``dst_fs``.
     :type dst_path: str
-    :returns: True if the file copy was executed, False otherwise.
 
     """
     with manage_fs(src_fs, writeable=False) as src_fs:
@@ -113,7 +112,6 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
                 # Same filesystem, so we can do a potentially optimized
                 # copy
                 src_fs.copy(src_path, dst_path, overwrite=True)
-                return True
             else:
                 # Standard copy
                 with src_fs.lock(), dst_fs.lock():
@@ -121,8 +119,6 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
                         # There may be an optimized copy available on
                         # dst_fs
                         dst_fs.setbinfile(dst_path, read_file)
-                        return True
-
 
 
 def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
@@ -214,7 +210,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path,
         dst_path)``.
 
     """
-
+    on_copy = on_copy or (lambda *args: None)
     walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
@@ -235,14 +231,13 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path,
                     for info in files:
                         src_path = info.make_path(dir_path)
                         dst_path = info.make_path(copy_path)
-                        file_copied = copy_file(
+                        copy_file(
                             src_fs,
                             src_path,
                             dst_fs,
                             dst_path
                         )
-                        if file_copied and on_copy is not None:
-                            on_copy(src_fs, src_path, dst_fs, dst_path)
+                        on_copy(src_fs, src_path, dst_fs, dst_path)
 
 
 def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path,
@@ -271,7 +266,7 @@ def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path,
         dst_path)``.
 
     """
-    on_copy = on_copy or (lambda src_fs, src_path, dst_fs, dst_path: None)
+    on_copy = on_copy or (lambda *args: None)
     walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
