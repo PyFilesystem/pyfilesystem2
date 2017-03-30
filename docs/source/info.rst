@@ -189,5 +189,5 @@ Because of this requirement, times are stored as
 `epoch times <https://en.wikipedia.org/wiki/Unix_time>`_. The Info object
 will convert these to datetime objects from the standard library.
 Additionally, the Info object will convert permissions from a list of
-strings in to a `class`:fs.permissions.Permissions` objects.
+strings in to a :class:`~fs.permissions.Permissions` objects.
 
