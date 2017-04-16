@@ -1,0 +1,6 @@
+{
+  "url": "http://localhost:22081",
+  "login": "admin",
+  "password": "admin",
+  "root": "/exist/webdav/db"
+}
