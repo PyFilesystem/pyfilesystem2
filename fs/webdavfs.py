@@ -113,8 +113,8 @@ class WebDAVFile(object):
         return lines
 
     def read(self, size=None):
-        if self._mode.writing:
-            raise IOError("File is in write mode")
+        if not self._mode.reading   :
+            raise IOError("File is not in read mode")
         if size:
             self.pos += size
         return self.data.read(size)
@@ -141,6 +141,8 @@ class WebDAVFile(object):
             self.data.write(b'\0' * (size - data_size))
 
     def write(self, data):
+        if not self._mode.writing:
+            raise IOError("File is not in write mode")
         self.data.write(data)
         self.seek(len(data), Seek.current)
 
