@@ -6,7 +6,6 @@ import os
 import unittest
 import tempfile
 import shutil
-import datetime
 from six import PY2
 
 import fs.copy
