@@ -19,7 +19,7 @@ CLASSIFIERS = [
     'Topic :: System :: Filesystems',
 ]
 
-with open('README.txt', 'r') as f:
+with open('README.rst', 'rt') as f:
     DESCRIPTION = f.read()
 
 REQUIREMENTS = [
@@ -34,7 +34,7 @@ setup(
     author="Will McGugan",
     author_email="will@willmcgugan.com",
     classifiers=CLASSIFIERS,
-    description="Filesystem abstraction layer",
+    description="Python's filesystem abstraction layer",
     install_requires=REQUIREMENTS,
     extras_require={
         ":python_version<'3.5'": ['scandir~=1.5'],
@@ -46,6 +46,6 @@ setup(
     platforms=['any'],
     test_suite="nose.collector",
     tests_require=['appdirs', 'mock', 'pytz', 'pyftpdlib'],
-    url="http://pypi.python.org/pypi/fs/",
+    url="https://github.com/PyFilesystem/pyfilesystem2",
     version=__version__,
 )
