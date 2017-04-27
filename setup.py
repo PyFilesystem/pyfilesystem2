@@ -28,6 +28,7 @@ REQUIREMENTS = [
     "pytz",
     "setuptools",
     "six~=1.10.0",
+    "webdavclient2"
 ]
 
 setup(

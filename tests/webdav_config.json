@@ -1,5 +1,5 @@
 {
-  "url": "http://localhost:22082",
+  "url": "http://zopyx.com:22082",
   "login": "admin",
   "password": "admin",
   "root": "/exist/webdav/db"
