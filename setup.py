@@ -24,7 +24,7 @@ with open('README.rst', 'rt') as f:
 
 REQUIREMENTS = [
     "appdirs~=1.4.0",
-    "enum34~=1.1.6",
+    "enum34~=1.1.6 ; python_version < '3.4'",
     "pytz",
     "setuptools",
     "six~=1.10.0",
