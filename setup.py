@@ -24,7 +24,6 @@ with open('README.rst', 'rt') as f:
 
 REQUIREMENTS = [
     "appdirs~=1.4.0",
-    "enum34~=1.1.6 ; python_version < '3.4'",
     "pytz",
     "setuptools",
     "six~=1.10.0",
@@ -37,7 +36,8 @@ setup(
     description="Python's filesystem abstraction layer",
     install_requires=REQUIREMENTS,
     extras_require={
-        ":python_version<'3.5'": ['scandir~=1.5'],
+        ":python_version < '3.5'": ['scandir~=1.5'],
+        ":python_version < '3.4'": ['enum34~=1.1.6']
     },
     license="BSD",
     long_description=DESCRIPTION,
