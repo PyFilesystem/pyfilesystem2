@@ -94,3 +94,15 @@ class TestOSFS(FSTestCases, unittest.TestCase):
                 self.assertTrue(os.path.isdir(fs_dir))
         finally:
             shutil.rmtree(dir_path)
+
+
+class TestOSFSScandir(TestOSFS):
+
+    def test_scandir_purepython(self):
+        with mock.patch.object(self.fs, '_scandir', self.fs._scandir_py):
+            self.test_scandir()
+
+    @unittest.skipIf(osfs.scandir is None, "scandir not available.")
+    def test_scandir_c_extension(self):
+        with mock.patch.object(self.fs, '_scandir', self.fs._scandir_c):
+            self.test_scandir()
