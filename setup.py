@@ -37,7 +37,7 @@ setup(
     description="Python's filesystem abstraction layer",
     install_requires=REQUIREMENTS,
     extras_require={
-        ":python_version<'3.5'": ['scandir~=1.5'],
+        "scandir : python_version < '3.5'": ['scandir~=1.5'],
     },
     license="BSD",
     long_description=DESCRIPTION,
