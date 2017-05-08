@@ -17,7 +17,7 @@ from fs.test import FSTestCases
 from six import text_type
 
 
-class TestOSFS(FSTestCases, unittest.TestCase):
+class OSFSTestBase(FSTestCases, unittest.TestCase):
     """Test OSFS implementation."""
 
     def make_fs(self):
@@ -96,7 +96,11 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             shutil.rmtree(dir_path)
 
 
-class TestOSFSScandir(TestOSFS):
+class TestOSFS(OSFSTestBase, unittest.TestCase):
+    pass
+
+
+class TestOSFSScandir(OSFSTestBase, unittest.TestCase):
 
     def test_scandir_purepython(self):
         with mock.patch.object(self.fs, '_scandir', self.fs._scandir_py):
