@@ -97,9 +97,9 @@ class FS(object):
         :return: list of names, relative to ``path``.
         :rtype: list
 
-        :raises `fs.errors.DirectoryExpected`: If `path` is not a
+        :raises fs.errors.DirectoryExpected: If `path` is not a
             directory.
-        :raises `fs.errors.ResourceNotFound`: If `path` does not exist.
+        :raises fs.errors.ResourceNotFound: If `path` does not exist.
 
         This method will return a list of the resources in a directory.
         A 'resource' is a file, directory, or one of the other types
@@ -120,8 +120,8 @@ class FS(object):
         :param bool recreate: Do not raise an error if the directory exists.
         :rtype: :class:`~fs.subfs.SubFS`
 
-        :raises `fs.errors.DirectoryExists`: if the path already exists.
-        :raises `fs.errors.ResourceNotFound`: if the path is not found.
+        :raises fs.errors.DirectoryExists: if the path already exists.
+        :raises fs.errors.ResourceNotFound: if the path is not found.
 
         """
 
@@ -142,10 +142,10 @@ class FS(object):
             information required by the filesystem (if any).
         :rtype: file object
 
-        :raises `fs.errors.FileExpected`: If the path is not a file.
-        :raises `fs.errors.FileExists`: If the file exists, and
+        :raises fs.errors.FileExpected: If the path is not a file.
+        :raises fs.errors.FileExists: If the file exists, and
             *exclusive mode* is specified (`x` in the mode).
-        :raises `fs.errors.ResourceNotFound`: If `path` does not exist.
+        :raises fs.errors.ResourceNotFound: If `path` does not exist.
 
         """
 
@@ -156,8 +156,8 @@ class FS(object):
 
         :param str path: Path to the file you want to remove.
 
-        :raises `fs.errors.FileExpected`: if the path is a directory.
-        :raises `fs.errors.ResourceNotFound`: if the path does not
+        :raises fs.errors.FileExpected: if the path is a directory.
+        :raises fs.errors.ResourceNotFound: if the path does not
             exist.
 
         """
@@ -169,14 +169,14 @@ class FS(object):
 
         :param str path: Path of the directory to remove.
 
-        :raises `fs.errors.DirectoryNotEmpty`: If the directory is not
+        :raises fs.errors.DirectoryNotEmpty: If the directory is not
             empty (see :meth:`~fs.base.removetree` if you want to
             remove the directory contents).
-        :raises `fs.errors.DirectoryExpected`: If the path is not a
+        :raises fs.errors.DirectoryExpected: If the path is not a
             directory.
-        :raises `fs.errors.ResourceNotFound`: If the path does not
+        :raises fs.errors.ResourceNotFound: If the path does not
             exist.
-        :raises `fs.errors.RemoveRootError`: If an attempt is made to
+        :raises fs.errors.RemoveRootError: If an attempt is made to
             remove the root directory (i.e. `'/'`).
         """
 
@@ -188,7 +188,7 @@ class FS(object):
         :param str path: Path to a resource on the filesystem.
         :param dict info: Dict of resource info.
 
-        :raises `fs.errors.ResourceNotFound`: If `path` does not exist
+        :raises fs.errors.ResourceNotFound: If `path` does not exist
             on the filesystem.
 
         This method is the compliment to :class:`~fs.base.getinfo` and is
@@ -219,8 +219,8 @@ class FS(object):
 
         :param str path: Path to a file.
         :param bytes data: Bytes to append.
-        :raises: `ValueError` if ``data`` is not bytes.
-        :raises: `fs.errors.ResourceNotFound` if a parent directory of
+        :raises ValueError: if ``data`` is not bytes.
+        :raises fs.errors.ResourceNotFound: if a parent directory of
             ``path`` does not exist.
 
         """
@@ -242,8 +242,8 @@ class FS(object):
 
         :param str path: Path to a file.
         :param str text: Text to append.
-        :raises: `ValueError` if ``text`` is not bytes.
-        :raises: `fs.errors.ResourceNotFound` if a parent directory of
+        :raises ValueError: if ``text`` is not bytes.
+        :raises fs.errors.ResourceNotFound: if a parent directory of
             ``path`` does not exist.
 
         """
@@ -290,9 +290,9 @@ class FS(object):
         :type src_path: str
         :param dst_path: Path to destination file.
         :type dst_path: str
-        :raises `fs.errors.DestinationExists`: If ``dst_path`` exists,
+        :raises fs.errors.DestinationExists: If ``dst_path`` exists,
             and overwrite == ``False``.
-        :raises `fs.errors.ResourceNotFound`: If a parent directory of
+        :raises fs.errors.ResourceNotFound: If a parent directory of
             ``dst_path`` does not exist.
 
         """
@@ -310,7 +310,7 @@ class FS(object):
         :param str dst_path: Destination directory.
         :param bool create: If ``True`` then ``src_path`` will be
             created if it doesn't already exist.
-        :raises `fs.errors.ResourceNotFound`: If the destination
+        :raises fs.errors.ResourceNotFound: If the destination
             directory does not exist, and ``create`` is not True.
 
         """
@@ -465,7 +465,7 @@ class FS(object):
         :returns: file contents
         :rtype: bytes
 
-        :raises `fs.errors.ResourceNotFound`: If ``path`` does not
+        :raises fs.errors.ResourceNotFound: If ``path`` does not
             exist.
 
         """
@@ -483,7 +483,7 @@ class FS(object):
         :param str errors: Unicode errors parameter.
         :param str newline: Newlines parameter.
         :returns: file contents.
-        :raises `fs.errors.ResourceNotFound`: If ``path`` does not
+        :raises fs.errors.ResourceNotFound: If ``path`` does not
             exist.
 
         """
@@ -570,7 +570,7 @@ class FS(object):
 
         :param str path: A path on the filesystem.
         :rtype: str
-        :raises NoSysPath: If there is no corresponding system path.
+        :raises fs.errors.NoSysPath: If there is no corresponding system path.
 
         A system path is one recognized by the OS, that may be used
         outside of PyFilesystem (in an application or a shell for
@@ -641,7 +641,7 @@ class FS(object):
             for ``purpose``.
         :returns: A URL.
         :rtype: str
-        :raises `fs.errors.NoURL`: If the path does not map to a URL.
+        :raises fs.errors.NoURL: If the path does not map to a URL.
 
         """
         raise errors.NoURL(path, purpose)
@@ -768,9 +768,9 @@ class FS(object):
         :returns: A sub-directory filesystem.
         :rtype: :class:`~fs.subfs.SubFS`
 
-        :raises `fs.errors.DirectoryExists`: if the path is already
+        :raises fs.errors.DirectoryExists: if the path is already
             a directory, and ``recreate`` is False.
-        :raises `fs.errors.DirectoryExpected`: if one of the ancestors
+        :raises fs.errors.DirectoryExpected: if one of the ancestors
             in the path isn't a directory.
 
         """
@@ -799,9 +799,9 @@ class FS(object):
             file will be written to.
         :param bool overwrite: If `True` destination path will be
             overwritten if it exists.
-        :raises `fs.errors.DestinationExists`: If ``dst_path`` exists,
+        :raises fs.errors.DestinationExists: If ``dst_path`` exists,
             and overwrite == ``False``.
-        :raises `fs.errors.ResourceNotFound`: If a parent directory of
+        :raises fs.errors.ResourceNotFound: If a parent directory of
             ``dst_path`` does not exist.
 
         """
@@ -875,7 +875,7 @@ class FS(object):
         :param str path: Path to a directory on the filesystem.
         :returns: A filesystem object representing a sub-directory.
         :rtype: :class:`~fs.subfs.SubFS`
-        :raises `fs.errors.DirectoryExpected`: If ``dst_path`` does not
+        :raises fs.errors.DirectoryExpected: If ``dst_path`` does not
             exist or is not a directory.
 
         """
@@ -1111,9 +1111,9 @@ class FS(object):
 
         :param str path: A path
         :returns: A normalized, absolute path.
-        :rtype str:
-        :raises `fs.errors.InvalidPath`: If the path is invalid.
-        :raises: :class:`~fs.errors.FilesystemClosed` if the filesystem
+        :rtype: str
+        :raises fs.errors.InvalidPath: If the path is invalid.
+        :raises fs.errors.FilesystemClosed: if the filesystem
             is closed.
 
         """
@@ -1187,7 +1187,7 @@ class FS(object):
             filesystem is closed.
 
         :returns: None
-        :raises: :class:`~fs.errors.FilesystemClosed` if the filesystem
+        :raises fs.errors.FilesystemClosed: if the filesystem
             is closed.
 
         """
