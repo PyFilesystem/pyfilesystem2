@@ -36,6 +36,7 @@ __all__ = [
     'PathError',
     'PermissionDenied',
     'RemoteConnectionError',
+    'RemoveRootError',
     'ResourceError',
     'ResourceInvalid',
     'ResourceLocked',
