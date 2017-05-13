@@ -151,7 +151,6 @@ class WriteTarFS(WrapFS):
             defined in the tarfile module in the stdlib).
 
         """
-        print(type(file or self._file))
         if not self.isclosed():
             write_tar(
                 self._temp_fs,
