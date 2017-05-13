@@ -219,6 +219,6 @@ The :func:`~fs.copy.copy_fs` and :func:`~fs.copy.copy_dir` functions also accept
 
     >>> from fs.copy import copy_fs
     >>> from fs.walk import Walker
-    >>> copy_fs('~/projects', 'zip://projects.zip', walker=Walker(files=['*.py']))
+    >>> copy_fs('~/projects', 'zip://projects.zip', walker=Walker(filter=['*.py']))
 
 
