@@ -18,6 +18,7 @@ Contents:
    openers.rst
    walking.rst
    builtin.rst
+   external.rst
    implementers.rst
    reference.rst
 
