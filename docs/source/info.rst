@@ -43,7 +43,7 @@ You can specify which namespace(s) you are interested in as positional
 arguments to :meth:`~fs.base.FS.getinfo`. For example, the following
 retrieves the ``details`` and ``access`` namespaces for a file::
 
-    resource_info = fs.getinfo('myfile.txt', 'details', 'access')
+    resource_info = fs.getinfo('myfile.txt', namespaces=['details', 'access'])
 
 In addition to the specified namespaces, the fileystem will also return
 the ``basic`` namespace, which contains the name of the resource, and a
