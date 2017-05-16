@@ -367,73 +367,68 @@ class OSFS(FS):
                         os.utime(sys_path, (accessed, modified))
 
 
-
-    def _scandir_c(self, path, namespaces=None):
-        self.check()
-        namespaces = namespaces or ()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
-        with convert_os_errors('scandir', path, directory=True):
-            for dir_entry in scandir(sys_path):
-                info = {
-                    "basic": {
-                        "name": dir_entry.name,
-                        "is_dir": dir_entry.is_dir()
+    if scandir:
+        def _scandir(self, path, namespaces=None):
+            self.check()
+            namespaces = namespaces or ()
+            _path = self.validatepath(path)
+            sys_path = self._to_sys_path(_path)
+            with convert_os_errors('scandir', path, directory=True):
+                for dir_entry in scandir(sys_path):
+                    info = {
+                        "basic": {
+                            "name": dir_entry.name,
+                            "is_dir": dir_entry.is_dir()
+                        }
                     }
-                }
-                if 'details' in namespaces:
-                    stat_result = dir_entry.stat()
-                    info['details'] = \
-                        self._make_details_from_stat(stat_result)
-                if 'stat' in namespaces:
-                    stat_result = dir_entry.stat()
-                    info['stat'] = {
-                        k: getattr(stat, k)
-                        for k in dir(stat) if k.startswith('st_')
-                    }
-                if 'access' in namespaces:
-                    stat_result = dir_entry.stat()
-                    info['access'] =\
-                        self._make_access_from_stat(stat_result)
+                    if 'details' in namespaces:
+                        stat_result = dir_entry.stat()
+                        info['details'] = \
+                            self._make_details_from_stat(stat_result)
+                    if 'stat' in namespaces:
+                        stat_result = dir_entry.stat()
+                        info['stat'] = {
+                            k: getattr(stat, k)
+                            for k in dir(stat) if k.startswith('st_')
+                        }
+                    if 'access' in namespaces:
+                        stat_result = dir_entry.stat()
+                        info['access'] =\
+                            self._make_access_from_stat(stat_result)
 
-                yield Info(info)
+                    yield Info(info)
 
-    def _scandir_py(self, path, namespaces=None):
-        self.check()
-        namespaces = namespaces or ()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
-        with convert_os_errors('scandir', path, directory=True):
-            for entry_name in os.listdir(sys_path):
-                entry_path = os.path.join(sys_path, entry_name)
-                info = {
-                    "basic": {
-                        "name": entry_name,
-                        "is_dir": os.path.isdir(entry_path),
-                    }
-                }
-                if 'details' in namespaces:
-                    stat_result = os.stat(entry_path)
-                    info['details'] = \
-                        self._make_details_from_stat(stat_result)
-                if 'stat' in namespaces:
-                    stat_result = os.stat(entry_path)
-                    info['stat'] = {
-                        k: getattr(stat, k)
-                        for k in dir(stat) if k.startswith('st_')
-                    }
-                if 'access' in namespaces:
-                    stat_result = os.stat(entry_path)
-                    info['access'] =\
-                        self._make_access_from_stat(stat_result)
-
-                yield Info(info)
-
-    # Set the method used by OSFS.scandir
-    if scandir is None:
-        _scandir = _scandir_py
     else:
-        _scandir = _scandir_c
+
+        def _scandir(self, path, namespaces=None):
+            self.check()
+            namespaces = namespaces or ()
+            _path = self.validatepath(path)
+            sys_path = self._to_sys_path(_path)
+            with convert_os_errors('scandir', path, directory=True):
+                for entry_name in os.listdir(sys_path):
+                    entry_path = os.path.join(sys_path, entry_name)
+                    stat_result = os.stat(entry_path)
+                    info = {
+                        "basic": {
+                            "name": entry_name,
+                            "is_dir": stat.S_ISDIR(stat_result.st_mode),
+                        }
+                    }
+                    if 'details' in namespaces:
+                        info['details'] = \
+                            self._make_details_from_stat(stat_result)
+                    if 'stat' in namespaces:
+                        info['stat'] = {
+                            k: getattr(stat, k)
+                            for k in dir(stat) if k.startswith('st_')
+                        }
+                    if 'access' in namespaces:
+                        info['access'] =\
+                            self._make_access_from_stat(stat_result)
+
+                    yield Info(info)
+
 
     def scandir(self, path, namespaces=None, page=None):
         iter_info = self._scandir(path, namespaces=namespaces)
