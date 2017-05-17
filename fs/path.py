@@ -194,11 +194,11 @@ def join(*paths):
     :param paths: Paths to join are given in positional arguments.
     :rtype: str
 
-    >>> pathjoin('foo', 'bar', 'baz')
+    >>> join('foo', 'bar', 'baz')
     'foo/bar/baz'
-    >>> pathjoin('foo/bar', '../baz')
+    >>> join('foo/bar', '../baz')
     'foo/baz'
-    >>> pathjoin('foo/bar', '/baz')
+    >>> join('foo/bar', '/baz')
     '/baz'
 
     """
@@ -225,7 +225,7 @@ def combine(path1, path2):
     :param str path2: A PyFilesytem path.
     :rtype: str
 
-    This is faster than ``pathjoin``, but only works when the second
+    This is faster than :func:`~fs.path.join`, but only works when the second
     path is relative, and there are no back references in either path.
 
     >>> combine("foo/bar", "baz")
