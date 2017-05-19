@@ -16,7 +16,10 @@ import six
 try:
     from os import scandir
 except ImportError:
-    from scandir import scandir
+    try:
+        from scandir import scandir
+    except ImportError:
+        scandir = None
 
 from . import errors
 from .errors import FileExists
@@ -363,35 +366,69 @@ class OSFS(FS):
                     with convert_os_errors('setinfo', path):
                         os.utime(sys_path, (accessed, modified))
 
-    def _scandir(self, path, namespaces=None):
-        self.check()
-        namespaces = namespaces or ()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
-        with convert_os_errors('scandir', path, directory=True):
-            for dir_entry in scandir(sys_path):
-                info = {
-                    "basic": {
-                        "name": dir_entry.name,
-                        "is_dir": dir_entry.is_dir()
-                    }
-                }
-                if 'details' in namespaces:
-                    stat_result = dir_entry.stat()
-                    info['details'] = \
-                        self._make_details_from_stat(stat_result)
-                if 'stat' in namespaces:
-                    stat_result = dir_entry.stat()
-                    info['stat'] = {
-                        k: getattr(stat, k)
-                        for k in dir(stat) if k.startswith('st_')
-                    }
-                if 'access' in namespaces:
-                    stat_result = dir_entry.stat()
-                    info['access'] =\
-                        self._make_access_from_stat(stat_result)
 
-                yield Info(info)
+    if scandir:
+        def _scandir(self, path, namespaces=None):
+            self.check()
+            namespaces = namespaces or ()
+            _path = self.validatepath(path)
+            sys_path = self._to_sys_path(_path)
+            with convert_os_errors('scandir', path, directory=True):
+                for dir_entry in scandir(sys_path):
+                    info = {
+                        "basic": {
+                            "name": dir_entry.name,
+                            "is_dir": dir_entry.is_dir()
+                        }
+                    }
+                    if 'details' in namespaces:
+                        stat_result = dir_entry.stat()
+                        info['details'] = \
+                            self._make_details_from_stat(stat_result)
+                    if 'stat' in namespaces:
+                        stat_result = dir_entry.stat()
+                        info['stat'] = {
+                            k: getattr(stat, k)
+                            for k in dir(stat) if k.startswith('st_')
+                        }
+                    if 'access' in namespaces:
+                        stat_result = dir_entry.stat()
+                        info['access'] =\
+                            self._make_access_from_stat(stat_result)
+
+                    yield Info(info)
+
+    else:
+
+        def _scandir(self, path, namespaces=None):
+            self.check()
+            namespaces = namespaces or ()
+            _path = self.validatepath(path)
+            sys_path = self._to_sys_path(_path)
+            with convert_os_errors('scandir', path, directory=True):
+                for entry_name in os.listdir(sys_path):
+                    entry_path = os.path.join(sys_path, entry_name)
+                    stat_result = os.stat(entry_path)
+                    info = {
+                        "basic": {
+                            "name": entry_name,
+                            "is_dir": stat.S_ISDIR(stat_result.st_mode),
+                        }
+                    }
+                    if 'details' in namespaces:
+                        info['details'] = \
+                            self._make_details_from_stat(stat_result)
+                    if 'stat' in namespaces:
+                        info['stat'] = {
+                            k: getattr(stat, k)
+                            for k in dir(stat) if k.startswith('st_')
+                        }
+                    if 'access' in namespaces:
+                        info['access'] =\
+                            self._make_access_from_stat(stat_result)
+
+                    yield Info(info)
+
 
     def scandir(self, path, namespaces=None, page=None):
         iter_info = self._scandir(path, namespaces=namespaces)
