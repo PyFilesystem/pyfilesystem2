@@ -8,3 +8,7 @@ open_fs = registry.open_fs
 open = registry.open
 manage_fs = registry.manage_fs
 parse = registry.parse
+
+for _, modname, _ in pkgutil.iter_modules(__path__):
+    if not modname.startswith('_'):
+        importlib.import_module('.'.join([__name__, modname]), package=__name__)
