@@ -6,3 +6,5 @@ from ._errors import OpenerError, ParseError, Unsupported
 
 open_fs = registry.open_fs
 open = registry.open
+manage_fs = registry.manage_fs
+parse = registry.parse

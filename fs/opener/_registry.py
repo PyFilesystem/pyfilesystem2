@@ -1,7 +1,8 @@
 import re
+import contextlib
+import collections
 
 from ._base import Opener
-from ._utils import parse
 from ._errors import OpenerError, ParseError, Unsupported
 
 
@@ -10,6 +11,64 @@ class Registry(object):
     A registry for `Opener` instances.
 
     """
+
+    ParseResult = collections.namedtuple(
+        'ParseResult',
+        [
+            'protocol',
+            'username',
+            'password',
+            'resource',
+            'path'
+        ]
+    )
+
+    _RE_FS_URL = re.compile(r'''
+    ^
+    (.*?)
+    :\/\/
+
+    (?:
+    (?:(.*?)@(.*?))
+    |(.*?)
+    )
+
+    (?:
+    !(.*?)$
+    )*$
+    ''', re.VERBOSE)
+
+    @classmethod
+    def parse(cls, fs_url):
+        """
+        Parse a Filesystem URL and return a :class:`ParseResult`, or raise
+        :class:`ParseError` (subclass of ValueError) if the FS URL is
+        not value.
+
+        :param fs_url: A filesystem URL
+        :type fs_url: str
+        :rtype: :class:`ParseResult`
+
+        """
+        match = cls._RE_FS_URL.match(fs_url)
+        if match is None:
+            raise ParseError('{!r} is not a fs2 url'.format(fs_url))
+
+        fs_name, credentials, url1, url2, path = match.groups()
+        if credentials:
+            username, _, password = credentials.partition(':')
+            url = url1
+        else:
+            username = None
+            password = None
+            url = url2
+        return cls.ParseResult(
+            fs_name,
+            username,
+            password,
+            url,
+            path
+        )
 
     def __init__(self, default_opener='osfs'):
         """
@@ -70,7 +129,7 @@ class Registry(object):
             # URL may just be a path
             fs_url = "{}://{}".format(default_protocol, fs_url)
 
-        parse_result = parse(fs_url)
+        parse_result = self.parse(fs_url)
         protocol = parse_result.protocol
         open_path = parse_result.path
 
@@ -125,5 +184,61 @@ class Registry(object):
                 default_protocol=default_protocol
             )
         return _fs
+
+    @contextlib.contextmanager
+    def manage_fs(self, fs_url, create=False, writeable=True, cwd='.'):
+        '''
+        A context manager opens / closes a filesystem.
+
+        :param fs_url: A FS instance or a FS URL.
+        :type fs_url: str or FS
+        :param bool create: If ``True``, then create the filesytem if it
+            doesn't already exist.
+        :param bool writeable: If ``True``, then the filesystem should be
+            writeable.
+        :param str cwd: The current working directory, if opening a
+            :class:`~fs.osfs.OSFS`.
+
+        Sometimes it is convenient to be able to pass either a FS object
+        *or* an FS URL to a function. This context manager handles the
+        required logic for that.
+
+        Here's an example::
+
+            def print_ls(list_fs):
+                """List a directory."""
+                with manage_fs(list_fs) as fs:
+                    print(" ".join(fs.listdir()))
+
+        This function may be used in two ways. You may either pass either a
+        ``str``, as follows::
+
+            print_list('zip://projects.zip')
+
+        Or, an FS instance::
+
+            from fs.osfs import OSFS
+            projects_fs = OSFS('~/')
+            print_list(projects_fs)
+
+        '''
+        from ..base import FS
+        if isinstance(fs_url, FS):
+            yield fs_url
+        else:
+            _fs = self.open_fs(
+                fs_url,
+                create=create,
+                writeable=writeable,
+                cwd=cwd
+            )
+            try:
+                yield _fs
+            except:
+                raise
+            finally:
+                _fs.close()
+
+
 
 registry = Registry()
