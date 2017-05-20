@@ -1,3 +1,11 @@
+# coding: utf-8
+"""Definition of the base Opener object"""
+
+import six
+import abc
+
+
+@six.add_metaclass(abc.ABCMeta)
 class Opener(object):
     """
     The opener base class.
@@ -16,6 +24,7 @@ class Opener(object):
     def __repr__(self):
         return "<opener {!r}>".format(self.protocols)
 
+    @abc.abstractmethod
     def open_fs(self, fs_url, parse_result, writeable, create, cwd):
         """
         Open a filesystem object from a FS URL.
