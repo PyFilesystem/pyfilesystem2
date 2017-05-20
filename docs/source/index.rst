@@ -18,8 +18,9 @@ Contents:
    openers.rst
    walking.rst
    builtin.rst
-   external.rst
    implementers.rst
+   extension.rst
+   external.rst
    reference.rst
 
 
@@ -30,4 +31,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

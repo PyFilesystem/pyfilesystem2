@@ -1,5 +1,10 @@
 # coding: utf-8
-"""Errors raised when attempting to open a filesystem"""
+"""
+fs.opener._errors
+=================
+
+Errors raised when attempting to open a filesystem
+"""
 
 class ParseError(ValueError):
     """Raised when attempting to parse an invalid FS URL."""

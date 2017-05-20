@@ -1,5 +1,8 @@
 # coding: utf-8
 """
+fs.opener._registry
+===================
+
 Defines the Registry, which maps protocols and FS URLs to their
 respective Opener.
 """

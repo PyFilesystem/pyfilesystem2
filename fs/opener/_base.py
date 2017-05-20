@@ -1,5 +1,10 @@
 # coding: utf-8
-"""Definition of the base Opener object"""
+"""
+fs.opener._base
+===============
+
+Defines the Opener abstract base class.
+"""
 
 import six
 import abc
