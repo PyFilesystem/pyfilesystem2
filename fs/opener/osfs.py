@@ -1,5 +1,3 @@
-import os
-
 from ._base import Opener
 from ._registry import registry
 
@@ -9,7 +7,8 @@ class OSFSOpener(Opener):
 
     def open_fs(self, fs_url, parse_result, writeable, create, cwd):
         from ..osfs import OSFS
-        _path = os.path.abspath(os.path.join(cwd, parse_result.resource))
-        path = os.path.normpath(_path)
+        from ..path import abspath, normpath, join
+        _path = abspath(join(cwd, parse_result.resource))
+        path = normpath(_path)
         osfs = OSFS(path, create=create)
         return osfs
