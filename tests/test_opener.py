@@ -17,7 +17,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_simple(self):
         parsed = opener.parse('osfs://foo/bar')
-        expected = opener.ParseResult(
+        expected = opener.registry.ParseResult(
             'osfs',
             None,
             None,
@@ -28,7 +28,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_credentials(self):
         parsed = opener.parse('ftp://user:pass@ftp.example.org')
-        expected = opener.ParseResult(
+        expected = opener.registry.ParseResult(
             'ftp',
             'user',
             'pass',
@@ -38,7 +38,7 @@ class TestParse(unittest.TestCase):
         self.assertEqual(expected, parsed)
 
         parsed = opener.parse('ftp://user@ftp.example.org')
-        expected = opener.ParseResult(
+        expected = opener.registry.ParseResult(
             'ftp',
             'user',
             '',
@@ -49,7 +49,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_path(self):
         parsed = opener.parse('osfs://foo/bar!example.txt')
-        expected = opener.ParseResult(
+        expected = opener.registry.ParseResult(
             'osfs',
             None,
             None,
