@@ -1,3 +1,9 @@
+# coding: utf-8
+"""
+Defines the Registry, which maps protocols and FS URLs to their
+respective Opener.
+"""
+
 import re
 import contextlib
 import collections

@@ -1,3 +1,6 @@
+# coding: utf-8
+"""Defines the TarOpener."""
+
 from ._base import Opener
 from ._registry import registry
 

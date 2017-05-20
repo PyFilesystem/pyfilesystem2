@@ -1,3 +1,5 @@
+"""Defines the OSFSOpener."""
+
 from ._base import Opener
 from ._registry import registry
 
