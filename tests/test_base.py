@@ -44,7 +44,7 @@ class TestBase(unittest.TestCase):
 
     def test_validatepath(self):
         """Test validatepath method."""
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             self.fs.validatepath(b'bytes')
 
         self.fs._meta['invalid_path_chars'] = 'Z'

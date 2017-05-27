@@ -1120,7 +1120,11 @@ class FS(object):
         self.check()
 
         if isinstance(path, bytes):
-            raise ValueError('path must not be bytes')
+            raise TypeError(
+                'paths must be unicode (not str)'
+                if six.PY2 else
+                'paths must be str (not bytes)'
+            )
 
         meta = self.getmeta()
 

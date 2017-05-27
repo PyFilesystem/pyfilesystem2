@@ -18,7 +18,7 @@ try:
 except ImportError:
     try:
         from scandir import scandir
-    except ImportError:
+    except ImportError:  # pragma: nocover
         scandir = None
 
 from . import errors

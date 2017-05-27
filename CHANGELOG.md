@@ -6,6 +6,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+
+### Fixed
+
+- Stat information was missing from info
+
+### Changed
+
+- More specific error when `validatepath` throws an error about the path
+    argument being the wrong type, and changed from a ValueError to a
+    TypeError.
+
 ## [2.0.3] - 2017-04-22
 
 ### Added
