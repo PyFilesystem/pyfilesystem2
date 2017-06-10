@@ -152,8 +152,10 @@ class OSFS(FS):
             'size': stat_result.st_size,
             'type': int(cls._get_type_from_stat(stat_result))
         }
-        if hasattr(stat_result, 'st_birthtime'):
-            details['created'] = stat_result.st_birthtime
+        # On other Unix systems (such as FreeBSD), the following
+        # attributes may be available (but may be only filled out if
+        # root tries to use them):
+        details['created'] = getattr(stat_result, 'st_birthtime', None)
         ctime_key = (
             'created'
             if _WINDOWS_PLATFORM
