@@ -6,10 +6,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+### Added
+
+- Opener extension mechanism contributed by Martin Larralde.
 
 ### Fixed
 
-- Stat information was missing from info
+- Stat information was missing from info.
 
 ### Changed
 
