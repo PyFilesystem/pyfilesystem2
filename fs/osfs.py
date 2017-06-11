@@ -44,9 +44,9 @@ class OSFS(FS):
     """
     Create an OSFS.
 
-    :param root_path: An OS path to the location on your HD you
-        wish to manage.
-    :type root_path: str
+    :param root_path: An OS path or path-like object to the location on
+        your HD you wish to manage.
+    :type root_path: str or path-like
     :param create: Set to ``True`` to create the root directory if it
         does not already exist, otherwise the directory should exist
         prior to creating the ``OSFS`` instance.
@@ -54,9 +54,6 @@ class OSFS(FS):
     :param int create_mode: The permissions that will be used to create
         the directory if ``create`` is True and the path doesn't exist,
         defaults to ``0o777``.
-    :param encoding: The encoding to use for paths, or ``None``
-        (default) to auto-detect.
-    :type encoding: str
     :raises `fs.errors.CreateFailed`: If ``root_path`` does not
         exists, or could not be created.
 
