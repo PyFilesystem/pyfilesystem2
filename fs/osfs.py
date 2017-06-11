@@ -25,8 +25,9 @@ from . import errors
 from .errors import FileExists
 from .base import FS
 from .enums import ResourceType
+from ._fscompat import fsencode, fsdecode, fspath
 from .info import Info
-from .path import abspath, basename, normpath
+from .path import basename
 from .permissions import Permissions
 from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
@@ -71,13 +72,11 @@ class OSFS(FS):
     def __init__(self,
                  root_path,
                  create=False,
-                 create_mode=0o777,
-                 encoding=None):
+                 create_mode=0o777):
         """Create an OSFS instance."""
 
         super(OSFS, self).__init__()
-        self.encoding = encoding or sys.getfilesystemencoding()
-
+        root_path = fsdecode(fspath(root_path))
         _root_path = os.path.expanduser(os.path.expandvars(root_path))
         _root_path = os.path.normpath(os.path.abspath(_root_path))
         self.root_path = _root_path
@@ -113,24 +112,20 @@ class OSFS(FS):
             _meta["invalid_path_chars"] = '\0'
 
             if 'PC_PATH_MAX' in os.pathconf_names:
-                root_path_safe = _root_path.encode(self.encoding) \
-                    if six.PY2 and isinstance(_root_path, six.text_type) \
-                    else _root_path
                 _meta['max_sys_path_length'] = (
                     os.pathconf(
-                        root_path_safe,
+                        fsencode(_root_path),
                         os.pathconf_names['PC_PATH_MAX']
                     )
                 )
 
     def __repr__(self):
-        _fmt = "{}({!r}, encoding={!r})"
+        _fmt = "{}({!r})"
         return _fmt.format(self.__class__.__name__,
-                           self.root_path,
-                           self.encoding)
+                           self.root_path)
 
     def __str__(self):
-        fmt = "<{} '{}'>"
+        fmt = "<{} '{!r}'>"
         return fmt.format(self.__class__.__name__.lower(),
                           self.root_path)
 
