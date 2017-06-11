@@ -14,6 +14,13 @@ class PathMock(object):
         return self._path
 
 
+class BrokenPathMock(object):
+    def __init__(self, path):
+        self._path = path
+    def __fspath__(self):
+        return self.broken
+
+
 class TestFSCompact(unittest.TestCase):
 
     def test_fspath(self):
@@ -23,6 +30,15 @@ class TestFSCompact(unittest.TestCase):
         self.assertEqual(fspath(path), b'foo')
         path = 'foo'
         assert path is fspath(path)
+
+        with self.assertRaises(TypeError):
+            fspath(100)
+
+        with self.assertRaises(TypeError):
+            fspath(PathMock(5))
+
+        with self.assertRaises(AttributeError):
+            fspath(BrokenPathMock('foo'))
 
     def test_fsencode(self):
         encode_bytes = fsencode(b'foo')
