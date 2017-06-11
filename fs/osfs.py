@@ -125,7 +125,7 @@ class OSFS(FS):
                            self.root_path)
 
     def __str__(self):
-        fmt = "<{} '{!r}'>"
+        fmt = "<{} '{}'>"
         return fmt.format(self.__class__.__name__.lower(),
                           self.root_path)
 
