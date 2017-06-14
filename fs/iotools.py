@@ -112,17 +112,10 @@ class RawWrapper(io.IOBase):
     def writelines(self, sequence):
         return self._f.writelines(sequence)
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        self.close()
-
     def __iter__(self):
         return iter(self._f)
 
-    def __del__(self):
-        self.close()
+
 
 
 def make_stream(name,
