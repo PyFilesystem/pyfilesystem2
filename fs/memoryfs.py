@@ -34,7 +34,6 @@ class _MemoryFile(io.IOBase):
 
         self.accessed_time = time.time()
         self.modified_time = time.time()
-        #self.closed = False
         self.pos = 0
 
         if self._mode.truncate:
@@ -149,12 +148,6 @@ class _MemoryFile(io.IOBase):
         with self._seek_lock():
             self.on_modify()
             self._bytes_io.writelines(sequence)
-
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
 
 
 class _DirEntry(object):

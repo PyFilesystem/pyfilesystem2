@@ -22,8 +22,6 @@ class RawWrapper(io.IOBase):
         if not self._f.closed:
             super(RawWrapper, self).close()
         self._f.close()
-            # self._f.close()
-            # self._closed = True
 
     def fileno(self):
         return self._f.fileno()
