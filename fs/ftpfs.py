@@ -87,7 +87,7 @@ def _encode(s):
     return s.encode() if PY2 and isinstance(s, text_type) else s
 
 
-class FTPFile(object):
+class FTPFile(io.IOBase):
 
     def __init__(self, ftpfs, path, mode):
         self.fs = ftpfs
@@ -98,7 +98,6 @@ class FTPFile(object):
         self.ftp = self._open_ftp()
         self._read_conn = None
         self._write_conn = None
-        self._closed = False
 
     def _open_ftp(self):
         ftp = self.fs._open_ftp()
@@ -154,7 +153,7 @@ class FTPFile(object):
 
     def close(self):
         with self._lock:
-            if not self._closed:
+            if not self.closed:
                 try:
                     if self._write_conn is not None:
                         self._write_conn.close()
@@ -167,10 +166,13 @@ class FTPFile(object):
                     except error_temp:  # pragma: nocover
                         pass
                 finally:
-                    self._closed = True
+                    super(FTPFile, self).close()
 
     def tell(self):
         return self.pos
+
+    def readable(self):
+        return self.mode.reading
 
     def read(self, size=None):
         if not self.mode.reading:
@@ -211,6 +213,9 @@ class FTPFile(object):
                 break
         return lines
 
+    def writable(self):
+        return self.mode.writing
+
     def write(self, data):
         if not self.mode.writing:
             raise IOError('File not open for writing')
@@ -242,6 +247,8 @@ class FTPFile(object):
                 if len(data) < size:
                     f.write(b'\0' * (size - len(data)))
 
+    def seekable(self):
+        return True
 
     def seek(self, pos, whence=Seek.set):
         if whence not in (Seek.set, Seek.current, Seek.end):
@@ -265,6 +272,7 @@ class FTPFile(object):
             if self._write_conn:
                 self._write_conn.close()
                 self._write_conn = None
+
 
 
 class FTPFS(FS):

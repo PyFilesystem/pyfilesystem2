@@ -9,19 +9,21 @@ from io import SEEK_SET, SEEK_CUR
 from .mode import Mode
 
 
-class RawWrapper(object):
+class RawWrapper(io.IOBase):
     """Convert a Python 2 style file-like object in to a IO object."""
 
     def __init__(self, f, mode=None, name=None):
         self._f = f
         self.mode = mode or getattr(f, 'mode', None)
         self.name = name
-        self.closed = False
         super(RawWrapper, self).__init__()
 
     def close(self):
+        if not self._f.closed:
+            super(RawWrapper, self).close()
         self._f.close()
-        self.closed = True
+            # self._f.close()
+            # self._closed = True
 
     def fileno(self):
         return self._f.fileno()

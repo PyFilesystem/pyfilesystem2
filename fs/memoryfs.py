@@ -23,7 +23,7 @@ from .mode import Mode
 
 
 @six.python_2_unicode_compatible
-class _MemoryFile(object):
+class _MemoryFile(io.IOBase):
 
     def __init__(self, path, memory_fs, bytes_io, mode, lock):
         self._path = path
@@ -34,7 +34,7 @@ class _MemoryFile(object):
 
         self.accessed_time = time.time()
         self.modified_time = time.time()
-        self.closed = False
+        #self.closed = False
         self.pos = 0
 
         if self._mode.truncate:
@@ -96,7 +96,8 @@ class _MemoryFile(object):
         with self._lock:
             if not self.closed:
                 self._memory_fs._on_close_file(self, self._path)
-            self.closed = True
+            super(_MemoryFile, self).close()
+            #self.closed = True
 
     def read(self, size=None):
         if not self._mode.reading:
@@ -107,9 +108,15 @@ class _MemoryFile(object):
             self.on_access()
             return self._bytes_io.read(size)
 
+    def readable(self):
+        return self._mode.reading
+
     def readlines(self, hint=-1):
         with self._seek_lock():
             return self._bytes_io.readlines(hint)
+
+    def seekable(self):
+        return True
 
     def seek(self, *args, **kwargs):
         with self._seek_lock():
@@ -127,6 +134,9 @@ class _MemoryFile(object):
                 self._bytes_io.seek(0, os.SEEK_END)
                 file_size = self._bytes_io.tell()
                 self._bytes_io.write(b'\0' * (size - file_size))
+
+    def writable(self):
+        return self._mode.writing
 
     def write(self, data):
         if not self._mode.writing:
