@@ -131,26 +131,6 @@ class FTPFile(io.IOBase):
         _repr = "<ftpfile {!r} {!r} {!r}>"
         return _repr.format(self.fs.ftp_url, self.path, self.mode)
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        self.close()
-
-    def __iter__(self):
-        return line_iterator(self)
-
-    def __del__(self):
-        self.close()
-
-    def flush(self):
-        pass
-
-    def next(self):
-        return self.readline()
-
-    __next__ = next
-
     def close(self):
         with self._lock:
             if not self.closed:
