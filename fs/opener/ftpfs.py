@@ -21,7 +21,7 @@ class FTPOpener(Opener):
             passwd=parse_result.password,
         )
         ftp_fs = (
-            ftp_fs.opendir(dir_path, fs_class=ClosingSubFS)
+            ftp_fs.opendir(dir_path, factory=ClosingSubFS)
             if dir_path else
             ftp_fs
         )

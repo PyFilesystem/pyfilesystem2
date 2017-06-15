@@ -887,7 +887,7 @@ class FSTestCases(object):
         self.fs.opendir('/')
 
         # Check ClosingSubFS closes 'parent'
-        with self.fs.opendir('foo', fs_class=ClosingSubFS) as foo_fs:
+        with self.fs.opendir('foo', factory=ClosingSubFS) as foo_fs:
             six.assertCountEqual(self, foo_fs.listdir('/'), ['bar', 'egg'])
             self.assertTrue(foo_fs.isfile('bar'))
             self.assertTrue(foo_fs.isfile('egg'))

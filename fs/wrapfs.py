@@ -345,15 +345,15 @@ class WrapFS(FS):
             )
         return open_file
 
-    def opendir(self, path, fs_class=None):
+    def opendir(self, path, factory=None):
         from .subfs import SubFS
-        fs_class = fs_class or SubFS
+        factory = factory or SubFS
         if not self.getinfo(path).is_dir:
             raise errors.DirectoryExpected(
                 path=path
             )
         with unwrap_errors(path):
-            return fs_class(self, path)
+            return factory(self, path)
 
     def setbytes(self, path, contents):
         self.check()
