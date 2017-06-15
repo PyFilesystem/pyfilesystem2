@@ -3,6 +3,7 @@
 
 from ._base import Opener
 from ._registry import registry
+from ..subfs import ClosingSubFS
 
 @registry.install
 class FTPOpener(Opener):
@@ -20,7 +21,7 @@ class FTPOpener(Opener):
             passwd=parse_result.password,
         )
         ftp_fs = (
-            ftp_fs.opendir(dir_path)
+            ftp_fs.opendir(dir_path, fs_class=ClosingSubFS)
             if dir_path else
             ftp_fs
         )

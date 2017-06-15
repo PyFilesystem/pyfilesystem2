@@ -869,10 +869,15 @@ class FS(object):
         )
         return io_stream
 
-    def opendir(self, path):
+    def opendir(self, path, fs_class=None):
         """Get a filesystem object for a sub-directory.
 
         :param str path: Path to a directory on the filesystem.
+        :param fs_class: The FS class to map on to the given directory.
+            This will be :class:`~fs.subfs.SubFS` by default, but it is
+            possible to return an instance of the class given here, as
+            long as it has the same signature as
+            :class:`~fs.subfs.SubFS`
         :returns: A filesystem object representing a sub-directory.
         :rtype: :class:`~fs.subfs.SubFS`
         :raises fs.errors.DirectoryExpected: If ``dst_path`` does not
@@ -880,12 +885,13 @@ class FS(object):
 
         """
         from .subfs import SubFS
+        fs_class = fs_class or SubFS
 
         if not self.getbasic(path).is_dir:
             raise errors.DirectoryExpected(
                 path=path
             )
-        return SubFS(self, path)
+        return fs_class(self, path)
 
     def removetree(self, dir_path):
         """
