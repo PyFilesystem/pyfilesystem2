@@ -665,7 +665,12 @@ class FSTestCases(object):
 
         with self.fs.open('foo/hello', 'wt') as f:
             repr(f)
+            self.assertIsInstance(f, io.IOBase)
+            self.assertTrue(f.writable())
+            self.assertFalse(f.readable())
+            self.assertFalse(f.closed)
             f.write(text)
+        self.assertTrue(f.closed)
 
         with self.assertRaises(errors.FileExists):
             with self.fs.open('foo/hello', 'xt') as f:
@@ -673,7 +678,12 @@ class FSTestCases(object):
 
         # Read it back
         with self.fs.open('foo/hello', 'rt') as f:
+            self.assertIsInstance(f, io.IOBase)
+            self.assertTrue(f.readable())
+            self.assertFalse(f.writable())
+            self.assertFalse(f.closed)
             hello = f.read()
+        self.assertTrue(f.closed)
         self.assertEqual(hello, text)
         self.assert_text('foo/hello', text)
 
@@ -691,10 +701,17 @@ class FSTestCases(object):
         with self.fs.open('foo/hello') as f:
             try:
                 fn = f.fileno()
-            except AttributeError:
+            except io.UnsupportedOperation:
                 pass
             else:
                 self.assertEqual(os.read(fn, 7), b'Goodbye')
+
+        # Test text files are proper iterators over themselves
+        lines = os.linesep.join(["Line 1", "Line 2", "Line 3"])
+        self.fs.settext("iter.txt", lines)
+        with self.fs.open("iter.txt") as f:
+            for actual, expected in zip(f, lines.splitlines(1)):
+                self.assertEqual(actual, expected)
 
     def test_openbin_rw(self):
         # Open a file that doesn't exist
@@ -704,11 +721,16 @@ class FSTestCases(object):
         self.fs.makedir('foo')
 
         # Create a new text file
-        text = b'Hello, World'
+        text = b'Hello, World\n'
 
         with self.fs.openbin('foo/hello', 'w') as f:
             repr(f)
+            self.assertIsInstance(f, io.IOBase)
+            self.assertTrue(f.writable())
+            self.assertFalse(f.readable())
             f.write(text)
+            self.assertFalse(f.closed)
+        self.assertTrue(f.closed)
 
         with self.assertRaises(errors.FileExists):
             with self.fs.openbin('foo/hello', 'x') as f:
@@ -716,7 +738,12 @@ class FSTestCases(object):
 
         # Read it back
         with self.fs.openbin('foo/hello', 'r') as f:
+            self.assertIsInstance(f, io.IOBase)
+            self.assertTrue(f.readable())
+            self.assertFalse(f.writable())
             hello = f.read()
+            self.assertFalse(f.closed)
+        self.assertTrue(f.closed)
         self.assertEqual(hello, text)
         self.assert_bytes('foo/hello', text)
 
@@ -738,10 +765,18 @@ class FSTestCases(object):
         with self.fs.openbin('foo/hello') as f:
             try:
                 fn = f.fileno()
-            except AttributeError:
+            except io.UnsupportedOperation:
                 pass
             else:
                 self.assertEqual(os.read(fn, 7), b'Goodbye')
+
+        # Test binary files are proper iterators over themselves
+        lines = b"\n".join([b"Line 1", b"Line 2", b"Line 3"])
+        self.fs.setbytes("iter.bin", lines)
+        with self.fs.openbin("iter.bin") as f:
+            for actual, expected in zip(f, lines.splitlines(1)):
+                self.assertEqual(actual, expected)
+
 
     def test_open_files(self):
         # Test file-like objects work as expected.
@@ -749,12 +784,17 @@ class FSTestCases(object):
         with self.fs.open('text', 'w') as f:
             repr(f)
             text_type(f)
+            self.assertIsInstance(f, io.IOBase)
+            self.assertTrue(f.writable())
+            self.assertFalse(f.readable())
+            self.assertFalse(f.closed)
             self.assertEqual(f.tell(), 0)
             f.write('Hello\nWorld\n')
             self.assertEqual(f.tell(), 12)
             f.writelines(['foo\n', 'bar\n', 'baz\n'])
             with self.assertRaises(IOError):
                 f.read(1)
+        self.assertTrue(f.closed)
 
         with self.fs.open('bin', 'wb') as f:
             with self.assertRaises(IOError):
@@ -763,31 +803,48 @@ class FSTestCases(object):
         with self.fs.open('text', 'r') as f:
             repr(f)
             text_type(f)
+            self.assertIsInstance(f, io.IOBase)
+            self.assertFalse(f.writable())
+            self.assertTrue(f.readable())
+            self.assertFalse(f.closed)
             self.assertEqual(
                 f.readlines(),
                 ['Hello\n', 'World\n', 'foo\n', 'bar\n', 'baz\n']
             )
             with self.assertRaises(IOError):
                 f.write('no')
+        self.assertTrue(f.closed)
 
         with self.fs.open('text', 'rb') as f:
+            self.assertIsInstance(f, io.IOBase)
+            self.assertFalse(f.writable())
+            self.assertTrue(f.readable())
+            self.assertFalse(f.closed)
             self.assertEqual(
                 f.readlines(8),
                 [b'Hello\n', b'World\n']
             )
             with self.assertRaises(IOError):
                 f.write('no')
+        self.assertTrue(f.closed)
 
         with self.fs.open('text', 'r') as f:
             self.assertEqual(
                 list(f),
                 ['Hello\n', 'World\n', 'foo\n', 'bar\n', 'baz\n']
             )
+            self.assertFalse(f.closed)
+        self.assertTrue(f.closed)
 
         iter_lines = iter(self.fs.open('text'))
         self.assertEqual(next(iter_lines), 'Hello\n')
 
         with self.fs.open('text', 'rb') as f:
+            self.assertIsInstance(f, io.IOBase)
+            self.assertFalse(f.writable())
+            self.assertTrue(f.readable())
+            self.assertTrue(f.seekable())
+            self.assertFalse(f.closed)
             self.assertEqual(f.read(1), b'H')
             f.seek(3, Seek.set)
             self.assertEqual(f.read(1), b'l')
@@ -797,8 +854,14 @@ class FSTestCases(object):
             self.assertEqual(f.read(1), b'z')
             with self.assertRaises(ValueError):
                 f.seek(10, 77)
+        self.assertTrue(f.closed)
 
         with self.fs.open('text', 'r+b') as f:
+            self.assertIsInstance(f, io.IOBase)
+            self.assertTrue(f.readable())
+            self.assertTrue(f.writable())
+            self.assertTrue(f.seekable())
+            self.assertFalse(f.closed)
             f.seek(5)
             f.truncate()
             f.seek(0)
@@ -812,19 +875,31 @@ class FSTestCases(object):
             f.write(b'O')
             f.seek(4)
             self.assertEqual(f.read(1), b'O')
+        self.assertTrue(f.closed)
 
     def test_openbin(self):
         # Write a binary file
         with self.fs.openbin('file.bin', 'wb') as write_file:
             repr(write_file)
             text_type(write_file)
+            self.assertIsInstance(write_file, io.IOBase)
+            self.assertTrue(write_file.writable())
+            self.assertFalse(write_file.readable())
+            self.assertFalse(write_file.closed)
             write_file.write(b'\0\1\2')
+        self.assertTrue(write_file.closed)
+
         # Read a binary file
         with self.fs.openbin('file.bin', 'rb') as read_file:
             repr(write_file)
             text_type(write_file)
+            self.assertIsInstance(read_file, io.IOBase)
+            self.assertTrue(read_file.readable())
+            self.assertFalse(read_file.writable())
+            self.assertFalse(read_file.closed)
             data = read_file.read()
         self.assertEqual(data, b'\0\1\2')
+        self.assertTrue(read_file.closed)
 
         # Check disallow text mode
         with self.assertRaises(ValueError):

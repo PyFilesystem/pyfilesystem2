@@ -9,19 +9,22 @@ from io import SEEK_SET, SEEK_CUR
 from .mode import Mode
 
 
-class RawWrapper(object):
+class RawWrapper(io.IOBase):
     """Convert a Python 2 style file-like object in to a IO object."""
 
     def __init__(self, f, mode=None, name=None):
         self._f = f
         self.mode = mode or getattr(f, 'mode', None)
         self.name = name
-        self.closed = False
         super(RawWrapper, self).__init__()
 
     def close(self):
-        self._f.close()
-        self.closed = True
+        if not self.closed:
+            # Close self first since it will
+            # flush itself, so we can't close
+            # self._f before that
+            super(RawWrapper, self).close()
+            self._f.close()
 
     def fileno(self):
         return self._f.fileno()
@@ -110,17 +113,9 @@ class RawWrapper(object):
     def writelines(self, sequence):
         return self._f.writelines(sequence)
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *args, **kwargs):
-        self.close()
-
     def __iter__(self):
         return iter(self._f)
 
-    def __del__(self):
-        self.close()
 
 
 def make_stream(name,
