@@ -869,10 +869,14 @@ class FS(object):
         )
         return io_stream
 
-    def opendir(self, path):
+    def opendir(self, path, factory=None):
         """Get a filesystem object for a sub-directory.
 
         :param str path: Path to a directory on the filesystem.
+        :param factory: A callable that when invoked with an FS instance
+            and `path` will return a new FS object representing the sub-
+            directory contents. If no `factory` is supplied then
+            :meth:`~fs.subfs.SubFS` will be used.
         :returns: A filesystem object representing a sub-directory.
         :rtype: :class:`~fs.subfs.SubFS`
         :raises fs.errors.DirectoryExpected: If ``dst_path`` does not
@@ -880,12 +884,13 @@ class FS(object):
 
         """
         from .subfs import SubFS
+        factory = factory or SubFS
 
         if not self.getbasic(path).is_dir:
             raise errors.DirectoryExpected(
                 path=path
             )
-        return SubFS(self, path)
+        return factory(self, path)
 
     def removetree(self, dir_path):
         """

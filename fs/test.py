@@ -24,7 +24,7 @@ from fs import ResourceType, Seek
 from fs import errors
 from fs import walk
 from fs.opener import open_fs
-from fs.subfs import SubFS
+from fs.subfs import ClosingSubFS, SubFS
 
 import pytz
 import six
@@ -939,11 +939,15 @@ class FSTestCases(object):
 
         # Open a sub directory
         with self.fs.opendir('foo') as foo_fs:
+            repr(foo_fs)
+            text_type(foo_fs)
             six.assertCountEqual(self, foo_fs.listdir('/'), ['bar', 'egg'])
             self.assertTrue(foo_fs.isfile('bar'))
             self.assertTrue(foo_fs.isfile('egg'))
             self.assertEqual(foo_fs.getbytes('bar'), b'barbar')
             self.assertEqual(foo_fs.getbytes('egg'), b'eggegg')
+
+        self.assertFalse(self.fs.isclosed())
 
         # Attempt to open a non-existent directory
         with self.assertRaises(errors.ResourceNotFound):
@@ -956,6 +960,16 @@ class FSTestCases(object):
         # These should work, and will essentially return a 'clone' of sorts
         self.fs.opendir('')
         self.fs.opendir('/')
+
+        # Check ClosingSubFS closes 'parent'
+        with self.fs.opendir('foo', factory=ClosingSubFS) as foo_fs:
+            six.assertCountEqual(self, foo_fs.listdir('/'), ['bar', 'egg'])
+            self.assertTrue(foo_fs.isfile('bar'))
+            self.assertTrue(foo_fs.isfile('egg'))
+            self.assertEqual(foo_fs.getbytes('bar'), b'barbar')
+            self.assertEqual(foo_fs.getbytes('egg'), b'eggegg')
+
+        self.assertTrue(self.fs.isclosed())
 
     def test_remove(self):
 

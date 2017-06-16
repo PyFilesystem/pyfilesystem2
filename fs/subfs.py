@@ -29,7 +29,8 @@ class SubFS(WrapFS):
         self._sub_dir = abspath(normpath(path))
 
     def __repr__(self):
-        return "SubFS({!r}, {!r})".format(
+        return "{}({!r}, {!r})".format(
+            self.__class__.__name__,
             self._wrap_fs,
             self._sub_dir
         )
@@ -46,3 +47,14 @@ class SubFS(WrapFS):
     def delegate_path(self, path):
         _path = join(self._sub_dir, relpath(normpath(path)))
         return self._wrap_fs, _path
+
+
+class ClosingSubFS(SubFS):
+    """
+    A version of SubFS which will close its parent automatically.
+
+    """
+
+    def close(self):
+        self.delegate_fs().close()
+        super(ClosingSubFS, self).close()
