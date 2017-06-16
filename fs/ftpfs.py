@@ -132,8 +132,8 @@ class FTPFile(io.IOBase):
         return _repr.format(self.fs.ftp_url, self.path, self.mode)
 
     def close(self):
-        with self._lock:
-            if not self.closed:
+        if not self.closed:
+            with self._lock:
                 try:
                     if self._write_conn is not None:
                         self._write_conn.close()
@@ -252,7 +252,6 @@ class FTPFile(io.IOBase):
             if self._write_conn:
                 self._write_conn.close()
                 self._write_conn = None
-
 
 
 class FTPFS(FS):

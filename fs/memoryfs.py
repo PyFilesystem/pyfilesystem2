@@ -92,11 +92,10 @@ class _MemoryFile(io.IOBase):
             return self._bytes_io.readline(*args, **kwargs)
 
     def close(self):
-        with self._lock:
-            if not self.closed:
+        if not self.closed:
+            with self._lock:
                 self._memory_fs._on_close_file(self, self._path)
-            super(_MemoryFile, self).close()
-            #self.closed = True
+                super(_MemoryFile, self).close()
 
     def read(self, size=None):
         if not self._mode.reading:

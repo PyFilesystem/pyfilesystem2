@@ -19,9 +19,12 @@ class RawWrapper(io.IOBase):
         super(RawWrapper, self).__init__()
 
     def close(self):
-        if not self._f.closed:
+        if not self.closed:
+            # Close self first since it will
+            # flush itself, so we can't close
+            # self._f before that
             super(RawWrapper, self).close()
-        self._f.close()
+            self._f.close()
 
     def fileno(self):
         return self._f.fileno()
@@ -112,7 +115,6 @@ class RawWrapper(io.IOBase):
 
     def __iter__(self):
         return iter(self._f)
-
 
 
 
