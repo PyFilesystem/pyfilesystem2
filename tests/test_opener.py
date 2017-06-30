@@ -1,11 +1,14 @@
 from __future__ import unicode_literals
 
 import os
+import mock
 import tempfile
 import unittest
+import pkg_resources
 
 from fs import opener
 from fs.osfs import OSFS
+from fs.opener import errors
 from fs.memoryfs import MemoryFS
 
 
@@ -61,10 +64,86 @@ class TestParse(unittest.TestCase):
 
 class TestRegistry(unittest.TestCase):
 
-    def test_empty(self):
-        registry = opener.Registry()
+    def test_registry_protocols(self):
+        # Check regitry.protocols list the names of all available entry points
+        entry_map = pkg_resources.get_entry_map('fs', 'fs.opener')
+        self.assertEqual(
+            sorted(entry_map.keys()),
+            sorted(opener.registry.protocols)
+        )
+
+    def test_unknown_protocol(self):
         with self.assertRaises(opener.Unsupported):
-            registry.open_fs('osfs:///')
+            opener.open_fs('unknown://')
+
+    def test_entry_point_load_error(self):
+
+        entry_point = mock.MagicMock()
+        entry_point.__next__.return_value = entry_point
+        entry_point.load.side_effect = ValueError("some error")
+
+        with mock.patch('pkg_resources.iter_entry_points', return_value=entry_point):
+            with self.assertRaises(errors.EntryPointError) as ctx:
+                opener.open_fs('test://')
+            self.assertEqual(
+                'could not load entry point', str(ctx.exception))
+
+    def test_entry_point_type_error(self):
+
+        entry_point = mock.MagicMock()
+        entry_point.__next__.return_value = entry_point
+
+        with mock.patch('pkg_resources.iter_entry_points', return_value=entry_point):
+            with self.assertRaises(errors.EntryPointError) as ctx:
+                opener.open_fs('test://')
+            self.assertEqual(
+                'entry point did not return an opener', str(ctx.exception))
+
+    def test_entry_point_create_error(self):
+
+        entry_point = mock.MagicMock()
+        entry_point.__next__.return_value = entry_point
+        entry_point.load.return_value = entry_point
+        entry_point.side_effect = ValueError("some creation error")
+
+        with mock.patch('pkg_resources.iter_entry_points', return_value=entry_point):
+            with mock.patch('builtins.issubclass', return_value=True):
+                with self.assertRaises(errors.EntryPointError) as ctx:
+                    opener.open_fs('test://')
+            self.assertEqual(
+                'could not instantiate opener', str(ctx.exception))
+
+
+
+class TestManageFS(unittest.TestCase):
+
+    def test_manage_fs_url(self):
+        with opener.manage_fs('mem://') as mem_fs:
+            self.assertIsInstance(mem_fs, MemoryFS)
+        self.assertTrue(mem_fs.isclosed())
+
+    def test_manage_fs_obj(self):
+        mem_fs = MemoryFS()
+        with opener.manage_fs(mem_fs) as open_mem_fs:
+            self.assertIs(mem_fs, open_mem_fs)
+        self.assertFalse(mem_fs.isclosed())
+
+    def test_manage_fs_error(self):
+        try:
+            with opener.manage_fs('mem://') as mem_fs:
+                1/0
+        except ZeroDivisionError:
+            pass
+
+        self.assertTrue(mem_fs.isclosed())
+
+class TestOpeners(unittest.TestCase):
+
+    def test_repr(self):
+        # Check __repr__ works
+        for entry_point in pkg_resources.iter_entry_points('fs.opener'):
+            _opener = entry_point.load()
+            repr(_opener())
 
     def test_open_osfs(self):
         fs = opener.open_fs("osfs://.")
@@ -109,33 +188,3 @@ class TestRegistry(unittest.TestCase):
         mem_fs = opener.open_fs("mem://")
         mem_fs_2 = opener.open_fs(mem_fs)
         self.assertEqual(mem_fs, mem_fs_2)
-
-
-class TestManageFS(unittest.TestCase):
-
-    def test_manage_fs_url(self):
-        with opener.manage_fs('mem://') as mem_fs:
-            self.assertIsInstance(mem_fs, MemoryFS)
-        self.assertTrue(mem_fs.isclosed())
-
-    def test_manage_fs_obj(self):
-        mem_fs = MemoryFS()
-        with opener.manage_fs(mem_fs) as open_mem_fs:
-            self.assertIs(mem_fs, open_mem_fs)
-        self.assertFalse(mem_fs.isclosed())
-
-    def test_manage_fs_error(self):
-        try:
-            with opener.manage_fs('mem://') as mem_fs:
-                1/0
-        except ZeroDivisionError:
-            pass
-
-        self.assertTrue(mem_fs.isclosed())
-
-class TestOpeners(unittest.TestCase):
-
-    def test_repr(self):
-        # Check __repr__ works
-        for _opener in opener.registry.protocols.values():
-            repr(_opener)
