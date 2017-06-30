@@ -8,12 +8,13 @@ respective Opener.
 """
 
 import re
+import six
 import contextlib
 import collections
 import pkg_resources
 
 from .base import Opener
-from .errors import OpenerError, ParseError, Unsupported
+from .errors import ParseError, Unsupported, EntryPointError
 
 
 class Registry(object):
@@ -91,6 +92,44 @@ class Registry(object):
         """
         self.default_opener = default_opener
 
+    def get_opener(self, protocol):
+        """Get the opener class associated to a given protocol.
+
+        :param str protocol: A filesystem URL protocol
+        :rtype: ``Opener``
+        :raises Unsupported: If no opener could be found
+        :raises EntryPointLoadingError: If the returned entry point is not
+            an ``Opener`` subclass or could not be loaded successfully.
+        """
+        entry_point = next(
+            pkg_resources.iter_entry_points('fs.opener', protocol), None)
+
+        if entry_point is None:
+            raise Unsupported(
+                "protocol '{}' is not supported".format(protocol))
+
+        try:
+            opener = entry_point.load()
+
+        except Exception as exception:
+            six.raise_from(
+                EntryPointLoadingError('could not load entry point'),
+                exception)
+
+        else:
+            if not issubclass(opener, Opener):
+                raise EntryPointLoadingError(
+                    'entry point did not return an opener')
+
+        try:
+            instance = opener()
+        except Exception as exception:
+            six.raise_from(
+                EntryPointLoadingError('could not instantiate opener'),
+                exception)
+
+        return opener
+
     def open(self,
              fs_url,
              writeable=True,
@@ -120,12 +159,7 @@ class Registry(object):
         protocol = parse_result.protocol
         open_path = parse_result.path
 
-        opener = self.protocols.get(protocol, None)
-
-        if not opener:
-            raise Unsupported(
-                "protocol '{}' is not supported".format(protocol)
-            )
+        opener = self.get_opener(protocol)
 
         open_fs = opener.open_fs(
             fs_url,
