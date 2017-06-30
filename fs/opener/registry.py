@@ -10,9 +10,10 @@ respective Opener.
 import re
 import contextlib
 import collections
+import pkg_resources
 
-from ._base import Opener
-from ._errors import OpenerError, ParseError, Unsupported
+from .base import Opener
+from .errors import OpenerError, ParseError, Unsupported
 
 
 class Registry(object):
@@ -89,29 +90,6 @@ class Registry(object):
 
         """
         self.default_opener = default_opener
-        self.protocols = {}
-
-    def install(self, opener):
-        """
-        Install an opener.
-
-        :param opener: An :class:`Opener` instance, or a callable
-            that returns an opener instance.
-
-        May be used as a class decorator. For example::
-
-            registry = Registry()
-
-            @registry.install
-            class ArchiveOpener(Opener):
-                protocols = ['zip', 'tar']
-
-        """
-        if not isinstance(opener, Opener):
-            opener = opener()
-        assert opener.protocols, "must list one or more protocols"
-        for protocol in opener.protocols:
-            self.protocols[protocol] = opener
 
     def open(self,
              fs_url,

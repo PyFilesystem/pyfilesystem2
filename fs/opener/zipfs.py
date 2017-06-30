@@ -1,10 +1,8 @@
 # coding: utf-8
 """Defines the ZipOpener."""
 
-from ._base import Opener
-from ._registry import registry
+from .base import Opener
 
-@registry.install
 class ZipOpener(Opener):
     protocols = ['zip']
 
