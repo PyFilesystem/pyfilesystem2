@@ -122,13 +122,13 @@ class Registry(object):
                     'entry point did not return an opener')
 
         try:
-            instance = opener()
+            opener_instance = opener()
         except Exception as exception:
             six.raise_from(
                 EntryPointLoadingError('could not instantiate opener'),
                 exception)
 
-        return opener
+        return opener_instance
 
     def open(self,
              fs_url,
