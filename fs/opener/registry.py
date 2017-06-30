@@ -81,6 +81,11 @@ class Registry(object):
             path
         )
 
+    @property
+    def protocols(self):
+        return [entry_point.name for entry_point \
+                in pkg_resources.iter_entry_points('fs.opener')]
+
     def __init__(self, default_opener='osfs'):
         """
         Create a registry object.
@@ -113,19 +118,18 @@ class Registry(object):
 
         except Exception as exception:
             six.raise_from(
-                EntryPointLoadingError('could not load entry point'),
+                EntryPointError('could not load entry point'),
                 exception)
 
         else:
             if not issubclass(opener, Opener):
-                raise EntryPointLoadingError(
-                    'entry point did not return an opener')
+                raise EntryPointError('entry point did not return an opener')
 
         try:
             opener_instance = opener()
         except Exception as exception:
             six.raise_from(
-                EntryPointLoadingError('could not instantiate opener'),
+                EntryPointError('could not instantiate opener'),
                 exception)
 
         return opener_instance
