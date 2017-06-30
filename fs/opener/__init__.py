@@ -10,6 +10,7 @@ various objects and functions to open and manage FS.
 # Declare fs.opener as a namespace package
 import pkg_resources
 pkg_resources.declare_namespace(__name__)
+del pkg_resources
 
 # Import objects into fs.opener namespace
 from .registry import registry, Registry
