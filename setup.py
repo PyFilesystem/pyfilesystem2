@@ -39,6 +39,15 @@ setup(
         "scandir :python_version < '3.5'": ['scandir~=1.5'],
         ":python_version < '3.4'": ['enum34~=1.1.6']
     },
+    entry_points={'fs.opener': [
+        'ftp  = fs.opener.ftpfs:FTPFSOpener',
+        'file = fs.opener.osfs:OSFSOpener',
+        'osfs = fs.opener.osfs:OSFSOpener',
+        'mem  = fs.opener.memoryfs:MemOpener',
+        'tar  = fs.opener.tarfs:TarOpener',
+        'temp = fs.opener.tempfs:TempOpener',
+        'zip  = fs.opener.zipfs:ZipOpener',
+    ]},
     license="BSD",
     long_description=DESCRIPTION,
     name='fs',
@@ -49,3 +58,4 @@ setup(
     url="https://github.com/PyFilesystem/pyfilesystem2",
     version=__version__,
 )
+
