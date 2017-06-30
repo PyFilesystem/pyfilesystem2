@@ -40,7 +40,7 @@ setup(
         ":python_version < '3.4'": ['enum34~=1.1.6']
     },
     entry_points={'fs.opener': [
-        'ftp  = fs.opener.ftpfs:FTPFSOpener',
+        'ftp  = fs.opener.ftpfs:FTPOpener',
         'file = fs.opener.osfs:OSFSOpener',
         'osfs = fs.opener.osfs:OSFSOpener',
         'mem  = fs.opener.memoryfs:MemOpener',
@@ -58,4 +58,3 @@ setup(
     url="https://github.com/PyFilesystem/pyfilesystem2",
     version=__version__,
 )
-
