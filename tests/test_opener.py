@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import six
 import mock
 import tempfile
 import unittest
@@ -79,10 +80,11 @@ class TestRegistry(unittest.TestCase):
     def test_entry_point_load_error(self):
 
         entry_point = mock.MagicMock()
-        entry_point.__next__.return_value = entry_point
         entry_point.load.side_effect = ValueError("some error")
 
-        with mock.patch('pkg_resources.iter_entry_points', return_value=entry_point):
+        iter_entry_points = mock.MagicMock(return_value=iter([entry_point]))
+
+        with mock.patch('pkg_resources.iter_entry_points', iter_entry_points):
             with self.assertRaises(errors.EntryPointError) as ctx:
                 opener.open_fs('test://')
             self.assertEqual(
@@ -91,9 +93,10 @@ class TestRegistry(unittest.TestCase):
     def test_entry_point_type_error(self):
 
         entry_point = mock.MagicMock()
-        entry_point.__next__.return_value = entry_point
 
-        with mock.patch('pkg_resources.iter_entry_points', return_value=entry_point):
+        iter_entry_points = mock.MagicMock(return_value=iter([entry_point]))
+
+        with mock.patch('pkg_resources.iter_entry_points', iter_entry_points):
             with self.assertRaises(errors.EntryPointError) as ctx:
                 opener.open_fs('test://')
             self.assertEqual(
@@ -102,12 +105,14 @@ class TestRegistry(unittest.TestCase):
     def test_entry_point_create_error(self):
 
         entry_point = mock.MagicMock()
-        entry_point.__next__.return_value = entry_point
-        entry_point.load.return_value = entry_point
+        entry_point.load = mock.MagicMock(return_value=entry_point)
         entry_point.side_effect = ValueError("some creation error")
 
-        with mock.patch('pkg_resources.iter_entry_points', return_value=entry_point):
-            with mock.patch('builtins.issubclass', return_value=True):
+        iter_entry_points = mock.MagicMock(return_value=iter([entry_point]))
+        builtins = 'builtins' if six.PY3 else '__builtin__'
+
+        with mock.patch('pkg_resources.iter_entry_points', iter_entry_points):
+            with mock.patch(builtins+'.issubclass', return_value=True):
                 with self.assertRaises(errors.EntryPointError) as ctx:
                     opener.open_fs('test://')
             self.assertEqual(
