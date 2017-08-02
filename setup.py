@@ -39,7 +39,7 @@ setup(
         "scandir :python_version < '3.5'": ['scandir~=1.5'],
         ":python_version < '3.4'": ['enum34~=1.1.6']
     },
-    license="BSD",
+    license="MIT",
     long_description=DESCRIPTION,
     name='fs',
     packages=find_packages(exclude=("tests",)),
