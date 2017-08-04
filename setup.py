@@ -23,7 +23,7 @@ with open('README.rst', 'rt') as f:
     DESCRIPTION = f.read()
 
 REQUIREMENTS = [
-    "appdirs~=1.4.0",
+    "appdirs~=1.4.3",
     "pytz",
     "setuptools",
     "six~=1.10.0",
@@ -48,7 +48,7 @@ setup(
         'temp = fs.opener.tempfs:TempOpener',
         'zip  = fs.opener.zipfs:ZipOpener',
     ]},
-    license="BSD",
+    license="MIT",
     long_description=DESCRIPTION,
     name='fs',
     packages=find_packages(exclude=("tests",)),

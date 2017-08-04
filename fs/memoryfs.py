@@ -25,23 +25,23 @@ from .mode import Mode
 @six.python_2_unicode_compatible
 class _MemoryFile(io.IOBase):
 
-    def __init__(self, path, memory_fs, bytes_io, mode, lock):
+    def __init__(self, path, memory_fs, mode, dir_entry):
         self._path = path
         self._memory_fs = memory_fs
-        self._bytes_io = bytes_io
         self._mode = Mode(mode)
-        self._lock = lock
+        self._dir_entry = dir_entry
+        self._bytes_io = dir_entry.bytes_file
 
         self.accessed_time = time.time()
         self.modified_time = time.time()
         self.pos = 0
 
         if self._mode.truncate:
-            with self._lock:
+            with self._dir_entry.lock:
                 self._bytes_io.seek(0)
                 self._bytes_io.truncate()
         elif self._mode.appending:
-            with self._lock:
+            with self._dir_entry.lock:
                 self._bytes_io.seek(0, os.SEEK_END)
                 self.pos = self._bytes_io.tell()
 
@@ -51,26 +51,18 @@ class _MemoryFile(io.IOBase):
 
     @contextlib.contextmanager
     def _seek_lock(self):
-        with self._lock:
+        with self._dir_entry.lock:
             self._bytes_io.seek(self.pos)
             yield
             self.pos = self._bytes_io.tell()
 
     def on_modify(self):
         """Called when file data is modified."""
-        self.modified_time = time.time()
-        self._memory_fs._on_modify_file(
-            self._path,
-            self.modified_time
-        )
+        self._dir_entry.modified_time = self.modified_time = time.time()
 
     def on_access(self):
         """Called when file is accessed."""
-        self.accessed_time = time.time()
-        self._memory_fs._on_access_file(
-            self._path,
-            self.accessed_time
-        )
+        self._dir_entry.accessed_time = self.accessed_time = time.time()
 
     def flush(self):
         pass
@@ -93,8 +85,8 @@ class _MemoryFile(io.IOBase):
 
     def close(self):
         if not self.closed:
-            with self._lock:
-                self._memory_fs._on_close_file(self, self._path)
+            with self._dir_entry.lock:
+                self._dir_entry.remove_open_file(self)
                 super(_MemoryFile, self).close()
 
     def read(self, size=None):
@@ -267,19 +259,6 @@ class MemoryFS(FS):
                     return None
             return current_entry
 
-    def _on_close_file(self, mem_file, path):
-        dir_entry = self._get_dir_entry(path)
-        if dir_entry is not None:
-            dir_entry.remove_open_file(mem_file)
-
-    def _on_access_file(self, path, _time):
-        dir_entry = self._get_dir_entry(path)
-        dir_entry.accessed_time = _time
-
-    def _on_modify_file(self, path, _time):
-        dir_entry = self._get_dir_entry(path)
-        dir_entry.accessed_time = dir_entry.modified_time = _time
-
     def getinfo(self, path, namespaces=None):
         namespaces = namespaces or ()
         _path = self.validatepath(path)
@@ -370,9 +349,8 @@ class MemoryFS(FS):
                 mem_file = _MemoryFile(
                     path=_path,
                     memory_fs=self,
-                    bytes_io=file_dir_entry.bytes_file,
                     mode=mode,
-                    lock=file_dir_entry.lock
+                    dir_entry=file_dir_entry
                 )
 
                 file_dir_entry.add_open_file(mem_file)
@@ -388,9 +366,8 @@ class MemoryFS(FS):
             mem_file = _MemoryFile(
                 path=_path,
                 memory_fs=self,
-                bytes_io=file_dir_entry.bytes_file,
                 mode=mode,
-                lock=file_dir_entry.lock
+                dir_entry=file_dir_entry
             )
             file_dir_entry.add_open_file(mem_file)
             return mem_file
