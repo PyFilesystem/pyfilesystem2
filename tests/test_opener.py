@@ -88,7 +88,7 @@ class TestRegistry(unittest.TestCase):
             with self.assertRaises(errors.EntryPointError) as ctx:
                 opener.open_fs('test://')
             self.assertEqual(
-                'could not load entry point', str(ctx.exception))
+                'could not load entry point; some error', str(ctx.exception))
 
     def test_entry_point_type_error(self):
 
