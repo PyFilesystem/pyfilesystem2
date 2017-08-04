@@ -116,7 +116,7 @@ class TestRegistry(unittest.TestCase):
                 with self.assertRaises(errors.EntryPointError) as ctx:
                     opener.open_fs('test://')
             self.assertEqual(
-                'could not instantiate opener', str(ctx.exception))
+                'could not instantiate opener; some creation error', str(ctx.exception))
 
 
 
