@@ -1,16 +1,14 @@
 # coding: utf-8
 """Defines the FTPOpener."""
 
-from ._base import Opener
-from ._registry import registry
-from ..subfs import ClosingSubFS
+from .base import Opener
 
-@registry.install
 class FTPOpener(Opener):
     protocols = ['ftp']
 
     def open_fs(self, fs_url, parse_result, writeable, create, cwd):
         from ..ftpfs import FTPFS
+        from ..subfs import ClosingSubFS
         ftp_host, _, dir_path = parse_result.resource.partition('/')
         ftp_host, _, ftp_port = ftp_host.partition(':')
         ftp_port = int(ftp_port) if ftp_port.isdigit() else 21

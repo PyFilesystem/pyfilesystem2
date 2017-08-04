@@ -1,8 +1,8 @@
+# coding: utf-8
 """Defines the OSFSOpener."""
-from ._base import Opener
-from ._registry import registry
 
-@registry.install
+from .base import Opener
+
 class OSFSOpener(Opener):
     protocols = ['file', 'osfs']
 

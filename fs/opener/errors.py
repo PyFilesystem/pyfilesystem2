@@ -13,6 +13,9 @@ class ParseError(ValueError):
 class OpenerError(Exception):
     """Base class for opener related errors."""
 
-
 class Unsupported(OpenerError):
     """May be raised by opener if the opener fails to open a FS."""
+
+
+class EntryPointError(OpenerError, RuntimeError):
+    """Raised by the registry when an entry point cannot be loaded."""

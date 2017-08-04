@@ -8,11 +8,13 @@ respective Opener.
 """
 
 import re
+import six
 import contextlib
 import collections
+import pkg_resources
 
-from ._base import Opener
-from ._errors import OpenerError, ParseError, Unsupported
+from .base import Opener
+from .errors import ParseError, Unsupported, EntryPointError
 
 
 class Registry(object):
@@ -79,6 +81,11 @@ class Registry(object):
             path
         )
 
+    @property
+    def protocols(self):
+        return [entry_point.name for entry_point \
+                in pkg_resources.iter_entry_points('fs.opener')]
+
     def __init__(self, default_opener='osfs'):
         """
         Create a registry object.
@@ -89,29 +96,43 @@ class Registry(object):
 
         """
         self.default_opener = default_opener
-        self.protocols = {}
 
-    def install(self, opener):
+    def get_opener(self, protocol):
+        """Get the opener class associated to a given protocol.
+
+        :param str protocol: A filesystem URL protocol
+        :rtype: ``Opener``
+        :raises Unsupported: If no opener could be found
+        :raises EntryPointLoadingError: If the returned entry point is not
+            an ``Opener`` subclass or could not be loaded successfully.
         """
-        Install an opener.
+        entry_point = next(
+            pkg_resources.iter_entry_points('fs.opener', protocol), None)
 
-        :param opener: An :class:`Opener` instance, or a callable
-            that returns an opener instance.
+        if entry_point is None:
+            raise Unsupported(
+                "protocol '{}' is not supported".format(protocol))
 
-        May be used as a class decorator. For example::
+        try:
+            opener = entry_point.load()
 
-            registry = Registry()
+        except Exception as exception:
+            six.raise_from(
+                EntryPointError('could not load entry point'),
+                exception)
 
-            @registry.install
-            class ArchiveOpener(Opener):
-                protocols = ['zip', 'tar']
+        else:
+            if not issubclass(opener, Opener):
+                raise EntryPointError('entry point did not return an opener')
 
-        """
-        if not isinstance(opener, Opener):
-            opener = opener()
-        assert opener.protocols, "must list one or more protocols"
-        for protocol in opener.protocols:
-            self.protocols[protocol] = opener
+        try:
+            opener_instance = opener()
+        except Exception as exception:
+            six.raise_from(
+                EntryPointError('could not instantiate opener'),
+                exception)
+
+        return opener_instance
 
     def open(self,
              fs_url,
@@ -142,12 +163,7 @@ class Registry(object):
         protocol = parse_result.protocol
         open_path = parse_result.path
 
-        opener = self.protocols.get(protocol, None)
-
-        if not opener:
-            raise Unsupported(
-                "protocol '{}' is not supported".format(protocol)
-            )
+        opener = self.get_opener(protocol)
 
         open_fs = opener.open_fs(
             fs_url,

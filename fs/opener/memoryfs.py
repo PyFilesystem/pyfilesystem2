@@ -1,10 +1,8 @@
 # coding: utf-8
 """Defines the MemOpener."""
 
-from ._base import Opener
-from ._registry import registry
+from .base import Opener
 
-@registry.install
 class MemOpener(Opener):
     protocols = ['mem']
 
