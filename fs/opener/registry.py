@@ -7,6 +7,10 @@ Defines the Registry, which maps protocols and FS URLs to their
 respective Opener.
 """
 
+from __future__ import absolute_import
+from __future__ import print_function
+from __future__ import unicode_literals
+
 import re
 import six
 import contextlib
@@ -83,8 +87,10 @@ class Registry(object):
 
     @property
     def protocols(self):
-        return [entry_point.name for entry_point \
-                in pkg_resources.iter_entry_points('fs.opener')]
+        return [
+            entry_point.name
+            for entry_point in pkg_resources.iter_entry_points('fs.opener')
+        ]
 
     def __init__(self, default_opener='osfs'):
         """
@@ -97,40 +103,53 @@ class Registry(object):
         """
         self.default_opener = default_opener
 
+    def __repr__(self):
+        return "<fs-registry {!r}>".format(self.protocols)
+
     def get_opener(self, protocol):
         """Get the opener class associated to a given protocol.
 
         :param str protocol: A filesystem URL protocol
         :rtype: ``Opener``
         :raises Unsupported: If no opener could be found
-        :raises EntryPointLoadingError: If the returned entry point is not
-            an ``Opener`` subclass or could not be loaded successfully.
+        :raises EntryPointLoadingError: If the returned entry point is
+            not an ``Opener`` subclass or could not be loaded
+            successfully.
         """
         entry_point = next(
-            pkg_resources.iter_entry_points('fs.opener', protocol), None)
+            pkg_resources.iter_entry_points('fs.opener', protocol),
+            None
+        )
 
         if entry_point is None:
             raise Unsupported(
-                "protocol '{}' is not supported".format(protocol))
+                "protocol '{}' is not supported".format(protocol)
+            )
 
         try:
             opener = entry_point.load()
-
         except Exception as exception:
             six.raise_from(
-                EntryPointError('could not load entry point'),
-                exception)
-
+                EntryPointError(
+                    'could not load entry point; {}'.format(exception)
+                ),
+                exception
+            )
         else:
             if not issubclass(opener, Opener):
-                raise EntryPointError('entry point did not return an opener')
+                raise EntryPointError(
+                    'entry point did not return an opener'
+                )
 
         try:
             opener_instance = opener()
         except Exception as exception:
             six.raise_from(
-                EntryPointError('could not instantiate opener'),
-                exception)
+                EntryPointError(
+                    'could not instantiate opener; {}'.format(exception)
+                ),
+                exception
+            )
 
         return opener_instance
 
@@ -235,8 +254,8 @@ class Registry(object):
                 with manage_fs(list_fs) as fs:
                     print(" ".join(fs.listdir()))
 
-        This function may be used in two ways. You may either pass either a
-        ``str``, as follows::
+        This function may be used in two ways. You may either pass
+        either a ``str``, as follows::
 
             print_list('zip://projects.zip')
 
@@ -263,7 +282,6 @@ class Registry(object):
                 raise
             finally:
                 _fs.close()
-
 
 
 registry = Registry()

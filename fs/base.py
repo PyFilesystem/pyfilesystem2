@@ -191,8 +191,8 @@ class FS(object):
         :raises fs.errors.ResourceNotFound: If `path` does not exist
             on the filesystem.
 
-        This method is the compliment to :class:`~fs.base.getinfo` and is
-        used to set info values on a resource.
+        This method is the compliment to :class:`~fs.base.getinfo` and
+        is used to set info values on a resource.
 
         The ``info`` dict should be in the same format as the raw
         info returned by ``getinfo(file).raw``. Here's an example::

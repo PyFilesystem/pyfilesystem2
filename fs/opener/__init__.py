@@ -11,8 +11,9 @@ various objects and functions to open and manage FS.
 __import__('pkg_resources').declare_namespace(__name__)
 
 # Import objects into fs.opener namespace
-from .registry import registry, Registry
+from .base import Opener
 from .errors import OpenerError, ParseError, Unsupported
+from .registry import registry, Registry
 
 # Alias functions defined as Registry methods
 open_fs = registry.open_fs
@@ -24,6 +25,7 @@ parse = registry.parse
 __all__ = [
     "registry",
     "Registry",
+    "Opener",
     "OpenerError",
     "ParseError",
     "Unsupported",
