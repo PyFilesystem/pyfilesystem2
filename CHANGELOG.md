@@ -4,7 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## Unreleased
+## [2.0.6] - 2017-08-05
+
+### Fixes
+- Opener refinements
+
+## [2.0.5] - 2017-08-02
 
 ### Fixed
 - Fixed potential for deadlock in MemoryFS
