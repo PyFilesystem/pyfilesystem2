@@ -4,23 +4,23 @@ Creating an extension
 =====================
 
 Once a filesystem has been implemented, it can be integrated with other
-projects and applications using PyFilesystem.
+applications and projects using PyFilesystem.
 
 
 Naming Convention
 -----------------
 
 For visibility in PyPi, we recommend that your package be prefixed with
-``fs-``, for example your package may be named `fs-awesome` or `fs-
-awesomefs`.
+``fs-``. For instance if you have implemented an ``AwesomeFS``
+PyFilesystem class, your packaged could be be named ``fs-awesome`` or
+``fs-awesomefs``.
 
 
 Opener
 ------
 
-In order for your filesystem to be opened through :doc:`openers` like
-the other builtin filesystems, you should define a
-:class:`~fs.opener.base.Opener` class for your filesystem.
+In order for your filesystem to be opened with an :ref:`FS URL <fs-urls>`
+you should define an :class:`~fs.opener.base.Opener` class.
 
 Here's an example taken from an Amazon S3 Filesystem::
 
@@ -51,7 +51,7 @@ Here's an example taken from an Amazon S3 Filesystem::
           )
           return s3fs
 
-My convention this would be declared in ``opener.py``.
+By convention this would be defined in ``opener.py``.
 
 
 To register the opener you will need to define an `entry point
@@ -59,18 +59,17 @@ To register the opener you will need to define an `entry point
 in your setup.py. See below for an example.
 
 
-The ``setup.py`` file
----------------------
+The setup.py file
+-----------------
 
 Refer to the `setuptools documentation <https://setuptools.readthedocs.io/>`_
 to see how to write a ``setup.py`` file. There are only a few things that
 should be kept in mind when creating a Pyfilesystem2 extension. Make sure that:
 
-* ``fs`` is in the ``install_requires`` list, in order to always have
-  Pyfilesystem2 installed before your extension. You should reference
-  the version number with the ``~=`` operator which ensures that the
-  install will get any bugfix releases of PyFilesystem but not any
-  potentially breaking changes.
+* ``fs`` is in the ``install_requires`` list. You should reference the
+  version number with the ``~=`` operator which ensures that the install
+  will get any bugfix releases of PyFilesystem but not any potentially
+  breaking changes.
 * Ìf you created an opener, include it as an ``fs.opener`` entry point,
   using the name of the entry point as the protocol to be used.
 
@@ -100,27 +99,23 @@ Here is an minimal ``setup.py`` for our project:
 Good Practices
 --------------
 
-* Keep track of your achievements ! Add ``__version__``, ``__author__``,
-  ``__author_email__`` and ``__license__`` variables to your project
-  (either in ``fs/awesomefs.py`` or ``fs/awesomefs/__init__.py`` depending
-  on the chosen structure), containing:
+Keep track of your achievements! Add the following values to your ``__init__.py``:
 
-    ``__version__``
-      the version of the extension (use `Semantic Versioning
-      <http://semver.org/>`_ if possible !)
+ * ``__version__`` The version of the extension (we recommend following
+   `Semantic Versioning <http://semver.org/>`_),
+ * ``__author__`` Your name(s).
+ * ``__author_email__`` Your email(s).
+ * ``__license__`` The module's license.
 
-    ``__author__``
-      your name(s)
+Let us Know
+-----------
 
-    ``__author_email__``
-      your email(s)
-
-    ``__license__``
-      the license of the subpackage
+Contact us to add your filesystem to the `PyFilesystem Wiki <https://www.pyfilesystem.org/page/index-of-filesystems/>`_.
 
 
 Live Example
 ------------
 
 See `fs.sshfs <https://github.com/althonos/fs.sshfs>`_ for a functioning
-PyFilesystem2 extension implementing a Pyfilesystem2 filesystem over SSH.
+PyFilesystem2 extension implementing a Pyfilesystem2 filesystem over
+SSH.

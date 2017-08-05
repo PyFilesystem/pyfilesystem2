@@ -846,8 +846,7 @@ class FS(object):
             ``utf-8``)
         :param str errors: What to do with unicode decode errors (see
             `stdlib docs <https://docs.python.org/3/library/codecs.html#error-handlers>`_)
-        :param str newline: New line parameter (See `stdlib docs
-            <https://docs.python.org/3/library/functions.html#open>`_)
+        :param str newline: New line parameter (See stdlib docs).
         :param options: Additional keyword parameters to set
             implementation specific options (if required). See
             implementation docs for details.

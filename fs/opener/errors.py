@@ -3,7 +3,8 @@
 fs.opener.errors
 ================
 
-Errors raised when attempting to open a filesystem
+Errors raised when attempting to open a filesystem.
+
 """
 
 class ParseError(ValueError):
@@ -13,9 +14,11 @@ class ParseError(ValueError):
 class OpenerError(Exception):
     """Base class for opener related errors."""
 
-class Unsupported(OpenerError):
-    """May be raised by opener if the opener fails to open a FS."""
+
+class UnsupportedProtocol(OpenerError):
+    """May be raised if no opener could be found for a given
+    protocol."""
 
 
-class EntryPointError(OpenerError, RuntimeError):
+class EntryPointError(OpenerError):
     """Raised by the registry when an entry point cannot be loaded."""

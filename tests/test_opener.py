@@ -9,14 +9,18 @@ import pkg_resources
 
 from fs import opener
 from fs.osfs import OSFS
-from fs.opener import errors
+from fs.opener import registry, errors
 from fs.memoryfs import MemoryFS
 
 
 class TestParse(unittest.TestCase):
 
+    def test_registry_repr(self):
+        str(registry)
+        repr(registry)
+
     def test_parse_not_url(self):
-        with self.assertRaises(opener.ParseError):
+        with self.assertRaises(errors.ParseError):
             parsed = opener.parse('foo/bar')
 
     def test_parse_simple(self):
@@ -66,15 +70,21 @@ class TestParse(unittest.TestCase):
 class TestRegistry(unittest.TestCase):
 
     def test_registry_protocols(self):
-        # Check regitry.protocols list the names of all available entry points
-        entry_map = pkg_resources.get_entry_map('fs', 'fs.opener')
+        # Check registry.protocols list the names of all available entry points
+
+        protocols = [
+            entry_point.name
+            for entry_point in
+            pkg_resources.iter_entry_points('fs.opener')
+        ]
+
         self.assertEqual(
-            sorted(entry_map.keys()),
+            sorted(protocols),
             sorted(opener.registry.protocols)
         )
 
     def test_unknown_protocol(self):
-        with self.assertRaises(opener.Unsupported):
+        with self.assertRaises(errors.UnsupportedProtocol):
             opener.open_fs('unknown://')
 
     def test_entry_point_load_error(self):
@@ -119,7 +129,6 @@ class TestRegistry(unittest.TestCase):
                 'could not instantiate opener; some creation error', str(ctx.exception))
 
 
-
 class TestManageFS(unittest.TestCase):
 
     def test_manage_fs_url(self):
@@ -139,8 +148,8 @@ class TestManageFS(unittest.TestCase):
                 1/0
         except ZeroDivisionError:
             pass
-
         self.assertTrue(mem_fs.isclosed())
+
 
 class TestOpeners(unittest.TestCase):
 

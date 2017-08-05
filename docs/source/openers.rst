@@ -1,3 +1,5 @@
+.. _fs-urls:
+
 FS URLs
 =======
 

@@ -5,6 +5,7 @@ fs.opener.registry
 
 Defines the Registry, which maps protocols and FS URLs to their
 respective Opener.
+
 """
 
 from __future__ import absolute_import
@@ -18,7 +19,7 @@ import collections
 import pkg_resources
 
 from .base import Opener
-from .errors import ParseError, Unsupported, EntryPointError
+from .errors import ParseError, UnsupportedProtocol, EntryPointError
 
 
 class Registry(object):
@@ -56,12 +57,11 @@ class Registry(object):
     @classmethod
     def parse(cls, fs_url):
         """
-        Parse a Filesystem URL and return a :class:`ParseResult`, or raise
-        :class:`ParseError` (subclass of ValueError) if the FS URL is
-        not value.
+        Parse a Filesystem URL and return a :class:`ParseResult`, or
+        raise :class:`ParseError` (subclass of ValueError) if the FS URL
+        is not value.
 
-        :param fs_url: A filesystem URL
-        :type fs_url: str
+        :param str fs_url: A filesystem URL
         :rtype: :class:`ParseResult`
 
         """
@@ -85,13 +85,6 @@ class Registry(object):
             path
         )
 
-    @property
-    def protocols(self):
-        return [
-            entry_point.name
-            for entry_point in pkg_resources.iter_entry_points('fs.opener')
-        ]
-
     def __init__(self, default_opener='osfs'):
         """
         Create a registry object.
@@ -102,19 +95,26 @@ class Registry(object):
 
         """
         self.default_opener = default_opener
+        self.protocols = [
+            entry_point.name
+            for entry_point in
+            pkg_resources.iter_entry_points('fs.opener')
+        ]
 
     def __repr__(self):
         return "<fs-registry {!r}>".format(self.protocols)
 
     def get_opener(self, protocol):
-        """Get the opener class associated to a given protocol.
+        """
+        Get the opener class associated to a given protocol.
 
-        :param str protocol: A filesystem URL protocol
-        :rtype: ``Opener``
-        :raises `~fs.opener.errors.Unsupported`: If no opener could be found
-        :raises EntryPointLoadingError: If the returned entry point is
-            not an ``Opener`` subclass or could not be loaded
+        :param str protocol: A filesystem protocol.
+        :rtype: ``Opener``.
+        :raises `~fs.opener.errors.UnsupportedProtocol`: If no opener could be found.
+        :raises `EntryPointLoadingError`: If the returned entry
+            point is not an ``Opener`` subclass or could not be loaded
             successfully.
+
         """
         entry_point = next(
             pkg_resources.iter_entry_points('fs.opener', protocol),
@@ -122,7 +122,7 @@ class Registry(object):
         )
 
         if entry_point is None:
-            raise Unsupported(
+            raise UnsupportedProtocol(
                 "protocol '{}' is not supported".format(protocol)
             )
 
