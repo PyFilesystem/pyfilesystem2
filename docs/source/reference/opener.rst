@@ -3,11 +3,11 @@ fs.opener
 
 Open filesystems from a URL.
 
-.. automodule:: fs.opener._base
+.. automodule:: fs.opener.base
     :members:
 
-.. automodule:: fs.opener._registry
+.. automodule:: fs.opener.registry
     :members:
 
-.. automodule:: fs.opener._errors
+.. automodule:: fs.opener.errors
     :members:

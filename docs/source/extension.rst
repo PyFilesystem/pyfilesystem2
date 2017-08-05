@@ -3,63 +3,60 @@
 Creating an extension
 =====================
 
-Once an new filesystem implemented, it is possible to distribute as a
-subpackage contained in the ``fs`` namespace. Let's say you are trying
-to create an extension for a filesystem called **AwesomeFS**.
+Once a filesystem has been implemented, it can be integrated with other
+projects and applications using PyFilesystem.
 
 
 Naming Convention
 -----------------
 
-For the sake of clarity, and to give a clearer sight of the
-Pyfilesystem2 ecosystem, your extension should be called **fs.awesome**
-or **fs.awesomefs**, since PyPI allows packages to be namespaced. Let us
-stick with **fs.awesome** for now.
-
-
-Extension Structure
--------------------
-
-The extension must have either of the following structures: ::
-
-  └── fs.awesome                            └── fs.awesome
-      ├── fs                                    ├── fs
-      │   ├── awesomefs.py                      │   ├── awesomefs
-      │   └── opener                            |   |   ├── __init__.py
-      │       └── awesomefs.py                  |   |   ├── some_file.py
-      └── setup.py                              |   |   └── some_other_file.py
-                                                │   └── opener
-                                                │       └── awesomefs.py
-                                                └── setup.py
-
-
-The structure on the left will work fine if you only need a single file
-to implement **AwesomeFS**, but if you end up creating more,
-you should probably use the structure on the right (create a package
-instead of a single file).
-
-.. warning ::
-
-   Do **NOT** create ``fs/__init__.py`` or ``fs/opener/__init__.py`` ! Since
-   those files are vital to the main Pyfilesystem2 package, including them
-   could result in having your extension break the whole Pyfilesystem2
-   package when installing.
-
+For visibility in PyPi, we recommend that your package be prefixed with
+``fs-``, for example your package may be named `fs-awesome` or `fs-
+awesomefs`.
 
 
 Opener
 ------
 
-In order for your filesystem to be opened through :doc:`openers` like the
-other builtin filesystems, you must declare an :class:`~fs.opener.base.Opener`.
-For good practice, the implementation should be done in a file inside the
-``fs.opener`` module, so in our case, ``fs/opener/awesomefs.py``. Let us call
-the opener ``AwesomeFSOpener``. Once done with the implementation, you must
-declare the opener as an entry point in the setup file for ``fs.open_fs`` to
-actually register this new protocol. See below for an example, or read about
-`entry points <http://setuptools.readthedocs.io/en/latest/setuptools.html?highlight=entry%20points#dynamic-discovery-of-services-and-plugins>`_
-if you want to know more.
+In order for your filesystem to be opened through :doc:`openers` like
+the other builtin filesystems, you should define a
+:class:`~fs.opener.base.Opener` class for your filesystem.
 
+Here's an example taken from an Amazon S3 Filesystem::
+
+
+  """Defines the S3FSOpener."""
+
+  __all__ = ['S3FSOpener']
+
+  from fs.opener import Opener, OpenerError
+
+  from ._s3fs import S3FS
+
+
+  class S3FSOpener(Opener):
+      protocols = ['s3']
+
+      def open_fs(self, fs_url, parse_result, writeable, create, cwd):
+          bucket_name, _, dir_path = parse_result.resource.partition('/')
+          if not bucket_name:
+              raise OpenerError(
+                  "invalid bucket name in '{}'".format(fs_url)
+              )
+          s3fs = S3FS(
+              bucket_name,
+              dir_path=dir_path or '/',
+              aws_access_key_id=parse_result.username or None,
+              aws_secret_access_key=parse_result.password or None,
+          )
+          return s3fs
+
+My convention this would be declared in ``opener.py``.
+
+
+To register the opener you will need to define an `entry point
+<http://setuptools.readthedocs.io/en/latest/setuptools.html?highlight=entry%20points#dynamic-discovery-of-services-and-plugins>`_
+in your setup.py. See below for an example.
 
 
 The ``setup.py`` file
@@ -69,22 +66,13 @@ Refer to the `setuptools documentation <https://setuptools.readthedocs.io/>`_
 to see how to write a ``setup.py`` file. There are only a few things that
 should be kept in mind when creating a Pyfilesystem2 extension. Make sure that:
 
-* the name of the package is the *namespaced* name (**fs.awesome** with our
-  example).
-* ``fs``, ``fs.opener`` and ``fs.awesomefs`` packages are included. Since
-  you can't create ``fs/__init__.py`` and ``fs/opener/__init__.py``, setuptools
-  won't be able to find your packages if you use ``setuptools.find_packages``,
-  so you will have to include packages manually.
-* ``fs`` is in the ``install_requires`` list, in order to
-  always have Pyfilesystem2 installed before your extension.
-* Ìf you created an opener, include it as an ``fs.opener`` entry point, using
-  the name of the entry point as the protocol to be used. If the protocol to
-  open ``AwesomeFS`` were ``awe://``, the entry point declaration would be::
-
-      awe = fs.opener.awesomefs:AwesomeFS
-
-  (format, like any other setuptools entry point, is ``protocol = module.submodule:OpenerClass``).
-
+* ``fs`` is in the ``install_requires`` list, in order to always have
+  Pyfilesystem2 installed before your extension. You should reference
+  the version number with the ``~=`` operator which ensures that the
+  install will get any bugfix releases of PyFilesystem but not any
+  potentially breaking changes.
+* Ìf you created an opener, include it as an ``fs.opener`` entry point,
+  using the name of the entry point as the protocol to be used.
 
 Here is an minimal ``setup.py`` for our project:
 
@@ -92,26 +80,26 @@ Here is an minimal ``setup.py`` for our project:
 
    from setuptools import setup
    setup(
+       name='fs-awesomefs',  # Name in PyPi
        author="You !",
        author_email="your.email@domain.ext",
        description="An awesome filesystem for pyfilesystem2 !",
-       install_requires=["fs"],
-       entry_points = {'fs.opener': [
-           'awe = fs.opener.awesomefs:AwesomeFS',
-       ]},
+       install_requires=[
+           "fs~=2.0.5"
+       ],
+       entry_points = {
+           'fs.opener': [
+               'awe = awesomefs.opener:AwesomeFSOpener',
+           ]
+       },
        license="MY LICENSE",
-       name='fs.awesome',
-       packages=['fs', 'fs.opener', 'fs.awesome'], # if fs.awesomefs is a package
-       #packages=['fs', 'fs.opener'] # if fs.awesomefs is not a package
+       packages=['awesomefs'],
        version="X.Y.Z",
    )
 
 Good Practices
 --------------
 
-* Use `relative imports <https://www.python.org/dev/peps/pep-0328/#guido-s-decision>`_
-  whenever you try to access to a resource in the ``fs`` module or any of its
-  submodules.
 * Keep track of your achievements ! Add ``__version__``, ``__author__``,
   ``__author_email__`` and ``__license__`` variables to your project
   (either in ``fs/awesomefs.py`` or ``fs/awesomefs/__init__.py`` depending

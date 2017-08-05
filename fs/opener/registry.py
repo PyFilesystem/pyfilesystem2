@@ -1,6 +1,6 @@
 # coding: utf-8
 """
-fs.opener._registry
+fs.opener.registry
 ===================
 
 Defines the Registry, which maps protocols and FS URLs to their
@@ -111,7 +111,7 @@ class Registry(object):
 
         :param str protocol: A filesystem URL protocol
         :rtype: ``Opener``
-        :raises Unsupported: If no opener could be found
+        :raises `~fs.opener.errors.Unsupported`: If no opener could be found
         :raises EntryPointLoadingError: If the returned entry point is
             not an ``Opener`` subclass or could not be loaded
             successfully.

@@ -1,7 +1,7 @@
 # coding: utf-8
 """
-fs.opener._base
-===============
+fs.opener.base
+==============
 
 Defines the Opener abstract base class.
 """
@@ -15,12 +15,8 @@ class Opener(object):
     """
     The opener base class.
 
-    An opener is responsible for opening a filesystems from one or more
-    protocols. A list of supported protocols is supplied in a class
-    attribute called `protocols`.
-
-    Openers should be registered with a :class:`~fs.opener.Registry`
-    object, which picks an appropriate opener object for a given FS URL.
+    An opener is responsible for opening a filesystem for a given
+    protocol.
 
     """
 

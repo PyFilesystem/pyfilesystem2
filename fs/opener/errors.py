@@ -1,7 +1,7 @@
 # coding: utf-8
 """
-fs.opener._errors
-=================
+fs.opener.errors
+================
 
 Errors raised when attempting to open a filesystem
 """
