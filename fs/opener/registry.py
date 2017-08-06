@@ -95,14 +95,21 @@ class Registry(object):
 
         """
         self.default_opener = default_opener
-        self.protocols = [
-            entry_point.name
-            for entry_point in
-            pkg_resources.iter_entry_points('fs.opener')
-        ]
+        self._protocols = None
+
 
     def __repr__(self):
         return "<fs-registry {!r}>".format(self.protocols)
+
+    @property
+    def protocols(self):
+        if self._protocols is None:
+            self._protocols = [
+                entry_point.name
+                for entry_point in
+                pkg_resources.iter_entry_points('fs.opener')
+            ]
+        return self._protocols
 
     def get_opener(self, protocol):
         """
