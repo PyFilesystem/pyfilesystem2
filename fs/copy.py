@@ -21,9 +21,7 @@ def copy_fs(src_fs, dst_fs, walker=None, on_copy=None):
     Copy the contents of one filesystem to another.
 
     :param src_fs: Source filesystem.
-    :type src_fs: :type src_fs: FS URL or instance
-    :param src_path: A path to a directory on ``src_fs``.
-    :type src_path: str
+    :type src_fs: FS URL or instance
     :param dst_fs: Destination filesystem.
     :type dst_fs: FS URL or instance
     :param walker: A walker object that will be used to scan for files
@@ -48,9 +46,7 @@ def copy_fs_if_newer(src_fs, dst_fs, walker=None, on_copy=None):
     always executed.
 
     :param src_fs: Source filesystem.
-    :type src_fs: :type src_fs: FS URL or instance
-    :param src_path: A path to a directory on ``src_fs``.
-    :type src_path: str
+    :type src_fs: FS URL or instance
     :param dst_fs: Destination filesystem.
     :type dst_fs: FS URL or instance
     :param walker: A walker object that will be used to scan for files
@@ -68,17 +64,19 @@ def copy_fs_if_newer(src_fs, dst_fs, walker=None, on_copy=None):
 
 def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
     """
-       Determine if source file is newer than destination file.
+    Determine if source file is newer than destination file.
 
-       :param src_fs: Source filesystem.
-       :type src_fs: :type src_fs: FS URL or instance
-       :param src_path: A path to a directory on ``src_fs``.
-       :type src_path: str
-       :param dst_fs: Destination filesystem.
-       :type dst_fs: FS URL or instance
-       :returns: True if source file is newer than destination file or
-            file modification time cannot be determined. False otherwise.
-       """
+    :param src_fs: Source filesystem.
+    :type src_fs: FS URL or instance
+    :param src_path: Path to a file on ``src_fs``.
+    :type src_path: str
+    :param dst_fs: Destination filesystem.
+    :type dst_fs: FS URL or instance
+    :param dst_path: Path to a file on ``dst_fs``.
+    :type dst_path: str
+    :returns: True if source file is newer than destination file or
+        file modification time cannot be determined. False otherwise.
+    """
     try:
         if dst_fs.exists(dst_path):
             namespace = ('details', 'modified')
