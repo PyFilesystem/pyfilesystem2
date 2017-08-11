@@ -97,7 +97,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
 
     def test_symlinks(self):
         with open(self._get_real_path('foo'), 'wb') as f:
-            f.write('foobar')
+            f.write(b'foobar')
         os.symlink(self._get_real_path('foo'), self._get_real_path('bar'))
         self.assertFalse(self.fs.islink('foo'))
         self.assertTrue(self.fs.islink('bar'))
