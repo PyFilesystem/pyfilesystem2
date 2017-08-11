@@ -129,6 +129,29 @@ filesystems which map directly to the OS filesystem. Most other
 filesystems will not support this namespace.
 
 
+LStat Namespace
+~~~~~~~~~~~~~~~
+
+The ``lstat`` namespace contains information reported by a call to
+`os.lstat <https://docs.python.org/3.5/library/stat.html>`_. This
+namespace is supported by :class:`~fs.osfs.OSFS` and potentially other
+filesystems which map directly to the OS filesystem. Most other
+filesystems will not support this namespace.
+
+Link Namespace
+~~~~~~~~~~~~~~
+
+The ``link`` namespace contains information about a symlink.
+
+=================== ======= ============================================
+Name                type    Description
+------------------- ------- --------------------------------------------
+target              str     A path to the symlink target, or ``None`` if
+                            this path is not a symlink. Note this path
+                            is a *system* path, and not a path on the
+                            filesystem object.
+=================== ======= ============================================
+
 Other Namespaces
 ~~~~~~~~~~~~~~~~
 
@@ -144,6 +167,7 @@ with the :meth:`~fs.info.Info.get` method.
     It is not an error to request a namespace (or namespaces) that the
     filesystem does *not* support. Any unknown namespaces will be
     ignored.
+
 
 Raw Info
 --------

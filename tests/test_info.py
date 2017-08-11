@@ -29,6 +29,7 @@ class TestInfo(unittest.TestCase):
         self.assertIsNone(info.permissions)
         self.assertIsNone(info.user)
         self.assertIsNone(info.group)
+        self.assertIsNone(info.target)
 
     def test_access(self):
         info = Info({

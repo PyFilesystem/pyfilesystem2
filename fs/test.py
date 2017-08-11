@@ -379,6 +379,12 @@ class FSTestCases(object):
         self.assertTrue(self.fs.isdir('foo'))
         self.assertFalse(self.fs.isdir('bar'))
 
+    def test_islink(self):
+        self.fs.touch('foo')
+        self.assertFalse(self.fs.islink('foo'))
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.islink('bar')
+
     def test_getsize(self):
         self.fs.setbytes('empty', b'')
         self.fs.setbytes('one', b'a')
@@ -1194,7 +1200,10 @@ class FSTestCases(object):
         ])
 
         # Hard to test optional namespaces, but at least run the code
-        list(self.fs.scandir('/', namespaces=['details', 'stat', 'access']))
+        list(self.fs.scandir(
+            '/',
+            namespaces=['details', 'link', 'stat', 'lstat', 'access']
+        ))
 
         # Test paging
         page1 = list(self.fs.scandir('/', page=(None, 2)))

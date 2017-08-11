@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 
-from . import filesize
 from .path import join
 from .enums import ResourceType
 from .permissions import Permissions
@@ -298,3 +297,16 @@ class Info(object):
 
         """
         return self.get('access', 'gid')
+
+    @property
+    def target(self):
+        """
+        Get the link target, if this is a symlink, or ``None`` if this
+        is not a symlink.
+
+        Requires the ``"link"`` namespace.
+
+        :rtype: bool
+
+        """
+        return self.get('link', 'target')

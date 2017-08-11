@@ -199,13 +199,24 @@ class OSFS(FS):
     # Required Methods
     # --------------------------------------------------------
 
+    def _gettarget(self, sys_path):
+        try:
+            target = os.readlink(sys_path)
+        except OSError:
+            return None
+        else:
+            return target
+
     def getinfo(self, path, namespaces=None):
         self.check()
         namespaces = namespaces or ()
         _path = self.validatepath(path)
         sys_path = self.getsyspath(_path)
+        _lstat = None
         with convert_os_errors('getinfo', path):
             _stat = os.stat(sys_path)
+            if 'lstat' in namespaces:
+                _stat = os.lstat(sys_path)
 
         info = {
             'basic': {
@@ -219,6 +230,15 @@ class OSFS(FS):
             info['stat'] = {
                 k: getattr(_stat, k)
                 for k in dir(_stat) if k.startswith('st_')
+            }
+        if 'lstat' in namespaces:
+            info['lstat'] = {
+                k: getattr(_lstat, k)
+                for k in dir(_lstat) if k.startswith('st_')
+            }
+        if 'link' in namespaces:
+            info['link'] = {
+                'target': self._gettarget(sys_path)
             }
         if 'access' in namespaces:
             info['access'] = self._make_access_from_stat(_stat)
@@ -315,6 +335,15 @@ class OSFS(FS):
         resource_type = self._get_type_from_stat(stat)
         return resource_type
 
+    def islink(self, path):
+        self.check()
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
+        if not self.exists(path):
+            raise errors.ResourceNotFound(path)
+        with convert_os_errors('islink', path):
+            return os.path.islink(sys_path)
+
     def open(self,
              path,
              mode="r",
@@ -360,7 +389,6 @@ class OSFS(FS):
                     with convert_os_errors('setinfo', path):
                         os.utime(sys_path, (accessed, modified))
 
-
     if scandir:
         def _scandir(self, path, namespaces=None):
             self.check()
@@ -384,6 +412,18 @@ class OSFS(FS):
                         info['stat'] = {
                             k: getattr(stat_result, k)
                             for k in dir(stat_result) if k.startswith('st_')
+                        }
+                    if 'lstat' in namespaces:
+                        lstat_result = dir_entry.stat(follow_symlinks=False)
+                        info['lstat'] = {
+                            k: getattr(lstat_result, k)
+                            for k in dir(lstat_result) if k.startswith('st_')
+                        }
+                    if 'link' in namespaces:
+                        info['link'] = {
+                            'target': self._gettarget(
+                                os.path.join(sys_path, dir_entry.name)
+                            )
                         }
                     if 'access' in namespaces:
                         stat_result = dir_entry.stat()
@@ -416,6 +456,18 @@ class OSFS(FS):
                         info['stat'] = {
                             k: getattr(stat_result, k)
                             for k in dir(stat_result) if k.startswith('st_')
+                        }
+                    if 'lstat' in namespaces:
+                        lstat_result = os.lstat(entry_path)
+                        info['lstat'] = {
+                            k: getattr(lstat_result, k)
+                            for k in dir(lstat_result) if k.startswith('st_')
+                        }
+                    if 'link' in namespaces:
+                       info['link'] = {
+                            'target': self._gettarget(
+                                os.path.join(sys_path, entry_name)
+                            )
                         }
                     if 'access' in namespaces:
                         info['access'] =\

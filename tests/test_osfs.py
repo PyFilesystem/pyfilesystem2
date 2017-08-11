@@ -94,3 +94,20 @@ class TestOSFS(FSTestCases, unittest.TestCase):
                 self.assertTrue(os.path.isdir(fs_dir))
         finally:
             shutil.rmtree(dir_path)
+
+    def test_symlinks(self):
+        with open(self._get_real_path('foo'), 'wb') as f:
+            f.write('foobar')
+        os.symlink(self._get_real_path('foo'), self._get_real_path('bar'))
+        self.assertFalse(self.fs.islink('foo'))
+        self.assertTrue(self.fs.islink('bar'))
+
+        foo_info = self.fs.getinfo('foo', namespaces=['link', 'lstat'])
+        self.assertIn('link', foo_info.raw)
+        self.assertIn('lstat', foo_info.raw)
+        self.assertEqual(foo_info.get('link', 'target'), None)
+        self.assertEqual(foo_info.target, foo_info.raw['link']['target'])
+        bar_info = self.fs.getinfo('bar', namespaces=['link', 'lstat'])
+        self.assertIn('link', bar_info.raw)
+        self.assertIn('lstat', bar_info.raw)
+

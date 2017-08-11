@@ -117,7 +117,8 @@ class FS(object):
         :param permissions: :class:`~fs.permissions.Permissions`
             instance.
         :type permissions: Permissions
-        :param bool recreate: Do not raise an error if the directory exists.
+        :param bool recreate: Do not raise an error if the directory
+            exists.
         :rtype: :class:`~fs.subfs.SubFS`
 
         :raises fs.errors.DirectoryExists: if the path already exists.
@@ -707,6 +708,17 @@ class FS(object):
         except errors.ResourceNotFound:
             return False
 
+    def islink(self, path):
+        """
+        Check if a path is a symlink.
+
+        :param str path: A path on the filesystem.
+        :rtype: bool
+
+        """
+        self.getinfo(path)
+        return False
+
     def lock(self):
         """
         Get a context manager that *locks* the filesystem.
@@ -727,7 +739,7 @@ class FS(object):
         multiple filesystem methods. Individual methods are thread safe
         already, and don't need to be locked.
 
-        ..note ::
+        .. note::
             This only locks at the Python level. There is nothing to
             prevent other processes from modifying the filesystem
             outside of the filesystem instance.
