@@ -425,7 +425,9 @@ class OSFS(FS):
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        info['link'] = self._make_link_info(sys_path)
+                        info['link'] = self._make_link_info(
+                            os.path.join(sys_path, dir_entry.name)
+                        )
                     if 'access' in namespaces:
                         stat_result = dir_entry.stat()
                         info['access'] =\
@@ -465,7 +467,9 @@ class OSFS(FS):
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        info['link'] = self._make_link_info(sys_path)
+                        info['link'] = self._make_link_info(
+                            os.path.join(sys_path, dir_entry.name)
+                        )
                     if 'access' in namespaces:
                         info['access'] =\
                             self._make_access_from_stat(stat_result)
