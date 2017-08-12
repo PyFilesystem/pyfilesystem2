@@ -16,7 +16,12 @@ class TestInfo(unittest.TestCase):
 
     def test_empty(self):
         """Test missing info."""
-        info = Info({})
+        info = Info({
+            'basic': {},
+            'details': {},
+            'access': {},
+            'link': {}
+        })
 
         self.assertIsNone(info.name)
         self.assertIsNone(info.is_dir)

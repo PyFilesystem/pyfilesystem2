@@ -207,6 +207,13 @@ class OSFS(FS):
         else:
             return target
 
+    def _make_link_info(self, sys_path):
+        _target = self._gettarget(sys_path)
+        link = {
+            'target': _target,
+        }
+        return link
+
     def getinfo(self, path, namespaces=None):
         self.check()
         namespaces = namespaces or ()
@@ -237,9 +244,7 @@ class OSFS(FS):
                 for k in dir(_lstat) if k.startswith('st_')
             }
         if 'link' in namespaces:
-            info['link'] = {
-                'target': self._gettarget(sys_path)
-            }
+            info['link'] = self._make_link_info(sys_path)
         if 'access' in namespaces:
             info['access'] = self._make_access_from_stat(_stat)
 
@@ -420,11 +425,7 @@ class OSFS(FS):
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        info['link'] = {
-                            'target': self._gettarget(
-                                os.path.join(sys_path, dir_entry.name)
-                            )
-                        }
+                        info['link'] = self._make_link_info(sys_path)
                     if 'access' in namespaces:
                         stat_result = dir_entry.stat()
                         info['access'] =\
@@ -464,11 +465,7 @@ class OSFS(FS):
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                       info['link'] = {
-                            'target': self._gettarget(
-                                os.path.join(sys_path, entry_name)
-                            )
-                        }
+                        info['link'] = self._make_link_info(sys_path)
                     if 'access' in namespaces:
                         info['access'] =\
                             self._make_access_from_stat(stat_result)

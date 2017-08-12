@@ -30,6 +30,7 @@ __all__ = [
     'InsufficientStorage',
     'InvalidCharsInPath',
     'InvalidPath',
+    'MissingInfoNamespace',
     'NoURL',
     'OperationFailed',
     'OperationTimeout',
@@ -43,6 +44,16 @@ __all__ = [
     'ResourceNotFound',
     'Unsupported',
 ]
+
+
+class MissingInfoNamespace(AttributeError):
+    """Raised when an expected namespace was missing."""
+
+    def __init__(self, namespace):
+        msg = "namespace '{}' is required for this attribute"
+        super(MissingInfoNamespace, self).__init__(
+            msg.format(namespace)
+        )
 
 
 @six.python_2_unicode_compatible
