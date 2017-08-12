@@ -468,7 +468,7 @@ class OSFS(FS):
                         }
                     if 'link' in namespaces:
                         info['link'] = self._make_link_info(
-                            os.path.join(sys_path, dir_entry.name)
+                            os.path.join(sys_path, entry_name)
                         )
                     if 'access' in namespaces:
                         info['access'] =\
