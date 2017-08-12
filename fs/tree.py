@@ -108,7 +108,7 @@ def render(fs,
 
     counts = {"dirs": 0, "files": 0}
 
-    def format_directory(path, levels=[]):
+    def format_directory(path, levels):
         """Recursive directory function."""
         try:
             directory = sorted(
@@ -150,5 +150,5 @@ def render(fs,
                     format_filename(info.name)
                 ))
 
-    format_directory(abspath(normpath(path)))
+    format_directory(abspath(normpath(path)), [])
     return counts['dirs'], counts['files']
