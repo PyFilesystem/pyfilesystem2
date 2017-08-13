@@ -178,7 +178,7 @@ class _DirEntry(object):
 
     def get_entry(self, name, default=None):
         assert self.is_dir, 'must be a directory'
-        return self._dir.get(name)
+        return self._dir.get(name, default)
 
     def set_entry(self, name, dir_entry):
         self._dir[name] = dir_entry
