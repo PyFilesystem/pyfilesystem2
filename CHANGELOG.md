@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 - Lstat info namespace
 - Link info namespace
-- islink method
+- FS.islink method
+- Info.is_link method
 
 
 ## [2.0.7] - 2017-08-06
