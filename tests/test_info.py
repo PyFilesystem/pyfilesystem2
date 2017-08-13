@@ -35,6 +35,7 @@ class TestInfo(unittest.TestCase):
         self.assertIsNone(info.user)
         self.assertIsNone(info.group)
         self.assertIsNone(info.target)
+        self.assertFalse(info.is_link)
 
     def test_access(self):
         info = Info({
@@ -52,6 +53,15 @@ class TestInfo(unittest.TestCase):
         self.assertEqual(info.group, 'devs')
         self.assertEqual(info.uid, 10)
         self.assertEqual(info.gid, 12)
+
+    def test_link(self):
+        info = Info({
+            'link': {
+                'target': 'foo'
+            }
+        })
+        self.assertTrue(info.is_link)
+        self.assertEqual(info.target, 'foo')
 
     def test_basic(self):
         # Check simple file
@@ -121,3 +131,7 @@ class TestInfo(unittest.TestCase):
         info_copy = info.copy()
         self.assertEqual(info.raw, info_copy.raw)
 
+    def test_get(self):
+        info = Info({'baz':{}})
+        self.assertIsNone(info.get('foo', 'bar'))
+        self.assertIsNone(info.get('baz', 'bar'))
