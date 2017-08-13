@@ -312,6 +312,13 @@ class WrapFS(FS):
             _isfile = _fs.isfile(_path)
         return _isfile
 
+    def islink(self, path):
+        self.check()
+        _fs, _path = self.delegate_path(path)
+        with unwrap_errors(path):
+            _islink = _fs.islink(_path)
+        return _islink
+
     def makedirs(self, path, permissions=None, recreate=False):
         self.check()
         _fs, _path = self.delegate_path(path)

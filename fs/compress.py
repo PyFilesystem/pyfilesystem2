@@ -171,10 +171,11 @@ def write_tar(src_fs,
             tar_info.mtime = mtime
 
             for tarattr, infoattr in tar_attr:
-                if getattr(info, infoattr) is not None:
-                    setattr(tar_info, tarattr, getattr(info, infoattr))
+                if getattr(info, infoattr, None) is not None:
+                    setattr(tar_info, tarattr, getattr(info, infoattr, None))
 
-            tar_info.mode = getattr(info.permissions, 'mode', 0o420)
+            if info.has_namespace('access'):
+                tar_info.mode = getattr(info.permissions, 'mode', 0o420)
 
             if info.is_dir:
                 tar_info.type = tarfile.DIRTYPE

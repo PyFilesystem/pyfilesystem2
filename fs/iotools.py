@@ -1,8 +1,6 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import six
-
 import io
 from io import SEEK_SET, SEEK_CUR
 

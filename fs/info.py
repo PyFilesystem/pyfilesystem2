@@ -4,9 +4,9 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 
-from . import filesize
 from .path import join
 from .enums import ResourceType
+from .errors import MissingInfoNamespace
 from .permissions import Permissions
 from .time import epoch_to_datetime
 
@@ -59,10 +59,8 @@ class Info(object):
         >>> info.get('access', 'permissions')
         ['u_r', 'u_w', '_wx']
 
-        :param namespace: A namespace identifier.
-        :type namespace: str
-        :param key: A key within the namespace.
-        :type key: str
+        :param str namespace: A namespace identifier.
+        :param str key: A key within the namespace.
         :param default: A default value to return if either the
             namespace or namespace + key is not found.
         """
@@ -70,6 +68,15 @@ class Info(object):
             return self.raw[namespace].get(key, default)
         except KeyError:
             return default
+
+    def _require_namespace(self, namespace):
+        """
+        Raise a MissingInfoNamespace if the given namespace is not
+        present in the info.
+
+        """
+        if namespace not in self.raw:
+            raise MissingInfoNamespace(namespace)
 
     def is_writeable(self, namespace, key):
         """
@@ -147,6 +154,17 @@ class Info(object):
         return not self.get('basic', 'is_dir')
 
     @property
+    def is_link(self):
+        """
+        Check if a resource is a symlink.
+
+        :rtype: bool
+
+        """
+        self._require_namespace('link')
+        return self.get('link', 'target') is not None
+
+    @property
     def type(self):
         """
         Get the resource type enumeration.
@@ -154,8 +172,11 @@ class Info(object):
         Requires the ``"details"`` namespace.
 
         :type: :class:`~fs.ResourceType`
+        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('details')
         return ResourceType(self.get('details', 'type', 0))
 
     @property
@@ -167,8 +188,11 @@ class Info(object):
         Requires the ``"details"`` namespace.
 
         :rtype: datetime
+        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('details')
         _time = self._make_datetime(
             self.get('details', 'accessed')
         )
@@ -183,8 +207,11 @@ class Info(object):
         Requires the ``"details"`` namespace.
 
         :rtype: datetime
+        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('details')
         _time = self._make_datetime(
             self.get('details', 'modified')
         )
@@ -199,8 +226,11 @@ class Info(object):
         Requires the ``"details"`` namespace.
 
         :rtype: datetime
+        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('details')
         _time = self._make_datetime(
             self.get('details', 'created')
         )
@@ -215,8 +245,11 @@ class Info(object):
         Requires the ``"details"`` namespace.
 
         :rtype: datetime
+        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('details')
         _time = self._make_datetime(
             self.get('details', 'metadata_changed')
         )
@@ -230,8 +263,11 @@ class Info(object):
         Requires the ``"access"`` namespace.
 
         :rtype: :class:`fspermissions.Permissions`
+        :raises ~fs.errors.MissingInfoNamespace: if the 'ACCESS'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('access')
         _perm_names = self.get('access', 'permissions')
         if _perm_names is None:
             return None
@@ -246,8 +282,11 @@ class Info(object):
         Requires the ``"details"`` namespace.
 
         :rtype: int
+        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('details')
         return self.get('details', 'size')
 
     @property
@@ -258,8 +297,11 @@ class Info(object):
         Requires the ``"access"`` namespace.
 
         :rtype: str
+        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('access')
         return self.get('access', 'user')
 
     @property
@@ -270,8 +312,11 @@ class Info(object):
         Requires the ``"access"`` namespace.
 
         :rtype: int
+        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('access')
         return self.get('access', 'uid')
 
     @property
@@ -283,8 +328,11 @@ class Info(object):
         Requires the ``"access"`` namespace.
 
         :rtype: str
+        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('access')
         return self.get('access', 'group')
 
     @property
@@ -295,6 +343,25 @@ class Info(object):
         Requires the ``"access"`` namespace.
 
         :rtype: int
+        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
+            namespace is not in the Info.
 
         """
+        self._require_namespace('access')
         return self.get('access', 'gid')
+
+    @property
+    def target(self):
+        """
+        Get the link target, if this is a symlink, or ``None`` if this
+        is not a symlink.
+
+        Requires the ``"link"`` namespace.
+
+        :rtype: bool
+        :raises ~fs.errors.MissingInfoNamespace: if the 'link'
+            namespace is not in the Info.
+
+        """
+        self._require_namespace('link')
+        return self.get('link', 'target')

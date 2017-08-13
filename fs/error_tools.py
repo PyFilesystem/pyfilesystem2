@@ -19,6 +19,7 @@ class _ConvertOSErrors(object):
 
     FILE_ERRORS = {
         64: errors.RemoteConnectionError,  # ENONET
+        errno.EACCES: errors.PermissionDenied,
         errno.ENOENT: errors.ResourceNotFound,
         errno.EFAULT: errors.ResourceNotFound,
         errno.ESRCH: errors.ResourceNotFound,

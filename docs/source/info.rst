@@ -109,8 +109,9 @@ Name             type                Description
 gid              int                 The group ID.
 group            str                 The group name.
 permissions      Permissions         An instance of
-                                     :class:`~fs.permissions.Permissions`, which
-                                     contains the permissions for the resource.
+                                     :class:`~fs.permissions.Permissions`,
+                                     which contains the permissions for the
+                                     resource.
 uid              int                 The user ID.
 user             str                 The user name of the owner.
 ================ =================== ==========================================
@@ -129,6 +130,30 @@ filesystems which map directly to the OS filesystem. Most other
 filesystems will not support this namespace.
 
 
+LStat Namespace
+~~~~~~~~~~~~~~~
+
+The ``lstat`` namespace contains information reported by a call to
+`os.lstat <https://docs.python.org/3.5/library/stat.html>`_. This
+namespace is supported by :class:`~fs.osfs.OSFS` and potentially other
+filesystems which map directly to the OS filesystem. Most other
+filesystems will not support this namespace.
+
+Link Namespace
+~~~~~~~~~~~~~~
+
+The ``link`` namespace contains information about a symlink.
+
+=================== ======= ============================================
+Name                type    Description
+------------------- ------- --------------------------------------------
+target              str     A path to the symlink target, or ``None`` if
+                            this path is not a symlink.
+                            Note, the meaning of this target is somewhat
+                            filesystem dependent, and may not be a valid
+                            path on the FS object.
+=================== ======= ============================================
+
 Other Namespaces
 ~~~~~~~~~~~~~~~~
 
@@ -144,6 +169,30 @@ with the :meth:`~fs.info.Info.get` method.
     It is not an error to request a namespace (or namespaces) that the
     filesystem does *not* support. Any unknown namespaces will be
     ignored.
+
+Missing Namespaces
+------------------
+
+Some attributes on the Info objects require that a given namespace be
+present. If you attempt to reference them without the namespace being
+present (because you didn't request it, or the filesystem doesn't
+support it) then a :class:`~fs.errors.MissingInfoNamespace` exception
+will be thrown. Here's how you might handle such exceptions::
+
+    try:
+        print('user is {}'.format(info.user))
+    except errors.MissingInfoNamespace:
+        # No 'access' namespace
+        pass
+
+If you prefer a *look before you leap* approach, you can use use the
+:meth:`~fs.info.Info.has_namespace` method. Here's an example::
+
+
+     if info.has_namespace('access'):
+         print('user is {}'.format(info.user))
+
+See :class:`~fs.info.Info` for details regarding info attributes.
 
 Raw Info
 --------
