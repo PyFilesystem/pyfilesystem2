@@ -124,7 +124,7 @@ class SiteDataFS(_AppFS):
     A filesystem for application site data.
 
     May also be opened with
-    ``open_fs('sitedate://appname:author:version')``.
+    ``open_fs('sitedata://appname:author:version')``.
 
     :param str appname: The name of the application.
     :param str author: The name of the author (used on Windows).
