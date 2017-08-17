@@ -2,6 +2,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from six import text_type
+
 from . import errors
 from .base import FS
 from .memoryfs import MemoryFS
@@ -67,10 +69,19 @@ class MountFS(FS):
 
         :param path: A path within the MountFS.
         :type path: str
-        :param fs: A filesystem object to mount.
+        :param fs: A filesystem object or FS URL to mount.
         :type fs: :class:`~fs.base.FS`
 
         """
+        if isinstance(fs, text_type):
+            from .opener import open_fs
+            fs = open_fs(fs)
+
+        if not isinstance(fs, FS):
+            raise TypeError(
+                'fs argument must be an FS object or a FS URL'
+            )
+
         if fs is self:
             raise ValueError('Unable to mount self')
         _path = forcedir(abspath(normpath(path)))

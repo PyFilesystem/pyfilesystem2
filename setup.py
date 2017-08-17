@@ -47,6 +47,13 @@ setup(
         'tar  = fs.opener.tarfs:TarOpener',
         'temp = fs.opener.tempfs:TempOpener',
         'zip  = fs.opener.zipfs:ZipOpener',
+
+        'userdata = fs.opener.appfs:Opener',
+        'userconf = fs.opener.appfs:Opener',
+        'sitedata = fs.opener.appfs:Opener',
+        'siteconf = fs.opener.appfs:Opener',
+        'usercache = fs.opener.appfs:Opener',
+        'userlog = fs.opener.appfs:Opener',
     ]},
     license="MIT",
     long_description=DESCRIPTION,

@@ -202,3 +202,24 @@ class TestOpeners(unittest.TestCase):
         mem_fs = opener.open_fs("mem://")
         mem_fs_2 = opener.open_fs(mem_fs)
         self.assertEqual(mem_fs, mem_fs_2)
+
+    def test_open_userdata(self):
+        with self.assertRaises(errors.OpenerError):
+            opener.open_fs('userdata://foo:bar:baz:egg')
+
+        app_fs = opener.open_fs(
+            'userdata://fstest:willmcgugan:1.0',
+            create=True
+        )
+        self.assertEqual(app_fs.app_dirs.appname, 'fstest')
+        self.assertEqual(app_fs.app_dirs.appauthor, 'willmcgugan')
+        self.assertEqual(app_fs.app_dirs.version, '1.0')
+
+    def test_open_userdata_no_version(self):
+        app_fs = opener.open_fs(
+            'userdata://fstest:willmcgugan',
+            create=True
+        )
+        self.assertEqual(app_fs.app_dirs.appname, 'fstest')
+        self.assertEqual(app_fs.app_dirs.appauthor, 'willmcgugan')
+        self.assertEqual(app_fs.app_dirs.version, None)

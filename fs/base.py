@@ -1204,7 +1204,7 @@ class FS(object):
         Check a filesystem may be used.
 
         Will throw a :class:`~fs.errors.FilesystemClosed` if the
-            filesystem is closed.
+        filesystem is closed.
 
         :returns: None
         :raises fs.errors.FilesystemClosed: if the filesystem

@@ -5,15 +5,21 @@ from __future__ import print_function
 from collections import namedtuple
 from operator import itemgetter
 
+from six import text_type
+
 from .base import FS
 from .mode import check_writable
 from . import errors
+from .opener import open_fs
 from .path import abspath, normpath
 
 
 _PrioritizedFS = namedtuple(
     '_PrioritizedFS',
-    ['priority', 'fs']
+    [
+        'priority',
+        'fs'
+    ]
 )
 
 
@@ -61,8 +67,8 @@ class MultiFS(FS):
         :param name: A unique name to refer to the filesystem being
             added.
         :type name: str
-        :param fs: The filesystem to add
-        :type fs: Filesystem
+        :param fs: The filesystem to add.
+        :type fs: Filesystem or FS URL.
         :param write: If this value is True, then the ``fs`` will be
             used as the writeable FS.
         :type write: bool
@@ -74,6 +80,14 @@ class MultiFS(FS):
         :type priority: int
 
         """
+
+        if isinstance(fs, text_type):
+            fs = open_fs(fs)
+
+        if not isinstance(fs, FS):
+            raise TypeError(
+                'fs argument should be an FS object or FS URL'
+            )
 
         self._filesystems[name] = _PrioritizedFS(
             priority=(priority, self._sort_index),

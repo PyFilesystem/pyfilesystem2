@@ -30,15 +30,21 @@ class TestMountFS2(FSTestCases, unittest.TestCase):
 
 class TestMountFSBehaviours(unittest.TestCase):
 
+    def test_bad_mount(self):
+        mount_fs = MountFS()
+        with self.assertRaises(TypeError):
+            mount_fs.mount('foo', 5)
+        with self.assertRaises(TypeError):
+            mount_fs.mount('foo', b'bar')
+
     def test_listdir(self):
         mount_fs = MountFS()
         self.assertEqual(mount_fs.listdir('/'), [])
         m1 = MemoryFS()
-        m2 = TempFS()
         m3 = MemoryFS()
         m4 = TempFS()
         mount_fs.mount('/m1', m1)
-        mount_fs.mount('/m2', m2)
+        mount_fs.mount('/m2', 'temp://')
         mount_fs.mount('/m3', m3)
         with self.assertRaises(MountError):
             mount_fs.mount('/m3/foo', m4)
