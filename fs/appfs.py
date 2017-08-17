@@ -63,6 +63,9 @@ class UserDataFS(_AppFS):
     """
     A filesystem for per-user application data.
 
+    May also be opened with
+    ``open_fs('userdata://appname:author:version')``.
+
     :param str appname: The name of the application.
     :param str author: The name of the author (used on Windows).
     :param str version: Optional version string, if a unique location
@@ -79,6 +82,9 @@ class UserDataFS(_AppFS):
 class UserConfigFS(_AppFS):
     """
     A filesystem for per-user config data.
+
+    May also be opened with
+    ``open_fs('userconf://appname:author:version')``.
 
     :param str appname: The name of the application.
     :param str author: The name of the author (used on Windows).
@@ -97,6 +103,9 @@ class UserCacheFS(_AppFS):
     """
     A filesystem for per-user application cache data.
 
+    May also be opened with
+    ``open_fs('usercache://appname:author:version')``.
+
     :param str appname: The name of the application.
     :param str author: The name of the author (used on Windows).
     :param str version: Optional version string, if a unique location
@@ -113,6 +122,9 @@ class UserCacheFS(_AppFS):
 class SiteDataFS(_AppFS):
     """
     A filesystem for application site data.
+
+    May also be opened with
+    ``open_fs('sitedate://appname:author:version')``.
 
     :param str appname: The name of the application.
     :param str author: The name of the author (used on Windows).
@@ -131,6 +143,9 @@ class SiteConfigFS(_AppFS):
     """
     A filesystem for application config data.
 
+    May also be opened with
+    ``open_fs('siteconf://appname:author:version')``.
+
     :param str appname: The name of the application.
     :param str author: The name of the author (used on Windows).
     :param str version: Optional version string, if a unique location
@@ -147,6 +162,9 @@ class SiteConfigFS(_AppFS):
 class UserLogFS(_AppFS):
     """
     A filesystem for per-user application log data.
+
+    May also be opened with
+    ``open_fs('userlog://appname:author:version')``.
 
     :param str appname: The name of the application.
     :param str author: The name of the author (used on Windows).
