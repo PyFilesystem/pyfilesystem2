@@ -10,7 +10,7 @@ from .errors import OpenerError
 from .. import appfs
 
 
-class Opener(Opener):
+class AppFSOpener(Opener):
 
     protocols = [
         'userdata',
