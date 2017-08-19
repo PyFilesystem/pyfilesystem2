@@ -42,7 +42,7 @@ class Opener(Opener):
         else:
             raise OpenerError(
                 'resource should be <appname>:<author> '
-                'or <appname>:<author>:<version'
+                'or <appname>:<author>:<version>'
             )
 
         fs_instance = fs_class(

@@ -2,8 +2,6 @@ from __future__ import unicode_literals
 
 import unittest
 
-from six import text_type
-
 from fs.multifs import MultiFS
 from fs.memoryfs import MemoryFS
 from fs import errors
