@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 
 from .base import Opener
 from .errors import OpenerError
+from ..subfs import ClosingSubFS
 from .. import appfs
 
 
@@ -31,9 +32,10 @@ class AppFSOpener(Opener):
     }
 
     def open_fs(self, fs_url, parse_result, writeable, create, cwd):
-        fs_class = self._protocol_mapping[parse_result.protocol]
 
-        tokens = parse_result.resource.split(':', 3)
+        fs_class = self._protocol_mapping[parse_result.protocol]
+        resource, delim, path = parse_result.resource.partition('/')
+        tokens = resource.split(':', 3)
         if len(tokens) == 2:
             appname, author = tokens
             version = None
@@ -45,11 +47,18 @@ class AppFSOpener(Opener):
                 'or <appname>:<author>:<version>'
             )
 
-        fs_instance = fs_class(
+        app_fs = fs_class(
             appname,
             author=author,
             version=version,
             create=create
         )
-        return fs_instance
+
+        app_fs = (
+            app_fs.opendir(path, factory=ClosingSubFS)
+            if delim
+            else app_fs
+        )
+
+        return app_fs
 

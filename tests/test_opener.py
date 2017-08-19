@@ -7,10 +7,11 @@ import tempfile
 import unittest
 import pkg_resources
 
-from fs import opener
+from fs import open_fs, opener
 from fs.osfs import OSFS
 from fs.opener import registry, errors
 from fs.memoryfs import MemoryFS
+from fs.appfs import UserDataFS
 
 
 class TestParse(unittest.TestCase):
@@ -223,3 +224,12 @@ class TestOpeners(unittest.TestCase):
         self.assertEqual(app_fs.app_dirs.appname, 'fstest')
         self.assertEqual(app_fs.app_dirs.appauthor, 'willmcgugan')
         self.assertEqual(app_fs.app_dirs.version, None)
+
+    def test_user_data_opener(self):
+        user_data_fs = open_fs('userdata://fstest:willmcgugan:1.0')
+        self.assertIsInstance(user_data_fs, UserDataFS)
+        user_data_fs.makedir('foo', recreate=True)
+        user_data_fs.settext('foo/bar.txt', 'baz')
+        user_data_fs_foo_dir = open_fs('userdata://fstest:willmcgugan:1.0/foo/')
+        self.assertEqual(user_data_fs_foo_dir.gettext('bar.txt'), 'baz')
+

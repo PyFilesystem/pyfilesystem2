@@ -7,6 +7,7 @@ import six
 from fs.appfs import UserDataFS
 
 
+
 class TestAppFS(unittest.TestCase):
     """Test Application FS."""
 
