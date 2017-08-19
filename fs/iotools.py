@@ -115,7 +115,6 @@ class RawWrapper(io.IOBase):
         return iter(self._f)
 
 
-
 def make_stream(name,
                 bin_file,
                 mode='r',

@@ -70,7 +70,6 @@ class WrapFS(FS):
         """
         return self._wrap_fs
 
-
     def appendbytes(self, path, data):
         self.check()
         _fs, _path = self.delegate_path(path)
@@ -87,7 +86,6 @@ class WrapFS(FS):
                                   encoding=encoding,
                                   errors=errors,
                                   newline=newline)
-
 
     def getinfo(self, path, namespaces=None):
         self.check()

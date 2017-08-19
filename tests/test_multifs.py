@@ -64,6 +64,18 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         self.assertFalse(m1.isclosed())
         self.assertFalse(m2.isclosed())
 
+    def test_opener(self):
+        """Test use of FS URLs."""
+        multi_fs = MultiFS()
+        with self.assertRaises(TypeError):
+            multi_fs.add_fs(u'foo', 5)
+        multi_fs.add_fs(u'f1', u'mem://')
+        multi_fs.add_fs(u'f2', u'temp://')
+        self.assertIsInstance(
+            multi_fs.get_fs(u'f1'),
+            MemoryFS
+        )
+
     def test_priority(self):
         """Test priority order is working"""
         m1 = MemoryFS()
