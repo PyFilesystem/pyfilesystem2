@@ -123,6 +123,7 @@ class Registry(object):
             successfully.
 
         """
+        protocol = protocol or self.default_opener
         entry_point = next(
             pkg_resources.iter_entry_points('fs.opener', protocol),
             None
