@@ -1125,6 +1125,15 @@ class FSTestCases(object):
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.copy('baz', 'a/b/c/baz')
 
+        # Test copying a source that doesn't exist
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.copy('egg', 'spam')
+
+        # Test copying a directory
+        self.fs.makedir('dir')
+        with self.assertRaises(errors.FileExpected):
+            self.fs.copy('dir', 'folder')
+
     def test_create(self):
         # Test create new file
         self.assertFalse(self.fs.exists('foo'))
@@ -1642,6 +1651,10 @@ class FSTestCases(object):
 
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.copydir('foo', 'foofoo')
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.copydir('spam', 'egg', create=True)
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.copydir('foo2/foofoo.txt', 'foofoo.txt', create=True)
 
     def test_movedir(self):
         self.fs.makedirs('foo/bar/baz/egg')
