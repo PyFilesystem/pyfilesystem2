@@ -595,6 +595,10 @@ class FSTestCases(object):
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.move('bar', 'egg/bar')
 
+        # Check moving an unexisting source
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.move('egg', 'spam')
+
         # Check moving between different directories
         self.fs.makedir('baz')
         self.fs.setbytes('baz/bazbaz', b'bazbaz')
@@ -602,6 +606,12 @@ class FSTestCases(object):
         self.fs.move('baz/bazbaz', 'baz2/bazbaz')
         self.assert_not_exists('baz/bazbaz')
         self.assert_bytes('baz2/bazbaz', b'bazbaz')
+
+        # Check moving a directory raises an error
+        self.assert_isdir('baz2')
+        self.assert_not_exists('yolk')
+        with self.assertRaises(errors.FileExpected):
+            self.fs.move('baz2', 'yolk')
 
     def test_makedir(self):
         # Check edge case of root
@@ -782,7 +792,6 @@ class FSTestCases(object):
         with self.fs.openbin("iter.bin") as f:
             for actual, expected in zip(f, lines.splitlines(1)):
                 self.assertEqual(actual, expected)
-
 
     def test_open_files(self):
         # Test file-like objects work as expected.
@@ -1666,8 +1675,17 @@ class FSTestCases(object):
         self.assert_not_exists('foo/bar/foofoo.txt')
         self.assert_not_exists('foo/bar/baz/egg')
 
+        # Check moving to an unexisting directory
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.movedir('foo', 'foofoo')
+
+        # Check moving an unexisting directory
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.movedir('spam', 'egg', create=True)
+
+        # Check moving a file
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.movedir('foo2/foofoo.txt', 'foo2/baz/egg')
 
     def test_match(self):
         self.assertTrue(self.fs.match(['*.py'], 'foo.py'))
