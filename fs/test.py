@@ -329,7 +329,6 @@ class FSTestCases(object):
         self.assertEqual(data, contents)
         self.assertIsInstance(data, text_type)
 
-
     def test_appendbytes(self):
         with self.assertRaises(ValueError):
             self.fs.appendbytes('foo', 'bar')
@@ -1698,3 +1697,22 @@ class FSTestCases(object):
         written = write_tree.getvalue()
         expected = u'|-- foo\n|   `-- bar\n`-- test.txt\n'
         self.assertEqual(expected, written)
+
+    def test_unicode_path(self):
+        if not self.fs.getmeta().get('unicode_paths', False):
+            self.skipTest('the filesystem does not support unicode paths.')
+
+        self.fs.makedir('földér')
+        self.fs.settext('☭.txt', 'Smells like communism.')
+        self.fs.setbytes('földér/☣.txt', b'Smells like an old syringe.')
+
+        self.assert_isdir('földér')
+        self.assertEqual(['☣.txt'], self.fs.listdir('földér'))
+        self.assertEqual('☣.txt', self.fs.getinfo('földér/☣.txt').name)
+        self.assert_text('☭.txt', 'Smells like communism.')
+        self.assert_bytes('földér/☣.txt', b'Smells like an old syringe.')
+
+        self.fs.remove('földér/☣.txt')
+        self.assert_not_exists('földér/☣.txt')
+        self.fs.removedir('földér')
+        self.assert_not_exists('földér')
