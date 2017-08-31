@@ -734,7 +734,7 @@ class FSTestCases(object):
             self.assertIsInstance(f, io.IOBase)
             self.assertTrue(f.writable())
             self.assertFalse(f.readable())
-            f.write(text)
+            self.assertEqual(len(text), f.write(text))
             self.assertFalse(f.closed)
         self.assertTrue(f.closed)
 
@@ -756,7 +756,7 @@ class FSTestCases(object):
         # Test overwrite
         text = b'Goodbye, World'
         with self.fs.openbin('foo/hello', 'w') as f:
-            f.write(text)
+            self.assertEqual(len(text), f.write(text))
         self.assert_bytes('foo/hello', text)
 
         # Test FileExpected raised
@@ -845,6 +845,9 @@ class FSTestCases(object):
         iter_lines = iter(self.fs.open('text'))
         self.assertEqual(next(iter_lines), 'Hello\n')
 
+        with self.fs.open('unicode', 'w') as f:
+            self.assertEqual(12, f.write('Héllo\nWörld\n'))
+
         with self.fs.open('text', 'rb') as f:
             self.assertIsInstance(f, io.IOBase)
             self.assertFalse(f.writable())
@@ -852,11 +855,11 @@ class FSTestCases(object):
             self.assertTrue(f.seekable())
             self.assertFalse(f.closed)
             self.assertEqual(f.read(1), b'H')
-            f.seek(3, Seek.set)
+            self.assertEqual(3, f.seek(3, Seek.set))
             self.assertEqual(f.read(1), b'l')
-            f.seek(2, Seek.current)
+            self.assertEqual(6, f.seek(2, Seek.current))
             self.assertEqual(f.read(1), b'W')
-            f.seek(-2, Seek.end)
+            self.assertEqual(22, f.seek(-2, Seek.end))
             self.assertEqual(f.read(1), b'z')
             with self.assertRaises(ValueError):
                 f.seek(10, 77)
@@ -868,18 +871,18 @@ class FSTestCases(object):
             self.assertTrue(f.writable())
             self.assertTrue(f.seekable())
             self.assertFalse(f.closed)
-            f.seek(5)
-            f.truncate()
-            f.seek(0)
+            self.assertEqual(5, f.seek(5))
+            self.assertEqual(5, f.truncate())
+            self.assertEqual(0, f.seek(0))
             self.assertEqual(f.read(), b'Hello')
-            f.truncate(10)
-            f.seek(0)
+            self.assertEqual(10, f.truncate(10))
+            self.assertEqual(0, f.seek(0))
             print(repr(self.fs))
             print(repr(f))
             self.assertEqual(f.read(), b'Hello\0\0\0\0\0')
-            f.seek(4)
+            self.assertEqual(4, f.seek(4))
             f.write(b'O')
-            f.seek(4)
+            self.assertEqual(4, f.seek(4))
             self.assertEqual(f.read(1), b'O')
         self.assertTrue(f.closed)
 
@@ -892,7 +895,7 @@ class FSTestCases(object):
             self.assertTrue(write_file.writable())
             self.assertFalse(write_file.readable())
             self.assertFalse(write_file.closed)
-            write_file.write(b'\0\1\2')
+            self.assertEqual(3, write_file.write(b'\0\1\2'))
         self.assertTrue(write_file.closed)
 
         # Read a binary file
