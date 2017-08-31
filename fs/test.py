@@ -1716,3 +1716,20 @@ class FSTestCases(object):
         self.assert_not_exists('földér/☣.txt')
         self.fs.removedir('földér')
         self.assert_not_exists('földér')
+
+    def test_case_sensitive(self):
+        if self.fs.getmeta().get('case_insensitive', False):
+            self.skipTest('the filesystem is not case sensitive.')
+
+        self.fs.makedir('foo')
+        self.fs.makedir('Foo')
+        self.fs.touch('fOO')
+
+        self.assert_exists('foo')
+        self.assert_exists('Foo')
+        self.assert_exists('fOO')
+        self.assert_not_exists('FoO')
+
+        self.assert_isdir('foo')
+        self.assert_isdir('Foo')
+        self.assert_isfile('fOO')
