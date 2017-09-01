@@ -99,6 +99,9 @@ class FTPFile(io.IOBase):
         self._read_conn = None
         self._write_conn = None
 
+    def __length_hint__(self):
+        return self.fs.getsize(self.path)
+
     def _open_ftp(self):
         ftp = self.fs._open_ftp()
         ftp.voidcmd(_encode('TYPE I'))
@@ -154,7 +157,7 @@ class FTPFile(io.IOBase):
     def readable(self):
         return self.mode.reading
 
-    def read(self, size=None):
+    def read(self, size=-1):
         if not self.mode.reading:
             raise IOError('File not open for reading')
 
@@ -163,8 +166,8 @@ class FTPFile(io.IOBase):
 
         conn = self.read_conn
         with self._lock:
-            while remaining is None or remaining:
-                if remaining is None:
+            while remaining:
+                if remaining < 0:
                     read_size = DEFAULT_CHUNK_SIZE
                 else:
                     read_size = min(DEFAULT_CHUNK_SIZE, remaining)
@@ -176,8 +179,7 @@ class FTPFile(io.IOBase):
                     break
                 chunks.append(chunk)
                 self.pos += len(chunk)
-                if remaining is not None:
-                    remaining -= len(chunk)
+                remaining -= len(chunk)
         return b''.join(chunks)
 
     def readline(self, size=None):
@@ -220,17 +222,14 @@ class FTPFile(io.IOBase):
     def truncate(self, size=None):
         # Inefficient, but I don't know if truncate is possible with ftp
         with self._lock:
-            if size is None:
-                size = self.tell()
+            size = size or self.tell()
             with self.fs.openbin(self.path) as f:
                 data = f.read(size)
             with self.fs.openbin(self.path, 'w') as f:
                 f.write(data)
                 if len(data) < size:
                     f.write(b'\0' * (size - len(data)))
-
-        self.pos = size or self.tell()
-        return self.pos
+        return size
 
     def seekable(self):
         return True

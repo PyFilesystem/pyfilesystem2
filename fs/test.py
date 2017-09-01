@@ -884,6 +884,7 @@ class FSTestCases(object):
             self.assertEqual(0, f.seek(0))
             self.assertEqual(f.read(), b'Hello')
             self.assertEqual(10, f.truncate(10))
+            self.assertEqual(5, f.tell())
             self.assertEqual(0, f.seek(0))
             print(repr(self.fs))
             print(repr(f))
