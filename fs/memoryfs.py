@@ -121,10 +121,10 @@ class _MemoryFile(io.IOBase):
             self.on_modify()
             new_size = self._bytes_io.truncate(size)
             if size is not None and self._bytes_io.tell() < size:
-                self._bytes_io.seek(0, os.SEEK_END)
-                file_size = self._bytes_io.tell()
+                file_size = self._bytes_io.seek(0, os.SEEK_END)
                 self._bytes_io.write(b'\0' * (size - file_size))
-            return new_size
+                self._bytes_io.seek(-size+file_size, os.SEEK_END)
+            return size or new_size
 
     def writable(self):
         return self._mode.writing
