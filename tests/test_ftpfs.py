@@ -203,6 +203,12 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         self.fs.ftp.sendcmd = broken_sendcmd
         self.assertEqual(self.fs.features, {})
 
+    def test_getmeta_unicode_path(self):
+        self.assertTrue(self.fs.getmeta().get('unicode_paths'))
+        self.fs.features
+        del self.fs.features['UTF8']
+        self.assertFalse(self.fs.getmeta().get('unicode_paths'))
+
 
 class TestFTPFSNoMLSD(TestFTPFS):
 

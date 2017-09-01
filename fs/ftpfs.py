@@ -103,7 +103,7 @@ class FTPFile(io.IOBase):
         return self.fs.getsize(self.path)
 
     def _open_ftp(self):
-        ftp = self.fs._open_ftp()
+        ftp = self.fs._open_ftp(self.fs.encoding)
         ftp.voidcmd(_encode('TYPE I'))
         return ftp
 
@@ -312,17 +312,19 @@ class FTPFS(FS):
         )
         return _fmt.format(host=self.host, port=self.port)
 
-    def _open_ftp(self):
+    def _open_ftp(self, encoding="utf-8"):
         _ftp = FTP()
         _ftp.set_debuglevel(0)
         with ftp_errors(self):
+            _ftp.encoding = encoding
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
         return _ftp
 
     def _manage_ftp(self):
-        ftp = self._open_ftp()
+        ftp = self._open_ftp(self.encoding)
         return manage_ftp(ftp)
+
 
     @property
     def ftp_url(self):
@@ -336,9 +338,21 @@ class FTPFS(FS):
     @property
     def ftp(self):
         if self._ftp is None:
-            self._ftp = self._open_ftp()
+            self._ftp = self._open_ftp(self.encoding)
             self._welcome = self._ftp.getwelcome()
         return self._ftp
+
+    @property
+    def encoding(self):
+        if self._ftp is None:
+            if self._features is None:
+                _ftp = self._open_ftp('latin-1')
+                has_utf8 = "UTF8" in _ftp.sendcmd('FEAT')
+            else:
+                has_utf8 = "UTF8" in self._features
+            return "utf-8" if has_utf8 else "latin-1"
+        else:
+            return self._ftp.encoding
 
     @property
     def features(self):
@@ -497,6 +511,14 @@ class FTPFS(FS):
                 raise errors.ResourceNotFound(path)
             info = directory[file_name]
             return info
+
+    def getmeta(self, namespace="standard"):
+        _meta = {}
+        if namespace == "standard":
+            _meta = self._meta.copy()
+            _meta['unicode_paths'] = "UTF8" in self.features
+        return _meta
+
 
     def listdir(self, path):
         self.check()
