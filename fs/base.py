@@ -318,6 +318,8 @@ class FS(object):
         with self._lock:
             if not create and not self.exists(dst_path):
                 raise errors.ResourceNotFound(dst_path)
+            if not self.getinfo(src_path).is_dir:
+                raise errors.DirectoryExpected(src_path)
             copy.copy_dir(
                 self,
                 src_path,
