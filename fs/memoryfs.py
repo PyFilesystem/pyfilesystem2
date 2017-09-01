@@ -116,14 +116,15 @@ class _MemoryFile(io.IOBase):
     def tell(self):
         return self.pos
 
-    def truncate(self, size):
+    def truncate(self, size=None):
         with self._seek_lock():
             self.on_modify()
-            self._bytes_io.truncate(size)
+            new_size = self._bytes_io.truncate(size)
             if size is not None and self._bytes_io.tell() < size:
                 self._bytes_io.seek(0, os.SEEK_END)
                 file_size = self._bytes_io.tell()
                 self._bytes_io.write(b'\0' * (size - file_size))
+            return new_size
 
     def writable(self):
         return self._mode.writing
@@ -133,7 +134,7 @@ class _MemoryFile(io.IOBase):
             raise IOError('File not open for writing')
         with self._seek_lock():
             self.on_modify()
-            self._bytes_io.write(data)
+            return self._bytes_io.write(data)
 
     def writelines(self, sequence):
         with self._seek_lock():
