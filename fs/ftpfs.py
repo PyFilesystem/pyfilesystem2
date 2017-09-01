@@ -212,6 +212,8 @@ class FTPFile(io.IOBase):
                 remaining_data -= sent_size
                 self.pos += sent_size
 
+        return data_pos
+
     def writelines(self, lines):
         self.write(b''.join(lines))
 
@@ -226,6 +228,9 @@ class FTPFile(io.IOBase):
                 f.write(data)
                 if len(data) < size:
                     f.write(b'\0' * (size - len(data)))
+
+        self.pos = size or self.tell()
+        return self.pos
 
     def seekable(self):
         return True
@@ -252,6 +257,7 @@ class FTPFile(io.IOBase):
             if self._write_conn:
                 self._write_conn.close()
                 self._write_conn = None
+        return self.tell()
 
 
 class FTPFS(FS):
