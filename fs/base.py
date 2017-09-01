@@ -820,6 +820,8 @@ class FS(object):
 
         if not overwrite and self.exists(dst_path):
             raise errors.DestinationExists(dst_path)
+        if self.getinfo(src_path).is_dir:
+            raise errors.FileExpected(src_path)
         if self.getmeta().get('supports_rename', False):
             try:
                 src_sys_path = self.getsyspath(src_path)
