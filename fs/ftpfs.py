@@ -83,8 +83,12 @@ def parse_ftp_error(e):
     return code, message
 
 
-def _encode(s):
-    return s.encode() if PY2 and isinstance(s, text_type) else s
+if PY2:
+    def _encode(s):
+        return s.encode("utf-8") if isinstance(s, text_type) else s
+else:
+    def _encode(s):
+        return s
 
 
 class FTPFile(io.IOBase):
@@ -345,12 +349,8 @@ class FTPFS(FS):
     @property
     def encoding(self):
         if self._ftp is None:
-            if self._features is None:
-                _ftp = self._open_ftp('latin-1')
-                has_utf8 = "UTF8" in _ftp.sendcmd('FEAT')
-            else:
-                has_utf8 = "UTF8" in self._features
-            return "utf-8" if has_utf8 else "latin-1"
+            _ftp = self._open_ftp('latin-1')
+            return "utf-8" if "UTF8" in _ftp.sendcmd('FEAT') else "latin-1"
         else:
             return self._ftp.encoding
 
