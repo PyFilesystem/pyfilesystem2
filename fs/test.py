@@ -1713,10 +1713,14 @@ class FSTestCases(object):
         self.assert_text('☭.txt', 'Smells like communism.')
         self.assert_bytes('földér/☣.txt', b'Smells like an old syringe.')
 
+        if self.fs.hassyspath('földér/☣.txt'):
+            self.assertTrue(os.path.exists(self.fs.getsyspath('földér/☣.txt')))
+
         self.fs.remove('földér/☣.txt')
         self.assert_not_exists('földér/☣.txt')
         self.fs.removedir('földér')
         self.assert_not_exists('földér')
+
 
     def test_case_sensitive(self):
         if self.fs.getmeta().get('case_insensitive', False):
