@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -22,7 +23,6 @@ from ftplib import error_temp
 
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.test import ThreadedTestFTPd
 
 from fs import errors
 from fs.opener import open_fs
@@ -89,6 +89,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
+        from pyftpdlib.test import ThreadedTestFTPd
         super(TestFTPFS, cls).setUpClass()
 
         cls._temp_dir = tempfile.mkdtemp('ftpfs2tests')
