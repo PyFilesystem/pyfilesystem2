@@ -1,6 +1,5 @@
 """
 Useful functions for working with PyFilesystem paths.
-sdsd
 This is broadly similar to the standard ``os.path`` module but works
 with paths in the canonical format expected by all FS objects (that is,
 separated by forward slashes and with an optional leading slash).
