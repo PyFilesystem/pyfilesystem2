@@ -22,7 +22,7 @@ from ftplib import error_temp
 
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.test import FTPd
+from pyftpdlib.test import ThreadedTestFTPd
 
 from fs import errors
 from fs.opener import open_fs
@@ -95,7 +95,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         cls._temp_path = os.path.join(cls._temp_dir, text_type(uuid.uuid4()))
         os.mkdir(cls._temp_path)
 
-        cls.server = FTPd()
+        cls.server = ThreadedTestFTPd()
         cls.server.shutdown_after = -1
         cls.server.handler.authorizer = DummyAuthorizer()
         cls.server.handler.authorizer.add_user(
