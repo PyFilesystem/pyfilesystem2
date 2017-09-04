@@ -1,7 +1,7 @@
 """
 This module can compress the contents of a filesystem.
 
-Currently only the Zip format is supported.
+Currently zip and tar are supported.
 """
 
 from __future__ import absolute_import
@@ -105,7 +105,7 @@ def write_tar(src_fs,
               encoding="utf-8",
               walker=None):
     """
-    Write the contents of a filesystem to a zip file.
+    Write the contents of a filesystem to a tar file.
 
     :param file: Destination file, may be a file name or an open file
         object.
