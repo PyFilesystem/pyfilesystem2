@@ -659,6 +659,30 @@ class FSTestCases(object):
         with self.assertRaises(errors.DirectoryExpected):
             self.fs.makedirs('foo.bin/bar/baz/egg')
 
+    def test_repeat_dir(self):
+        # Catches bug with directories contain repeated names,
+        # discovered in s3fs
+        self.fs.makedirs('foo/foo/foo')
+        self.assertEqual(
+            self.fs.listdir(u''),
+            ['foo']
+        )
+        self.assertEqual(
+            self.fs.listdir('foo'),
+            ['foo']
+        )
+        self.assertEqual(
+            self.fs.listdir('foo/foo'),
+            ['foo']
+        )
+        self.assertEqual(
+            self.fs.listdir('foo/foo/foo'),
+            []
+        )
+        scan = list(self.fs.scandir('foo'))
+        self.assertEqual(len(scan), 1)
+        self.assertEqual(scan[0].name, 'foo')
+
     def test_open(self):
         # Open a file that doesn't exist
         with self.assertRaises(errors.ResourceNotFound):

@@ -262,7 +262,7 @@ class Info(object):
 
         Requires the ``"access"`` namespace.
 
-        :rtype: :class:`fspermissions.Permissions`
+        :rtype: :class:`fs.permissions.Permissions`
         :raises ~fs.errors.MissingInfoNamespace: if the 'ACCESS'
             namespace is not in the Info.
 
