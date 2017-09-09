@@ -56,6 +56,16 @@ class TestParse(unittest.TestCase):
         )
         self.assertEqual(expected, parsed)
 
+        parsed = opener.parse('ftp://user@ftp.example.org:password@proxy')
+        expected = opener.registry.ParseResult(
+            'ftp',
+            'user@ftp.example.org',
+            'password',
+            'proxy',
+            None
+        )
+        self.assertEqual(expected, parsed)
+
     def test_parse_path(self):
         parsed = opener.parse('osfs://foo/bar!example.txt')
         expected = opener.registry.ParseResult(
