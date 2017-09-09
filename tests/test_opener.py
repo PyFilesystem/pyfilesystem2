@@ -31,6 +31,7 @@ class TestParse(unittest.TestCase):
             None,
             None,
             'foo/bar',
+            {},
             None
         )
         self.assertEqual(expected, parsed)
@@ -42,6 +43,7 @@ class TestParse(unittest.TestCase):
             'user',
             'pass',
             'ftp.example.org',
+            {},
             None
         )
         self.assertEqual(expected, parsed)
@@ -52,6 +54,7 @@ class TestParse(unittest.TestCase):
             'user',
             '',
             'ftp.example.org',
+            {},
             None
         )
         self.assertEqual(expected, parsed)
@@ -63,7 +66,37 @@ class TestParse(unittest.TestCase):
             None,
             None,
             'foo/bar',
+            {},
             'example.txt'
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_params(self):
+        parsed = opener.parse('ftp://ftp.example.org?proxy=ftp.proxy.org')
+        expected = opener.registry.ParseResult(
+            'ftp',
+            None,
+            None,
+            'ftp.example.org',
+            {
+                'proxy':'ftp.proxy.org'
+            },
+            None
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_params_multiple(self):
+        parsed = opener.parse('ftp://ftp.example.org?foo&bar=1')
+        expected = opener.registry.ParseResult(
+            'ftp',
+            None,
+            None,
+            'ftp.example.org',
+            {
+                'foo':'',
+                'bar':'1'
+            },
+            None
         )
         self.assertEqual(expected, parsed)
 

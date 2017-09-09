@@ -17,6 +17,7 @@ import six
 import contextlib
 import collections
 import pkg_resources
+from six.moves import urllib
 
 from .base import Opener
 from .errors import ParseError, UnsupportedProtocol, EntryPointError
@@ -35,6 +36,7 @@ class Registry(object):
             'username',
             'password',
             'resource',
+            'params',
             'path'
         ]
     )
@@ -77,11 +79,18 @@ class Registry(object):
             username = None
             password = None
             url = url2
+        url, _, _params = url.partition('?')
+        if _params:
+            params = urllib.parse.parse_qs(_params, keep_blank_values=True)
+            params = {k:v[0] for k, v in params.items()}
+        else:
+            params = {}
         return cls.ParseResult(
             fs_name,
             username,
             password,
             url,
+            params,
             path
         )
 
