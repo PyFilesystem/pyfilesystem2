@@ -107,9 +107,6 @@ class FTPFile(io.IOBase):
         self._read_conn = None
         self._write_conn = None
 
-    def __length_hint__(self):
-        return self.fs.getsize(self.path)
-
     def _open_ftp(self):
         ftp = self.fs._open_ftp(self.fs.ftp.encoding)
         ftp.voidcmd(str('TYPE I'))
