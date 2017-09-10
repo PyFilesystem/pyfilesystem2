@@ -87,7 +87,7 @@ if PY2:
     def _encode(st, encoding):
         return st.encode(encoding) if isinstance(st, text_type) else st
     def _decode(st, encoding):
-        return st.decode(encoding) if isinstance(st, bytes) else st
+        return st.decode(encoding, 'replace') if isinstance(st, bytes) else st
 else:
     def _encode(st, _):
         return st
