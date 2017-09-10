@@ -15,7 +15,7 @@ from ftplib import error_perm
 from ftplib import error_temp
 
 from six import PY2
-from six import text_type, binary_type
+from six import text_type
 
 from . import errors
 from .base import FS
@@ -87,7 +87,7 @@ if PY2:
     def _encode(st, encoding):
         return st.encode(encoding) if isinstance(st, text_type) else st
     def _decode(st, encoding):
-        return st.decode(encoding) if isinstance(st, binary_type) else st
+        return st.decode(encoding) if isinstance(st, bytes) else st
 else:
     def _encode(st, _):
         return st
