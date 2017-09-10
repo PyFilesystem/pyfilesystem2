@@ -230,7 +230,8 @@ class FTPFile(io.IOBase):
     def truncate(self, size=None):
         # Inefficient, but I don't know if truncate is possible with ftp
         with self._lock:
-            size = size or self.tell()
+            if size is None:
+                size = self.tell()
             with self.fs.openbin(self.path) as f:
                 data = f.read(size)
             with self.fs.openbin(self.path, 'w') as f:
