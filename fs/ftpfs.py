@@ -83,8 +83,16 @@ def parse_ftp_error(e):
     return code, message
 
 
-def _encode(s):
-    return s.encode() if PY2 and isinstance(s, text_type) else s
+if PY2:
+    def _encode(st, encoding):
+        return st.encode(encoding) if isinstance(st, text_type) else st
+    def _decode(st, encoding):
+        return st.decode(encoding, 'replace') if isinstance(st, bytes) else st
+else:
+    def _encode(st, _):
+        return st
+    def _decode(st, _):
+        return st
 
 
 class FTPFile(io.IOBase):
@@ -100,15 +108,15 @@ class FTPFile(io.IOBase):
         self._write_conn = None
 
     def _open_ftp(self):
-        ftp = self.fs._open_ftp()
-        ftp.voidcmd(_encode('TYPE I'))
+        ftp = self.fs._open_ftp(self.fs.ftp.encoding)
+        ftp.voidcmd(str('TYPE I'))
         return ftp
 
     @property
     def read_conn(self):
         if self._read_conn is None:
             self._read_conn = self.ftp.transfercmd(
-                _encode('RETR ' + self.path),
+                str('RETR ') + _encode(self.path, self.ftp.encoding),
                 self.pos
             )
         return self._read_conn
@@ -118,11 +126,11 @@ class FTPFile(io.IOBase):
         if self._write_conn is None:
             if self.mode.appending:
                 self._write_conn = self.ftp.transfercmd(
-                    _encode('APPE ' + self.path)
+                    str('APPE ') + _encode(self.path, self.ftp.encoding)
                 )
             else:
                 self._write_conn = self.ftp.transfercmd(
-                    _encode('STOR ' + self.path),
+                    str('STOR ') + _encode(self.path, self.ftp.encoding),
                     self.pos
                 )
         return self._write_conn
@@ -154,7 +162,7 @@ class FTPFile(io.IOBase):
     def readable(self):
         return self.mode.reading
 
-    def read(self, size=None):
+    def read(self, size=-1):
         if not self.mode.reading:
             raise IOError('File not open for reading')
 
@@ -163,8 +171,8 @@ class FTPFile(io.IOBase):
 
         conn = self.read_conn
         with self._lock:
-            while remaining is None or remaining:
-                if remaining is None:
+            while remaining:
+                if remaining < 0:
                     read_size = DEFAULT_CHUNK_SIZE
                 else:
                     read_size = min(DEFAULT_CHUNK_SIZE, remaining)
@@ -176,8 +184,7 @@ class FTPFile(io.IOBase):
                     break
                 chunks.append(chunk)
                 self.pos += len(chunk)
-                if remaining is not None:
-                    remaining -= len(chunk)
+                remaining -= len(chunk)
         return b''.join(chunks)
 
     def readline(self, size=None):
@@ -212,6 +219,8 @@ class FTPFile(io.IOBase):
                 remaining_data -= sent_size
                 self.pos += sent_size
 
+        return data_pos
+
     def writelines(self, lines):
         self.write(b''.join(lines))
 
@@ -226,6 +235,7 @@ class FTPFile(io.IOBase):
                 f.write(data)
                 if len(data) < size:
                     f.write(b'\0' * (size - len(data)))
+        return size
 
     def seekable(self):
         return True
@@ -252,6 +262,7 @@ class FTPFile(io.IOBase):
             if self._write_conn:
                 self._write_conn.close()
                 self._write_conn = None
+        return self.tell()
 
 
 class FTPFS(FS):
@@ -307,16 +318,17 @@ class FTPFS(FS):
         )
         return _fmt.format(host=self.host, port=self.port)
 
-    def _open_ftp(self):
+    def _open_ftp(self, encoding="utf-8"):
         _ftp = FTP()
         _ftp.set_debuglevel(0)
         with ftp_errors(self):
+            _ftp.encoding = encoding
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
         return _ftp
 
     def _manage_ftp(self):
-        ftp = self._open_ftp()
+        ftp = self._open_ftp(self.ftp.encoding)
         return manage_ftp(ftp)
 
     @property
@@ -331,7 +343,9 @@ class FTPFS(FS):
     @property
     def ftp(self):
         if self._ftp is None:
-            self._ftp = self._open_ftp()
+            _ftp = self._open_ftp('latin-1')
+            encoding = 'utf-8' if 'UTF8' in _ftp.sendcmd('FEAT') else 'latin-1'
+            self._ftp = self._open_ftp(encoding)
             self._welcome = self._ftp.getwelcome()
         return self._ftp
 
@@ -340,13 +354,11 @@ class FTPFS(FS):
         """Get features dict from FTP server."""
         if self._features is None:
             try:
-                response = self.ftp.sendcmd(_encode("FEAT"))
+                response = _decode(self.ftp.sendcmd("FEAT"), "ascii")
             except error_perm:
                 self._features = {}
             else:
                 self._features = {}
-                if PY2:
-                    response = response.decode('ascii')
                 if response.split('-')[0] == '211':
                     for line in response.splitlines():
                         if line.startswith(' '):
@@ -359,7 +371,7 @@ class FTPFS(FS):
         lines = []
         with ftp_errors(self, path=path):
             self.ftp.retrlines(
-                _encode('LIST {}'.format(_path)),
+                str('LIST ') + _encode(_path, self.ftp.encoding),
                 lines.append
             )
         lines = [
@@ -375,13 +387,12 @@ class FTPFS(FS):
         return 'MLST' in self.features
 
     def create(self, path, wipe=False):
-        self.check()
-        self.validatepath(path)
+        _path = self.validatepath(path)
         with ftp_errors(self, path):
             if wipe or not self.isfile(path):
                 empty_file = io.BytesIO()
                 self.ftp.storbinary(
-                    _encode("STOR {}".format(path)),
+                    str("STOR ") + _encode(_path, self.ftp.encoding),
                     empty_file
                 )
 
@@ -410,6 +421,7 @@ class FTPFS(FS):
     def _parse_facts(cls, line):
         name = None
         facts = {}
+        # print(line, type(line))
         for fact in line.split(';'):
             k, sep, v = fact.partition('=')
             if sep:
@@ -456,7 +468,6 @@ class FTPFS(FS):
             yield raw_info
 
     def getinfo(self, path, namespaces=None):
-        self.check()
         _path = self.validatepath(path)
         namespaces = namespaces or ()
 
@@ -477,11 +488,9 @@ class FTPFS(FS):
             with self._lock:
                 with ftp_errors(self, path=path):
                     response = self.ftp.sendcmd(
-                        _encode('MLST {}'.format(_path))
+                        str('MLST ') + _encode(_path, self.ftp.encoding)
                     )
-                if PY2:
-                    response = response.decode('utf-8')
-                lines = response.splitlines()[1:-1]
+                lines = _decode(response, self.ftp.encoding).splitlines()[1:-1]
                 for raw_info in self._parse_mlsx(lines):
                     return Info(raw_info)
 
@@ -493,8 +502,15 @@ class FTPFS(FS):
             info = directory[file_name]
             return info
 
+    def getmeta(self, namespace="standard"):
+        _meta = {}
+        if namespace == "standard":
+            _meta = self._meta.copy()
+            _meta['unicode_paths'] = "UTF8" in self.features
+        return _meta
+
+
     def listdir(self, path):
-        self.check()
         _path = self.validatepath(path)
         with self._lock:
             dir_list = [
@@ -504,9 +520,7 @@ class FTPFS(FS):
         return dir_list
 
     def makedir(self, path, permissions=None, recreate=False):
-        self.check()
-        self.validatepath(path)
-        _path = abspath(normpath(path))
+        _path = self.validatepath(path)
 
         with ftp_errors(self, path=path):
             if _path == '/':
@@ -517,7 +531,7 @@ class FTPFS(FS):
 
             if not (recreate and self.isdir(path)):
                 try:
-                    self.ftp.mkd(_encode(_path))
+                    self.ftp.mkd(_encode(_path, self.ftp.encoding))
                 except error_perm as e:
                     code, _ = parse_ftp_error(e)
                     if code == 550:
@@ -532,12 +546,11 @@ class FTPFS(FS):
     def openbin(self, path, mode="r", buffering=-1, **options):
         _mode = Mode(mode)
         _mode.validate_bin()
-        self.check()
-        self.validatepath(path)
+        _path = self.validatepath(path)
 
         with self._lock:
             try:
-                info = self.getinfo(path)
+                info = self.getinfo(_path)
             except errors.ResourceNotFound:
                 if _mode.reading:
                     raise errors.ResourceNotFound(path)
@@ -546,31 +559,28 @@ class FTPFS(FS):
                     raise errors.FileExpected(path)
             if _mode.exclusive:
                 raise errors.FileExists(path)
-            f = FTPFile(self, abspath(normpath(path)), mode)
+            f = FTPFile(self, _path, mode)
         return f
 
     def remove(self, path):
         self.check()
-        self.validatepath(path)
-        _path = abspath(normpath(path))
+        _path = self.validatepath(path)
         dir_name, file_name = split(_path)
         with self._lock:
             if self.isdir(path):
                 raise errors.FileExpected(path=path)
             with ftp_errors(self, path):
-                self.ftp.delete(_encode(_path))
+                self.ftp.delete(_encode(_path, self.ftp.encoding))
 
     def removedir(self, path):
-        self.check()
-        _path = abspath(normpath(path))
-        self.validatepath(path)
+        _path = self.validatepath(path)
         if _path == '/':
             raise errors.RemoveRootError()
         _dir_name, file_name = split(_path)
 
         with ftp_errors(self, path):
             try:
-                self.ftp.rmd(_encode(_path))
+                self.ftp.rmd(_encode(_path, self.ftp.encoding))
             except error_perm as e:
                 code, _ = parse_ftp_error(e)
                 if code == 550:
@@ -581,16 +591,15 @@ class FTPFS(FS):
                 raise  # pragma: no cover
 
     def _scandir(self, path, namespaces=None):
-        self.check()
-        self.validatepath(path)
-        _path = abspath(normpath(path))
+        _path = self.validatepath(path)
         with self._lock:
             if self.supports_mlst:
                 lines = []
                 with ftp_errors(self, path=path):
                     try:
                         self.ftp.retrlines(
-                            _encode("MLSD {}".format(_path)), lines.append
+                            str("MLSD ") + _encode(_path, self.ftp.encoding),
+                            lambda l: lines.append(_decode(l, self.ftp.encoding))
                         )
                     except error_perm as e:
                         if not self.getinfo(path).is_dir:
@@ -614,41 +623,34 @@ class FTPFS(FS):
         return iter_info
 
     def setbinfile(self, path, file):
-        _path = abspath(normpath(path))
-        self.validatepath(path)
+        _path = self.validatepath(path)
         with self._lock:
             with self._manage_ftp() as ftp:
                 with ftp_errors(self, path):
                     ftp.storbinary(
-                        "STOR {}".format(_encode(_path)),
+                        str("STOR ") + _encode(_path, self.ftp.encoding),
                         file
                     )
 
     def setbytes(self, path, contents):
         if not isinstance(contents, bytes):
             raise ValueError('contents must be bytes')
-        _path = abspath(normpath(path))
-        self.validatepath(path)
-        bin_file = io.BytesIO(contents)
-        with self._lock:
-            with self._manage_ftp() as ftp:
-                with ftp_errors(self, path):
-                    ftp.storbinary(
-                        "STOR {}".format(_encode(_path)),
-                        bin_file
-                    )
+        self.setbinfile(path, io.BytesIO(contents))
 
     def setinfo(self, path, info):
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
 
     def getbytes(self, path):
-        _path = abspath(normpath(path))
+        _path = self.validatepath(path)
         data = io.BytesIO()
         with ftp_errors(self, path):
             with self._manage_ftp() as ftp:
                 try:
-                    ftp.retrbinary("RETR {}".format(_path), data.write)
+                    ftp.retrbinary(
+                        str("RETR ") + _encode(_path, self.ftp.encoding),
+                        data.write
+                    )
                 except error_perm as e:
                     code, _ = parse_ftp_error(e)
                     if code == 550:
@@ -663,7 +665,7 @@ class FTPFS(FS):
         if not self.isclosed():
             try:
                 self.ftp.quit()
-            except Exception:
+            except Exception:  # pragma: no cover
                 pass
             self._ftp = None
         super(FTPFS, self).close()

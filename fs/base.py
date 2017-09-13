@@ -318,6 +318,8 @@ class FS(object):
         with self._lock:
             if not create and not self.exists(dst_path):
                 raise errors.ResourceNotFound(dst_path)
+            if not self.getinfo(src_path).is_dir:
+                raise errors.DirectoryExpected(src_path)
             copy.copy_dir(
                 self,
                 src_path,
@@ -820,6 +822,8 @@ class FS(object):
 
         if not overwrite and self.exists(dst_path):
             raise errors.DestinationExists(dst_path)
+        if self.getinfo(src_path).is_dir:
+            raise errors.FileExpected(src_path)
         if self.getmeta().get('supports_rename', False):
             try:
                 src_sys_path = self.getsyspath(src_path)
