@@ -25,8 +25,6 @@ from fs.opener import open_fs
 from fs.ftpfs import FTPFS, ftp_errors
 from fs.test import FSTestCases
 
-from nose.plugins.attrib import attr
-
 
 # Prevent socket timeouts from slowing tests too much
 socket.setdefaulttimeout(1)
@@ -84,8 +82,8 @@ class TestFTPErrors(unittest.TestCase):
 
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
-    user='user'
-    pasw='1234'
+    user = 'user'
+    pasw = '1234'
 
     @classmethod
     def setUpClass(cls):
