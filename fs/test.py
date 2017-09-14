@@ -1750,6 +1750,7 @@ class FSTestCases(object):
         if self.fs.getmeta().get('case_insensitive', False):
             self.skipTest('the filesystem is not case sensitive.')
 
+
         self.fs.makedir('foo')
         self.fs.makedir('Foo')
         self.fs.touch('fOO')

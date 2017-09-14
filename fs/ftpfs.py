@@ -421,7 +421,6 @@ class FTPFS(FS):
     def _parse_facts(cls, line):
         name = None
         facts = {}
-        # print(line, type(line))
         for fact in line.split(';'):
             k, sep, v = fact.partition('=')
             if sep:
