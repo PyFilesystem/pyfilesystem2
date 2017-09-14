@@ -3,26 +3,22 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import threading
+import socket
 import ftplib
 import os
 import platform
 import shutil
-import subprocess
-import sys
 import tempfile
 import time
 import unittest
 import uuid
 
 from six import text_type
-from six.moves.urllib.request import urlopen
 
 from ftplib import error_perm
 from ftplib import error_temp
 
 from pyftpdlib.authorizers import DummyAuthorizer
-from pyftpdlib.handlers import FTPHandler
 
 from fs import errors
 from fs.opener import open_fs
@@ -30,6 +26,10 @@ from fs.ftpfs import FTPFS, ftp_errors
 from fs.test import FSTestCases
 
 from nose.plugins.attrib import attr
+
+
+# Prevent socket timeouts from slowing tests too much
+socket.setdefaulttimeout(1)
 
 
 class TestFTPFSClass(unittest.TestCase):
@@ -133,7 +133,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
     def test_host(self):
         self.assertEqual(self.fs.host, self.server.host)
 
-    @attr('slow')
+    #@attr('slow')
     def test_connection_error(self):
         fs = FTPFS('ftp.not.a.chance', timeout=1)
         with self.assertRaises(errors.RemoteConnectionError):
