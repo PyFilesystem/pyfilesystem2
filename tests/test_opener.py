@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 
 import os
-import six
 import mock
 import tempfile
 import unittest
 import pkg_resources
+
+import six
 
 from fs import open_fs, opener
 from fs.osfs import OSFS
@@ -114,13 +115,25 @@ class TestParse(unittest.TestCase):
         )
         self.assertEqual(expected, parsed)
 
-    def test_parse_user_password_decod(self):
+    def test_parse_user_password_decode(self):
         parsed = opener.parse('ftp://user%40large:password@ftp.example.org')
         expected = opener.registry.ParseResult(
             'ftp',
             'user@large',
             'password',
             'ftp.example.org',
+            {},
+            None
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_resource_decode(self):
+        parsed = opener.parse('ftp://user%40large:password@ftp.example.org/%7Econnolly')
+        expected = opener.registry.ParseResult(
+            'ftp',
+            'user@large',
+            'password',
+            'ftp.example.org/~connolly',
             {},
             None
         )

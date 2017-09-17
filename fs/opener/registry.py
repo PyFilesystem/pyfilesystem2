@@ -16,7 +16,7 @@ import collections
 import contextlib
 import re
 import six
-from six.moves import urllib
+from six.moves.urllib.parse import parse_qs, unquote
 import pkg_resources
 
 from .base import Opener
@@ -67,6 +67,7 @@ class Registry(object):
         :rtype: :class:`ParseResult`
 
         """
+
         match = cls._RE_FS_URL.match(fs_url)
         if match is None:
             raise ParseError('{!r} is not a fs2 url'.format(fs_url))
@@ -74,16 +75,17 @@ class Registry(object):
         fs_name, credentials, url1, url2, path = match.groups()
         if credentials:
             username, _, password = credentials.partition(':')
-            username = urllib.parse.unquote(username)
-            password = urllib.parse.unquote(password)
+            username = unquote(username)
+            password = unquote(password)
             url = url1
         else:
             username = None
             password = None
             url = url2
         url, has_qs, _params = url.partition('?')
+        url = unquote(url)
         if has_qs:
-            params = urllib.parse.parse_qs(_params, keep_blank_values=True)
+            params = parse_qs(_params, keep_blank_values=True)
             params = {k:v[0] for k, v in params.items()}
         else:
             params = {}
