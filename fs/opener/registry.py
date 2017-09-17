@@ -12,12 +12,12 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import collections
+import contextlib
 import re
 import six
-import contextlib
-import collections
-import pkg_resources
 from six.moves import urllib
+import pkg_resources
 
 from .base import Opener
 from .errors import ParseError, UnsupportedProtocol, EntryPointError
@@ -74,13 +74,15 @@ class Registry(object):
         fs_name, credentials, url1, url2, path = match.groups()
         if credentials:
             username, _, password = credentials.partition(':')
+            username = urllib.parse.unquote(username)
+            password = urllib.parse.unquote(password)
             url = url1
         else:
             username = None
             password = None
             url = url2
-        url, _, _params = url.partition('?')
-        if _params:
+        url, has_qs, _params = url.partition('?')
+        if has_qs:
             params = urllib.parse.parse_qs(_params, keep_blank_values=True)
             params = {k:v[0] for k, v in params.items()}
         else:

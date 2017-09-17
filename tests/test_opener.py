@@ -100,6 +100,32 @@ class TestParse(unittest.TestCase):
         )
         self.assertEqual(expected, parsed)
 
+    def test_parse_user_password_proxy(self):
+        parsed = opener.parse('ftp://user:password@ftp.example.org?proxy=ftp.proxy.org')
+        expected = opener.registry.ParseResult(
+            'ftp',
+            'user',
+            'password',
+            'ftp.example.org',
+            {
+                'proxy': 'ftp.proxy.org'
+            },
+            None
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_user_password_decod(self):
+        parsed = opener.parse('ftp://user%40large:password@ftp.example.org')
+        expected = opener.registry.ParseResult(
+            'ftp',
+            'user@large',
+            'password',
+            'ftp.example.org',
+            {},
+            None
+        )
+        self.assertEqual(expected, parsed)
+
 
 class TestRegistry(unittest.TestCase):
 
