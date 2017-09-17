@@ -1,73 +1,43 @@
+# coding: utf-8
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import socket
 import ftplib
 import os
 import platform
 import shutil
-import subprocess
-import sys
 import tempfile
 import time
 import unittest
 import uuid
 
 from six import text_type
-from six.moves.urllib.request import urlopen
 
 from ftplib import error_perm
 from ftplib import error_temp
 
 from pyftpdlib.authorizers import DummyAuthorizer
-from pyftpdlib.handlers import FTPHandler
-from pyftpdlib.servers import FTPServer
 
 from fs import errors
 from fs.opener import open_fs
-from fs.ftpfs import ftp_errors
-
-from nose.plugins.attrib import attr
-
-
-_WINDOWS_PLATFORM = platform.system() == 'Windows'
-
-
-if __name__ == "__main__":
-    # Run an ftp server that exposes a given directory
-    import sys
-    authorizer = DummyAuthorizer()
-    authorizer.add_user("user", "12345", sys.argv[1], perm="elradfmw")
-    authorizer.add_anonymous(sys.argv[1])
-
-    handler = FTPHandler
-    handler.authorizer = authorizer
-    address = ("127.0.0.1", int(sys.argv[2]))
-
-    ftpd = FTPServer(address, handler)
-
-    sys.stdout.write('serving\n')
-    sys.stdout.flush()
-    ftpd.serve_forever()
-    sys.exit(0)
-
-
+from fs.ftpfs import FTPFS, ftp_errors
 from fs.test import FSTestCases
 
-ftp_port_offset = 0
-ftp_port = 30000 + (os.getpid() % 8)
+
+# Prevent socket timeouts from slowing tests too much
+socket.setdefaulttimeout(1)
 
 
 class TestFTPFSClass(unittest.TestCase):
 
     def test_parse_ftp_time(self):
-        from fs.ftpfs import FTPFS
         self.assertIsNone(FTPFS._parse_ftp_time('notreallyatime'))
         t = FTPFS._parse_ftp_time('19740705000000')
         self.assertEqual(t, 142214400)
 
     def test_parse_mlsx(self):
-        from fs.ftpfs import FTPFS
         info = list(
             FTPFS._parse_mlsx(['create=19740705000000;modify=19740705000000; /foo'])
         )[0]
@@ -78,7 +48,6 @@ class TestFTPFSClass(unittest.TestCase):
         self.assertEqual(info, [])
 
     def test_opener(self):
-        from fs.ftpfs import FTPFS
         ftp_fs = open_fs('ftp://will:wfc@ftp.example.org')
         self.assertIsInstance(ftp_fs, FTPFS)
         self.assertEqual(ftp_fs.host, 'ftp.example.org')
@@ -111,82 +80,59 @@ class TestFTPErrors(unittest.TestCase):
                 raise error_perm('999 foo')
 
 
-@attr('slow')
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
-    def make_fs(self):
-        from fs.ftpfs import FTPFS
-        global ftp_port_offset
-        temp_path = os.path.join(self._temp_dir, text_type(uuid.uuid4()))
-        _ftp_port = ftp_port + ftp_port_offset
-        ftp_port_offset += 1
+    user = 'user'
+    pasw = '1234'
 
-        os.mkdir(temp_path)
-        env = os.environ.copy()
+    @classmethod
+    def setUpClass(cls):
+        from pyftpdlib.test import ThreadedTestFTPd
+        super(TestFTPFS, cls).setUpClass()
 
-        server = subprocess.Popen(
-            [
-                sys.executable,
-                os.path.abspath(__file__),
-                temp_path,
-                text_type(_ftp_port)
-            ],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=env
-        )
-        server.stdout.readline()
+        cls._temp_dir = tempfile.mkdtemp('ftpfs2tests')
+        cls._temp_path = os.path.join(cls._temp_dir, text_type(uuid.uuid4()))
+        os.mkdir(cls._temp_path)
 
-        if _WINDOWS_PLATFORM:
-            # Don't know why this is necessary on Windows
+        cls.server = ThreadedTestFTPd()
+        cls.server.shutdown_after = -1
+        cls.server.handler.authorizer = DummyAuthorizer()
+        cls.server.handler.authorizer.add_user(
+            cls.user, cls.pasw, cls._temp_path, perm="elradfmw")
+        cls.server.handler.authorizer.add_anonymous(cls._temp_path)
+        cls.server.start()
+
+        # Don't know why this is necessary on Windows
+        if platform.system() == 'Windows':
             time.sleep(0.1)
-
         # Poll until a connection can be made
-        start_time = time.time()
-        while time.time() - start_time < 5:
-            try:
-                ftpurl = urlopen('ftp://127.0.0.1:{}'.format(_ftp_port))
-            except IOError:
-                time.sleep(0)
-            else:
-                ftpurl.read()
-                ftpurl.close()
-                break
-        else:
-            raise Exception("unable to start ftp server")
-        self.servers.append(server)
+        if not cls.server.is_alive():
+            raise RuntimeError("could not start FTP server.")
 
-        fs = FTPFS(
-            '127.0.0.1',
-            user='user',
-            passwd='12345',
-            port=_ftp_port,
-            timeout=5.0
-        )
-        return fs
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.stop()
+        shutil.rmtree(cls._temp_dir)
+        super(TestFTPFS, cls).tearDownClass()
 
-    def setUp(self):
-        self.servers = []
-        self._temp_dir = tempfile.mkdtemp('ftpfs2tests')
-        super(TestFTPFS, self).setUp()
+    def make_fs(self):
+        return open_fs('ftp://{}:{}@{}:{}'.format(
+            self.user, self.pasw, self.server.host, self.server.port
+        ))
 
     def tearDown(self):
-        while self.servers:
-            server = self.servers.pop(0)
-            if sys.platform == 'win32':
-                os.popen('TASKKILL /PID {} /F'.format(server.pid))
-            else:
-                server.terminate()
-                server.wait()
-                #os.system('kill {}'.format(server.pid))
-        shutil.rmtree(self._temp_dir)
+        shutil.rmtree(self._temp_path)
+        os.mkdir(self._temp_path)
         super(TestFTPFS, self).tearDown()
 
     def test_ftp_url(self):
         self.assertTrue(self.fs.ftp_url.startswith('ftp://127.0.0.1'))
 
+    def test_host(self):
+        self.assertEqual(self.fs.host, self.server.host)
+
+    #@attr('slow')
     def test_connection_error(self):
-        from fs.ftpfs import FTPFS
         fs = FTPFS('ftp.not.a.chance', timeout=1)
         with self.assertRaises(errors.RemoteConnectionError):
             fs.listdir('/')
@@ -202,6 +148,12 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
             raise ftplib.error_perm('nope')
         self.fs.ftp.sendcmd = broken_sendcmd
         self.assertEqual(self.fs.features, {})
+
+    def test_getmeta_unicode_path(self):
+        self.assertTrue(self.fs.getmeta().get('unicode_paths'))
+        self.fs.features
+        del self.fs.features['UTF8']
+        self.assertFalse(self.fs.getmeta().get('unicode_paths'))
 
 
 class TestFTPFSNoMLSD(TestFTPFS):

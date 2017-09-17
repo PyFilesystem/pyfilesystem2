@@ -2,6 +2,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import unicodedata
 import datetime
 import re
 import time
@@ -94,12 +95,14 @@ def decode_linux(line, match):
     is_link = perms.startswith('l')
     is_dir = perms.startswith('d') or is_link
     if is_link:
-        name, _, link_name = name.partition('->')
+        name, _, _link_name = name.partition('->')
         name = name.strip()
-        link_name = link_name.strip()
+        _link_name = _link_name.strip()
     permissions = Permissions.parse(perms[1:])
 
     mtime_epoch = _parse_time(mtime)
+
+    name = unicodedata.normalize('NFC', name)
 
     raw_info = {
         "basic": {
