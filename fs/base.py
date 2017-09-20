@@ -537,6 +537,10 @@ class FS(object):
                             os.rename operation.
         =================== ============================================
 
+        Most builtin filesystems will provide all these keys, and third-
+        party filesystems should do so whenever possible. A key may not
+        be present if there is no way to know the value.
+
         .. note::
             Meta information is constant for the lifetime of the
             filesystem, and may be cached.
