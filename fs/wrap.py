@@ -1,3 +1,24 @@
+"""
+fs.wrap
+=======
+
+A collection of :class:`~fs.wrapfs.WrapFS` objects that modify the
+behavior of another filesystem.
+
+Here's an example that opens a filesystem then makes it *read only*::
+
+    from fs import open_fs
+    from fs.wrap import read_only
+
+    projects_fs = open_fs('~/projects')
+    read_only_projects_fs = read_only(projects_fs)
+
+    # Will raise ResourceReadOnly exception
+    read_only_projects_fs.remove('__init__.py')
+
+
+"""
+
 from __future__ import print_function
 from __future__ import unicode_literals
 

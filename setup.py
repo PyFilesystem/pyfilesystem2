@@ -26,7 +26,7 @@ REQUIREMENTS = [
     "appdirs~=1.4.3",
     "pytz",
     "setuptools",
-    "six~=1.10.0",
+    "six~=1.10",
 ]
 
 setup(

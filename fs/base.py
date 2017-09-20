@@ -524,7 +524,7 @@ class FS(object):
         =================== ============================================
         key                 Description
         ------------------- --------------------------------------------
-        case_insensitive    True if this filesystem is case sensitive.
+        case_insensitive    True if this filesystem is case insensitive.
         invalid_path_chars  A string containing the characters that may
                             may not be used on this filesystem.
         max_path_length     Maximum number of characters permitted in a

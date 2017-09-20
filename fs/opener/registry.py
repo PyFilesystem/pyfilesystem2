@@ -83,7 +83,7 @@ class Registry(object):
             password = None
             url = url2
         url, has_qs, _params = url.partition('?')
-        url = unquote(url)
+        resource = unquote(url)
         if has_qs:
             params = parse_qs(_params, keep_blank_values=True)
             params = {k:v[0] for k, v in params.items()}
@@ -93,7 +93,7 @@ class Registry(object):
             fs_name,
             username,
             password,
-            url,
+            resource,
             params,
             path
         )
@@ -116,6 +116,7 @@ class Registry(object):
 
     @property
     def protocols(self):
+        """A list of supported protocols."""
         if self._protocols is None:
             self._protocols = [
                 entry_point.name
@@ -257,10 +258,10 @@ class Registry(object):
 
         :param fs_url: A FS instance or a FS URL.
         :type fs_url: str or FS
-        :param bool create: If ``True``, then create the filesytem if it
-            doesn't already exist.
-        :param bool writeable: If ``True``, then the filesystem should be
-            writeable.
+        :param bool create: If ``True``, then create the filesystem if
+            it doesn't already exist.
+        :param bool writeable: If ``True``, then the filesystem should
+            be writeable.
         :param str cwd: The current working directory, if opening a
             :class:`~fs.osfs.OSFS`.
 
