@@ -279,7 +279,6 @@ class FTPFS(FS):
     """
 
     _meta = {
-        'case_insensitive': False,
         'invalid_path_chars': '\0',
         'network': True,
         'read_only': False,
