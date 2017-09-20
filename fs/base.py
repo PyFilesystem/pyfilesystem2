@@ -538,8 +538,8 @@ class FS(object):
         =================== ============================================
 
         Most builtin filesystems will provide all these keys, and third-
-        party filesystems should do so whenever possible. A key may not
-        be present if there is no way to know the value.
+        party filesystems should do so whenever possible, but a key may
+        not be present if there is no way to know the value.
 
         .. note::
             Meta information is constant for the lifetime of the
