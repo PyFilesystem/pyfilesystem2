@@ -36,14 +36,13 @@ FS URLs may also be appended with a ``?`` symbol followed by a url-encoded query
 
     myprotocol://example.org?key1=value1&key2
 
-
 The query string would be decoded as ``{"key1": "value1", "key2": ""}``. See the filesystem documentation for information on what query string parameters are supported.
 
 
 Opening FS URLS
 ---------------
 
-To open a filesysem with a FS URL, you can use :meth:`~fs.opener.registry.open_fs`, which may be imported and used as follows::
+To open a filesysem with a FS URL, you can use :meth:`~fs.opener.registry.Registry.open_fs`, which may be imported and used as follows::
 
     from fs import open_fs
     projects_fs = open_fs('osfs://~/projects')
