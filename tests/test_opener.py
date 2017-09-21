@@ -13,6 +13,7 @@ from fs.osfs import OSFS
 from fs.opener import registry, errors
 from fs.memoryfs import MemoryFS
 from fs.appfs import UserDataFS
+from fs.opener.parse import ParseResult
 
 
 class TestParse(unittest.TestCase):
@@ -27,7 +28,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_simple(self):
         parsed = opener.parse('osfs://foo/bar')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'osfs',
             None,
             None,
@@ -39,7 +40,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_credentials(self):
         parsed = opener.parse('ftp://user:pass@ftp.example.org')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             'user',
             'pass',
@@ -50,7 +51,7 @@ class TestParse(unittest.TestCase):
         self.assertEqual(expected, parsed)
 
         parsed = opener.parse('ftp://user@ftp.example.org')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             'user',
             '',
@@ -62,7 +63,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_path(self):
         parsed = opener.parse('osfs://foo/bar!example.txt')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'osfs',
             None,
             None,
@@ -74,7 +75,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_params(self):
         parsed = opener.parse('ftp://ftp.example.org?proxy=ftp.proxy.org')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             None,
             None,
@@ -88,7 +89,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_params_multiple(self):
         parsed = opener.parse('ftp://ftp.example.org?foo&bar=1')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             None,
             None,
@@ -103,7 +104,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_user_password_proxy(self):
         parsed = opener.parse('ftp://user:password@ftp.example.org?proxy=ftp.proxy.org')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             'user',
             'password',
@@ -117,7 +118,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_user_password_decode(self):
         parsed = opener.parse('ftp://user%40large:password@ftp.example.org')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             'user@large',
             'password',
@@ -129,7 +130,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_resource_decode(self):
         parsed = opener.parse('ftp://user%40large:password@ftp.example.org/%7Econnolly')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             'user@large',
             'password',

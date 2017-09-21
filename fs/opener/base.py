@@ -32,7 +32,7 @@ class Opener(object):
 
         :param str fs_url: A filesystem URL
         :param parse_result: A parsed filesystem URL.
-        :type parse_result: :class:`ParseResult`
+        :type parse_result: :class:`~fs.opener.parse.ParseResult`
         :param bool writeable: True if the filesystem must be writeable.
         :param bool create: True if the filesystem should be created if
             it does not exist.

@@ -10,6 +10,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Added params support to FS URLs
 
+### Fixed
+
+- Many fixes to FTPFS contributed by Martin Larralde.
+
 ## [2.0.9]
 
 ### Changed
