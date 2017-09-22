@@ -61,7 +61,8 @@ class Registry(object):
 
         :param str protocol: A filesystem protocol.
         :rtype: ``Opener``.
-        :raises `~fs.opener.errors.UnsupportedProtocol`: If no opener could be found.
+        :raises `~fs.opener.errors.UnsupportedProtocol`: If no opener
+            could be found.
         :raises `EntryPointLoadingError`: If the returned entry
             point is not an ``Opener`` subclass or could not be loaded
             successfully.
@@ -155,9 +156,7 @@ class Registry(object):
         Open a filesystem object from a FS URL (ignoring the path
         component).
 
-        :param str fs_url: A filesystem URL
-        :param parse_result: A parsed filesystem URL.
-        :type parse_result: :class:`~fs.opener.parse.ParseResult`
+        :param str fs_url: A filesystem URL.
         :param bool writeable: True if the filesystem must be writeable.
         :param bool create: True if the filesystem should be created if
             it does not exist.
