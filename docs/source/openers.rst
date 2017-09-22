@@ -5,9 +5,12 @@ FS URLs
 
 PyFilesystem can open a filesystem via an *FS URL*, which is similar to a URL you might enter in to a browser. FS URLs are useful if you want to specify a filesystem dynamically, such as in a conf file or from the command line.
 
-FS URLs are parsed in to the following format::
+Format
+------
 
-    <type>://<username>:<password>@<resource>
+FS URLs are formatted in the following way::
+
+    <protocol>://<username>:<password>@<resource>
 
 The components are as follows:
 
@@ -22,11 +25,16 @@ Here are a few examples::
     osfs://c://system32
     ftp://ftp.example.org/pub
     mem://
+    ftp://will:daffodil@ftp.example.org/private
 
-If ``<type>`` is not specified then it is assumed to be an :class:`~fs.osfs.OSFS`. The following FS URLs are equivalent::
+
+If ``<type>`` is not specified then it is assumed to be an :class:`~fs.osfs.OSFS`, i.e. the following FS URLs are equivalent::
 
     osfs://~/projects
     ~/projects
+
+.. note::
+    The `username` and `passwords` fields may not contain a colon (``:``) or an ``@`` symbol. If you need these symbols they may be `percent encoded <https://en.wikipedia.org/wiki/Percent-encoding>`_.
 
 
 URL Parameters
@@ -36,7 +44,9 @@ FS URLs may also be appended with a ``?`` symbol followed by a url-encoded query
 
     myprotocol://example.org?key1=value1&key2
 
-The query string would be decoded as ``{"key1": "value1", "key2": ""}``. See the filesystem documentation for information on what query string parameters are supported.
+The query string would be decoded as ``{"key1": "value1", "key2": ""}``.
+
+Query strings are used to provide additional filesystem-specific information used when opening. See the filesystem documentation for information on what query string parameters are supported.
 
 
 Opening FS URLS
