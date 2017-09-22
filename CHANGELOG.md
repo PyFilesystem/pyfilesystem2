@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.10]
+
+### Added
+
+- Added params support to FS URLs
+
+### Fixed
+
+- Many fixes to FTPFS contributed by Martin Larralde.
+
 ## [2.0.9]
 
 ### Changed

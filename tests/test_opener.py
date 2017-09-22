@@ -1,17 +1,19 @@
 from __future__ import unicode_literals
 
 import os
-import six
 import mock
 import tempfile
 import unittest
 import pkg_resources
+
+import six
 
 from fs import open_fs, opener
 from fs.osfs import OSFS
 from fs.opener import registry, errors
 from fs.memoryfs import MemoryFS
 from fs.appfs import UserDataFS
+from fs.opener.parse import ParseResult
 
 
 class TestParse(unittest.TestCase):
@@ -26,44 +28,115 @@ class TestParse(unittest.TestCase):
 
     def test_parse_simple(self):
         parsed = opener.parse('osfs://foo/bar')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'osfs',
             None,
             None,
             'foo/bar',
+            {},
             None
         )
         self.assertEqual(expected, parsed)
 
     def test_parse_credentials(self):
         parsed = opener.parse('ftp://user:pass@ftp.example.org')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             'user',
             'pass',
             'ftp.example.org',
+            {},
             None
         )
         self.assertEqual(expected, parsed)
 
         parsed = opener.parse('ftp://user@ftp.example.org')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'ftp',
             'user',
             '',
             'ftp.example.org',
+            {},
             None
         )
         self.assertEqual(expected, parsed)
 
     def test_parse_path(self):
         parsed = opener.parse('osfs://foo/bar!example.txt')
-        expected = opener.registry.ParseResult(
+        expected = ParseResult(
             'osfs',
             None,
             None,
             'foo/bar',
+            {},
             'example.txt'
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_params(self):
+        parsed = opener.parse('ftp://ftp.example.org?proxy=ftp.proxy.org')
+        expected = ParseResult(
+            'ftp',
+            None,
+            None,
+            'ftp.example.org',
+            {
+                'proxy':'ftp.proxy.org'
+            },
+            None
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_params_multiple(self):
+        parsed = opener.parse('ftp://ftp.example.org?foo&bar=1')
+        expected = ParseResult(
+            'ftp',
+            None,
+            None,
+            'ftp.example.org',
+            {
+                'foo':'',
+                'bar':'1'
+            },
+            None
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_user_password_proxy(self):
+        parsed = opener.parse('ftp://user:password@ftp.example.org?proxy=ftp.proxy.org')
+        expected = ParseResult(
+            'ftp',
+            'user',
+            'password',
+            'ftp.example.org',
+            {
+                'proxy': 'ftp.proxy.org'
+            },
+            None
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_user_password_decode(self):
+        parsed = opener.parse('ftp://user%40large:password@ftp.example.org')
+        expected = ParseResult(
+            'ftp',
+            'user@large',
+            'password',
+            'ftp.example.org',
+            {},
+            None
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_resource_decode(self):
+        parsed = opener.parse('ftp://user%40large:password@ftp.example.org/%7Econnolly')
+        expected = ParseResult(
+            'ftp',
+            'user@large',
+            'password',
+            'ftp.example.org/~connolly',
+            {},
+            None
         )
         self.assertEqual(expected, parsed)
 

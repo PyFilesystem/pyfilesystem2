@@ -54,10 +54,10 @@ For example::
     '/home/will/test.txt'
 
 Not all filesystems map to a system path (for example, files in a
-:meth:`~fs.memoryfs.MemoryFS` will only ever exists in memory).
+:class:`~fs.memoryfs.MemoryFS` will only ever exists in memory).
 
 If you call ``getsyspath`` on a filesystem which doesn't map to a system
-path, it will raise a :meth:`~fs.errors.NoSysPath` exception. If you
+path, it will raise a :class:`~fs.errors.NoSysPath` exception. If you
 prefer a *look before you leap* approach, you can check if a resource
 has a system path by calling :meth:`~fs.base.FS.hassyspath`
 

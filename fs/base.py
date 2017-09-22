@@ -515,7 +515,7 @@ class FS(object):
         specified with the `namespace` parameter. The default namespace,
         ``"standard"``, contains common information regarding the
         filesystem's capabilities. Some filesystems may provide other
-        namespaces, which expose less common, or implementation specific
+        namespaces which expose less common or implementation specific
         information. If a requested namespace is not supported by
         a filesystem, then an empty dictionary will be returned.
 
@@ -524,7 +524,7 @@ class FS(object):
         =================== ============================================
         key                 Description
         ------------------- --------------------------------------------
-        case_insensitive    True if this filesystem is case sensitive.
+        case_insensitive    True if this filesystem is case insensitive.
         invalid_path_chars  A string containing the characters that may
                             may not be used on this filesystem.
         max_path_length     Maximum number of characters permitted in a
@@ -548,7 +548,7 @@ class FS(object):
 
         """
         if namespace == 'standard':
-            meta = self._meta
+            meta = self._meta.copy()
         else:
             meta = {}
         return meta

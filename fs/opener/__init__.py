@@ -12,13 +12,13 @@ __import__('pkg_resources').declare_namespace(__name__)
 
 # Import objects into fs.opener namespace
 from .base import Opener
+from .parse import parse_fs_url as parse
 from .registry import registry
 
 # Alias functions defined as Registry methods
 open_fs = registry.open_fs
 open = registry.open
 manage_fs = registry.manage_fs
-parse = registry.parse
 
 # __all__ with aliases and classes
 __all__ = [

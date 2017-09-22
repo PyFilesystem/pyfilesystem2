@@ -31,6 +31,7 @@ __all__ = [
     'InvalidCharsInPath',
     'InvalidPath',
     'MissingInfoNamespace',
+    'NoSysPath',
     'NoURL',
     'OperationFailed',
     'OperationTimeout',

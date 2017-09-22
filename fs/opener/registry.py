@@ -12,14 +12,13 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import re
-import six
 import contextlib
-import collections
+import six
 import pkg_resources
 
 from .base import Opener
-from .errors import ParseError, UnsupportedProtocol, EntryPointError
+from .errors import UnsupportedProtocol, EntryPointError
+from .parse import parse_fs_url
 
 
 class Registry(object):
@@ -28,62 +27,6 @@ class Registry(object):
 
     """
 
-    ParseResult = collections.namedtuple(
-        'ParseResult',
-        [
-            'protocol',
-            'username',
-            'password',
-            'resource',
-            'path'
-        ]
-    )
-
-    _RE_FS_URL = re.compile(r'''
-    ^
-    (.*?)
-    :\/\/
-
-    (?:
-    (?:(.*?)@(.*?))
-    |(.*?)
-    )
-
-    (?:
-    !(.*?)$
-    )*$
-    ''', re.VERBOSE)
-
-    @classmethod
-    def parse(cls, fs_url):
-        """
-        Parse a Filesystem URL and return a :class:`ParseResult`, or
-        raise :class:`ParseError` (subclass of ValueError) if the FS URL
-        is not value.
-
-        :param str fs_url: A filesystem URL
-        :rtype: :class:`ParseResult`
-
-        """
-        match = cls._RE_FS_URL.match(fs_url)
-        if match is None:
-            raise ParseError('{!r} is not a fs2 url'.format(fs_url))
-
-        fs_name, credentials, url1, url2, path = match.groups()
-        if credentials:
-            username, _, password = credentials.partition(':')
-            url = url1
-        else:
-            username = None
-            password = None
-            url = url2
-        return cls.ParseResult(
-            fs_name,
-            username,
-            password,
-            url,
-            path
-        )
 
     def __init__(self, default_opener='osfs'):
         """
@@ -103,6 +46,7 @@ class Registry(object):
 
     @property
     def protocols(self):
+        """A list of supported protocols."""
         if self._protocols is None:
             self._protocols = [
                 entry_point.name
@@ -117,7 +61,8 @@ class Registry(object):
 
         :param str protocol: A filesystem protocol.
         :rtype: ``Opener``.
-        :raises `~fs.opener.errors.UnsupportedProtocol`: If no opener could be found.
+        :raises `~fs.opener.errors.UnsupportedProtocol`: If no opener
+            could be found.
         :raises `EntryPointLoadingError`: If the returned entry
             point is not an ``Opener`` subclass or could not be loaded
             successfully.
@@ -186,7 +131,7 @@ class Registry(object):
             # URL may just be a path
             fs_url = "{}://{}".format(default_protocol, fs_url)
 
-        parse_result = self.parse(fs_url)
+        parse_result = parse_fs_url(fs_url)
         protocol = parse_result.protocol
         open_path = parse_result.path
 
@@ -211,9 +156,7 @@ class Registry(object):
         Open a filesystem object from a FS URL (ignoring the path
         component).
 
-        :param str fs_url: A filesystem URL
-        :param parse_result: A parsed filesystem URL.
-        :type parse_result: :class:`ParseResult`
+        :param str fs_url: A filesystem URL.
         :param bool writeable: True if the filesystem must be writeable.
         :param bool create: True if the filesystem should be created if
             it does not exist.
@@ -244,10 +187,10 @@ class Registry(object):
 
         :param fs_url: A FS instance or a FS URL.
         :type fs_url: str or FS
-        :param bool create: If ``True``, then create the filesytem if it
-            doesn't already exist.
-        :param bool writeable: If ``True``, then the filesystem should be
-            writeable.
+        :param bool create: If ``True``, then create the filesystem if
+            it doesn't already exist.
+        :param bool writeable: If ``True``, then the filesystem should
+            be writeable.
         :param str cwd: The current working directory, if opening a
             :class:`~fs.osfs.OSFS`.
 
