@@ -89,6 +89,7 @@ def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
         #todo: should log something here
         return True
 
+
 def copy_file(src_fs, src_path, dst_fs, dst_path):
     """
     Copy a file from one filesystem to another. If the destination

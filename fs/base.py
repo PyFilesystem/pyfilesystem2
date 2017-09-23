@@ -1,6 +1,6 @@
 """
 fs.base
-========
+=======
 
 PyFilesystem base class
 
