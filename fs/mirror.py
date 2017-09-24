@@ -33,7 +33,7 @@ def _compare(info1, info2):
     # Check modified dates
     date1 = info1.modified
     date2 = info2.modified
-    return date1 is None or date2 is None or date1 >= date2
+    return date1 is None or date2 is None or date1 > date2
 
 
 def mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
@@ -55,12 +55,13 @@ def mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
     """
     with manage_fs(src_fs, writeable=False) as _src_fs:
         with manage_fs(dst_fs, create=True) as _dst_fs:
-            return _mirror(
-                _src_fs,
-                _dst_fs,
-                walker=walker,
-                copy_if_newer=copy_if_newer
-            )
+            with _src_fs.lock(), _dst_fs.lock():
+                return _mirror(
+                    _src_fs,
+                    _dst_fs,
+                    walker=walker,
+                    copy_if_newer=copy_if_newer
+                )
 
 
 def _mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
@@ -77,23 +78,23 @@ def _mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
             dst = {}
 
         # Copy files
-        for file_ in files:
-            _path = file_.make_path(path)
-            dst_file = dst.pop(file_.name, None)
+        for _file in files:
+            _path = _file.make_path(path)
+            dst_file = dst.pop(_file.name, None)
             if dst_file is not None:
                 if dst_file.is_dir:
                     # Destination is a directory, remove it
                     dst_fs.removetree(_path)
                 else:
                     # Compare file info
-                    if copy_if_newer and not _compare(file_, dst_file):
+                    if copy_if_newer and not _compare(_file, dst_file):
                         continue
             copy_file(src_fs, _path, dst_fs, _path)
 
         # Make directories
-        for dir_ in dirs:
-            _path = dir_.make_path(path)
-            dst_dir = dst.pop(dir_.name, None)
+        for _dir in dirs:
+            _path = _dir.make_path(path)
+            dst_dir = dst.pop(_dir.name, None)
             if dst_dir is not None:
                 # Directory name exists on dst
                 if not dst_dir.is_dir:
