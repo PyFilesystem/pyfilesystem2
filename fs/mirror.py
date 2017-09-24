@@ -2,7 +2,12 @@
 fs.mirror
 =========
 
-Utilities to mirror file structures.
+Create a duplicate of a filesystem.
+
+Mirroring will create a copy of a source filesystem on a destination
+filesystem. If there are no files on the destination, then mirroring
+is simply a straight copy. If there are any files or directories on the
+destination they may be deleted or modified to match the source.
 
 """
 
@@ -11,14 +16,15 @@ from __future__ import unicode_literals
 
 
 from .copy import copy_file
+from .errors import ResourceNotFound
 from .walk import Walker
 from .opener import manage_fs
 
 
-def _compare(info1, info2, default=True):
+def _compare(info1, info2):
     """
     Compare two (file) info objects and return True if the file should
-    be copied, or False if they are the same.
+    be copied, or False if they should not.
 
     """
     # Check filesize has changed
@@ -27,64 +33,79 @@ def _compare(info1, info2, default=True):
     # Check modified dates
     date1 = info1.modified
     date2 = info2.modified
-    if date1 is None or date2 is None:
-        # If either FS doesn't support modified, then return default
-        return default
-    if date1 != date2:
-        return True
-    return False
+    return date1 is None or date2 is None or date1 >= date2
 
 
-def mirror(src_fs, dst_fs, walker=None, compare_modified=True):
+def mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
+    """
+    Mirror files / directories from one filesystem to another.
+
+    :param src_fs: A source filesystem.
+    :type src_fs: FS URL or instance.
+    :param dst_fs: A destination filesystem.
+    :type dst_fs: FS URL or instance.
+    :param walker: An optional waler instance.
+    :type walker: :class:`~fs.walk.Walker`
+    :param bool copy_if_newer: Only copy newer files.
+
+    Mirroring a filesystem will create an exact copy of ``src_fs`` on
+    ``dst_fs``, by removing any files / directories on the destination
+    that aren't on the source, and copying files that aren't.
+
+    """
     with manage_fs(src_fs, writeable=False) as _src_fs:
         with manage_fs(dst_fs, create=True) as _dst_fs:
             return _mirror(
                 _src_fs,
                 _dst_fs,
                 walker=walker,
-                compare_modified=compare_modified
+                copy_if_newer=copy_if_newer
             )
 
 
-def _mirror(src_fs, dst_fs, walker=None, compare_modified=True):
+def _mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
     walker = walker or Walker()
     walk = walker.walk(src_fs, namespaces=['details'])
     for path, dirs, files in walk:
-        dst = {
-            info.name: info
-            for info in dst_fs.scandir(path, namespace=['details'])
-        }
+        try:
+            dst = {
+                info.name: info
+                for info in dst_fs.scandir(path, namespaces=['details'])
+            }
+        except ResourceNotFound:
+            dst_fs.makedir(path)
+            dst = {}
 
         # Copy files
-        for file in files:
-            _path = file.make_path(path)
-            dst_file = dst.pop(file.name)
+        for file_ in files:
+            _path = file_.make_path(path)
+            dst_file = dst.pop(file_.name, None)
             if dst_file is not None:
                 if dst_file.is_dir:
                     # Destination is a directory, remove it
                     dst_fs.removetree(_path)
                 else:
                     # Compare file info
-                    if compare_modified and not _compare(file, dst_file):
+                    if copy_if_newer and not _compare(file_, dst_file):
                         continue
             copy_file(src_fs, _path, dst_fs, _path)
 
         # Make directories
         for dir_ in dirs:
             _path = dir_.make_path(path)
-            dst_dir = dst.pop(dir_.name)
+            dst_dir = dst.pop(dir_.name, None)
             if dst_dir is not None:
                 # Directory name exists on dst
                 if not dst_dir.is_dir:
                     # Not a directory, so remove it
-                    dst_fs.remove(dir_.make_path)
+                    dst_fs.remove(_path)
             else:
                 # Make the directory in dst
                 dst_fs.makedir(_path, recreate=True)
 
         # Remove any remaining resources
         while dst:
-            _name, info = dst.popitem()
+            _, info = dst.popitem()
             _path = info.make_path(path)
             if info.is_dir:
                 dst_fs.removetree(_path)
