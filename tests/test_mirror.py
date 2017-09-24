@@ -22,6 +22,7 @@ class TestMirror(unittest.TestCase):
         return sorted(contents)
 
     def assert_compare_fs(self, fs1, fs2):
+        """Assert filesystems and contents are the same."""
         self.assertEqual(
             self._contents(fs1),
             self._contents(fs2)
