@@ -1,13 +1,6 @@
 """
-fs.mirror
-=========
 
-Create a duplicate of a filesystem.
-
-Mirroring will create a copy of a source filesystem on a destination
-filesystem. If there are no files on the destination, then mirroring
-is simply a straight copy. If there are any files or directories on the
-destination they may be deleted or modified to match the source.
+Create a 'mirror' of a filesystem.
 
 """
 
