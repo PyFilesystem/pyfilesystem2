@@ -221,4 +221,4 @@ The :func:`~fs.copy.copy_fs` and :func:`~fs.copy.copy_dir` functions also accept
     >>> from fs.walk import Walker
     >>> copy_fs('~/projects', 'zip://projects.zip', walker=Walker(filter=['*.py']))
 
-
+An alternative to copying is *mirroring*, which will copy a filesystem them keep it up to date by copying only changed files / directories. See :func:`~fs.mirror.mirror`.
