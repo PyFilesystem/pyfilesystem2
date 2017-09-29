@@ -26,6 +26,7 @@ from .mode import Mode
 class _MemoryFile(io.IOBase):
 
     def __init__(self, path, memory_fs, mode, dir_entry):
+        super(_MemoryFile, self).__init__()
         self._path = path
         self._memory_fs = memory_fs
         self._mode = Mode(mode)

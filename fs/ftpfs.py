@@ -341,6 +341,7 @@ class FTPFS(FS):
 
     @property
     def ftp(self):
+        """Get a FTP (ftplib) object."""
         if self._ftp is None:
             _ftp = self._open_ftp('latin-1')
             try:
