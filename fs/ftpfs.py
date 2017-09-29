@@ -343,8 +343,18 @@ class FTPFS(FS):
     def ftp(self):
         if self._ftp is None:
             _ftp = self._open_ftp('latin-1')
-            encoding = 'utf-8' if 'UTF8' in _ftp.sendcmd('FEAT') else 'latin-1'
-            self._ftp = self._open_ftp(encoding)
+            try:
+                encoding = (
+                    'utf-8'
+                    if 'UTF8' in _ftp.sendcmd('FEAT')
+                    else 'latin-1'
+                )
+            except error_perm:
+                encoding = 'latin-1'
+            if encoding != 'latin-1':
+                self._ftp = self._open_ftp(encoding)
+            else:
+                self._ftp = _ftp
             self._welcome = self._ftp.getwelcome()
         return self._ftp
 
