@@ -57,12 +57,14 @@ class _MemoryFile(io.IOBase):
             yield
             self.pos = self._bytes_io.tell()
 
-    def on_modify(self):
-        """Called when file data is modified."""
+    def on_modify(self):  # noqa: D401
+        """Called when file data is modified.
+        """
         self._dir_entry.modified_time = self.modified_time = time.time()
 
-    def on_access(self):
-        """Called when file is accessed."""
+    def on_access(self):  # noqa: D401
+        """Called when file is accessed.
+        """
         self._dir_entry.accessed_time = self.accessed_time = time.time()
 
     def flush(self):
@@ -211,12 +213,10 @@ class MemoryFS(FS):
     memory. This makes them very fast, but non-permanent.
 
     Memory filesystems are useful for caches, temporary data stores,
-    unit testing, etc.
+    unit testing, etc. They do require no parameters to their constructor.
 
-    Memory filesystems require no parameters to their constructor. The
-    following is how you would create a ``MemoryFS`` instance::
-
-        mem_fs = MemoryFS()
+    Exemple:
+        >>> mem_fs = MemoryFS()
 
     """
 
@@ -231,9 +231,7 @@ class MemoryFS(FS):
     }
 
     def __init__(self):
-        """
-        Create an in-memory filesystem.
-
+        """Create an in-memory filesystem.
         """
         self._meta = self._meta.copy()
         self.root = self._make_dir_entry(ResourceType.directory, '')
@@ -249,7 +247,8 @@ class MemoryFS(FS):
         return _DirEntry(*args, **kwargs)
 
     def _get_dir_entry(self, dir_path):
-        """Get a directory entry, or None if one doesn't exist."""
+        """Get a directory entry, or `None` if one doesn't exist.
+        """
         with self._lock:
             dir_path = normpath(dir_path)
             current_entry = self.root

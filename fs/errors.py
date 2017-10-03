@@ -258,9 +258,8 @@ class IllegalBackReference(ValueError):
     outside of the root. For example, ``"/foo/../../"``, contains two back
     references which would reference a directory above the root.
 
-    .. note::
-
-        This exception is a subclass of ``ValueError`` as it is not
+    Note:
+        This exception is a subclass of `ValueError` as it is not
         strictly speaking an issue with a filesystem or resource.
 
     """

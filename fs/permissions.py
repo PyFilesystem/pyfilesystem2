@@ -10,15 +10,14 @@ import six
 
 
 def make_mode(init):
-    """
-    Make a mode integer from an initial value.
-
+    """Make a mode integer from an initial value.
     """
     return Permissions.get_mode(init)
 
 
 class _PermProperty(object):
-    """Creates simple properties to get/set permissions."""
+    """Creates simple properties to get/set permissions.
+    """
     def __init__(self, name):
         self._name = name
         self.__doc__ = "Boolean for '{}' permission.".format(name)
@@ -35,35 +34,34 @@ class _PermProperty(object):
 
 @six.python_2_unicode_compatible
 class Permissions(object):
-    """
-    An abstraction for file system permissions.
-
-    :param list names: A list of permissions.
-    :param int mode: A mode integer.
-    :param str user: A triplet of *user* permissions, e.g. ``"rwx"`` or
-        ``"r--"``
-    :param str group: A triplet of *group* permissions, e.g. ``"rwx"``
-        or ``"r--"``
-    :param str other: A triplet of *other* permissions, e.g. ``"rwx"``
-        or ``"r--"``
-    :param bool sticky: A boolean for the *sticky* bit.
-    :param bool setuid: A boolean for the *setuid* bit.
-    :param bool setguid: A boolean for the *setuid* bit.
+    """An abstraction for file system permissions.
 
     Permissions objects store information regarding the permissions
     on a resource. It supports Linux permissions, but is generic enough
     to manage permission information from almost any filesystem.
 
-    >>> from fs.permissions import Permissions
-    >>> p = Permissions(user='rwx', group='rw-', other='r--')
-    >>> print(p)
-    rwxrw-r--
-    >>> p.mode
-    500
-    >>> oct(p.mode)
-    '0764'
+    Arguments:
+        names (list, optional): A list of permissions.
+        mode (int, optional): A mode integer.
+        user (str, optional): A triplet of *user* permissions, e.g.
+            ``"rwx"`` or ``"r--"``
+        group (str, optional): A triplet of *group* permissions, e.g.
+            ``"rwx"`` or ``"r--"``
+        other (str, optional): A triplet of *other* permissions, e.g.
+            ``"rwx"`` or ``"r--"``
+        sticky (bool, optional): A boolean for the *sticky* bit.
+        setuid (bool, optional): A boolean for the *setuid* bit.
+        setguid (bool, optional): A boolean for the *setguid* bit.
 
-
+    Example:
+        >>> from fs.permissions import Permissions
+        >>> p = Permissions(user='rwx', group='rw-', other='r--')
+        >>> print(p)
+        rwxrw-r--
+        >>> p.mode
+        500
+        >>> oct(p.mode)
+        '0764'
 
     """
 
@@ -171,7 +169,8 @@ class Permissions(object):
 
     @classmethod
     def parse(cls, ls):
-        """Parse permissions in linux notation."""
+        """Parse permissions in Linux notation.
+        """
         user = ls[:3]
         group = ls[3:6]
         other = ls[6:9]
@@ -179,25 +178,28 @@ class Permissions(object):
 
     @classmethod
     def load(cls, permissions):
-        """Load a serialized permissions object."""
+        """Load a serialized permissions object.
+        """
         return cls(names=permissions)
 
     @classmethod
     def create(cls, init=None):
-        """
-        Create a permissions object from an initial value.
+        """Create a permissions object from an initial value.
 
-        :param init: May be None for equivalent for 0o777 permissions,
-            a mode integer, or a list of permission names.
-        :returns: mode integer, that may be used by `os.makedir`
-            (amongst others).
+        Arguments:
+            init (int or list or None): May be None to use 0o777 permissions,
+                a mode integer, or a list of permission names.
 
-        >>> Permissions.create(None)
-        Permissions(user='rwx', group='rwx', other='rwx')
-        >>> Permissions.create(0o700)
-        Permissions(user='rwx', group='', other='')
-        >>> Permissions.create(['u_r', 'u_w', 'u_x'])
-        Permissions(user='rwx', group='', other='')
+        Returns:
+            int: mode integer that may be used for instance by `os.makedir`.
+
+        Example:
+            >>> Permissions.create(None)
+            Permissions(user='rwx', group='rwx', other='rwx')
+            >>> Permissions.create(0o700)
+            Permissions(user='rwx', group='', other='')
+            >>> Permissions.create(['u_r', 'u_w', 'u_x'])
+            Permissions(user='rwx', group='', other='')
 
         """
         if init is None:
@@ -212,22 +214,23 @@ class Permissions(object):
 
     @classmethod
     def get_mode(cls, init):
-        """
-        Convert an initial value to a mode integer.
-
+        """Convert an initial value to a mode integer.
         """
         return cls.create(init).mode
 
     def copy(self):
-        """Make a copy of this permissions object."""
+        """Make a copy of this permissions object.
+        """
         return Permissions(names=list(self._perms))
 
     def dump(self):
-        """Get a list suitable for serialization."""
+        """Get a list suitable for serialization.
+        """
         return sorted(self._perms)
 
     def as_str(self):
-        """Get a linux-style string representation of permissions."""
+        """Get a Linux-style string representation of permissions.
+        """
         perms = [
             c if name in self._perms else '-'
             for name, c in zip(
@@ -247,7 +250,8 @@ class Permissions(object):
 
     @property
     def mode(self):
-        """Mode integer."""
+        """int: Mode integer.
+        """
         mode = 0
         for name, mask in self._LINUX_PERMS:
             if name in self._perms:
@@ -256,7 +260,6 @@ class Permissions(object):
 
     @mode.setter
     def mode(self, mode):
-        """Set mode integer."""
         self._perms = {
             name
             for name, mask in self._LINUX_PERMS
@@ -280,30 +283,34 @@ class Permissions(object):
     setguid = _PermProperty('setguid')
 
     def add(self, *permissions):
-        """
-        Add permission(s).
+        """Add permission(s).
 
-        :param permissions: Permission name(s).
+        Arguments:
+            *permissions (str): Permission name(s), such as ``'u_w'``
+                or ``'u_x'``.
 
         """
         self._perms.update(permissions)
 
     def remove(self, *permissions):
-        """
-        Remove permission(s).
+        """Remove permission(s).
 
-        :param permissions: Permission name(s).
+        Arguments:
+            *permissions (str): Permission name(s), such as ``'u_w'``
+                or ``'u_x'``.s
 
         """
         self._perms.difference_update(permissions)
 
     def check(self, *permissions):
-        """
-        Check if one or more permissions are enabled.
+        """Check if one or more permissions are enabled.
 
-        :param permissions: Permission name(s).
-        :returns: True if all given permissions are set.
-        :rtype bool:
+        Arguments:
+            *permissions (str): Permission name(s), such as ``'u_w'``
+                or ``'u_x'``.
+
+        Returns:
+            bool: `True` if all given permissions are set.
 
         """
         return self._perms.issuperset(permissions)

@@ -266,15 +266,16 @@ class FTPFile(io.IOBase):
 
 
 class FTPFS(FS):
-    """
-    A FTP (File Transport Protocol) Filesystem.
+    """A FTP (File Transport Protocol) Filesystem.
 
-    :param str host: A FTP host, e.g. ``'ftp.mirror.nl'``.
-    :param str user: A username (default is ``'anonymous'``)
-    :param passwd: Password for the server, or ``None`` for anon.
-    :param acct: FTP account.
-    :param int timeout: Timeout for contacting server (in seconds).
-    :param int port: Port number (default 21).
+    Arguments:
+        host (str): A FTP host, e.g. ``'ftp.mirror.nl'``.
+        user (str, optional): A username (default is `'anonymous'``).
+        passwd (str, optional): Password for the server, or ``None`` for anon.
+        acct (str, optional): FTP account.
+        timeout (int, optional): Timeout for contacting server (in seconds,
+            defaults to 10).
+        port (int, optional): FTP port number (default 21).
 
     """
 
@@ -341,7 +342,8 @@ class FTPFS(FS):
 
     @property
     def ftp(self):
-        """Get a FTP (ftplib) object."""
+        """Get a `~ftplib.FTP` object.
+        """
         if self._ftp is None:
             _ftp = self._open_ftp('latin-1')
             try:
@@ -362,7 +364,8 @@ class FTPFS(FS):
 
     @property
     def features(self):
-        """Get features dict from FTP server."""
+        """Get features dictionary from FTP server.
+        """
         if self._features is None:
             try:
                 response = _decode(self.ftp.sendcmd("FEAT"), "ascii")

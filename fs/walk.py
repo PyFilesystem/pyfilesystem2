@@ -25,38 +25,42 @@ Step = namedtuple('Step', 'path, dirs, files')
 
 
 class WalkerBase(object):
-    """
-    The base class for a Walker.
+    """The base class for a Walker.
 
-    To create a custom walker, implement
-    :meth:`~fs.walk.WalkerBase.walk` in a sub-class.
+    To create a custom walker, implement `~fs.walk.WalkerBase.walk`
+    in a sub-class.
 
-    See :meth:`~fs.walk.Walker` for a fully featured walker object that
+    See `~fs.walk.Walker` for a fully featured walker object that
     should be adequate for all but your most exotic directory walking
     needs.
 
     """
 
     def walk(self, fs, path='/', namespaces=None):
-        """
-        Walk the directory structure of a filesystem.
+        """Walk the directory structure of a filesystem.
 
-        :param fs: A FS object.
-        :param str path: a path to a directory.
-        :param list namespaces: A list of additional namespaces to add
-            to the Info objects.
-        :returns: Iterator of :class:`~fs.walk.Step` named tuples.
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str, optional): A path to a directory on the filesystem.
+            namespaces(list, optional): A list of additional namespaces
+                to add to the `~fs.info.Info` objects.
+
+        Returns:
+            ~collections.Iterator: iterator of `~fs.walk.Step` named tuples.
 
         """
         raise NotImplementedError
 
     def files(self, fs, path='/'):
-        """
-        Walk a filesystem, yielding absolute paths to files.
+        """Walk a filesystem, yielding absolute paths to files.
 
-        :param fs: A FS object.
-        :param str path: A path to a directory.
-        :returns: An iterable of file paths.
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str, optional): A path to a directory on the filesystem.
+
+        Yields:
+            str: absolute path to files on the filesystem found
+            recursively within the given directory.
 
         """
         iter_walk = iter(self.walk(fs, path=path))
@@ -65,11 +69,15 @@ class WalkerBase(object):
                 yield join(_path, info.name)
 
     def dirs(self, fs, path='/'):
-        """
-        Walk a filesystem, yielding absolute paths to directories.
+        """Walk a filesystem, yielding absolute paths to directories.
 
-        :param str fs: A FS object.
-        :param str path: A path to a directory.
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str, optional): A path to a directory on the filesystem.
+
+        Yields:
+            str: absolute path to directories on the filesystem found
+            recursively within the given directory.
 
         """
         for path, dirs, _ in self.walk(fs, path=path):
@@ -77,15 +85,16 @@ class WalkerBase(object):
                 yield join(path, info.name)
 
     def info(self, fs, path='/', namespaces=None):
-        """
-        Walk a filesystem, yielding tuples of ``(<absolute path>,
-        <resource info>)``.
+        """Walk a filesystem, yielding tuples of ``(<path>, <info>)``.
 
-        :param str fs: A FS object.
-        :param str path: A path to a directory.
-        :param list namespaces: A list of additional namespaces to add
-            to the Info objects.
-        :returns: An iterable of :class:`~fs.info.Info` objects.
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str, optional): A path to a directory on the filesystem.
+            namespaces (list, optional): A list of additional namespaces
+                to add to the `Info` objects.
+
+        Yields:
+            (str, `Info`): a couple of ``(<absolute path>, <resource info>)``.
 
         """
         _walk = self.walk(fs, path=path, namespaces=namespaces)
@@ -95,24 +104,23 @@ class WalkerBase(object):
 
 
 class Walker(WalkerBase):
-    """
-    A walker object recursively lists directories in a filesystem.
+    """A walker object recursively lists directories in a filesystem.
 
-    :param bool ignore_errors: If true, any errors reading a
-        directory will be ignored, otherwise exceptions will be
-        raised.
-    :param callable on_error: If ``ignore_errors`` is false, then
-        this callable will be invoked with a path and the exception
-        object. It should return True to ignore the error, or False
-        to re-raise it.
-    :param str search: If ``'breadth'`` then the directory will be
-        walked *top down*. Set to ``'depth'`` to walk *bottom up*.
-    :param list filter: If supplied, this parameter should be a list of
-        filename patterns, e.g. ``['*.py']``. Files will only be
-        returned if the final component matches one of the patterns.
-    :param list exclude_dirs: A list of patterns that will be used
-        to filter out directories from the walk. e.g. ``['*.svn',
-        '*.git']``.
+    Arguments:
+        ignore_errors (bool, optional): If `True`, any errors reading
+            a directory will be ignored, otherwise exceptions will be
+            raised.
+        on_error (callable, optional): If ``ignore_errors`` is `False`,
+            then this callable will be invoked for a path and the exception
+            object. It should return `True` to ignore the error, or `False`
+            to re-raise it.
+        search (str, optional): If ``'breadth'`` then the directory will be
+            walked *top down*. Set to ``'depth'`` to walk *bottom up*.
+        filter (list, optional): If supplied, this parameter should be a
+            list of filename patterns, e.g. ``['*.py']``. Files will only
+            be returned if the final component matches one of the patterns.
+        exclude_dirs (list, optional): A list of patterns that will be used
+            to filter out directories from the walk. e.g. ``['*.svn', '*.git']``.
 
     """
 
@@ -137,11 +145,19 @@ class Walker(WalkerBase):
 
     @classmethod
     def bind(cls, fs):
-        """
+        """Bind a `Walker` instance to a given filesystem.
+
         This *binds* in instance of the Walker to a given filesystem, so
         that you won't need to explicitly provide the filesystem as a
-        parameter. Here's an example of binding::
+        parameter.
 
+        Arguments:
+            fs (FS): A filesystem object.
+
+        Returns:
+            ~fs.walk.BoundWalker: a bound walker.
+
+        Example:
             >>> from fs import open_fs
             >>> from fs.walk import Walker
             >>> home_fs = open_fs('~/')
@@ -152,15 +168,13 @@ class Walker(WalkerBase):
         Unless you have written a customized walker class, you will be
         unlikely to need to call this explicitly, as filesystem objects
         already have a ``walk`` attribute which is a bound walker
-        object. Here's how you might use it::
+        object.
 
+        Example:
             >>> from fs import open_fs
             >>> home_fs = open_fs('~/')
             >>> for path in home_fs.walk.files(filter=['*.py']):
             ...     print(path)
-
-        :param fs: A filesystem object.
-        :returns: a :class:`~fs.walk.BoundWalker`
 
         """
         return BoundWalker(fs)
@@ -176,17 +190,18 @@ class Walker(WalkerBase):
         )
 
     def filter_files(self, fs, infos):
-        """
-        Filters a sequence of resource Info objects.
+        """Filter a sequence of resource `Info` objects.
 
         The default implementation filters those files for which
-        :meth:`~fs.walk.Walker.check_file` returns True.
+        `~fs.walk.Walker.check_file` returns `True`.
 
-        :param fs: A FS object.
-        :type fs: :class:`~fs.base.FS`
-        :param infos: A list of :class:`~fs.info.Info` instances.
-        :type infos: list
-        :rtype: list
+        Arguments:
+            fs (FS): a filesystem instance.
+            infos (list): A list of :class:`~fs.info.Info` instances.
+
+        Returns:
+            list: a list of `Info` objects passing the ``check_file``
+            validation.
 
         """
         _check_file = self.check_file
@@ -197,14 +212,16 @@ class Walker(WalkerBase):
 
 
     def check_open_dir(self, fs, info):
-        """
-        Check if a directory should be opened. Override to exclude
-        directories from the walk.
+        """Check if a directory should be opened.
 
-        :param fs: A FS object.
-        :type fs: :class:`~fs.base.FS`
-        :param info: A :class:`~fs.info.Info` object.
-        :rtype: bool
+        Override to exclude directories from the walk.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            info (Info): A resource info object.
+
+        Returns:
+            bool: `True` if the directory should be opened.
 
         """
         if self.exclude_dirs is None:
@@ -212,26 +229,32 @@ class Walker(WalkerBase):
         return not fs.match(self.exclude_dirs, info.name)
 
     def check_file(self, fs, info):
-        """
-        Check if a filename should be included in the walk. Override to
-        exclude files from the walk.
+        """Check if a filename should be included.
 
-        :param fs: A FS object.
-        :type fs: :class:`~fs.base.FS`
-        :param info: A :class:`~fs.info.Info` object.
-        :rtype: bool
+        Override to exclude files from the walk.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            info (Info): A resource info object.
+
+        Returns:
+            bool: `True` if the file should be included.
 
         """
         return fs.match(self.filter, info.name)
 
     def _scan(self, fs, dir_path, namespaces):
-        """
-        Get an iterator of :class:`~fs.info.Info` objects for a
-        directory path.
+        """Get an iterator of `Info` objects for a directory path.
 
-        :param fs: A FS object.
-        :type fs: :class:`~fs.base.FS`
-        :param str dir_path: A path to a directory.
+        Arguments:
+            fs (FS): A filesystem instance.
+            dir_path (str): A path to a directory on the filesystem.
+            namespaces (list): A list of additional namespaces to
+                include in the `Info` objects.
+
+        Returns:
+            ~collections.Iterator: iterator of `Info` objects for
+            resources within the given path.
 
         """
         try:
@@ -242,14 +265,16 @@ class Walker(WalkerBase):
             six.reraise(type(error), error)
 
     def walk(self, fs, path='/', namespaces=None):
-        """
-        Walk the directory structure of a filesystem.
+        """Walk the directory structure of a filesystem.
 
-        :param fs: A FS object.
-        :param str path: a path to a directory.
-        :param list namespaces: A list of additional namespaces to add
-            to the Info objects.
-        :returns: :class:`~fs.walk.Step` iterator.
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str, optional): A path to a directory on the filesystem.
+            namespaces (list, optional): A list of additional namespaces
+                to add to the `Info` objects.
+
+        Returns:
+            collections.Iterator: an iterator of `~fs.walk.Step` instances.
 
         The return value is an iterator of ``(<path>, <dirs>, <files>)``
         named tuples,  where ``<path>`` is an absolute path to a
@@ -257,15 +282,15 @@ class Walker(WalkerBase):
         :class:`~fs.info.Info` objects for directories and files
         in ``<path>``.
 
-        Here's an example::
-
-            home_fs = open_fs('~/')
-            walker = Walker(filter=['*.py'])
-            for path, dirs, files in walker.walk(home_fs, namespaces=['details']):
-                print("[{}]".format(path))
-                print("{} directories".format(len(dirs)))
-                total = sum(info.size for info in files)
-                print("{} bytes {}".format(total))
+        Example:
+            >>> home_fs = open_fs('~/')
+            >>> walker = Walker(filter=['*.py'])
+            >>> namespaces = ['details']
+            >>> for path, dirs, files in walker.walk(home_fs, namespaces)
+            ...    print("[{}]".format(path))
+            ...    print("{} directories".format(len(dirs)))
+            ...    total = sum(info.size for info in files)
+            ...    print("{} bytes {}".format(total))
 
         """
         _path = abspath(normpath(path))
@@ -278,9 +303,7 @@ class Walker(WalkerBase):
         return do_walk(fs, _path, namespaces=namespaces)
 
     def _walk_breadth(self, fs, path, namespaces=None):
-        """
-        Walk files using a breadth first search.
-
+        """Walk files using a *breadth first* search.
         """
         queue = deque([path])
         push = queue.appendleft
@@ -304,9 +327,7 @@ class Walker(WalkerBase):
             )
 
     def _walk_depth(self, fs, path, namespaces=None):
-        """
-        Walk files using a depth first search.
-
+        """Walk files using a *depth first* search.
         """
         # No recursion!
 
@@ -342,18 +363,18 @@ class Walker(WalkerBase):
 
 
 class BoundWalker(object):
-    """
-    A class that binds a :class:`~fs.walk.Walker` instance to a FS
-    object.
+    """A class that binds a `Walker` instance to a `FS` instance.
 
-    :param fs: A FS object.
-    :param walker_class: A :class:`~fs.walk.WalkerBase` sub-class. The
-        default uses :class:`~fs.walk.Walker`.
+    Arguments:
+        fs (FS): A filesystem instance.
+        walker_class (type, optional): A :class:`~fs.walk.WalkerBase`
+            sub-class. The default uses :class:`~fs.walk.Walker`.
 
     You will typically not need to create instances of this class
     explicitly. Filesystems have a ``walk`` property which returns a
     ``BoundWalker`` object.
 
+    Example:
         >>> import fs
         >>> home_fs = fs.open_fs('~/')
         >>> home_fs.walk

@@ -18,11 +18,11 @@ from .path import recursepath
 
 
 def remove_empty(fs, path):
-    """
-    Remove all empty parents.
+    """Remove all empty parents.
 
-    :param fs: A FS object.
-    :param str path: Path to a directory on the filesystem.
+    Arguments:
+        fs (FS): A filesystem instance.
+        path (str): Path to a directory on the filesystem.
 
     """
     path = abspath(normpath(path))
@@ -38,10 +38,11 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
     """
     Copy data from one file object to another.
 
-    :param file-like src_file: File open for reading.
-    :param file-like dst_file: File open for writing.
-    :param int chunk_size: Number of bytes to copy at a time (or
-        ``None`` to use sensible default).
+    Arguments:
+        src_file (io.IOBase): File open for reading.
+        dst_file (io.IOBase): File open for writing.
+        chunk_size (int, optional): Number of bytes to copy at
+            a time (or `None` to use sensible default).
 
     """
     chunk_size = chunk_size or io.DEFAULT_BUFFER_SIZE
@@ -53,17 +54,18 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
 
 
 def get_intermediate_dirs(fs, dir_path):
-    """
-    Get paths of intermediate directories required to create a new
-    directory.
+    """Get a list of non-existing intermediate directories.
 
-    :param fs: A FS object.
-    :param str dir_path: A path to a new directory on the filesystem.
-    :returns: A list of paths.
-    :rtype: list
+    Arguments:
+        fs (FS): A filesystem instance.
+        dir_path (str): A path to a new directory on the filesystem.
 
-    :raises `fs.errors.DirectoryExpected`: If a path component
-        references a file and not a directory.
+    Returns:
+        list: A list of non-existing paths.
+
+    Raises:
+        `fs.errors.DirectoryExpected`: If a path component
+            references a file and not a directory.
 
     """
     intermediates = []

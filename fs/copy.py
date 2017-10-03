@@ -1,7 +1,4 @@
-"""
-
-Functions for copying resources *between* filesystem.
-
+"""Functions for copying resources *between* filesystem.
 """
 
 from __future__ import print_function
@@ -303,4 +300,3 @@ def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path,
                         if do_copy:
                             copy_file(src_fs, dir_path, dst_fs, copy_path)
                             on_copy(src_fs, dir_path, dst_fs, copy_path)
-

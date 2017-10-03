@@ -41,8 +41,7 @@ _WINDOWS_PLATFORM = platform.system() == 'Windows'
 
 @six.python_2_unicode_compatible
 class OSFS(FS):
-    """
-    Create an OSFS.
+    """Create an OSFS.
 
     :param root_path: An OS path or path-like object to the location on
         your HD you wish to manage.

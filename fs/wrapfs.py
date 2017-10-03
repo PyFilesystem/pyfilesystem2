@@ -13,12 +13,11 @@ from .error_tools import unwrap_errors
 
 @six.python_2_unicode_compatible
 class WrapFS(FS):
-    """"
-    A proxy for a filesystem object.
+    """"A proxy for a filesystem object.
 
     This class exposes an filesystem interface, where the data is
     stored on another filesystem(s), and is the basis for
-    :class:`~fs.subfs.SubFS` and other *virtual* filesystems.
+    `~fs.subfs.SubFS` and other *virtual* filesystems.
 
     """
 
@@ -49,23 +48,22 @@ class WrapFS(FS):
         return _str
 
     def delegate_path(self, path):
-        """
-        Encode a path for proxied filesystem.
+        """Encode a path for proxied filesystem.
 
-        :param path: A path on the fileystem.
-        :type path: str
-        :returns: a tuple of <filesystem>, <new path>
-        :rtype: tuple
+        Arguments:
+            path (str): A path on the filesystem.
+
+        Returns:
+            (FS, str): a tuple of ``(<filesystem>, <new_path>)``
 
         """
         return self._wrap_fs, path
 
     def delegate_fs(self):
-        """
-        Get the filesystem.
+        """Get the proxied filesystem.
 
         This method should return a filesystem for methods not
-        associated with a path, e.g. :meth:`~fs.base.FS.getmeta`.
+        associated with a path, e.g. `~fs.base.FS.getmeta`.
 
         """
         return self._wrap_fs

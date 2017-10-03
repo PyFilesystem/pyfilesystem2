@@ -8,7 +8,8 @@ from .mode import Mode
 
 
 class RawWrapper(io.IOBase):
-    """Convert a Python 2 style file-like object in to a IO object."""
+    """Convert a Python 2 style file-like object in to a IO object.
+    """
 
     def __init__(self, f, mode=None, name=None):
         self._f = f
@@ -124,7 +125,8 @@ def make_stream(name,
                 newline='',
                 line_buffering=False,
                 **kwargs):
-    """Take a Python 2.x binary file and return an IO Stream."""
+    """Take a Python 2.x binary file and return an IO Stream.
+    """
     reading = 'r' in mode
     writing = 'w' in mode
     appending = 'a' in mode
@@ -166,7 +168,8 @@ def make_stream(name,
 
 
 def line_iterator(readable_file, size=None):
-    """A not terribly efficient char by char line iterator."""
+    """A not terribly efficient char by char line iterator.
+    """
     read = readable_file.read
     line = []
     byte = b'1'

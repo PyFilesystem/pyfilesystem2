@@ -17,8 +17,7 @@ from .permissions import Permissions
 
 
 class TarFS(WrapFS):
-    """
-    Read and write tar files.
+    """Read and write tar files.
 
     There are two ways to open a TarFS for the use cases of reading
     a tar file, and creating a new one.
@@ -48,17 +47,14 @@ class TarFS(WrapFS):
                 'This tar file was written by PyFilesystem'
             )
 
-    :param file: An OS filename, or a open file object.
-    :type file: str or file
-    :param write: Set to ``True`` to write a new tar file, or ``False``
-        to read an existing tar file.
-    :type write: bool
-    :param compression:  Compression to use (one of the formats
-        supported by ``tarfile``: ``xz``, ``gz``, ``bz2``, or None).
-    :type compression: str
-    :param temp_fs: An opener string for the temporary filesystem
-        used to store data prior to tarring.
-    :type temp_fs: str
+    Arguments:
+        file (str or io.IOBase): An OS filename, or an open file handle.
+        write (bool, optional): Set to `True` to write a new tar file,
+            or use default (``False``) to read an existing tar file.
+        compression (str, optional): Compression to use (one of the formats
+            supported by `tarfile`: ``xz``, ``gz``, ``bz2``, or `None`).
+        temp_fs (str, optional): An FS URL for the temporary
+            filesystem used to store data prior to tarring.
 
     """
 
@@ -96,7 +92,8 @@ class TarFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class WriteTarFS(WrapFS):
-    """A writable tar file."""
+    """A writable tar file.
+    """
 
     def __init__(self,
                  file,
@@ -138,18 +135,19 @@ class WriteTarFS(WrapFS):
         super(WriteTarFS, self).close()
 
     def write_tar(self, file=None, compression=None, encoding=None):
-        """
-        Write tar to a file.
+        """Write tar to a file.
 
-        .. note::
+        Arguments:
+            file (str or io.IOBase, optional): Destination file, may be
+                a file name or an open file object.
+            compression (str, optional): Compression to use (one of
+                the constants defined in `tarfile` in the stdlib).
+            encoding (str, optional): The character encoding to use
+                (default uses the encoding defined in
+                `~WriteTarFS.__init__`).
+
+        Note:
             This is called automatically when the TarFS is closed.
-
-        :param file: Destination file, may be a file name or an open
-            file object.
-        :type file: str or file-like
-        :param compression: Compression to use (one of the constants
-            defined in the tarfile module in the stdlib).
-
         """
         if not self.isclosed():
             write_tar(
@@ -162,7 +160,8 @@ class WriteTarFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class ReadTarFS(FS):
-    """A readable tar file."""
+    """A readable tar file.
+    """
 
     _meta = {
         'case_insensitive': True,

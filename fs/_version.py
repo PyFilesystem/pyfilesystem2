@@ -1,2 +1,3 @@
-"""Version, used in module and setup.py."""
+"""Version, used in module and setup.py.
+"""
 __version__ = "2.0.12a0"

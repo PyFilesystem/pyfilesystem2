@@ -20,8 +20,7 @@ from .wrapfs import WrapFS
 
 
 class ZipFS(WrapFS):
-    """
-    Read and write zip files.
+    """Read and write zip files.
 
     There are two ways to open a ZipFS for the use cases of reading
     a zip file, and creating a new one.

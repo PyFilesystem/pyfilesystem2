@@ -15,8 +15,7 @@ from .path import abspath, join, normpath, relpath
 
 @six.python_2_unicode_compatible
 class SubFS(WrapFS):
-    """
-    A sub-directory on another filesystem.
+    """A sub-directory on another filesystem.
 
     A SubFS is a filesystem object that maps to a sub-directory of
     another filesystem. This is the object that is returned by
@@ -50,9 +49,7 @@ class SubFS(WrapFS):
 
 
 class ClosingSubFS(SubFS):
-    """
-    A version of SubFS which will close its parent automatically.
-
+    """A version of `SubFS` which will close its parent automatically.
     """
 
     def close(self):

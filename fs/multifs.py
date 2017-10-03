@@ -24,8 +24,7 @@ _PrioritizedFS = namedtuple(
 
 
 class MultiFS(FS):
-    """
-    A filesystem that delegates to a sequence of other filesystems.
+    """A filesystem that delegates to a sequence of other filesystems.
 
     Operations on the MultiFS will try each 'child' filesystem in order,
     until it succeeds. In effect, creating a filesystem that combines
@@ -39,7 +38,7 @@ class MultiFS(FS):
         "case_insensitive": False
     }
 
-    def __init__(self, auto_close=True):
+    def __init__(self, auto_close=True):  # noqa: D102
         super(MultiFS, self).__init__()
 
         self._auto_close = auto_close
@@ -61,26 +60,22 @@ class MultiFS(FS):
         return "<multifs>"
 
     def add_fs(self, name, fs, write=False, priority=0):
-        """
-        Adds a filesystem to the MultiFS.
+        """Add a filesystem to the MultiFS.
 
-        :param name: A unique name to refer to the filesystem being
-            added.
-        :type name: str
-        :param fs: The filesystem to add.
-        :type fs: Filesystem or FS URL.
-        :param write: If this value is True, then the ``fs`` will be
-            used as the writeable FS.
-        :type write: bool
-        :param priority: An integer that denotes the priority of the
-            filesystem being added. Filesystems will be searched in
-            descending priority order and then by the reverse order they
-            were added. So by default, the most recently added
-            filesystem will be looked at first.
-        :type priority: int
+        Arguments:
+            name (str): A unique name to refer to the filesystem being
+                added.
+            fs (FS or FS URL): The filesystem to add.
+            write (bool, optional): If this value is True,
+                then the ``fs`` will be used as the writeable FS (defaults
+                to False).
+            priority (int, optional): An integer that denotes the priority
+                of the filesystem being added. Filesystems will be searched
+                in descending priority order and then by the reverse order
+                they were added. So by default, the most recently added
+                filesystem will be looked at first.
 
         """
-
         if isinstance(fs, text_type):
             fs = open_fs(fs)
 
@@ -101,21 +96,28 @@ class MultiFS(FS):
             self._write_fs_name = name
 
     def get_fs(self, name):
-        """
-        Get a filesystem from its name.
+        """Get a filesystem from its name.
 
-        :param name: The name of a filesystem previously added.
-        :type name: str
+        Arguments:
+            name (str): The name of a filesystem previously added.
+
+        Returns:
+            FS: the filesystem added as ``name`` previously.
+
+        Raises:
+            KeyError: If no filesystem with given ``name`` could be found.
 
         """
         return self._filesystems[name].fs
 
     def _resort(self):
-        """Force iterate_fs to re-sort on next reference."""
+        """Force `iterate_fs` to re-sort on next reference.
+        """
         self._fs_sequence = None
 
     def iterate_fs(self):
-        """Get iterator that returns (name, fs) in priority order."""
+        """Get iterator that returns (name, fs) in priority order.
+        """
         if self._fs_sequence is None:
             self._fs_sequence = [
                 (name, fs)
@@ -129,34 +131,35 @@ class MultiFS(FS):
         return iter(self._fs_sequence)
 
     def _delegate(self, path):
-        """Get a filesystem which has a given path."""
+        """Get a filesystem which has a given path.
+        """
         for _name, fs in self.iterate_fs():
             if fs.exists(path):
                 return fs
         return None
 
     def _delegate_required(self, path):
+        """Check that there is a filesystem with the given ``path``.
+        """
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
         return fs
 
     def _require_writable(self, path):
+        """Check that ``path`` is writeable.
+        """
         if self.write_fs is None:
             raise errors.ResourceReadOnly(path)
 
     def which(self, path, mode="r"):
-        """
-        Get a tuple of (name, filesystem) that the given path would map
-        to.
+        """Get a tuple of (name, fs) that the given path would map to.
 
-        :param path: A path on the filesystem.
-        :type path: str
-        :param mode: A open mode.
-        :type mode: str
+        Arguments:
+            path (str): A path on the filesystem.
+            mode (str): An `io.open` mode.
 
         """
-
         if check_writable(mode):
             return self._write_fs_name, self.write_fs
         for name, fs in self.iterate_fs():
@@ -164,7 +167,7 @@ class MultiFS(FS):
                 return name, fs
         return None, None
 
-    def close(self):
+    def close(self):  # noqa: D102
         self._closed = True
         if self._auto_close:
             try:
@@ -174,7 +177,7 @@ class MultiFS(FS):
                 self._filesystems.clear()
                 self._resort()
 
-    def getinfo(self, path, namespaces=None):
+    def getinfo(self, path, namespaces=None):  # noqa: D102
         self.check()
         namespaces = namespaces or ()
         fs = self._delegate(path)
@@ -184,7 +187,7 @@ class MultiFS(FS):
         info = fs.getinfo(_path, namespaces=namespaces)
         return info
 
-    def listdir(self, path):
+    def listdir(self, path):  # noqa: D102
         self.check()
         directory = []
         exists = False
@@ -199,13 +202,13 @@ class MultiFS(FS):
             raise errors.ResourceNotFound(path)
         return directory
 
-    def makedir(self, path, permissions=None, recreate=False):
+    def makedir(self, path, permissions=None, recreate=False):  # noqa: D102
         self.check()
         self._require_writable(path)
         return self.write_fs.makedir(
             path, permissions=permissions, recreate=recreate)
 
-    def openbin(self, path, mode='r', buffering=-1, **options):
+    def openbin(self, path, mode='r', buffering=-1, **options):  # noqa: D102
         self.check()
         if check_writable(mode):
             self._require_writable(path)
@@ -219,17 +222,17 @@ class MultiFS(FS):
             **options
         )
 
-    def remove(self, path):
+    def remove(self, path):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.remove(path)
 
-    def removedir(self, path):
+    def removedir(self, path):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.removedir(path)
 
-    def scandir(self, path, namespaces=None, page=None):
+    def scandir(self, path, namespaces=None, page=None):  # noqa: D102
         self.check()
         seen = set()
         exists = False
@@ -246,14 +249,14 @@ class MultiFS(FS):
         if not exists:
             raise errors.ResourceNotFound(path)
 
-    def getbytes(self, path):
+    def getbytes(self, path):  # noqa: D102
         self.check()
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
         return fs.getbytes(path)
 
-    def gettext(self, path, encoding=None, errors=None, newline=''):
+    def gettext(self, path, encoding=None, errors=None, newline=''):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.gettext(
@@ -263,59 +266,59 @@ class MultiFS(FS):
             newline=newline
         )
 
-    def getsize(self, path):
+    def getsize(self, path):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.getsize(path)
 
-    def getsyspath(self, path):
+    def getsyspath(self, path):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.getsyspath(path)
 
-    def gettype(self, path):
+    def gettype(self, path):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.gettype(path)
 
-    def geturl(self, path, purpose='download'):
+    def geturl(self, path, purpose='download'):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.geturl(path, purpose=purpose)
 
-    def hassyspath(self, path):
+    def hassyspath(self, path):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.hassyspath(path)
 
-    def hasurl(self, path, purpose='download'):
+    def hasurl(self, path, purpose='download'):  # noqa: D102
         self.check()
         fs = self._delegate_required(path)
         return fs.hasurl(path, purpose=purpose)
 
-    def isdir(self, path):
+    def isdir(self, path):  # noqa: D102
         self.check()
         fs = self._delegate(path)
         return fs and fs.isdir(path)
 
-    def isfile(self, path):
+    def isfile(self, path):  # noqa: D102
         self.check()
         fs = self._delegate(path)
         return fs and fs.isfile(path)
 
-    def setinfo(self, path, info):
+    def setinfo(self, path, info):  # noqa: D102
         self.check()
         self._require_writable(path)
         return self.write_fs.setinfo(path, info)
 
-    def validatepath(self, path):
+    def validatepath(self, path):  # noqa: D102
         self.check()
         if self.write_fs is not None:
             self.write_fs.validatepath(path)
         else:
             super(MultiFS, self).validatepath(path)
 
-    def makedirs(self, path, permissions=None, recreate=False):
+    def makedirs(self, path, permissions=None, recreate=False):  # noqa: D102
         self.check()
         self._require_writable(path)
         return self.write_fs.makedirs(
@@ -331,7 +334,7 @@ class MultiFS(FS):
              encoding=None,
              errors=None,
              newline='',
-             **kwargs):
+             **kwargs):  # noqa: D102
         self.check()
         if check_writable(mode):
             self._require_writable(path)
@@ -348,11 +351,11 @@ class MultiFS(FS):
             **kwargs
         )
 
-    def setbinfile(self, path, file):
+    def setbinfile(self, path, file):  # noqa: D102
         self._require_writable(path)
         self.write_fs.setbinfile(path, file)
 
-    def setbytes(self, path, contents):
+    def setbytes(self, path, contents):  # noqa: D102
         self._require_writable(path)
         return self.write_fs.setbytes(path, contents)
 
@@ -361,7 +364,7 @@ class MultiFS(FS):
                 contents,
                 encoding='utf-8',
                 errors=None,
-                newline=''):
+                newline=''):  # noqa: D102
         self._require_writable(path)
         return self.write_fs.settext(
             path,

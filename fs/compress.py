@@ -27,23 +27,20 @@ def write_zip(src_fs,
               compression=zipfile.ZIP_DEFLATED,
               encoding="utf-8",
               walker=None):
-    """
-    Write the contents of a filesystem to a zip file.
+    """Write the contents of a filesystem to a zip file.
 
-    :param file: Destination file, may be a file name or an open file
-        object.
-    :type file: str or file-like.
-    :param compression: Compression to use (one of the constants defined
-        in the zipfile module in the stdlib).
-    :type compression: str
-    :param encoding: The encoding to use for filenames. The default is
-        ``"utf-8"``, use ``"CP437"`` if compatibility with WinZip is
-        desired.
-    :type encoding: str
-    :param walker: A :class:`~fs.walk.Walker` instance, or None to use
-        default walker. You can use this to specify which files you
-        want to compress.
-    :type walker: Walker or None
+    Arguments:
+        file (str or io.IOBase): Destination file, may be a file name
+            or an open file object.
+        compression (str, optional): Compression to use (one of the constants
+            defined in the :ref:`zipfile` module in the stdlib). Defaults
+            to :obj:`zipfile.ZIP_DEFLATED`.
+        encoding (str, optional):
+             The encoding to use for filenames. The default is ``"utf-8"``,
+             use ``"CP437"`` if compatibility with WinZip is desired.
+        walker (~fs.walk.Walker, optional): A :class:`Walker` instance,
+            or :obj:`None` to use default walker. You can use this to specify
+            which files you want to compress.
 
     """
     _zip = zipfile.ZipFile(
@@ -107,18 +104,16 @@ def write_tar(src_fs,
     """
     Write the contents of a filesystem to a tar file.
 
-    :param file: Destination file, may be a file name or an open file
-        object.
-    :type file: str or file-like.
-    :param compression: Compression to use.
-    :type compression: str
-    :param encoding: The encoding to use for filenames. The default is
-        ``"utf-8"``.
-    :type encoding: str
-    :param walker: A :class:`~fs.walk.Walker` instance, or None to use
-        default walker. You can use this to specify which files you
-        want to compress.
-    :type walker: Walker or None
+    Arguments:
+        file (str or io.IOBase): Destination file, may be a file name or an open file
+            object.
+        compression (str, optional): Compression to use, or :obj:`None`
+            for a plain *Tar* archive without compression.
+        encoding(str, optional): The encoding to use for filenames. The
+            default is ``"utf-8"``.
+        walker (~fs.walk.Walker, optional): A :class:`Walker` instance,
+            or :obj:`None` to use default walker. You can use this to specify
+            which files you want to compress.
 
     """
 
