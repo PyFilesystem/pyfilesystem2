@@ -25,24 +25,26 @@ def render(fs,
     """
     Render a directory structure in to a pretty tree.
 
-    :param fs: A filesystem.
-    :type fs: A :class:`~fs.base.FS` instance
-    :param file: An open file-like object to render the tree, or
-        ``None`` for stdout.
-    :type file: file or None
-    :type encoding: Unicode encoding, or None to auto-detect.
-    :type encoding: str or None
-    :param int max_levels: Maximum number of levels to display, or None
-        for no maximum.
-    :param bool with_color: Enable terminal color output, or None to
-        auto-detect terminal.
-    :param bool dirs_first: Show directories first.
-    :param list exclude: Option list of directory patterns to exclude
-        from the tree render.
-    :param filter: Optional list of files patterns to match in the tree
-        render.
-    :rtype: tuple
-    :returns: A tuple of ``(<directory count>, <file count>)``.
+    Arguments:
+        fs (~fs.base.FS): A filesystem instance.
+        path (str): The path of the directory to start rendering
+            from (defaults to root folder, i.e. ``'/'``).
+        file (io.IOBase): An open file-like object to render the
+            tree, or `None` for stdout.
+        encoding (str or None): Unicode encoding, or `None` to
+            auto-detect.
+        max_levels (int or None): Maximum number of levels to
+            display, or `None` for no maximum.
+        with_color (bool or None): Enable terminal color output,
+            or `None` to auto-detect terminal.
+        dirs_first (bool): Show directories first.
+        exclude (list or None): Option list of directory patterns
+            to exclude from the tree render.
+        filter (list or None): Optional list of files patterns to
+            match in the tree render.
+
+    Returns:
+        tuple: A tuple of ``(<directory count>, <file count>)``.
 
     """
     file = file or sys.stdout

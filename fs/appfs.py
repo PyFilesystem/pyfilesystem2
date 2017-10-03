@@ -60,120 +60,120 @@ class _AppFS(OSFS):
         )
 
 class UserDataFS(_AppFS):
-    """
-    A filesystem for per-user application data.
+    """A filesystem for per-user application data.
 
     May also be opened with
     ``open_fs('userdata://appname:author:version')``.
 
-    :param str appname: The name of the application.
-    :param str author: The name of the author (used on Windows).
-    :param str version: Optional version string, if a unique location
-        per version of the application is required.
-    :param bool roaming: If ``True``, use a *roaming* profile on
-        Windows.
-    :param bool create: If ``True`` (the default) the directory will
-        be created if it does not exist.
+    Arguments:
+        appname (str): The name of the application.
+        author (str): The name of the author (used on Windows).
+        version (str): Optional version string, if a unique location
+            per version of the application is required.
+        roaming (bool): If ``True``, use a *roaming* profile on
+            Windows.
+        create (bool): If ``True`` (the default) the directory
+            will be created if it does not exist.
 
     """
     app_dir = 'user_data_dir'
 
 
 class UserConfigFS(_AppFS):
-    """
-    A filesystem for per-user config data.
+    """A filesystem for per-user config data.
 
     May also be opened with
     ``open_fs('userconf://appname:author:version')``.
 
-    :param str appname: The name of the application.
-    :param str author: The name of the author (used on Windows).
-    :param str version: Optional version string, if a unique location
-        per version of the application is required.
-    :param bool roaming: If ``True``, use a *roaming* profile on
-        Windows.
-    :param bool create: If ``True`` (the default) the directory will
-        be created if it does not exist.
+    Arguments:
+        appname (str): The name of the application.
+        author (str): The name of the author (used on Windows).
+        version (str): Optional version string, if a unique location
+            per version of the application is required.
+        roaming (bool): If ``True``, use a *roaming* profile on
+            Windows.
+        create (bool): If ``True`` (the default) the directory
+            will be created if it does not exist.
 
     """
     app_dir = 'user_config_dir'
 
 
 class UserCacheFS(_AppFS):
-    """
-    A filesystem for per-user application cache data.
+    """A filesystem for per-user application cache data.
 
     May also be opened with
     ``open_fs('usercache://appname:author:version')``.
 
-    :param str appname: The name of the application.
-    :param str author: The name of the author (used on Windows).
-    :param str version: Optional version string, if a unique location
-        per version of the application is required.
-    :param bool roaming: If ``True``, use a *roaming* profile on
-        Windows.
-    :param bool create: If ``True`` (the default) the directory will
-        be created if it does not exist.
+    Arguments:
+        appname (str): The name of the application.
+        author (str): The name of the author (used on Windows).
+        version (str): Optional version string, if a unique location
+            per version of the application is required.
+        roaming (bool): If ``True``, use a *roaming* profile on
+            Windows.
+        create (bool): If ``True`` (the default) the directory
+            will be created if it does not exist.
 
     """
     app_dir = 'user_cache_dir'
 
 
 class SiteDataFS(_AppFS):
-    """
-    A filesystem for application site data.
+    """A filesystem for application site data.
 
     May also be opened with
     ``open_fs('sitedata://appname:author:version')``.
 
-    :param str appname: The name of the application.
-    :param str author: The name of the author (used on Windows).
-    :param str version: Optional version string, if a unique location
-        per version of the application is required.
-    :param bool roaming: If ``True``, use a *roaming* profile on
-        Windows.
-    :param bool create: If ``True`` (the default) the directory will
-        be created if it does not exist.
+    Arguments:
+        appname (str): The name of the application.
+        author (str): The name of the author (used on Windows).
+        version (str): Optional version string, if a unique location
+            per version of the application is required.
+        roaming (bool): If ``True``, use a *roaming* profile on
+            Windows.
+        create (bool): If ``True`` (the default) the directory
+            will be created if it does not exist.
 
     """
     app_dir = 'site_data_dir'
 
 
 class SiteConfigFS(_AppFS):
-    """
-    A filesystem for application config data.
+    """A filesystem for application config data.
 
     May also be opened with
     ``open_fs('siteconf://appname:author:version')``.
 
-    :param str appname: The name of the application.
-    :param str author: The name of the author (used on Windows).
-    :param str version: Optional version string, if a unique location
-        per version of the application is required.
-    :param bool roaming: If ``True``, use a *roaming* profile on
-        Windows.
-    :param bool create: If ``True`` (the default) the directory will
-        be created if it does not exist.
+    Arguments:
+        appname (str): The name of the application.
+        author (str): The name of the author (used on Windows).
+        version (str): Optional version string, if a unique location
+            per version of the application is required.
+        roaming (bool): If ``True``, use a *roaming* profile on
+            Windows.
+        create (bool): If ``True`` (the default) the directory
+            will be created if it does not exist.
 
     """
     app_dir = 'site_config_dir'
 
 
 class UserLogFS(_AppFS):
-    """
-    A filesystem for per-user application log data.
+    """A filesystem for per-user application log data.
 
     May also be opened with
     ``open_fs('userlog://appname:author:version')``.
 
-    :param str appname: The name of the application.
-    :param str author: The name of the author (used on Windows).
-    :param str version: Optional version string, if a unique location
-        per version of the application is required.
-    :param bool roaming: If ``True``, use a *roaming* profile on
-        Windows.
-    :param bool create: If ``True`` (the default) the directory will
-        be created if it does not exist.
+    Arguments:
+        appname (str): The name of the application.
+        author (str): The name of the author (used on Windows).
+        version (str): Optional version string, if a unique location
+            per version of the application is required.
+        roaming (bool): If ``True``, use a *roaming* profile on
+            Windows.
+        create (bool): If ``True`` (the default) the directory
+            will be created if it does not exist.
 
     """
     app_dir = 'user_log_dir'
