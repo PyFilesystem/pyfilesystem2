@@ -215,7 +215,7 @@ class MemoryFS(FS):
     Memory filesystems are useful for caches, temporary data stores,
     unit testing, etc. They do require no parameters to their constructor.
 
-    Exemple:
+    Example:
         >>> mem_fs = MemoryFS()
 
     """
