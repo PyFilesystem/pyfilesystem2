@@ -44,7 +44,7 @@ class OSFS(FS):
     """Create an OSFS.
 
     Arguments:
-        root_path (str or PathLike): An OS path or path-like object to
+        root_path (str or ~os.PathLike): An OS path or path-like object to
             the location on your HD you wish to manage.
         create (bool, optional): Set to `True` to create the root directory
             if it does not already exist, otherwise the directory should exist

@@ -50,17 +50,14 @@ class ZipFS(WrapFS):
             )
 
 
-    :param file: An OS filename, or a open file object.
-    :type file: str or file
-    :param write: Set to ``True`` to write a new zip file, or ``False``
-        to read an existing zip file.
-    :type write: bool
-    :param compression:  Compression to use (one of the constants
-        defined in the zipfile module in the stdlib).
-    :type compression: int
-    :param temp_fs: An opener string for the temporary filesystem
-        used to store data prior to zipping.
-    :type temp_fs: str
+    Arguments:
+        file (str or io.IOBase): An OS filename, or an open file object.
+        write (bool, optional): Set to `True` to write a new zip file, or
+            `False` (default) to read an existing zip file.
+        compression (str, optional): Compression to use (one of the constants
+            defined in the `zipfile` module in the stdlib).
+        temp_fs (str, optional): An FS URL for the temporary
+            filesystem used to store data prior to zipping.
 
     """
 
@@ -83,7 +80,8 @@ class ZipFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class WriteZipFS(WrapFS):
-    """A writable zip file."""
+    """A writable zip file.
+    """
 
     def __init__(self,
                  file,
@@ -125,17 +123,19 @@ class WriteZipFS(WrapFS):
         super(WriteZipFS, self).close()
 
     def write_zip(self, file=None, compression=None, encoding=None):
-        """
-        Write zip to a file.
+        """Write zip to a file.
 
-        .. note ::
+        Arguments:
+            file (str or io.IOBase, optional): Destination file, may be
+                a file name or an open file handle.
+            compression (str, optional): Compression to use (one of the
+                constants defined in the `zipfile` module in the stdlib).
+            encoding (str, optional): The character encoding to use
+                (default uses the encoding defined in
+                `~WriteZipFS.__init__`).
+
+        Note:
             This is called automatically when the ZipFS is closed.
-
-        :param file: Destination file, may be a file name or an open
-            file object.
-        :type file: str or file-like
-        :param compression: Compression to use (one of the constants
-            defined in the zipfile module in the stdlib).
 
         """
         if not self.isclosed():
