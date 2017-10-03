@@ -58,7 +58,7 @@ class FS(object):
 
     @property
     def walk(self):
-        """~fs.walk.BoundWalker: a walker bound to this filesystem.
+        """`~fs.walk.BoundWalker`: a walker bound to this filesystem.
         """
         return Walker.bind(self)
 

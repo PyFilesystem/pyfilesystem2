@@ -250,7 +250,7 @@ class Permissions(object):
 
     @property
     def mode(self):
-        """int: Mode integer.
+        """`int`: Mode integer.
         """
         mode = 0
         for name, mask in self._LINUX_PERMS:

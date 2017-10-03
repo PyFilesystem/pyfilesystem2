@@ -131,25 +131,25 @@ class Info(object):
 
     @property
     def name(self):
-        """str: the resource name.
+        """`str`: the resource name.
         """
         return self.get('basic', 'name')
 
     @property
     def is_dir(self):
-        """bool: `True` if the resource references a directory.
+        """`bool`: `True` if the resource references a directory.
         """
         return self.get('basic', 'is_dir')
 
     @property
     def is_file(self):
-        """bool: `True` if the resource references a file.
+        """`bool`: `True` if the resource references a file.
         """
         return not self.get('basic', 'is_dir')
 
     @property
     def is_link(self):
-        """bool: `True` if the resource is a symlink.
+        """`bool`: `True` if the resource is a symlink.
         """
         self._require_namespace('link')
         return self.get('link', 'target') is not None
@@ -170,7 +170,7 @@ class Info(object):
 
     @property
     def accessed(self):
-        """datetime: the time this resource was last accessed, or `None`.s
+        """:class:`datetime`: the resource last access time, or `None`.
 
         Requires the ``"details"`` namespace.
 
@@ -187,7 +187,7 @@ class Info(object):
 
     @property
     def modified(self):
-        """datetime: the time this resource was last modified, or `None`.
+        """:class:`datetime`: the resource last modification time, or `None`.
 
         Requires the ``"details"`` namespace.
 
@@ -204,7 +204,7 @@ class Info(object):
 
     @property
     def created(self):
-        """datetime: the time this resource was created, or `None`.
+        """:class:`datetime`: the resource creation time, or `None`.
 
         Requires the ``"details"`` namespace.
 
@@ -221,7 +221,7 @@ class Info(object):
 
     @property
     def metadata_changed(self):
-        """datetime: the time the resource metadata were changed, or `None`.
+        """:class:`datetime`: the resource metadata change time, or `None`.
 
         Requires the ``"details"`` namespace.
 
@@ -238,7 +238,7 @@ class Info(object):
 
     @property
     def permissions(self):
-        """Permissions: the permissions of the resource, or `None`.
+        """`Permissions`: the permissions of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
 
@@ -256,7 +256,7 @@ class Info(object):
 
     @property
     def size(self):
-        """int: the size of the resource, in bytes.
+        """`int`: the size of the resource, in bytes.
 
         Requires the ``"details"`` namespace.
 
@@ -270,7 +270,7 @@ class Info(object):
 
     @property
     def user(self):
-        """str: the owner of the resource, or `None`.
+        """`str`: the owner of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
 
@@ -283,7 +283,7 @@ class Info(object):
 
     @property
     def uid(self):
-        """int: the user id of the resource, or `None`.
+        """`int`: the user id of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
 
@@ -297,7 +297,7 @@ class Info(object):
 
     @property
     def group(self):
-        """str: the group of the resource owner, or ``None``.
+        """`str`: the group of the resource owner, or ``None``.
 
         Requires the ``"access"`` namespace.
 
@@ -311,7 +311,7 @@ class Info(object):
 
     @property
     def gid(self):
-        """int: the group id of the resource, or `None`.
+        """`int`: the group id of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
 
@@ -325,7 +325,7 @@ class Info(object):
 
     @property
     def target(self):
-        """Get the link target (if resource is a symlink), or `None`.
+        """`str`: the link target (if resource is a symlink), or `None`.
 
         Requires the ``"link"`` namespace.
 

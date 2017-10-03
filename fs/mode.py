@@ -109,55 +109,55 @@ class Mode(object):
 
     @property
     def create(self):
-        """bool: `True` if the mode would create a file.
+        """`bool`: `True` if the mode would create a file.
         """
         return 'a' in self or 'w' in self or 'x' in self
 
     @property
     def reading(self):
-        """bool: `True` if the mode permits reading.
+        """`bool`: `True` if the mode permits reading.
         """
         return 'r' in self or '+' in self
 
     @property
     def writing(self):
-        """bool: `True` if the mode permits writing.
+        """`bool`: `True` if the mode permits writing.
         """
         return 'w' in self or 'a' in self or '+' in self or 'x' in self
 
     @property
     def appending(self):
-        """bool: `True` if the mode permits appending.
+        """`bool`: `True` if the mode permits appending.
         """
         return 'a' in self
 
     @property
     def updating(self):
-        """bool: `True` if the mode permits both reading and writing.
+        """`bool`: `True` if the mode permits both reading and writing.
         """
         return '+' in self
 
     @property
     def truncate(self):
-        """bool: `True` if the mode would truncate an existing file.
+        """`bool`: `True` if the mode would truncate an existing file.
         """
         return 'w' in self or 'x' in self
 
     @property
     def exclusive(self):
-        """bool: `True` if the mode require exclusive creation.
+        """`bool`: `True` if the mode require exclusive creation.
         """
         return 'x' in self
 
     @property
     def binary(self):
-        """bool: `True` if a mode specifies binary.
+        """`bool`: `True` if a mode specifies binary.
         """
         return 'b' in self
 
     @property
     def text(self):
-        """bool: `True` if a mode specifies text.
+        """`bool`: `True` if a mode specifies text.
         """
         return 't' in self or 'b' not in self
 

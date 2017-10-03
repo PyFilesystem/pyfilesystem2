@@ -342,7 +342,7 @@ class FTPFS(FS):
 
     @property
     def ftp(self):
-        """Get a `~ftplib.FTP` object.
+        """`~ftplib.FTP`: the underlying FTP client.
         """
         if self._ftp is None:
             _ftp = self._open_ftp('latin-1')
@@ -364,7 +364,7 @@ class FTPFS(FS):
 
     @property
     def features(self):
-        """Get features dictionary from FTP server.
+        """`dict`: features of the remote FTP server.
         """
         if self._features is None:
             try:

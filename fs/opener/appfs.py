@@ -1,5 +1,6 @@
 # coding: utf-8
-"""Defines the MemOpener."""
+"""``AppFS`` opener.
+"""
 
 from __future__ import absolute_import
 from __future__ import print_function
@@ -61,4 +62,3 @@ class AppFSOpener(Opener):
         )
 
         return app_fs
-

@@ -1,5 +1,6 @@
 # coding: utf-8
-"""Defines the TempOpener."""
+"""`TempFS` opener.
+"""
 
 from __future__ import absolute_import
 from __future__ import print_function

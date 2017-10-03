@@ -22,8 +22,7 @@ def render(fs,
            dirs_first=True,
            exclude=None,
            filter=None):
-    """
-    Render a directory structure in to a pretty tree.
+    """Render a directory structure in to a pretty tree.
 
     Arguments:
         fs (~fs.base.FS): A filesystem instance.

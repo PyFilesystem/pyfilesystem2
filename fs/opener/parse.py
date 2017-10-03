@@ -1,9 +1,4 @@
-"""
-fs.opener.parse
-===============
-
-Parses FS URLs in to their constituent parts.
-
+"""Function to parse FS URLs in to their constituent parts.
 """
 
 from __future__ import absolute_import
@@ -33,15 +28,16 @@ _ParseResult = collections.namedtuple(
 class ParseResult(_ParseResult):
     """A named tuple containing fields of a parsed FS URL.
 
-    * ``protocol`` The protocol part of the url, e.g. ``osfs`` or
-      ``ftp``.
-    * ``username`` A username, or ``None`` .
-    * ``password`` An password, or ``None``.
-    * ``resource`` A *resource*, typically a domain and path, e.g.
-      ``ftp.example.org/dir``
-    * ``params`` An dictionary of parameters extracted from the query
-      string.
-    * ``path`` An optional path within the filesystem.
+    Attributes:
+        protocol (str): The protocol part of the url, e.g. ``osfs``
+            or ``ftp``.
+        username (str, optional): A username, or `None`.
+        password (str, optional): A password, or `None`.
+        resource (str): A *resource*, typically a domain and path, e.g.
+            ``ftp.example.org/dir``.
+        params (dict): A dictionary of parameters extracted from the
+            query string.
+        path (str, optional): A path within the filesystem, or `None`.
 
     """
 
@@ -63,14 +59,16 @@ _RE_FS_URL = re.compile(r'''
 
 
 def parse_fs_url(fs_url):
-    """
-    Parse a Filesystem URL and return a
-    :class:`~fs.opener.parse.ParseResult`, or raise
-    :class:`~fs.errors.ParseError` (subclass of ValueError) if the FS URL is
-    not value.
+    """Parse a Filesystem URL and return a `ParseResult`.
 
-    :param str fs_url: A filesystem URL
-    :rtype: :class:`~fs.opener.parse.ParseResult`
+    Arguments:
+        fs_url (str): A filesystem URL.
+
+    Returns:
+        ~fs.opener.parse.ParseResult: a parse result instance.
+
+    Raises:
+        ~fs.errors.ParseError: if the FS URL is not valid.
 
     """
 

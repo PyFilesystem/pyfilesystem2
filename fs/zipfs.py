@@ -183,10 +183,7 @@ class ReadZipFS(FS):
 
     @property
     def _directory(self):
-        """
-        Make a memory filesystem with the same directory structure
-        as the zip.
-
+        """`MemoryFS`: a filesystem with the same folder hierarchy as the zip.
         """
         self.check()
         with self._lock:
