@@ -352,10 +352,11 @@ class FTPFS(FS):
                 )
             except error_perm:
                 encoding = 'latin-1'
-            if encoding != 'latin-1':
-                self._ftp = self._open_ftp(encoding)
-            else:
-                self._ftp = _ftp
+            self._ftp = (
+                _ftp
+                if encoding == 'latin-1'
+                else self._open_ftp(encoding)
+            )
             self._welcome = self._ftp.getwelcome()
         return self._ftp
 
@@ -643,7 +644,7 @@ class FTPFS(FS):
 
     def setbytes(self, path, contents):
         if not isinstance(contents, bytes):
-            raise ValueError('contents must be bytes')
+            raise TypeError('contents must be bytes')
         self.setbinfile(path, io.BytesIO(contents))
 
     def setinfo(self, path, info):

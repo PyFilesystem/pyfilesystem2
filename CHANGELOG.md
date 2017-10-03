@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## Unreleased
+
+### Fixed
+
+- settext, appendtext, appendbytes, setbytes now raise a TypeError if
+  the type is wrong, rather than ValueError
+
 ## [2.0.11]
 
 ### Added
