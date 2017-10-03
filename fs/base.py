@@ -220,13 +220,13 @@ class FS(object):
 
         :param str path: Path to a file.
         :param bytes data: Bytes to append.
-        :raises ValueError: if ``data`` is not bytes.
+        :raises TypeError: if ``data`` is not bytes.
         :raises fs.errors.ResourceNotFound: if a parent directory of
             ``path`` does not exist.
 
         """
         if not isinstance(data, bytes):
-            raise ValueError('must be bytes')
+            raise TypeError('must be bytes')
         with self._lock:
             with self.open(path, 'ab') as append_file:
                 append_file.write(data)
@@ -243,13 +243,13 @@ class FS(object):
 
         :param str path: Path to a file.
         :param str text: Text to append.
-        :raises ValueError: if ``text`` is not bytes.
+        :raises TypeError: if ``text`` is not bytes.
         :raises fs.errors.ResourceNotFound: if a parent directory of
             ``path`` does not exist.
 
         """
         if not isinstance(text, six.text_type):
-            raise ValueError('must be unicode string')
+            raise TypeError('must be unicode string')
         with self._lock:
             with self.open(path,
                            'at',
@@ -973,7 +973,7 @@ class FS(object):
 
         """
         if not isinstance(contents, bytes):
-            raise ValueError('contents must be bytes')
+            raise TypeError('contents must be bytes')
         with closing(self.open(path, mode='wb')) as write_file:
             write_file.write(contents)
 
@@ -1094,7 +1094,7 @@ class FS(object):
 
         """
         if not isinstance(contents, six.text_type):
-            raise ValueError('contents must be unicode')
+            raise TypeError('contents must be unicode')
         with closing(self.open(path,
                                mode="wt",
                                encoding=encoding,
@@ -1248,7 +1248,7 @@ class FS(object):
         if patterns is None:
             return True
         if isinstance(patterns, six.text_type):
-            raise ValueError('patterns must be a list or sequence')
+            raise TypeError('patterns must be a list or sequence')
         case_sensitive = self.getmeta().get('case_sensitive', True)
         matcher = wildcard.get_matcher(patterns, case_sensitive)
         return matcher(name)
