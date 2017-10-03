@@ -1064,7 +1064,7 @@ class FS(object):
             contents (bytes): Data to be written.
 
         Raises:
-            ValueError: if contents is not bytes.
+            TypeError: if contents is not bytes.
 
         """
         if not isinstance(contents, bytes):
@@ -1190,7 +1190,7 @@ class FS(object):
                 as :obj:`io.open`).
 
         Raises:
-            ValueError: if ``contents`` is not a unicode string.
+            TypeError: if ``contents`` is not a unicode string.
 
         """
         if not isinstance(contents, six.text_type):
