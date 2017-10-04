@@ -20,7 +20,8 @@ from .path import normpath
 
 
 Step = namedtuple('Step', 'path, dirs, files')
-"""type: a *step* in a directory walk."""
+"""type: a *step* in a directory walk.
+"""
 
 
 class WalkerBase(object):
@@ -128,7 +129,7 @@ class Walker(WalkerBase):
                  on_error=None,
                  search="breadth",
                  filter=None,
-                 exclude_dirs=None):  # noqa: D102
+                 exclude_dirs=None):
         if search not in ('breadth', 'depth'):
             raise ValueError("search must be 'breadth' or 'depth'")
         self.ignore_errors = ignore_errors
@@ -384,7 +385,7 @@ class BoundWalker(object):
 
     """
 
-    def __init__(self, fs, walker_class=Walker):  # noqa: D102
+    def __init__(self, fs, walker_class=Walker):
         self.fs = fs
         self.walker_class = walker_class
 

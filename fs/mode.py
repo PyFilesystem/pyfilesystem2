@@ -39,7 +39,7 @@ class Mode(object):
 
     """
 
-    def __init__(self, mode):  # noqa: D102
+    def __init__(self, mode):
         self._mode = mode
         self.validate()
 

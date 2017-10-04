@@ -176,7 +176,8 @@ class ReadZipFS(FS):
         return "<zipfs '{}'>".format(self._file)
 
     def _path_to_zip_name(self, path):
-        """Convert a path to a zip file name."""
+        """Convert a path to a zip file name.
+        """
         if self._directory.isdir(path):
             return relpath(normpath(path)) + '/'
         else:

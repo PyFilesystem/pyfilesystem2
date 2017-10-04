@@ -34,7 +34,7 @@ class AppFSOpener(Opener):
         'userlog': appfs.UserLogFS
     }
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):  # noqa: D102
+    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
 
         fs_class = self._protocol_mapping[parse_result.protocol]
         resource, delim, path = parse_result.resource.partition('/')

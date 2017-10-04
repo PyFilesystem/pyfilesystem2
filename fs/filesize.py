@@ -81,6 +81,7 @@ def decimal(size):
     Example:
         >>> filesize.decimal(30000)
         '30.0 kB'
+        
     """
     return _to_str(
         size,

@@ -38,7 +38,7 @@ class MultiFS(FS):
         "case_insensitive": False
     }
 
-    def __init__(self, auto_close=True):  # noqa: D102
+    def __init__(self, auto_close=True):
         super(MultiFS, self).__init__()
 
         self._auto_close = auto_close
@@ -65,7 +65,7 @@ class MultiFS(FS):
         Arguments:
             name (str): A unique name to refer to the filesystem being
                 added.
-            fs (FS or FS URL): The filesystem to add.
+            fs (FS or str): The filesystem (instance or URL) to add.
             write (bool, optional): If this value is True,
                 then the ``fs`` will be used as the writeable FS (defaults
                 to False).
@@ -167,7 +167,7 @@ class MultiFS(FS):
                 return name, fs
         return None, None
 
-    def close(self):  # noqa: D102
+    def close(self):
         self._closed = True
         if self._auto_close:
             try:
@@ -177,7 +177,7 @@ class MultiFS(FS):
                 self._filesystems.clear()
                 self._resort()
 
-    def getinfo(self, path, namespaces=None):  # noqa: D102
+    def getinfo(self, path, namespaces=None):
         self.check()
         namespaces = namespaces or ()
         fs = self._delegate(path)
@@ -187,7 +187,7 @@ class MultiFS(FS):
         info = fs.getinfo(_path, namespaces=namespaces)
         return info
 
-    def listdir(self, path):  # noqa: D102
+    def listdir(self, path):
         self.check()
         directory = []
         exists = False
@@ -202,13 +202,13 @@ class MultiFS(FS):
             raise errors.ResourceNotFound(path)
         return directory
 
-    def makedir(self, path, permissions=None, recreate=False):  # noqa: D102
+    def makedir(self, path, permissions=None, recreate=False):
         self.check()
         self._require_writable(path)
         return self.write_fs.makedir(
             path, permissions=permissions, recreate=recreate)
 
-    def openbin(self, path, mode='r', buffering=-1, **options):  # noqa: D102
+    def openbin(self, path, mode='r', buffering=-1, **options):
         self.check()
         if check_writable(mode):
             self._require_writable(path)
@@ -222,17 +222,17 @@ class MultiFS(FS):
             **options
         )
 
-    def remove(self, path):  # noqa: D102
+    def remove(self, path):
         self.check()
         fs = self._delegate_required(path)
         return fs.remove(path)
 
-    def removedir(self, path):  # noqa: D102
+    def removedir(self, path):
         self.check()
         fs = self._delegate_required(path)
         return fs.removedir(path)
 
-    def scandir(self, path, namespaces=None, page=None):  # noqa: D102
+    def scandir(self, path, namespaces=None, page=None):
         self.check()
         seen = set()
         exists = False
@@ -249,14 +249,14 @@ class MultiFS(FS):
         if not exists:
             raise errors.ResourceNotFound(path)
 
-    def getbytes(self, path):  # noqa: D102
+    def getbytes(self, path):
         self.check()
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
         return fs.getbytes(path)
 
-    def gettext(self, path, encoding=None, errors=None, newline=''):  # noqa: D102
+    def gettext(self, path, encoding=None, errors=None, newline=''):
         self.check()
         fs = self._delegate_required(path)
         return fs.gettext(
@@ -266,59 +266,59 @@ class MultiFS(FS):
             newline=newline
         )
 
-    def getsize(self, path):  # noqa: D102
+    def getsize(self, path):
         self.check()
         fs = self._delegate_required(path)
         return fs.getsize(path)
 
-    def getsyspath(self, path):  # noqa: D102
+    def getsyspath(self, path):
         self.check()
         fs = self._delegate_required(path)
         return fs.getsyspath(path)
 
-    def gettype(self, path):  # noqa: D102
+    def gettype(self, path):
         self.check()
         fs = self._delegate_required(path)
         return fs.gettype(path)
 
-    def geturl(self, path, purpose='download'):  # noqa: D102
+    def geturl(self, path, purpose='download'):
         self.check()
         fs = self._delegate_required(path)
         return fs.geturl(path, purpose=purpose)
 
-    def hassyspath(self, path):  # noqa: D102
+    def hassyspath(self, path):
         self.check()
         fs = self._delegate_required(path)
         return fs.hassyspath(path)
 
-    def hasurl(self, path, purpose='download'):  # noqa: D102
+    def hasurl(self, path, purpose='download'):
         self.check()
         fs = self._delegate_required(path)
         return fs.hasurl(path, purpose=purpose)
 
-    def isdir(self, path):  # noqa: D102
+    def isdir(self, path):
         self.check()
         fs = self._delegate(path)
         return fs and fs.isdir(path)
 
-    def isfile(self, path):  # noqa: D102
+    def isfile(self, path):
         self.check()
         fs = self._delegate(path)
         return fs and fs.isfile(path)
 
-    def setinfo(self, path, info):  # noqa: D102
+    def setinfo(self, path, info):
         self.check()
         self._require_writable(path)
         return self.write_fs.setinfo(path, info)
 
-    def validatepath(self, path):  # noqa: D102
+    def validatepath(self, path):
         self.check()
         if self.write_fs is not None:
             self.write_fs.validatepath(path)
         else:
             super(MultiFS, self).validatepath(path)
 
-    def makedirs(self, path, permissions=None, recreate=False):  # noqa: D102
+    def makedirs(self, path, permissions=None, recreate=False):
         self.check()
         self._require_writable(path)
         return self.write_fs.makedirs(
@@ -334,7 +334,7 @@ class MultiFS(FS):
              encoding=None,
              errors=None,
              newline='',
-             **kwargs):  # noqa: D102
+             **kwargs):
         self.check()
         if check_writable(mode):
             self._require_writable(path)
@@ -351,11 +351,11 @@ class MultiFS(FS):
             **kwargs
         )
 
-    def setbinfile(self, path, file):  # noqa: D102
+    def setbinfile(self, path, file):
         self._require_writable(path)
         self.write_fs.setbinfile(path, file)
 
-    def setbytes(self, path, contents):  # noqa: D102
+    def setbytes(self, path, contents):
         self._require_writable(path)
         return self.write_fs.setbytes(path, contents)
 
@@ -364,7 +364,7 @@ class MultiFS(FS):
                 contents,
                 encoding='utf-8',
                 errors=None,
-                newline=''):  # noqa: D102
+                newline=''):
         self._require_writable(path)
         return self.write_fs.settext(
             path,

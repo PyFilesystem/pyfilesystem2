@@ -13,8 +13,8 @@ def move_fs(src_fs, dst_fs):
     """Move the contents of a filesystem to another filesystem.
 
     Arguments:
-        src_fs (FS or FS URL): Source filesystem.
-        dst_fs (FS or FS URL): Destination filesystem
+        src_fs (FS or str): Source filesystem (instance or URL).
+        dst_fs (FS or str): Destination filesystem (instance or URL).
 
     """
     move_dir(src_fs, '/', dst_fs, '/')
@@ -24,9 +24,9 @@ def move_file(src_fs, src_path, dst_fs, dst_path):
     """Move a file from one filesystem to another.
 
     Arguments:
-        src_fs (FS or FS URL): Source filesystem.
+        src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a file on ``src_fs``.
-        dst_fs (FS or FS URL); Destination filesystem.
+        dst_fs (FS or str); Destination filesystem (instance or URL).
         dst_path (str): Path to a file on ``dst_fs``.
 
     """
@@ -46,9 +46,9 @@ def move_dir(src_fs, src_path, dst_fs, dst_path):
     """Move a directory from one filesystem to another.
 
     Arguments:
-        src_fs (FS or FS URL): Source filesystem.
+        src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a directory on ``src_fs``
-        dst_fs (FS or FS URL): Destination filesystem.
+        dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a directory on ``dst_fs``
 
     """

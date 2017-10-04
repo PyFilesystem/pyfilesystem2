@@ -14,7 +14,7 @@ class ZipOpener(Opener):
     
     protocols = ['zip']
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):  # noqa: D102
+    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
         from ..zipfs import ZipFS
         zip_fs = ZipFS(
             parse_result.resource,

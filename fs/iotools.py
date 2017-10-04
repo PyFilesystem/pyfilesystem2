@@ -17,7 +17,7 @@ class RawWrapper(io.IOBase):
         self.name = name
         super(RawWrapper, self).__init__()
 
-    def close(self):  # noqa: D102
+    def close(self):
         if not self.closed:
             # Close self first since it will
             # flush itself, so we can't close
@@ -25,33 +25,33 @@ class RawWrapper(io.IOBase):
             super(RawWrapper, self).close()
             self._f.close()
 
-    def fileno(self):  # noqa: D102
+    def fileno(self):
         return self._f.fileno()
 
-    def flush(self):  # noqa: D102
+    def flush(self):
         return self._f.flush()
 
-    def isatty(self):  # noqa: D102
+    def isatty(self):
         return self._f.isatty()
 
-    def seek(self, offset, whence=SEEK_SET):  # noqa: D102
+    def seek(self, offset, whence=SEEK_SET):
         return self._f.seek(offset, whence)
 
-    def readable(self):  # noqa: D102
+    def readable(self):
         return getattr(
             self._f,
             'readable',
             lambda: Mode(self.mode).reading
         )()
 
-    def writable(self):  # noqa: D102
+    def writable(self):
         return getattr(
             self._f,
             'writable',
             lambda: Mode(self.mode).writing
         )()
 
-    def seekable(self):  # noqa: D102
+    def seekable(self):
         try:
             return self._f.seekable()
         except AttributeError:
@@ -62,10 +62,10 @@ class RawWrapper(io.IOBase):
             else:
                 return True
 
-    def tell(self):  # noqa: D102
+    def tell(self):
         return self._f.tell()
 
-    def truncate(self, size=None):  # noqa: D102
+    def truncate(self, size=None):
         return self._f.truncate(size)
 
     def write(self, data):
@@ -103,13 +103,13 @@ class RawWrapper(io.IOBase):
             b[:len(data)] = data
             return bytes_read
 
-    def readline(self, limit=-1):  # noqa: D102
+    def readline(self, limit=-1):
         return self._f.readline(limit)
 
-    def readlines(self, hint=-1):  # noqa: D102
+    def readlines(self, hint=-1):
         return self._f.readlines(hint)
 
-    def writelines(self, sequence):  # noqa: D102
+    def writelines(self, sequence):
         return self._f.writelines(sequence)
 
     def __iter__(self):

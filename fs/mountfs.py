@@ -36,7 +36,7 @@ class MountFS(FS):
         "invalid_path_chars": "\0",
     }
 
-    def __init__(self, auto_close=True):  # noqa: D102
+    def __init__(self, auto_close=True):
         super(MountFS, self).__init__()
         self.auto_close = auto_close
         self.default_fs = MemoryFS()
@@ -74,7 +74,7 @@ class MountFS(FS):
 
         Arguments:
             path (str): A path within the MountFS.
-            fs (~fs.base.FS or URL): A filesystem object or FS URL to mount.
+            fs (FS or str): A filesystem (instance or URL) to mount.
 
         """
         if isinstance(fs, text_type):
@@ -99,7 +99,7 @@ class MountFS(FS):
         self.mounts.append((_path, fs))
         self.default_fs.makedirs(_path, recreate=True)
 
-    def close(self):  # noqa: D102
+    def close(self):
         # Explicitly closes children if requested
         if self.auto_close:
             for _path, fs in self.mounts:
@@ -108,7 +108,7 @@ class MountFS(FS):
         self.default_fs.close()
         super(MountFS, self).close()
 
-    def desc(self, path):  # noqa: D102
+    def desc(self, path):
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
         fs, delegate_path = self._delegate(path)
@@ -116,34 +116,34 @@ class MountFS(FS):
             fs = self
         return "{path} on {fs}".format(fs=fs, path=delegate_path)
 
-    def getinfo(self, path, namespaces=None):  # noqa: D102
+    def getinfo(self, path, namespaces=None):
         self.check()
         fs, _path = self._delegate(path)
         return fs.getinfo(_path, namespaces=namespaces)
 
-    def listdir(self, path):  # noqa: D102
+    def listdir(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.listdir(_path)
 
-    def makedir(self, path, permissions=None, recreate=False):  # noqa: D102
+    def makedir(self, path, permissions=None, recreate=False):
         self.check()
         fs, _path = self._delegate(path)
         return fs.makedir(
             _path, permissions=permissions, recreate=recreate)
 
-    def openbin(self, path, mode='r', buffering=-1, **kwargs):  # noqa: D102
+    def openbin(self, path, mode='r', buffering=-1, **kwargs):
         validate_openbin_mode(mode)
         self.check()
         fs, _path = self._delegate(path)
         return fs.openbin(_path, mode=mode, buffering=-1, **kwargs)
 
-    def remove(self, path):  # noqa: D102
+    def remove(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.remove(_path)
 
-    def removedir(self, path):  # noqa: D102
+    def removedir(self, path):
         self.check()
         path = normpath(path)
         if path in ('', '/'):
@@ -151,12 +151,12 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.removedir(_path)
 
-    def getbytes(self, path):  # noqa: D102
+    def getbytes(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.getbytes(_path)
 
-    def gettext(self, path, encoding=None, errors=None, newline=None):  # noqa: D102
+    def gettext(self, path, encoding=None, errors=None, newline=None):
         self.check()
         fs, _path = self._delegate(path)
         return fs.gettext(
@@ -166,52 +166,52 @@ class MountFS(FS):
             newline=newline
         )
 
-    def getsize(self, path):  # noqa: D102
+    def getsize(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.getsize(_path)
 
-    def getsyspath(self, path):  # noqa: D102
+    def getsyspath(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.getsyspath(_path)
 
-    def gettype(self, path):  # noqa: D102
+    def gettype(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.gettype(_path)
 
-    def geturl(self, path, purpose='download'):  # noqa: D102
+    def geturl(self, path, purpose='download'):
         self.check()
         fs, _path = self._delegate(path)
         return fs.geturl(_path, purpose=purpose)
 
-    def hasurl(self, path, purpose='download'):  # noqa: D102
+    def hasurl(self, path, purpose='download'):
         self.check()
         fs, _path = self._delegate(path)
         return fs.hasurl(_path, purpose=purpose)
 
-    def isdir(self, path):  # noqa: D102
+    def isdir(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.isdir(_path)
 
-    def isfile(self, path):  # noqa: D102
+    def isfile(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.isfile(_path)
 
-    def scandir(self, path, namespaces=None, page=None):  # noqa: D102
+    def scandir(self, path, namespaces=None, page=None):
         self.check()
         fs, _path = self._delegate(path)
         return fs.scandir(_path, namespaces=namespaces, page=page)
 
-    def setinfo(self, path, info):  # noqa: D102
+    def setinfo(self, path, info):
         self.check()
         fs, _path = self._delegate(path)
         return fs.setinfo(_path, info)
 
-    def validatepath(self, path):  # noqa: D102
+    def validatepath(self, path):
         self.check()
         fs, _path = self._delegate(path)
         return fs.validatepath(_path)
@@ -223,7 +223,7 @@ class MountFS(FS):
              encoding=None,
              errors=None,
              newline='',
-             **options):  # noqa: D102
+             **options):
         validate_open_mode(mode)
         self.check()
         fs, _path = self._delegate(path)
@@ -237,12 +237,12 @@ class MountFS(FS):
             **options
         )
 
-    def setbinfile(self, path, file):  # noqa: D102
+    def setbinfile(self, path, file):
         self.check()
         fs, _path = self._delegate(path)
         return fs.setbinfile(_path, file)
 
-    def setbytes(self, path, contents):  # noqa: D102
+    def setbytes(self, path, contents):
         self.check()
         fs, _path = self._delegate(path)
         return fs.setbytes(_path, contents)
@@ -252,7 +252,7 @@ class MountFS(FS):
                 contents,
                 encoding='utf-8',
                 errors=None,
-                newline=''):  # noqa: D102
+                newline=''):
         fs, _path = self._delegate(path)
         return fs.settext(
             _path,

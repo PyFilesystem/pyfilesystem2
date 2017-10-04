@@ -14,7 +14,7 @@ class OSFSOpener(Opener):
 
     protocols = ['file', 'osfs']
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):  # noqa: D102
+    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
         from ..osfs import OSFS
         from os.path import abspath, expanduser, normpath, join
         _path = abspath(join(cwd, expanduser(parse_result.resource)))

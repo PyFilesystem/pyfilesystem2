@@ -14,7 +14,7 @@ class FTPOpener(Opener):
 
     protocols = ['ftp']
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):  # noqa: D102
+    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
         from ..ftpfs import FTPFS
         from ..subfs import ClosingSubFS
         ftp_host, _, dir_path = parse_result.resource.partition('/')

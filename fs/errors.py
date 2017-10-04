@@ -69,7 +69,8 @@ class FSError(Exception):
         super(FSError, self).__init__()
 
     def __str__(self):
-        """Return the error message."""
+        """Return the error message.
+        """
         msg = self._msg.format(**self.__dict__)
         return msg
 

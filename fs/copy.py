@@ -58,9 +58,9 @@ def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
     """Determine if source file is newer than destination file.
 
     Arguments:
-        src_fs (FS or str): Source filesystem instance or URL.
+        src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a file on the source filesystem.
-        dst_fs (FS or str): Destination filesystem instance or URL.
+        dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on the destination filesystem.
 
     Returns:
@@ -88,9 +88,9 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
     If the destination exists, and is a file, it will be first truncated.
 
     Arguments:
-        src_fs (FS or str): Source filesystem instance or URL.
+        src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a file on the source filesystem.
-        dst_fs (FS or str): Destination filesystem instance or URL.
+        dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on the destination filesystem.
 
     """
@@ -119,9 +119,9 @@ def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
     copy is always executed.
 
     Arguments:
-        src_fs (FS or str): Source filesystem instance or URL.
+        src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a file on the source filesystem.
-        dst_fs (FS or str): Destination filesystem instance or URL.
+        dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on the destination filesystem.
 
     Returns:
@@ -157,8 +157,8 @@ def copy_structure(src_fs, dst_fs, walker=None):
     """Copy directories (but not files) from ``src_fs`` to ``dst_fs``.
 
     Arguments:
-        src_fs (FS or str): Source filesystem instance or URL.
-        dst_fs (FS or str): Destination filesystem instance or URL.
+        src_fs (FS or str): Source filesystem (instance or URL).
+        dst_fs (FS or str): Destination filesystem (instance or URL).
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only
             want to consider a sub-set of the resources in ``src_fs``.
@@ -177,9 +177,9 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path,
     """Copy a directory from one filesystem to another.
 
     Arguments:
-        src_fs (FS or str): Source filesystem instance or URL.
+        src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a directory on the source filesystem.
-        dst_fs (FS or str): Destination filesystem instance or URL.
+        dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a directory on the destination filesystem.
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only
@@ -229,9 +229,9 @@ def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path,
     copy is always executed.
 
     Arguments:
-        src_fs (FS or str): Source filesystem instance or URL.
+        src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a directory on the source filesystem.
-        dst_fs (FS or str): Destination filesystem instance or URL.
+        dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a directory on the destination filesystem.
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only

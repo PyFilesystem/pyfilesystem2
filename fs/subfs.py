@@ -46,7 +46,7 @@ class SubFS(WrapFS):
 
 
 class ClosingSubFS(SubFS):
-    """A version of `SubFS` which will close its parent automatically.
+    """A version of `SubFS` which closes its parent when closed.
     """
 
     def close(self):
