@@ -271,7 +271,7 @@ class FTPFS(FS):
     Arguments:
         host (str): A FTP host, e.g. ``'ftp.mirror.nl'``.
         user (str, optional): A username (default is ``'anonymous'``).
-        passwd (str, optional): Password for the server, or ``None`` for anon.
+        passwd (str, optional): Password for the server, or `None` for anon.
         acct (str, optional): FTP account.
         timeout (int, optional): Timeout for contacting server (in seconds,
             defaults to 10).

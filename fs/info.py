@@ -16,11 +16,11 @@ class Info(object):
 
     Resource informations are returned by the following methods:
 
-     * :meth:`~fs.base.FS.getinfo`
-     * :meth:`~fs.base.FS.scandir`
-     * :meth:`~fs.base.FS.filterfir`
+         * :meth:`~fs.base.FS.getinfo`
+         * :meth:`~fs.base.FS.scandir`
+         * :meth:`~fs.base.FS.filterfir`
 
-     Arguments:
+    Arguments:
         raw_info (dict): A dict containing resource info.
         to_datetime (callable, optional): A callable that converts an
             epoch time to a datetime object. The default uses
@@ -297,7 +297,7 @@ class Info(object):
 
     @property
     def group(self):
-        """`str`: the group of the resource owner, or ``None``.
+        """`str`: the group of the resource owner, or `None`.
 
         Requires the ``"access"`` namespace.
 

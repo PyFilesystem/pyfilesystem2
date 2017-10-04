@@ -110,9 +110,9 @@ class FS(object):
         Arguments:
             path (str): Path to directory from root.
             permissions (~fs.permissions.Permissions, optional): a
-                :obj:`Permissions` instance, or ``None``to use default.
+                :obj:`Permissions` instance, or `None` to use default.
             recreate (bool, optional): Set to :obj:`True` to avoid raising an
-                error if the directory already exists (defaults to `False`).s
+                error if the directory already exists (defaults to `False`).
 
         Returns:
             ~fs.subfs.SubFS: a filesystem whose root is the new directory.

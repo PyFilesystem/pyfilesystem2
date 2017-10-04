@@ -42,9 +42,9 @@ class ResourceType(IntEnum):
 
 @unique
 class Seek(IntEnum):
-    """Constants used by :obj:`io.IOBase.seek`.
+    """Constants used by `io.IOBase.seek`.
 
-    These match :obj:`os.SEEK_CUR`, :obj:`os.SEEK_END`, and :obj:`os.SEEK_SET`
+    These match `os.SEEK_CUR`, `os.SEEK_END`, and `os.SEEK_SET`
     from the standard library.
 
     """
