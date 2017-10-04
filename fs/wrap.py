@@ -43,7 +43,7 @@ def cache_directory(fs):
         fs (FS): A filesystem instance.
 
     Returns:
-        FS: A filesystem that caches results of ``scandir``, ``isdir``
+        FS: A filesystem that caches results of `~FS.scandir``, `~FS.isdir`
         and other methods which read directory information.
 
     """

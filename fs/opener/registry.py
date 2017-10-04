@@ -19,14 +19,13 @@ class Registry(object):
     """A registry for `Opener` instances.
     """
 
-
     def __init__(self, default_opener='osfs'):
         """Create a registry object.
 
         Arguments:
             default_opener (str, optional): The protocol to use, if one
-            is not supplied. The default is to use 'osfs', so that the
-            FS URL is treated as a system path if no protocol is given.
+                is not supplied. The default is to use 'osfs', so that the
+                FS URL is treated as a system path if no protocol is given.
 
         """
         self.default_opener = default_opener
@@ -126,7 +125,6 @@ class Registry(object):
             (FS, str): a tuple of ``(<filesystem>, <path from url>)``
 
         """
-
         if '://' not in fs_url:
             # URL may just be a path
             fs_url = "{}://{}".format(default_protocol, fs_url)
@@ -183,7 +181,7 @@ class Registry(object):
         return _fs
 
     @contextlib.contextmanager
-    def manage_fs(self, fs_url, create=False, writeable=True, cwd='.'):
+    def manage_fs(self, fs_url, create=False, writeable=True, cwd='.'):  # noqa: D300,D301
         """Get a context manager to open and close a filesystem.
 
         Arguments:
@@ -201,12 +199,12 @@ class Registry(object):
 
         Example:
             >>> def print_ls(list_fs):
-            ...     '''List a directory.'''
+            ...     \"\"\"List a directory.\"\"\"
             ...     with manage_fs(list_fs) as fs:
             ...         print(' '.join(fs.listdir()))
 
             This function may be used in two ways. You may either pass
-            either a ``str``, as follows::
+            a ``str``, as follows::
 
                 >>> print_list('zip://projects.zip')
 

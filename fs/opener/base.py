@@ -8,8 +8,7 @@ import abc
 
 @six.add_metaclass(abc.ABCMeta)
 class Opener(object):
-    """
-    The opener base class.
+    """The base class for filesystem openers.
 
     An opener is responsible for opening a filesystem for a given
     protocol.

@@ -1,5 +1,5 @@
 # coding: utf-8
-"""``AppFS`` opener.
+"""``AppFS`` opener definition.
 """
 
 from __future__ import absolute_import
@@ -13,6 +13,8 @@ from .. import appfs
 
 
 class AppFSOpener(Opener):
+    """``AppFS`` opener.
+    """
 
     protocols = [
         'userdata',
@@ -32,7 +34,7 @@ class AppFSOpener(Opener):
         'userlog': appfs.UserLogFS
     }
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
+    def open_fs(self, fs_url, parse_result, writeable, create, cwd):  # noqa: D102
 
         fs_class = self._protocol_mapping[parse_result.protocol]
         resource, delim, path = parse_result.resource.partition('/')

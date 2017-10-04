@@ -1,7 +1,4 @@
-"""
-
-Create a 'mirror' of a filesystem.
-
+"""Function for *mirroring* a filesystem.
 """
 
 from __future__ import print_function

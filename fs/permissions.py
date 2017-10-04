@@ -1,6 +1,4 @@
-"""
-An abstract permissions container.
-
+"""Abstract permissions container.
 """
 
 from __future__ import print_function
@@ -18,6 +16,7 @@ def make_mode(init):
 class _PermProperty(object):
     """Creates simple properties to get/set permissions.
     """
+    
     def __init__(self, name):
         self._name = name
         self.__doc__ = "Boolean for '{}' permission.".format(name)
@@ -250,7 +249,7 @@ class Permissions(object):
 
     @property
     def mode(self):
-        """`int`: Mode integer.
+        """`int`: mode integer.
         """
         mode = 0
         for name, mask in self._LINUX_PERMS:

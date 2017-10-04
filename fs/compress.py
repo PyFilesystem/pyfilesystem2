@@ -1,7 +1,7 @@
-"""
-This module can compress the contents of a filesystem.
+"""Functions to compress the contents of a filesystem.
 
-Currently zip and tar are supported.
+Currently zip and tar are supported, using the `zipfile` and
+`tarfile` modules from the standard library.
 """
 
 from __future__ import absolute_import
@@ -101,8 +101,7 @@ def write_tar(src_fs,
               compression=None,
               encoding="utf-8",
               walker=None):
-    """
-    Write the contents of a filesystem to a tar file.
+    """Write the contents of a filesystem to a tar file.
 
     Arguments:
         file (str or io.IOBase): Destination file, may be a file name or
@@ -116,7 +115,6 @@ def write_tar(src_fs,
             which files you want to compress.
 
     """
-
     type_map = {
         ResourceType.block_special_file: tarfile.BLKTYPE,
         ResourceType.character: tarfile.CHRTYPE,

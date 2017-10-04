@@ -43,8 +43,7 @@ def move_file(src_fs, src_path, dst_fs, dst_path):
 
 
 def move_dir(src_fs, src_path, dst_fs, dst_path):
-    """
-    Move a directory from one filesystem to another.
+    """Move a directory from one filesystem to another.
 
     Arguments:
         src_fs (FS or FS URL): Source filesystem.

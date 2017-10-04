@@ -17,7 +17,7 @@ class RawWrapper(io.IOBase):
         self.name = name
         super(RawWrapper, self).__init__()
 
-    def close(self):
+    def close(self):  # noqa: D102
         if not self.closed:
             # Close self first since it will
             # flush itself, so we can't close
@@ -25,33 +25,33 @@ class RawWrapper(io.IOBase):
             super(RawWrapper, self).close()
             self._f.close()
 
-    def fileno(self):
+    def fileno(self):  # noqa: D102
         return self._f.fileno()
 
-    def flush(self):
+    def flush(self):  # noqa: D102
         return self._f.flush()
 
-    def isatty(self):
+    def isatty(self):  # noqa: D102
         return self._f.isatty()
 
-    def seek(self, offset, whence=SEEK_SET):
+    def seek(self, offset, whence=SEEK_SET):  # noqa: D102
         return self._f.seek(offset, whence)
 
-    def readable(self):
+    def readable(self):  # noqa: D102
         return getattr(
             self._f,
             'readable',
             lambda: Mode(self.mode).reading
         )()
 
-    def writable(self):
+    def writable(self):  # noqa: D102
         return getattr(
             self._f,
             'writable',
             lambda: Mode(self.mode).writing
         )()
 
-    def seekable(self):
+    def seekable(self):  # noqa: D102
         try:
             return self._f.seekable()
         except AttributeError:
@@ -62,10 +62,10 @@ class RawWrapper(io.IOBase):
             else:
                 return True
 
-    def tell(self):
+    def tell(self):  # noqa: D102
         return self._f.tell()
 
-    def truncate(self, size=None):
+    def truncate(self, size=None):  # noqa: D102
         return self._f.truncate(size)
 
     def write(self, data):
@@ -103,13 +103,13 @@ class RawWrapper(io.IOBase):
             b[:len(data)] = data
             return bytes_read
 
-    def readline(self, limit=-1):
+    def readline(self, limit=-1):  # noqa: D102
         return self._f.readline(limit)
 
-    def readlines(self, hint=-1):
+    def readlines(self, hint=-1):  # noqa: D102
         return self._f.readlines(hint)
 
-    def writelines(self, sequence):
+    def writelines(self, sequence):  # noqa: D102
         return self._f.writelines(sequence)
 
     def __iter__(self):
@@ -168,7 +168,14 @@ def make_stream(name,
 
 
 def line_iterator(readable_file, size=None):
-    """A not terribly efficient char by char line iterator.
+    """Iterate over the lines of a file.
+
+    Implementation reads each char individually, which is not very
+    efficient.
+
+    Yields:
+        str: a single line in the file.
+
     """
     read = readable_file.read
     line = []

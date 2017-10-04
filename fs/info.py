@@ -73,9 +73,11 @@ class Info(object):
             return default
 
     def _require_namespace(self, namespace):
-        """
-        Raise a MissingInfoNamespace if the given namespace is not
-        present in the info.
+        """Check if the given namespace is present in the info.
+
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the given namespace is not
+                present in the info.
 
         """
         if namespace not in self.raw:
@@ -277,6 +279,7 @@ class Info(object):
         Raises:
             ~fs.errors.MissingInfoNamespace: if the ``"access"``
                 namespace is not in the Info.
+
         """
         self._require_namespace('access')
         return self.get('access', 'user')
@@ -324,7 +327,7 @@ class Info(object):
         return self.get('access', 'gid')
 
     @property
-    def target(self):
+    def target(self):  # noqa: D402
         """`str`: the link target (if resource is a symlink), or `None`.
 
         Requires the ``"link"`` namespace.

@@ -1,5 +1,5 @@
 # coding: utf-8
-"""`ZipFS` opener.
+"""`ZipFS` opener definition.
 """
 
 from __future__ import absolute_import
@@ -9,9 +9,12 @@ from __future__ import unicode_literals
 from .base import Opener
 
 class ZipOpener(Opener):
+    """`ZipFS` opener.
+    """
+    
     protocols = ['zip']
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
+    def open_fs(self, fs_url, parse_result, writeable, create, cwd):  # noqa: D102
         from ..zipfs import ZipFS
         zip_fs = ZipFS(
             parse_result.resource,

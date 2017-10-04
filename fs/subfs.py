@@ -1,7 +1,4 @@
-"""
-
-A SubFS represents a directory in a 'parent' filesystem.
-
+"""representation of a directory in a 'parent' filesystem.
 """
 
 from __future__ import print_function
@@ -19,7 +16,7 @@ class SubFS(WrapFS):
 
     A SubFS is a filesystem object that maps to a sub-directory of
     another filesystem. This is the object that is returned by
-    :meth:`~fs.base.FS.opendir`.
+    `~fs.base.FS.opendir`.
 
     """
 

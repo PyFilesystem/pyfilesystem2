@@ -13,7 +13,7 @@ from .error_tools import unwrap_errors
 
 @six.python_2_unicode_compatible
 class WrapFS(FS):
-    """"A proxy for a filesystem object.
+    """A proxy for a filesystem object.
 
     This class exposes an filesystem interface, where the data is
     stored on another filesystem(s), and is the basis for

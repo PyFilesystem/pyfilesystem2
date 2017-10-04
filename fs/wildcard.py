@@ -13,7 +13,7 @@ _PATTERN_CACHE = LRUCache(_MAXCACHE)
 
 
 def match(pattern, name):
-    """Test whether ``name`` matches ``pattern``.
+    """Test whether a name matches a wildcard pattern.
 
     Arguments:
         pattern (str): A wildcard pattern, e.g. ``"*.py"``.
@@ -32,7 +32,7 @@ def match(pattern, name):
 
 
 def imatch(pattern, name):
-    """Test whether ``name`` matches ``pattern`` (case insensitive).
+    """Test whether a name matches a wildcard pattern (case insensitive).
 
     Arguments:
         pattern (str): A wildcard pattern, e.g. ``"*.py"``.
@@ -71,7 +71,7 @@ def match_any(patterns, name):
 
 
 def imatch_any(patterns, name):
-    """Test if a name matches any of a list of patterns, (case insensitive).
+    """Test if a name matches any of a list of patterns (case insensitive).
 
     Will return ``True`` if ``patterns`` is an empty list.
 

@@ -70,7 +70,6 @@ class OSFS(FS):
                  create_mode=0o777):
         """Create an OSFS instance.
         """
-
         super(OSFS, self).__init__()
         root_path = fsdecode(fspath(root_path))
         _root_path = os.path.expanduser(os.path.expandvars(root_path))

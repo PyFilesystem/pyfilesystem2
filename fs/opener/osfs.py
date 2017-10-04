@@ -1,5 +1,5 @@
 # coding: utf-8
-"""`OSFS` opener.
+"""`OSFS` opener definition.
 """
 
 from __future__ import absolute_import
@@ -9,9 +9,12 @@ from __future__ import unicode_literals
 from .base import Opener
 
 class OSFSOpener(Opener):
+    """`OSFS` opener.
+    """
+
     protocols = ['file', 'osfs']
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
+    def open_fs(self, fs_url, parse_result, writeable, create, cwd):  # noqa: D102
         from ..osfs import OSFS
         from os.path import abspath, expanduser, normpath, join
         _path = abspath(join(cwd, expanduser(parse_result.resource)))

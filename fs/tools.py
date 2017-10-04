@@ -1,6 +1,4 @@
-"""
-A collection of functions that operate on filesystems and tools.
-
+"""Miscellaneous tools for operating on filesystems.
 """
 
 from __future__ import print_function
@@ -35,8 +33,7 @@ def remove_empty(fs, path):
 
 
 def copy_file_data(src_file, dst_file, chunk_size=None):
-    """
-    Copy data from one file object to another.
+    """Copy data from one file object to another.
 
     Arguments:
         src_file (io.IOBase): File open for reading.

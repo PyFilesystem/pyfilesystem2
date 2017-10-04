@@ -1,6 +1,4 @@
-"""
-A collection of filesystems that map to application specific locations
-defined by the OS.
+"""Collection of filesystem in OS application-specific locations.
 
 These classes abstract away the different requirements for user data
 across platforms, which vary in their conventions. They are all
@@ -24,10 +22,9 @@ __all__ = ['UserDataFS',
 
 
 class _AppFS(OSFS):
+    """Abstract base class for an app FS.
     """
-    Abstract base class for an app FS.
 
-    """
     app_dir = None
 
     def __init__(self,
@@ -76,6 +73,7 @@ class UserDataFS(_AppFS):
             will be created if it does not exist.
 
     """
+
     app_dir = 'user_data_dir'
 
 
@@ -96,6 +94,7 @@ class UserConfigFS(_AppFS):
             will be created if it does not exist.
 
     """
+
     app_dir = 'user_config_dir'
 
 
@@ -116,6 +115,7 @@ class UserCacheFS(_AppFS):
             will be created if it does not exist.
 
     """
+
     app_dir = 'user_cache_dir'
 
 
@@ -136,6 +136,7 @@ class SiteDataFS(_AppFS):
             will be created if it does not exist.
 
     """
+
     app_dir = 'site_data_dir'
 
 
@@ -156,6 +157,7 @@ class SiteConfigFS(_AppFS):
             will be created if it does not exist.
 
     """
+
     app_dir = 'site_config_dir'
 
 
@@ -176,4 +178,5 @@ class UserLogFS(_AppFS):
             will be created if it does not exist.
 
     """
+
     app_dir = 'user_log_dir'

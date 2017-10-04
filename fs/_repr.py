@@ -1,6 +1,4 @@
-"""
-Tools to generate __repr__ strings
-
+"""Tools to generate __repr__ strings.
 """
 
 from __future__ import unicode_literals

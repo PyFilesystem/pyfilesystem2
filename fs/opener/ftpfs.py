@@ -1,5 +1,5 @@
 # coding: utf-8
-"""`FTPFS` opener.
+"""`FTPFS` opener definition.
 """
 
 from __future__ import absolute_import
@@ -9,9 +9,12 @@ from __future__ import unicode_literals
 from .base import Opener
 
 class FTPOpener(Opener):
+    """`FTPFS` opener.
+    """
+
     protocols = ['ftp']
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
+    def open_fs(self, fs_url, parse_result, writeable, create, cwd):  # noqa: D102
         from ..ftpfs import FTPFS
         from ..subfs import ClosingSubFS
         ftp_host, _, dir_path = parse_result.resource.partition('/')

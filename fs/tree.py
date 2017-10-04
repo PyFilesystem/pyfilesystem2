@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
-
-"""
-Render a FS object as text tree views.
-
+"""Render a FS object as text tree views.
 """
 
 from __future__ import print_function

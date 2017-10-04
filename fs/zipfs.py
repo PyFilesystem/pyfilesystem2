@@ -149,7 +149,8 @@ class WriteZipFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class ReadZipFS(FS):
-    """A readable zip file."""
+    """A readable zip file.
+    """
 
     _meta = {
         'case_insensitive': True,

@@ -1,3 +1,6 @@
+"""Tools for managing OS errors.
+"""
+
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -85,7 +88,9 @@ convert_os_errors = _ConvertOSErrors
 
 @contextmanager
 def unwrap_errors(path_replace):
-    """Manage a context to re-write the paths in resource exceptions to be
+    """Get a context to map OS errors to their `fs.errors` counterpart.
+
+    The context will re-write the paths in resource exceptions to be
     in the same context as the wrapped filesystem.
 
     The only parameter may be the path from the parent, if only one path

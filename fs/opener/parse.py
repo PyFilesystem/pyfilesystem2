@@ -71,7 +71,6 @@ def parse_fs_url(fs_url):
         ~fs.errors.ParseError: if the FS URL is not valid.
 
     """
-
     match = _RE_FS_URL.match(fs_url)
     if match is None:
         raise ParseError('{!r} is not a fs2 url'.format(fs_url))

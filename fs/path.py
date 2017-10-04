@@ -1,6 +1,6 @@
-"""
-Useful functions for working with PyFilesystem paths.
-This is broadly similar to the standard ``os.path`` module but works
+"""Useful functions for working with PyFilesystem paths.
+
+This is broadly similar to the standard `os.path` module but works
 with paths in the canonical format expected by all FS objects (that is,
 separated by forward slashes and with an optional leading slash).
 
@@ -110,8 +110,7 @@ def iteratepath(path):
 
 
 def recursepath(path, reverse=False):
-    """
-    Get intermediate paths from the root to the given path.
+    """Get intermediate paths from the root to the given path.
 
     Arguments:
         path (str): A PyFilesystem path
@@ -181,10 +180,9 @@ def abspath(path):
 
 
 def relpath(path):
-    """
-    Convert the given path to a relative path.
+    """Convert the given path to a relative path.
 
-    This is the inverse of abspath(), stripping a leading ``'/'`` from
+    This is the inverse of `abspath`, stripping a leading ``'/'`` from
     the path if it is present.
 
     Arguments:
@@ -475,8 +473,7 @@ def forcedir(path):
 
 
 def frombase(path1, path2):
-    """
-    Get the final path of ``path2`` that isn't in ``path1``.
+    """Get the final path of ``path2`` that isn't in ``path1``.
 
     Arguments:
         path1 (str): A PyFilesytem path.
