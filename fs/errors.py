@@ -43,6 +43,7 @@ __all__ = [
     'ResourceInvalid',
     'ResourceLocked',
     'ResourceNotFound',
+    'ResourceReadOnly',
     'Unsupported',
 ]
 
