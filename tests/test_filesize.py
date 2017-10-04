@@ -41,6 +41,42 @@ class TestFilesize(unittest.TestCase):
             '1.5 MB'
         )
 
+    def test_binary(self):
+
+        self.assertEqual(
+            filesize.binary(0),
+            '0 bytes'
+        )
+        self.assertEqual(
+            filesize.binary(1),
+            '1 byte'
+        )
+        self.assertEqual(
+            filesize.binary(2),
+            '2 bytes'
+        )
+        self.assertEqual(
+            filesize.binary(1024),
+            '1.0 KiB'
+        )
+
+        self.assertEqual(
+            filesize.binary(1024 * 1024),
+            '1.0 MiB'
+        )
+
+        self.assertEqual(
+            filesize.binary(1024 * 1024 + 1),
+            '1.0 MiB'
+        )
+
+        self.assertEqual(
+            filesize.binary(1.5 * 1024 * 1024),
+            '1.5 MiB'
+        )
+
+
+
     def test_decimal(self):
 
         self.assertEqual(
@@ -57,25 +93,25 @@ class TestFilesize(unittest.TestCase):
         )
         self.assertEqual(
             filesize.decimal(1000),
-            '1.0 kbit'
+            '1.0 kB'
         )
 
         self.assertEqual(
             filesize.decimal(1000 * 1000),
-            '1.0 Mbit'
+            '1.0 MB'
         )
 
         self.assertEqual(
             filesize.decimal(1000 * 1000 + 1),
-            '1.0 Mbit'
+            '1.0 MB'
         )
 
         self.assertEqual(
             filesize.decimal(1200 * 1000),
-            '1.2 Mbit'
+            '1.2 MB'
         )
 
     def test_errors(self):
 
-        with self.assertRaises(ValueError):
+        with self.assertRaises(TypeError):
             filesize.traditional('foo')
