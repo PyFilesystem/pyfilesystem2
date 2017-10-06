@@ -737,7 +737,7 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            bool: `True` if ``path`` maps to a directory.
+            bool: `True` if ``path`` maps to a directory.
 
         """
         try:
@@ -771,7 +771,7 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            bool: `True` if ``path`` maps to a file.
+            bool: `True` if ``path`` maps to a file.
 
         """
         try:
@@ -786,7 +786,7 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            bool: `True` if ``path`` maps to a symlink.
+            bool: `True` if ``path`` maps to a symlink.
 
         """
         self.getinfo(path)
@@ -855,7 +855,7 @@ class FS(object):
             path (str): Path to directory from root.
             permissions (~fs.permissions.Permissions, optional): Initial
                 permissions, or `None` to use defaults.
-            recreate (bool, optional):  If `False` (the default),
+            recreate (bool, optional):  If `False` (the default),
                 attempting to create an existing directory will raise an
                 error. Set to `True` to ignore existing directories.
 

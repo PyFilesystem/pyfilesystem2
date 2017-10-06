@@ -1,3 +1,4 @@
+# coding: utf-8
 """Functions for reporting filesizes.
 
 The functions declared in this module should cover the different
