@@ -10,6 +10,7 @@ Reference
    reference/enums.rst
    reference/errors.rst
    reference/info_objects.rst
+   reference/filesize.rst
    reference/mirror.rst
    reference/move.rst
    reference/mode.rst
