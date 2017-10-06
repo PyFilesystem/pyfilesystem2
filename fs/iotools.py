@@ -1,3 +1,6 @@
+"""Compatibility tools between Python 2 and Python 3 I/O interfaces.
+"""
+
 from __future__ import print_function
 from __future__ import unicode_literals
 

@@ -1,4 +1,4 @@
-"""Tools for managing mode strings.
+"""Abstract I/O mode container.
 
 Mode strings are used in in :meth:`~fs.base.FS.open` and
 :meth:`~fs.base.FS.openbin`.

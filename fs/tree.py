@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 """Render a FS object as text tree views.
 
 Color is supported on UNIX terminals.

@@ -1,3 +1,6 @@
+"""Manage other filesystems as a folder hierarchy.
+"""
+
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals

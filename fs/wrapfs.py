@@ -1,3 +1,6 @@
+"""Base class for filesystem wrappers.
+"""
+
 from __future__ import unicode_literals
 
 import six

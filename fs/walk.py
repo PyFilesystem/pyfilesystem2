@@ -1,4 +1,4 @@
-"""The machinery for walking a filesystem.
+"""Machinery for walking a filesystem.
 
 *Walking* a filesystem means recursively visiting a directory and
 any sub-directories. It is a fairly common requirement for copying,
