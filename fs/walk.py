@@ -545,7 +545,7 @@ class BoundWalker(object):
 
         Returns:
             ~collections.Iterable: an iterable yielding tuples of
-            ``(<absolute path>, <resource info>).
+            ``(<absolute path>, <resource info>)``.
 
         This method invokes `Walker.info` with the bound `FS` object.
 
