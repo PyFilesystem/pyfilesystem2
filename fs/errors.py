@@ -1,10 +1,10 @@
-"""Exception classes thrown by PyFilesystem objects.
+"""Exception classes thrown by filesystem operations.
 
-Errors relating to the underlying filesystem are translated in to one of
-the following exceptions.
+Errors relating to the underlying filesystem are translated in
+to one of the following exceptions.
 
-All Exception classes are derived from :class:`~fs.errors.FSError` which
-may be used as a catch-all filesystem exception.
+All Exception classes are derived from :class:`~fs.errors.FSError`
+which may be used as a catch-all filesystem exception.
 
 """
 

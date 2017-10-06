@@ -1,4 +1,4 @@
-"""representation of a directory in a 'parent' filesystem.
+"""Manage a directory in a *parent* filesystem.
 """
 
 from __future__ import print_function

@@ -1,3 +1,5 @@
+"""Manage filesystems on remote FTP servers.
+"""
 from __future__ import print_function
 from __future__ import unicode_literals
 

@@ -1,4 +1,4 @@
-"""Collection of filesystem in OS application-specific locations.
+"""Manage filesystems in platform-specific application directories.
 
 These classes abstract away the different requirements for user data
 across platforms, which vary in their conventions. They are all

@@ -1,5 +1,5 @@
 # coding: utf-8
-"""Tools to open and manage filesystems.
+"""Open filesystems from a URL.
 """
 
 # Declare fs.opener as a namespace package

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 """Render a FS object as text tree views.
+
+Color is supported on UNIX terminals.
 """
 
 from __future__ import print_function

@@ -1,4 +1,4 @@
-"""Collection of useful `~fs.wrapfs.WrapFS` objects.
+"""Collection of useful `~fs.wrapfs.WrapFS` subclasses.
 
 Here's an example that opens a filesystem then makes it *read only*::
 
