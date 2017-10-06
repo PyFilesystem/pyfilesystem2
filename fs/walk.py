@@ -199,7 +199,7 @@ class Walker(WalkerBase):
 
         Arguments:
             fs (FS): a filesystem instance.
-            infos (list): A list of :class:`~fs.info.Info` instances.
+            infos (list): A list of `~fs.info.Info` instances.
 
         Returns:
             list: a list of `Info` objects passing the ``check_file``
@@ -281,8 +281,7 @@ class Walker(WalkerBase):
         The return value is an iterator of ``(<path>, <dirs>, <files>)``
         named tuples,  where ``<path>`` is an absolute path to a
         directory, and ``<dirs>`` and ``<files>`` are a list of
-        :class:`~fs.info.Info` objects for directories and files
-        in ``<path>``.
+        `~fs.info.Info` objects for directories and files in ``<path>``.
 
         Example:
             >>> home_fs = open_fs('~/')

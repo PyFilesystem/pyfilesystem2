@@ -2,7 +2,7 @@
 
 These classes abstract away the different requirements for user data
 across platforms, which vary in their conventions. They are all
-subclasses of :class:`~fs.osfs.OSFS`.
+subclasses of `~fs.osfs.OSFS`.
 
 """
 # Thanks to authors of https://pypi.python.org/pypi/appdirs
@@ -67,9 +67,9 @@ class UserDataFS(_AppFS):
         author (str): The name of the author (used on Windows).
         version (str): Optional version string, if a unique location
             per version of the application is required.
-        roaming (bool): If :obj:`True`, use a *roaming* profile on
+        roaming (bool): If `True`, use a *roaming* profile on
             Windows.
-        create (bool): If :obj:`True` (the default) the directory
+        create (bool): If `True` (the default) the directory
             will be created if it does not exist.
 
     """
@@ -88,9 +88,9 @@ class UserConfigFS(_AppFS):
         author (str): The name of the author (used on Windows).
         version (str): Optional version string, if a unique location
             per version of the application is required.
-        roaming (bool): If :obj:`True`, use a *roaming* profile on
+        roaming (bool): If `True`, use a *roaming* profile on
             Windows.
-        create (bool): If :obj:`True` (the default) the directory
+        create (bool): If `True` (the default) the directory
             will be created if it does not exist.
 
     """
@@ -109,9 +109,9 @@ class UserCacheFS(_AppFS):
         author (str): The name of the author (used on Windows).
         version (str): Optional version string, if a unique location
             per version of the application is required.
-        roaming (bool): If :obj:`True`, use a *roaming* profile on
+        roaming (bool): If `True`, use a *roaming* profile on
             Windows.
-        create (bool): If :obj:`True` (the default) the directory
+        create (bool): If `True` (the default) the directory
             will be created if it does not exist.
 
     """
@@ -130,9 +130,9 @@ class SiteDataFS(_AppFS):
         author (str): The name of the author (used on Windows).
         version (str): Optional version string, if a unique location
             per version of the application is required.
-        roaming (bool): If :obj:`True`, use a *roaming* profile on
+        roaming (bool): If `True`, use a *roaming* profile on
             Windows.
-        create (bool): If :obj:`True` (the default) the directory
+        create (bool): If `True` (the default) the directory
             will be created if it does not exist.
 
     """
@@ -151,9 +151,9 @@ class SiteConfigFS(_AppFS):
         author (str): The name of the author (used on Windows).
         version (str): Optional version string, if a unique location
             per version of the application is required.
-        roaming (bool): If :obj:`True`, use a *roaming* profile on
+        roaming (bool): If `True`, use a *roaming* profile on
             Windows.
-        create (bool): If :obj:`True` (the default) the directory
+        create (bool): If `True` (the default) the directory
             will be created if it does not exist.
 
     """
@@ -172,9 +172,9 @@ class UserLogFS(_AppFS):
         author (str): The name of the author (used on Windows).
         version (str): Optional version string, if a unique location
             per version of the application is required.
-        roaming (bool): If :obj:`True`, use a *roaming* profile on
+        roaming (bool): If `True`, use a *roaming* profile on
             Windows.
-        create (bool): If :obj:`True` (the default) the directory
+        create (bool): If `True` (the default) the directory
             will be created if it does not exist.
 
     """

@@ -1,7 +1,7 @@
 """Abstract I/O mode container.
 
-Mode strings are used in in :meth:`~fs.base.FS.open` and
-:meth:`~fs.base.FS.openbin`.
+Mode strings are used in in `~fs.base.FS.open` and
+`~fs.base.FS.openbin`.
 
 """
 

@@ -19,9 +19,9 @@ class Info(object):
 
     Resource informations are returned by the following methods:
 
-         * :meth:`~fs.base.FS.getinfo`
-         * :meth:`~fs.base.FS.scandir`
-         * :meth:`~fs.base.FS.filterfir`
+         * `~fs.base.FS.getinfo`
+         * `~fs.base.FS.scandir`
+         * `~fs.base.FS.filterfir`
 
     Arguments:
         raw_info (dict): A dict containing resource info.
@@ -89,7 +89,7 @@ class Info(object):
     def is_writeable(self, namespace, key):
         """Check if a given key in a namespace is writable.
 
-        Uses :meth:`~fs.base.FS.setinfo`.
+        Uses `~fs.base.FS.setinfo`.
 
         Arguments:
             namespace (str): A namespace identifier.
@@ -175,7 +175,7 @@ class Info(object):
 
     @property
     def accessed(self):
-        """:class:`datetime`: the resource last access time, or `None`.
+        """`~datetime.datetime`: the resource last access time, or `None`.
 
         Requires the ``"details"`` namespace.
 
@@ -192,7 +192,7 @@ class Info(object):
 
     @property
     def modified(self):
-        """:class:`datetime`: the resource last modification time, or `None`.
+        """`~datetime.datetime`: the resource last modification time, or `None`.
 
         Requires the ``"details"`` namespace.
 
@@ -209,7 +209,7 @@ class Info(object):
 
     @property
     def created(self):
-        """:class:`datetime`: the resource creation time, or `None`.
+        """`~datetime.datetime`: the resource creation time, or `None`.
 
         Requires the ``"details"`` namespace.
 
@@ -226,7 +226,7 @@ class Info(object):
 
     @property
     def metadata_changed(self):
-        """:class:`datetime`: the resource metadata change time, or `None`.
+        """`~datetime.datetime`: the resource metadata change time, or `None`.
 
         Requires the ``"details"`` namespace.
 

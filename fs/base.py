@@ -94,7 +94,7 @@ class FS(object):
 
         This method will return a list of the resources in a directory.
         A *resource* is a file, directory, or one of the other types
-        defined in :obj:`~fs.ResourceType`.
+        defined in `~fs.ResourceType`.
 
         Arguments:
             path (str): A path to a directory on the filesystem
@@ -115,8 +115,8 @@ class FS(object):
         Arguments:
             path (str): Path to directory from root.
             permissions (~fs.permissions.Permissions, optional): a
-                :obj:`Permissions` instance, or `None` to use default.
-            recreate (bool, optional): Set to :obj:`True` to avoid raising an
+                `Permissions` instance, or `None` to use default.
+            recreate (bool, optional): Set to `True` to avoid raising an
                 error if the directory already exists (defaults to `False`).
 
         Returns:
@@ -176,8 +176,8 @@ class FS(object):
 
         Raises:
             fs.errors.DirectoryNotEmpty: If the directory is not empty (
-                see :obj:`~fs.base.FS.removetree` for a way to remove
-                the directory contents.).
+                see `~fs.base.FS.removetree` for a way to remove the
+                directory contents.).
             fs.errors.DirectoryExpected: If the path does not refer to
                 a directory.
             fs.errors.ResourceNotFound: If no resource exists at the
@@ -191,7 +191,7 @@ class FS(object):
     def setinfo(self, path, info):
         """Set info on a resource.
 
-        This method is the compliment to :obj:`~fs.base.FS.getinfo`
+        This method is the compliment to `~fs.base.FS.getinfo`
         and is used to set info values on a resource.
 
         Arguments:
@@ -226,7 +226,7 @@ class FS(object):
             data (bytes): Bytes to append.
 
         Raises:
-            TypeError: If ``data`` is not :obj:`bytes`.
+            TypeError: If ``data`` is not a `bytes` instance.
             fs.errors.ResourceNotFound: If a parent directory of
                 ``path`` does not exist.
 
@@ -251,7 +251,7 @@ class FS(object):
             encoding (str, optional): Encoding for text files
                 (defaults to ``utf-8``).
             errors (str, optional): What to do with unicode decode errors
-                (see :obj:`codecs` module for more information).
+                (see `codecs` module for more information).
             newline (str, optional): Newline parameter.
 
         Raises:
@@ -288,7 +288,7 @@ class FS(object):
             ...    )
 
         If you attempt to use a filesystem that has been closed, a
-        :obj:`~fs.errors.FilesystemClosed` exception will be thrown.
+        `~fs.errors.FilesystemClosed` exception will be thrown.
 
         """
         self._closed = True
@@ -299,12 +299,12 @@ class FS(object):
         Arguments:
             src_path (str): Path of source file.
             dst_path (str): Path to destination file.
-            overwrite (bool, Optional): If :obj:`True`, overwrite the
-                destination file if it exists (defaults to :obj:`False`).
+            overwrite (bool, Optional): If `True`, overwrite the
+                destination file if it exists (defaults to `False`).
 
         Raises:
             fs.errors.DestinationExists: If ``dst_path`` exists,
-                and ``overwrite`` is :obj:`False`.
+                and ``overwrite`` is `False`.
             fs.errors.ResourceNotFound: If a parent directory of
                 ``dst_path`` does not exist.
 
@@ -321,13 +321,13 @@ class FS(object):
         Arguments:
             src_path (str): Path of source directory.
             dst_path (str): Path to destination directory.
-            create (bool, optional): If :obj:`True`, then ``dst_path``
+            create (bool, optional): If `True`, then ``dst_path``
                 will be created if it doesn't exist alreadys
-                (defaults to :obj:`False`).
+                (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: If the ``dst_path``
-                does not exist, and ``create`` is not :obj:`True`.
+                does not exist, and ``create`` is not `True`.
 
         """
         with self._lock:
@@ -351,11 +351,11 @@ class FS(object):
 
         Arguments:
             path (str): Path to a new file in the filesystem.
-            wipe (bool, optional): If :obj:`True`, truncate any existing
-                file to 0 bytes (defaults to :obj:`False`).
+            wipe (bool, optional): If `True`, truncate any existing
+                file to 0 bytes (defaults to `False`).
 
         Returns:
-            bool: :obj:`True` if a new file had to be created.
+            bool: `True` if a new file had to be created.
 
         """
         with self._lock:
@@ -391,7 +391,7 @@ class FS(object):
             path (str): Path to a resource.
 
         Returns:
-            bool: :obj:`True` if a resource exists at the given path.
+            bool: `True` if a resource exists at the given path.
 
         """
         try:
@@ -411,7 +411,7 @@ class FS(object):
                   page=None):
         """Get an iterator of resource info, filtered by patterns.
 
-        This method enhances :obj:`~fs.base.FS.scandir` with additional
+        This method enhances `~fs.base.FS.scandir` with additional
         filtering functionality.
 
         Arguments:
@@ -428,12 +428,12 @@ class FS(object):
                 in the resource information, e.g. ``['basic', 'access']``.
             page (tuple, optional): May be a tuple of ``(<start>, <end>)``
                 indexes to return an iterator of a subset of the resource
-                info, or :obj:`None` to iterate over the entire directory.
+                info, or `None` to iterate over the entire directory.
                 Paging a directory scan may be necessary for very large
                 directories.
 
         Returns:
-            ~collections.abc.Iterator: an iterator of :obj:`Info` objects.
+            ~collections.abc.Iterator: an iterator of `Info` objects.
 
         """
         resources = self.scandir(path, namespaces=namespaces)
@@ -504,7 +504,7 @@ class FS(object):
         Arguments:
             path (str): A path to a readable file on the filesystem.
             encoding (str, optional): Encoding to use when reading contents
-                in text mode (defaults to :obj:`None`, reading in binary mode).
+                in text mode (defaults to `None`, reading in binary mode).
             errors (str, optional): Unicode errors parameter.
             newline (str, optional): Newlines parameter.
 
@@ -549,17 +549,19 @@ class FS(object):
         =================== ============================================
         key                 Description
         ------------------- --------------------------------------------
-        case_insensitive    True if this filesystem is case insensitive.
-        invalid_path_chars  A string containing the characters that may
+        case_insensitive    `True` if this filesystem is case
+                            insensitive.
+        invalid_path_chars  A string containing the characters that
                             may not be used on this filesystem.
-        max_path_length     Maximum number of characters permitted in a
-                            path, or None for no limit.
+        max_path_length     Maximum number of characters permitted in
+                            a path, or `None` for no limit.
         max_sys_path_length Maximum number of characters permitted in
-                            a sys path, or None for no limit.
-        network             True if this filesystem requires a network.
-        read_only           True if this filesystem is read only.
-        supports_rename     True if this filesystem supports an
-                            os.rename operation.
+                            a sys path, or `None` for no limit.
+        network             `True` if this filesystem requires a
+                            network.
+        read_only           `True` if this filesystem is read only.
+        supports_rename     `True` if this filesystem supports an
+                            `os.rename` operation.
         =================== ============================================
 
         Most builtin filesystems will provide all these keys, and third-
@@ -619,8 +621,8 @@ class FS(object):
         data anywhere the OS knows about. It is also possible for some
         paths to have a system path, whereas others don't.
 
-        If ``path`` doesn't have a system path,
-        a :class:`~fs.errors.NoSysPath` exception will be thrown.
+        If ``path`` doesn't have a system path, a `~fs.errors.NoSysPath`
+        exception will be thrown.
 
         Note:
             A filesystem may return a system path even if no
@@ -641,7 +643,7 @@ class FS(object):
 
         A type of a resource is an integer that identifies the what
         the resource references. The standard type integers may be one
-        of the values in the :class:`~fs.ResourceType` enumerations.
+        of the values in the `~fs.ResourceType` enumerations.
 
         The most common resource types, supported by virtually all
         filesystems are ``directory`` (1) and ``file`` (2), but the
@@ -694,7 +696,7 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            bool: :obj:`True` if the resource at ``path`` has a *syspath*.
+            bool: `True` if the resource at ``path`` has a *syspath*.
 
         """
         has_sys_path = True
@@ -710,10 +712,10 @@ class FS(object):
         Parameters:
             path (str): A path on the filesystem.
             purpose (str, optional): A purpose parameter, as given in
-                :obj:`~fs.base.FS.geturl`.
+                `~fs.base.FS.geturl`.
 
         Returns:
-            bool: :obj:`True` if an URL for the given purpose exists.
+            bool: `True` if an URL for the given purpose exists.
 
         """
         has_url = True
@@ -735,7 +737,7 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            bool: :obj:`True` if ``path`` maps to a directory.
+            bool: `True` if ``path`` maps to a directory.
 
         """
         try:
@@ -753,7 +755,7 @@ class FS(object):
             path (str): A path to a directory on the filesystem.
 
         Returns:
-            bool: :obj:`True` if the directory is empty.
+            bool: `True` if the directory is empty.
 
         Raises:
             errors.DirectoryExpected: If ``path`` is not a directory.
@@ -769,7 +771,7 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            bool: :obj:`True` if ``path`` maps to a file.
+            bool: `True` if ``path`` maps to a file.
 
         """
         try:
@@ -784,7 +786,7 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            bool: :obj:`True` if ``path`` maps to a symlink.
+            bool: `True` if ``path`` maps to a symlink.
 
         """
         self.getinfo(path)
@@ -829,11 +831,11 @@ class FS(object):
             dst_path (str): Path to destination directory.
             create (bool, optional): If `True`, then ``dst_path`` will
                 be created if it doesn't exist already (defaults
-                to :obj:`False`).
+                to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: if ``dst_path`` does not exist,
-                and ``create`` is :obj:`False`.
+                and ``create`` is `False`.
 
         """
         with self._lock:
@@ -852,17 +854,17 @@ class FS(object):
         Arguments:
             path (str): Path to directory from root.
             permissions (~fs.permissions.Permissions, optional): Initial
-                permissions, or :obj:`None` to use defaults.
-            recreate (bool, optional):  If :obj:`False` (the default),
+                permissions, or `None` to use defaults.
+            recreate (bool, optional):  If `False` (the default),
                 attempting to create an existing directory will raise an
-                error. Set to :obj:`True` to ignore existing directories.
+                error. Set to `True` to ignore existing directories.
 
         Returns:
             ~fs.subfs.SubFS: A sub-directory filesystem.
 
         Raises:
             fs.errors.DirectoryExists: if the path is already
-                a directory, and ``recreate`` is :obj:`False`.
+                a directory, and ``recreate`` is `False`.
             fs.errors.DirectoryExpected: if one of the ancestors
                 in the path is not a directory.
 
@@ -890,14 +892,14 @@ class FS(object):
             src_path (str): A path on the filesystem to move.
             dst_path (str): A path on the filesystem where the source
                 file will be written to.
-            overwrite (bool, optional): If :obj:`True`, destination path
+            overwrite (bool, optional): If `True`, destination path
                 will be overwritten if it exists.
 
         Raises:
             fs.errors.FileExpected: If ``src_path`` maps to a
                 directory instead of a file.
             fs.errors.DestinationExists: If ``dst_path`` exists,
-                and ``overwrite`` is :obj:`False`.
+                and ``overwrite`` is `False`.
             fs.errors.ResourceNotFound: If a parent directory of
                 ``dst_path`` does not exist.
 
@@ -945,7 +947,7 @@ class FS(object):
             encoding (str, optional): Encoding for text files
                 (defaults to ``utf-8``)
             errors (str, optional): What to do with unicode decode errors
-                (see :obj:`codecs` module for more information).
+                (see `codecs` module for more information).
             newline (str, optional): Newline parameter.
             **options: keyword arguments for any additional information
                 required by the filesystem (if any).
@@ -983,7 +985,7 @@ class FS(object):
             factory (callable, optional): A callable that when invoked
                 with an FS instance and ``path`` will return a new FS object
                 representing the sub-directory contents. If no ``factory``
-                is supplied then :class:`~fs.subfs.SubFS` will be used.
+                is supplied then `~fs.subfs.SubFS` will be used.
 
         Returns:
             ~fs.subfs.SubFS: A filesystem representing a sub-directory.
@@ -1005,7 +1007,7 @@ class FS(object):
     def removetree(self, dir_path):
         """Recursively remove the contents of a directory.
 
-        This method is similar to :meth:`~fs.base.removedir`, but will
+        This method is similar to `~fs.base.removedir`, but will
         remove the contents of the directory if it is not empty.
 
         Arguments:
@@ -1033,12 +1035,12 @@ class FS(object):
                 in the resource information, e.g. ``['basic', 'access']``.
             page (tuple, optional): May be a tuple of ``(<start>, <end>)``
                 indexes to return an iterator of a subset of the resource
-                info, or :obj:`None` to iterate over the entire directory.
+                info, or `None` to iterate over the entire directory.
                 Paging a directory scan may be necessary for very large
                 directories.
 
         Returns:
-            ~collections.abc.Iterator: an iterator of :class:`Info` objects.
+            ~collections.abc.Iterator: an iterator of `Info` objects.
 
         Raises:
             fs.errors.DirectoryExpected: If ``path`` is not a directory.
@@ -1114,11 +1116,11 @@ class FS(object):
             path (str): A path on the filesystem.
             file (io.IOBase): A file object open for reading.
             encoding (str, optional): Encoding of destination file,
-                defaults to :obj:`None` for binary.
+                defaults to `None` for binary.
             errors (str, optional): How encoding errors should be treated
-                (same as :obj:`io.open`).
+                (same as `io.open`).
             newline (str, optional): Newline parameter (same
-                as :obj:`io.open`).
+                as `io.open`).
 
         This method will read the contents of a supplied file object,
         and write to a file on the filesystem. If the destination
@@ -1152,10 +1154,10 @@ class FS(object):
         Arguments:
             path: A path to a resource on the filesystem.
             accessed (datetime, optional): The accessed time, or
-                :obj:`None` (the default) to use the current time.
+                `None` (the default) to use the current time.
             modified (datetime, optional): The modified time, or
-                :obj:`None` (the default) to use the same time as
-                the ``accessed`` parameter.
+                `None` (the default) to use the same time as the
+                ``accessed`` parameter.
 
         """
         details = {}
@@ -1190,9 +1192,9 @@ class FS(object):
             encoding (str, optional): Encoding of destination file
                 (defaults to ``'ut-8'``).
             errors (str, optional): How encoding errors should be treated
-                (same as :obj:`io.open`).
+                (same as `io.open`).
             newline (str, optional): Newline parameter (same
-                as :obj:`io.open`).
+                as `io.open`).
 
         Raises:
             TypeError: if ``contents`` is not a unicode string.
@@ -1236,7 +1238,7 @@ class FS(object):
         Many filesystems have restrictions on the format of paths they
         support. This method will check that ``path`` is valid on the
         underlaying storage mechanism and throw a
-        :class:`~fs.errors.InvalidPath` exception if it is not.
+        `~fs.errors.InvalidPath` exception if it is not.
 
         Arguments:
             path (str): A path.
@@ -1338,7 +1340,7 @@ class FS(object):
             name (str): A file or directory name (not a path)
 
         Returns:
-            bool: :obj:`True` if ``name`` matches any of the patterns.
+            bool: `True` if ``name`` matches any of the patterns.
 
         If a filesystem is case *insensitive* (such as Windows) then
         this method will perform a case insensitive match (i.e. ``*.py``
@@ -1353,8 +1355,8 @@ class FS(object):
             False
 
         Note:
-            If ``patterns`` is :obj:`None` (or ``['*']``), then this
-            method will always return :obj:`True`.
+            If ``patterns`` is `None` (or ``['*']``), then this
+            method will always return `True`.
 
         """
         if patterns is None:
@@ -1374,13 +1376,13 @@ class FS(object):
             path (str): The path of the directory to start rendering
                 from (defaults to root folder, i.e. ``'/'``).
             file (io.IOBase): An open file-like object to render the
-                tree, or :obj:`None` for stdout.
-            encoding (str): Unicode encoding, or :obj:`None`
-                to auto-detect.
+                tree, or `None` for stdout.
+            encoding (str): Unicode encoding, or `None` to
+                auto-detect.
             max_levels (int): Maximum number of levels to
-                display, or :obj:`None` for no maximum.
+                display, or `None` for no maximum.
             with_color (bool): Enable terminal color output,
-                or :obj:`None` to auto-detect terminal.
+                or `None` to auto-detect terminal.
             dirs_first (bool): Show directories first.
             exclude (list): Option list of directory patterns
                 to exclude from the tree render.

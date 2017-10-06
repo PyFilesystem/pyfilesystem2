@@ -38,9 +38,9 @@ def write_zip(src_fs,
         encoding (str, optional):
              The encoding to use for filenames. The default is ``"utf-8"``,
              use ``"CP437"`` if compatibility with WinZip is desired.
-        walker (~fs.walk.Walker, optional): A :class:`Walker` instance,
-            or `None` to use default walker. You can use this to specify
-            which files you want to compress.
+        walker (~fs.walk.Walker, optional): A `Walker` instance, or `None`
+            to use default walker. You can use this to specify which files
+            you want to compress.
 
     """
     _zip = zipfile.ZipFile(
@@ -110,9 +110,9 @@ def write_tar(src_fs,
             for a plain Tar archive without compression.
         encoding(str, optional): The encoding to use for filenames. The
             default is ``"utf-8"``.
-        walker (~fs.walk.Walker, optional): A :class:`Walker` instance,
-            or `None` to use default walker. You can use this to specify
-            which files you want to compress.
+        walker (~fs.walk.Walker, optional): A `Walker` instance, or `None`
+            to use default walker. You can use this to specify which files
+            you want to compress.
 
     """
     type_map = {
