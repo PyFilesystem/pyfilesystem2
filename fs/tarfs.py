@@ -25,7 +25,7 @@ class TarFS(WrapFS):
     There are two ways to open a TarFS for the use cases of reading
     a tar file, and creating a new one.
 
-    If you open the TarFS with  ``write`` set to ``False`` (the
+    If you open the TarFS with  ``write`` set to `False` (the
     default), then the filesystem will be a read only filesystem which
     maps to the files and directories within the tar file. Files are
     decompressed on the fly when you open them.
@@ -35,7 +35,7 @@ class TarFS(WrapFS):
         with TarFS('foo.tar.gz') as tar_fs:
             readme = tar_fs.gettext('readme.txt')
 
-    If you open the TarFS with ``write`` set to ``True``, then the TarFS
+    If you open the TarFS with ``write`` set to `True`, then the TarFS
     will be a empty temporary filesystem. Any files / directories you
     create in the TarFS will be written in to a tar file when the TarFS
     is closed. The compression is set from the new file name but may be
@@ -53,7 +53,7 @@ class TarFS(WrapFS):
     Arguments:
         file (str or io.IOBase): An OS filename, or an open file handle.
         write (bool, optional): Set to `True` to write a new tar file,
-            or use default (``False``) to read an existing tar file.
+            or use default (`False`) to read an existing tar file.
         compression (str, optional): Compression to use (one of the formats
             supported by `tarfile`: ``xz``, ``gz``, ``bz2``, or `None`).
         temp_fs (str, optional): An FS URL for the temporary

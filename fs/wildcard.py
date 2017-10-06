@@ -74,7 +74,7 @@ def match_any(patterns, name):
 def imatch_any(patterns, name):
     """Test if a name matches any of a list of patterns (case insensitive).
 
-    Will return ``True`` if ``patterns`` is an empty list.
+    Will return `True` if ``patterns`` is an empty list.
 
     Arguments:
         patterns (list): A list of wildcard pattern, e.g ``["*.py",

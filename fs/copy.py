@@ -17,8 +17,8 @@ def copy_fs(src_fs, dst_fs, walker=None, on_copy=None):
     """Copy the contents of one filesystem to another.
 
     Arguments:
-        src_fs (FS or str): A filesystem URL or instance.
-        dst_fs (FS or str): The destination filesystem URL or instance.
+        src_fs (FS or str): Source filesystem (URL or instance).
+        dst_fs (FS or str): Destination filesystem (URL or instance).
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only want
             to consider a sub-set of the resources in ``src_fs``.
@@ -40,8 +40,8 @@ def copy_fs_if_newer(src_fs, dst_fs, walker=None, on_copy=None):
     copy file is always executed.
 
     Arguments:
-        src_fs (FS or str): A filesystem URL or instance.
-        dst_fs (FS or str): The destination filesystem URL or instance.
+        src_fs (FS or str): Source filesystem (URL or instance).
+        dst_fs (FS or str): Destination filesystem (URL or instance).
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only want
             to consider a sub-set of the resources in ``src_fs``.

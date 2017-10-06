@@ -5,13 +5,13 @@ filesystem. If there are no files on the destination, then mirroring
 is simply a straight copy. If there are any files or directories on the
 destination they may be deleted or modified to match the source.
 
-In order to avoid redundant copying of files, ``mirror`` can compare
+In order to avoid redundant copying of files, `mirror` can compare
 timestamps, and only copy files with a newer modified date. This
 timestamp comparison is only done if the file sizes are different.
 
 This scheme will work if you have mirrored a directory previously, and
 you would like to copy any changes. Otherwise you should set the
-``copy_if_newer`` parameter to ``False`` to guarantee an exact copy, at
+``copy_if_newer`` parameter to `False` to guarantee an exact copy, at
 the expense of potentially copying extra files.
 
 """
@@ -50,8 +50,8 @@ def mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
     that aren't on the source, and copying files that aren't.
 
     Arguments:
-        src_fs (URL or FS): A source filesystem.
-        dst_fs (URL or FS): A destination filesystem.
+        src_fs (FS or str): Source filesystem (URL or instance).
+        dst_fs (FS or str): Destination filesystem (URL or instance).
         walker (~fs.walk.Walker, optional): An optional walker instance.
         copy_if_newer (bool, optional): Only copy newer files (the default).
 

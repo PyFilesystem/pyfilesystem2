@@ -28,9 +28,9 @@ class ZipFS(WrapFS):
     There are two ways to open a ZipFS for the use cases of reading
     a zip file, and creating a new one.
 
-    If you open the ZipFS with  ``write`` set to ``False`` (the
-    default), then the filesystem will be a read only filesystem which
-    maps to the files and directories within the zip file. Files are
+    If you open the ZipFS with  ``write`` set to `False` (the default)
+    then the filesystem will be a read only filesystem which maps to
+    the files and directories within the zip file. Files are
     decompressed on the fly when you open them.
 
     Here's how you might extract and print a readme from a zip file::
@@ -38,7 +38,7 @@ class ZipFS(WrapFS):
         with ZipFS('foo.zip') as zip_fs:
             readme = zip_fs.gettext('readme.txt')
 
-    If you open the ZipFS with ``write`` set to ``True``, then the ZipFS
+    If you open the ZipFS with ``write`` set to `True`, then the ZipFS
     will be a empty temporary filesystem. Any files / directories you
     create in the ZipFS will be written in to a zip file when the ZipFS
     is closed.

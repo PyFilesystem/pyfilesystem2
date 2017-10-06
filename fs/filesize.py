@@ -6,7 +6,7 @@ using several different units. Since there are many standards regarding
 file size units, three different functions have been implemented.
 
 See Also:
-    `Binary prefix <https://en.wikipedia.org/wiki/Binary_prefix>`_
+    * `Wikipedia: Binary prefix <https://en.wikipedia.org/wiki/Binary_prefix>`_
 
 """
 
@@ -72,8 +72,8 @@ def binary(size):
 
     This is the format that has gained adoption among manufacturers
     to avoid ambiguity regarding size units, since it explicitly states
-    using a binary base (`KiB` = `kibi bytes` = `kilo binary bytes`).
-    This format is notably being used by the Linux kernel (see
+    using a binary base (*KiB = kibi bytes = kilo binary bytes*).
+    This format is notably being used by the **Linux** kernel (see
     ``man 7 units``).
 
     Arguments:
