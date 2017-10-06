@@ -1,9 +1,4 @@
-"""
-fs.filesize
-===========
-
-Functions for reporting filesizes
-
+"""Functions for reporting filesizes.
 """
 
 from __future__ import division
@@ -33,13 +28,17 @@ def _to_str(size, suffixes, base):
 
 
 def traditional(size):
-    """
-    Convert a filesize in to a string representation with traditional
-    (base 2) units and JDEC prefixes.
+    """Convert a filesize in to a string (binary units, traditional prefixes).
 
-    :param int size: A file size.
-    :returns: A string containing a abbreviated file size and units.
-    :rtype str:
+    Arguments:
+        size (int): A file size.
+
+    Returns:
+        str: A string containing an abbreviated file size and units.
+
+    Example:
+        >>> filesize.traditional(30000)
+        '29.3 KB'
 
     """
     return _to_str(
@@ -50,14 +49,17 @@ def traditional(size):
 
 
 def binary(size):
-    """
-    Convert a filesize in to a string representation with binary units
-    and SI binary prefixes.
+    """Convert a filesize in to a string (binary units, SI binary prefixes).
 
-    :param int size: A file size.
-    :param bool si: True to use SI prefixes, False to use JDEC prefixes.
-    :returns: A string containing a abbreviated file size and units.
-    :rtype str:
+    Arguments:
+        int (size): A file size.
+
+    Returns:
+        str: A string containing a abbreviated file size and units.
+
+    Example:
+        >>> filesize.binary(30000)
+        '29.3 KiB'
 
     """
     return _to_str(
@@ -68,13 +70,17 @@ def binary(size):
 
 
 def decimal(size):
-    """
-    Convert a filesize in to a string representation with decimal
-    units and SI decimal prefixes.
+    """Convert a filesize in to a string (decimal units, SI decimal prefixes).
 
-    :param int size: A file size.
-    :returns: A string containing a abbreviated file size and units.
-    :rtype str:
+    Arguments:
+        int (size): A file size.
+
+    Returns:
+        str: A string containing a abbreviated file size and units.
+
+    Example:
+        >>> filesize.decimal(30000)
+        '30.0 kB'
     """
     return _to_str(
         size,
