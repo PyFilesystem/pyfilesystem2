@@ -78,9 +78,9 @@ def manage_ftp(ftp):
             pass
 
 
-def _parse_ftp_error(e):
+def _parse_ftp_error(error):
     """Extract code and message from ftp error."""
-    code, _, message = text_type(e).partition(' ')
+    code, _, message = text_type(error).partition(' ')
     if code.isdigit():
         code = int(code)
     return code, message
