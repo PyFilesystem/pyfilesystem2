@@ -108,7 +108,7 @@ class FTPFile(io.IOBase):
         self._write_conn = None
 
     def _open_ftp(self):
-        ftp = self.fs._open_ftp(self.fs.ftp.encoding)
+        ftp = self.fs._open_ftp()
         ftp.voidcmd(str('TYPE I'))
         return ftp
 
@@ -317,17 +317,39 @@ class FTPFS(FS):
         )
         return _fmt.format(host=self.host, port=self.port)
 
-    def _open_ftp(self, encoding="utf-8"):
+    def _open_ftp(self):
         _ftp = FTP()
         _ftp.set_debuglevel(0)
         with ftp_errors(self):
-            _ftp.encoding = encoding
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
+            self._features = {}
+            try:
+                feat_response = _decode(_ftp.sendcmd("FEAT"), 'latin-1')
+            except error_perm:
+                self.encoding = 'latin-1'
+            else:
+                if feat_response.split('-')[0] == '211':
+                    for line in feat_response.splitlines():
+                        if line.startswith(' '):
+                            k, _, v = line[1:].partition(' ')
+                            self._features[k] = v
+                self.encoding = (
+                    'utf-8'
+                    if 'UTF8' in self._features
+                    else 'latin-1'
+                )
+                if not PY2:
+                    _ftp.file = _ftp.sock.makefile(
+                        'r',
+                        encoding=self.encoding
+                    )
+        _ftp.encoding = self.encoding
+        self._welcome = _ftp.welcome
         return _ftp
 
     def _manage_ftp(self):
-        ftp = self._open_ftp(self.ftp.encoding)
+        ftp = self._open_ftp()
         return manage_ftp(ftp)
 
     @property
@@ -343,38 +365,13 @@ class FTPFS(FS):
     def ftp(self):
         """Get a FTP (ftplib) object."""
         if self._ftp is None:
-            _ftp = self._open_ftp('latin-1')
-            try:
-                encoding = (
-                    'utf-8'
-                    if 'UTF8' in _ftp.sendcmd('FEAT')
-                    else 'latin-1'
-                )
-            except error_perm:
-                encoding = 'latin-1'
-            self._ftp = (
-                _ftp
-                if encoding == 'latin-1'
-                else self._open_ftp(encoding)
-            )
-            self._welcome = self._ftp.getwelcome()
+            self._ftp = self._open_ftp()
         return self._ftp
 
     @property
     def features(self):
         """Get features dict from FTP server."""
-        if self._features is None:
-            try:
-                response = _decode(self.ftp.sendcmd("FEAT"), "ascii")
-            except error_perm:
-                self._features = {}
-            else:
-                self._features = {}
-                if response.split('-')[0] == '211':
-                    for line in response.splitlines():
-                        if line.startswith(' '):
-                            k, _, v = line[1:].partition(' ')
-                            self._features[k] = v
+        _ftp = self.ftp
         return self._features
 
     def _read_dir(self, path):
@@ -514,6 +511,7 @@ class FTPFS(FS):
 
     def getmeta(self, namespace="standard"):
         _meta = {}
+        self.ftp
         if namespace == "standard":
             _meta = self._meta.copy()
             _meta['unicode_paths'] = "UTF8" in self.features
