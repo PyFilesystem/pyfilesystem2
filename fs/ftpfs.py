@@ -101,6 +101,7 @@ else:
 class FTPFile(io.IOBase):
 
     def __init__(self, ftpfs, path, mode):
+        super(FTPFile, self).__init__()
         self.fs = ftpfs
         self.path = path
         self.mode = Mode(mode)
