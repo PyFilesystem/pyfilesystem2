@@ -143,12 +143,6 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         with self.assertRaises(errors.RemoteConnectionError):
             fs.open('foo.txt')
 
-    def test_features(self):
-        def broken_sendcmd(cmd):
-            raise ftplib.error_perm('nope')
-        self.fs.ftp.sendcmd = broken_sendcmd
-        self.assertEqual(self.fs.features, {})
-
     def test_getmeta_unicode_path(self):
         self.assertTrue(self.fs.getmeta().get('unicode_paths'))
         self.fs.features

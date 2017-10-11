@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - settext, appendtext, appendbytes, setbytes now raise a TypeError if
   the type is wrong, rather than ValueError
+- More efficient feature detection for FTPFS
+- Fixes for `fs.filesize`
 
 ## [2.0.11]
 
