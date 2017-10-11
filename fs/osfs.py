@@ -1,3 +1,9 @@
+"""Manage the filesystem provided by your OS.
+
+In essence, an `OSFS` is a thin layer over the `io` and `os` modules
+of the Python standard library.
+"""
+
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -41,28 +47,26 @@ _WINDOWS_PLATFORM = platform.system() == 'Windows'
 
 @six.python_2_unicode_compatible
 class OSFS(FS):
-    """
-    Create an OSFS.
+    """Create an OSFS.
 
-    :param root_path: An OS path or path-like object to the location on
-        your HD you wish to manage.
-    :type root_path: str or path-like
-    :param create: Set to ``True`` to create the root directory if it
-        does not already exist, otherwise the directory should exist
-        prior to creating the ``OSFS`` instance.
-    :type create: bool
-    :param int create_mode: The permissions that will be used to create
-        the directory if ``create`` is True and the path doesn't exist,
-        defaults to ``0o777``.
-    :raises `fs.errors.CreateFailed`: If ``root_path`` does not
-        exists, or could not be created.
+    Arguments:
+        root_path (str or ~os.PathLike): An OS path or path-like object to
+            the location on your HD you wish to manage.
+        create (bool, optional): Set to `True` to create the root directory
+            if it does not already exist, otherwise the directory should exist
+            prior to creating the ``OSFS`` instance (default `False`).
+        create_mode (int, optional): The permissions that will be used to
+            create the directory if ``create`` is `True` and the path doesn't
+            exist, defaults to ``0o777``.
 
+    Raises:
+        `fs.errors.CreateFailed`: If ``root_path`` does not
+            exists, or could not be created.
 
-    Here are some examples of creating ``OSFS`` objects::
-
-        current_directory_fs = OSFS('.')
-        home_fs = OSFS('~/')
-        windows_system32_fs = OSFS('c://system32')
+    Examples:
+        >>> current_directory_fs = OSFS('.')
+        >>> home_fs = OSFS('~/')
+        >>> windows_system32_fs = OSFS('c://system32')
 
     """
 
@@ -70,8 +74,8 @@ class OSFS(FS):
                  root_path,
                  create=False,
                  create_mode=0o777):
-        """Create an OSFS instance."""
-
+        """Create an OSFS instance.
+        """
         super(OSFS, self).__init__()
         root_path = fsdecode(fspath(root_path))
         _root_path = os.path.expanduser(os.path.expandvars(root_path))
@@ -127,7 +131,8 @@ class OSFS(FS):
                           self.root_path)
 
     def _to_sys_path(self, path):
-        """Convert a FS path to a path on the OS."""
+        """Convert a FS path to a path on the OS.
+        """
         sys_path = os.path.join(
             self.root_path,
             path.lstrip('/').replace('/', os.sep)
@@ -136,7 +141,8 @@ class OSFS(FS):
 
     @classmethod
     def _make_details_from_stat(cls, stat_result):
-        """Make an info dict from a stat_result object."""
+        """Make a *details* info dict from an `os.stat_result` object.
+        """
         details = {
             '_write': ['accessed', 'modified'],
             'accessed': stat_result.st_atime,
@@ -158,6 +164,8 @@ class OSFS(FS):
 
     @classmethod
     def _make_access_from_stat(cls, stat_result):
+        """Make an *access* info dict from an `os.stat_result` object.
+        """
         access = {}
         access['permissions'] = Permissions(
             mode=stat_result.st_mode
@@ -190,7 +198,8 @@ class OSFS(FS):
 
     @classmethod
     def _get_type_from_stat(cls, _stat):
-        """Get the resource type from a stat_result object."""
+        """Get the resource type from an `os.stat_result` object.
+        """
         st_mode = _stat.st_mode
         st_type = stat.S_IFMT(st_mode)
         return cls.STAT_TO_RESOURCE_TYPE.get(st_type, ResourceType.unknown)

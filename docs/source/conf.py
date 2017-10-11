@@ -38,11 +38,18 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
-    'sphinx.ext.viewcode'
+    'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon',
+    'sphinx.ext.intersphinx'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
+
+# intersphinx domain mapping
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/3.6', None)
+}
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -89,7 +96,7 @@ exclude_patterns = []
 
 # The reST default role (used for this markup: `text`) to use for all
 # documents.
-#default_role = None
+default_role = 'py:obj'
 
 # If true, '()' will be appended to :func: etc. cross-reference text.
 #add_function_parentheses = True

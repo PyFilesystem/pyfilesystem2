@@ -43,5 +43,8 @@ Now both filesystems may be accessed with the same path structure::
     print(combined_fs.gettext('/config/defaults.cfg'))
     read_jpg(combined_fs.open('/resources/images/logo.jpg', 'rb')
 
-.. automodule:: fs.mountfs
-    :members:
+.. autoclass:: fs.mountfs.MountFS
+   :members:
+
+.. autoexception:: fs.mountfs.MountError
+   :show-inheritance:

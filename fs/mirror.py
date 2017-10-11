@@ -1,6 +1,18 @@
-"""
+"""Function for *mirroring* a filesystem.
 
-Create a 'mirror' of a filesystem.
+Mirroring will create a copy of a source filesystem on a destination
+filesystem. If there are no files on the destination, then mirroring
+is simply a straight copy. If there are any files or directories on the
+destination they may be deleted or modified to match the source.
+
+In order to avoid redundant copying of files, `mirror` can compare
+timestamps, and only copy files with a newer modified date. This
+timestamp comparison is only done if the file sizes are different.
+
+This scheme will work if you have mirrored a directory previously, and
+you would like to copy any changes. Otherwise you should set the
+``copy_if_newer`` parameter to `False` to guarantee an exact copy, at
+the expense of potentially copying extra files.
 
 """
 
@@ -15,9 +27,10 @@ from .opener import manage_fs
 
 
 def _compare(info1, info2):
-    """
-    Compare two (file) info objects and return True if the file should
-    be copied, or False if they should not.
+    """Compare two `Info` objects to see if they should be copied.
+
+    Returns:
+        bool: `True` if the `Info` are different in size or mtime.
 
     """
     # Check filesize has changed
@@ -30,20 +43,17 @@ def _compare(info1, info2):
 
 
 def mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
-    """
-    Mirror files / directories from one filesystem to another.
-
-    :param src_fs: A source filesystem.
-    :type src_fs: FS URL or instance.
-    :param dst_fs: A destination filesystem.
-    :type dst_fs: FS URL or instance.
-    :param walker: An optional waler instance.
-    :type walker: :class:`~fs.walk.Walker`
-    :param bool copy_if_newer: Only copy newer files.
+    """Mirror files / directories from one filesystem to another.
 
     Mirroring a filesystem will create an exact copy of ``src_fs`` on
     ``dst_fs``, by removing any files / directories on the destination
     that aren't on the source, and copying files that aren't.
+
+    Arguments:
+        src_fs (FS or str): Source filesystem (URL or instance).
+        dst_fs (FS or str): Destination filesystem (URL or instance).
+        walker (~fs.walk.Walker, optional): An optional walker instance.
+        copy_if_newer (bool, optional): Only copy newer files (the default).
 
     """
     with manage_fs(src_fs, writeable=False) as _src_fs:

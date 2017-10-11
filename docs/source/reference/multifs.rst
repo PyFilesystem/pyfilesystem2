@@ -51,5 +51,5 @@ directories::
     `-- theme.html
 
 
-.. automodule:: fs.multifs
+.. autoclass:: fs.multifs.MultiFS
     :members:

@@ -1,10 +1,5 @@
 # coding: utf-8
-"""
-fs.opener
-========
-
-Imported at the same time as PyFilesystem2, contains
-various objects and functions to open and manage FS.
+"""Open filesystems from a URL.
 """
 
 # Declare fs.opener as a namespace package

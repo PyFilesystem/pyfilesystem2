@@ -1,7 +1,4 @@
-"""
-
-Functions for moving files between filesystems.
-
+"""Functions for moving files between filesystems.
 """
 
 from __future__ import print_function
@@ -13,30 +10,24 @@ from .opener import manage_fs
 
 
 def move_fs(src_fs, dst_fs):
-    """
-    Move the contents of a filesystem to another filesystem.
+    """Move the contents of a filesystem to another filesystem.
 
-    :param src_fs: Source filesystem.
-    :type src_fs: FS URL or instance
-    :param dst_fs: Destination filesystem.
-    :type dst_fs: FS URL or instance
+    Arguments:
+        src_fs (FS or str): Source filesystem (instance or URL).
+        dst_fs (FS or str): Destination filesystem (instance or URL).
 
     """
     move_dir(src_fs, '/', dst_fs, '/')
 
 
 def move_file(src_fs, src_path, dst_fs, dst_path):
-    """
-    Move a file from one filesystem to another.
+    """Move a file from one filesystem to another.
 
-    :param src_fs: Source filesystem.
-    :type src_fs: FS URL or instance
-    :param src_path: Path to a file on ``src_fs``.
-    :type src_path: str
-    :param dst_fs: Destination filesystem.
-    :type dst_fs: FS URL or instance
-    :param dst_fs: Path to a file on ``dst_fs``.
-    :type dst_fs: str
+    Arguments:
+        src_fs (FS or str): Source filesystem (instance or URL).
+        src_path (str): Path to a file on ``src_fs``.
+        dst_fs (FS or str); Destination filesystem (instance or URL).
+        dst_path (str): Path to a file on ``dst_fs``.
 
     """
     with manage_fs(src_fs) as src_fs:
@@ -52,16 +43,13 @@ def move_file(src_fs, src_path, dst_fs, dst_path):
 
 
 def move_dir(src_fs, src_path, dst_fs, dst_path):
-    """
-    Move a directory from one filesystem to another.
+    """Move a directory from one filesystem to another.
 
-    :param src_fs: Source filesystem.
-    :type src_fs: FS URL or instance
-    :param src_path: A path to a directory on ``src_fs``.
-    :type src_path: str
-    :param dst_fs: Destination filesystem.
-    :type dst_fs: FS URL or instance
-    :param str dst_path: A path to a directory on ``dst_fs``.
+    Arguments:
+        src_fs (FS or str): Source filesystem (instance or URL).
+        src_path (str): Path to a directory on ``src_fs``
+        dst_fs (FS or str): Destination filesystem (instance or URL).
+        dst_path (str): Path to a directory on ``dst_fs``
 
     """
     with manage_fs(src_fs) as src_fs:
