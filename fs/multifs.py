@@ -1,3 +1,6 @@
+"""Manage several filesystems through a single view.
+"""
+
 from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
@@ -24,8 +27,7 @@ _PrioritizedFS = namedtuple(
 
 
 class MultiFS(FS):
-    """
-    A filesystem that delegates to a sequence of other filesystems.
+    """A filesystem that delegates to a sequence of other filesystems.
 
     Operations on the MultiFS will try each 'child' filesystem in order,
     until it succeeds. In effect, creating a filesystem that combines
@@ -61,26 +63,22 @@ class MultiFS(FS):
         return "<multifs>"
 
     def add_fs(self, name, fs, write=False, priority=0):
-        """
-        Adds a filesystem to the MultiFS.
+        """Add a filesystem to the MultiFS.
 
-        :param name: A unique name to refer to the filesystem being
-            added.
-        :type name: str
-        :param fs: The filesystem to add.
-        :type fs: Filesystem or FS URL.
-        :param write: If this value is True, then the ``fs`` will be
-            used as the writeable FS.
-        :type write: bool
-        :param priority: An integer that denotes the priority of the
-            filesystem being added. Filesystems will be searched in
-            descending priority order and then by the reverse order they
-            were added. So by default, the most recently added
-            filesystem will be looked at first.
-        :type priority: int
+        Arguments:
+            name (str): A unique name to refer to the filesystem being
+                added.
+            fs (FS or str): The filesystem (instance or URL) to add.
+            write (bool, optional): If this value is True,
+                then the ``fs`` will be used as the writeable FS (defaults
+                to False).
+            priority (int, optional): An integer that denotes the priority
+                of the filesystem being added. Filesystems will be searched
+                in descending priority order and then by the reverse order
+                they were added. So by default, the most recently added
+                filesystem will be looked at first.
 
         """
-
         if isinstance(fs, text_type):
             fs = open_fs(fs)
 
@@ -101,21 +99,28 @@ class MultiFS(FS):
             self._write_fs_name = name
 
     def get_fs(self, name):
-        """
-        Get a filesystem from its name.
+        """Get a filesystem from its name.
 
-        :param name: The name of a filesystem previously added.
-        :type name: str
+        Arguments:
+            name (str): The name of a filesystem previously added.
+
+        Returns:
+            FS: the filesystem added as ``name`` previously.
+
+        Raises:
+            KeyError: If no filesystem with given ``name`` could be found.
 
         """
         return self._filesystems[name].fs
 
     def _resort(self):
-        """Force iterate_fs to re-sort on next reference."""
+        """Force `iterate_fs` to re-sort on next reference.
+        """
         self._fs_sequence = None
 
     def iterate_fs(self):
-        """Get iterator that returns (name, fs) in priority order."""
+        """Get iterator that returns (name, fs) in priority order.
+        """
         if self._fs_sequence is None:
             self._fs_sequence = [
                 (name, fs)
@@ -129,34 +134,35 @@ class MultiFS(FS):
         return iter(self._fs_sequence)
 
     def _delegate(self, path):
-        """Get a filesystem which has a given path."""
+        """Get a filesystem which has a given path.
+        """
         for _name, fs in self.iterate_fs():
             if fs.exists(path):
                 return fs
         return None
 
     def _delegate_required(self, path):
+        """Check that there is a filesystem with the given ``path``.
+        """
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
         return fs
 
     def _require_writable(self, path):
+        """Check that ``path`` is writeable.
+        """
         if self.write_fs is None:
             raise errors.ResourceReadOnly(path)
 
     def which(self, path, mode="r"):
-        """
-        Get a tuple of (name, filesystem) that the given path would map
-        to.
+        """Get a tuple of (name, fs) that the given path would map to.
 
-        :param path: A path on the filesystem.
-        :type path: str
-        :param mode: A open mode.
-        :type mode: str
+        Arguments:
+            path (str): A path on the filesystem.
+            mode (str): An `io.open` mode.
 
         """
-
         if check_writable(mode):
             return self._write_fs_name, self.write_fs
         for name, fs in self.iterate_fs():

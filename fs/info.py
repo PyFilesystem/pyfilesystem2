@@ -1,3 +1,6 @@
+"""Container for filesystem resource informations.
+"""
+
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -12,26 +15,26 @@ from .time import epoch_to_datetime
 
 
 class Info(object):
-    """
-    Container for :ref:`info`, returned by the following methods:
+    """Container for :ref:`info`.
 
-     * :meth:`~fs.base.FS.getinfo`
-     * :meth:`~fs.base.FS.scandir`
-     * :meth:`~fs.base.FS.filterfir`
+    Resource informations are returned by the following methods:
 
-    :param dict raw_info: A dict containing resource info.
-    :param to_datetime: A callable that converts an epoch time to a
-        datetime object. The default uses
-        :func:`~fs.time.epoch_to_datetime`.
+         * `~fs.base.FS.getinfo`
+         * `~fs.base.FS.scandir`
+         * `~fs.base.FS.filterfir`
+
+    Arguments:
+        raw_info (dict): A dict containing resource info.
+        to_datetime (callable, optional): A callable that converts an
+            epoch time to a datetime object. The default uses
+            :func:`~fs.time.epoch_to_datetime`.
 
     """
 
     def __init__(self,
                  raw_info,
                  to_datetime=epoch_to_datetime):
-        """
-        Create a resource info object from a raw info dict.
-
+        """Create a resource info object from a raw info dict.
         """
         self.raw = raw_info
         self._to_datetime = to_datetime
@@ -53,16 +56,19 @@ class Info(object):
             return None
 
     def get(self, namespace, key, default=None):
-        """
-        Get a raw info value.
+        """Get a raw info value.
 
-        >>> info.get('access', 'permissions')
-        ['u_r', 'u_w', '_wx']
+        Arguments:
+            namespace (str): A namespace identifier.
+            key (str): A key within the namespace.
+            default (object, optional): A default value to return
+                if either the namespace or the key within the namespace
+                is not found.
 
-        :param str namespace: A namespace identifier.
-        :param str key: A key within the namespace.
-        :param default: A default value to return if either the
-            namespace or namespace + key is not found.
+        Example:
+            >>> info.get('access', 'permissions')
+            ['u_r', 'u_w', '_wx']
+
         """
         try:
             return self.raw[namespace].get(key, default)
@@ -70,110 +76,98 @@ class Info(object):
             return default
 
     def _require_namespace(self, namespace):
-        """
-        Raise a MissingInfoNamespace if the given namespace is not
-        present in the info.
+        """Check if the given namespace is present in the info.
+
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the given namespace is not
+                present in the info.
 
         """
         if namespace not in self.raw:
             raise MissingInfoNamespace(namespace)
 
     def is_writeable(self, namespace, key):
-        """
-        Check if a given key in a namespace is writable (with
-        :meth:`~fs.base.FS.setinfo`).
+        """Check if a given key in a namespace is writable.
 
-        :param namespace: A namespace identifier.
-        :type namespace: str
-        :param key: A key within the namespace.
-        :type key: str
-        :rtype: bool
+        Uses `~fs.base.FS.setinfo`.
+
+        Arguments:
+            namespace (str): A namespace identifier.
+            key (str): A key within the namespace.
+
+        Returns:
+            bool: `True` if the key can be modified, `False` otherwise.
 
         """
         _writeable = self.get(namespace, '_write', ())
         return key in _writeable
 
     def has_namespace(self, namespace):
-        """
-        Check if the resource info contains a given namespace.
+        """Check if the resource info contains a given namespace.
 
-        :param namespace: A namespace name.
-        :type namespace: str
-        :rtype: bool
+        Arguments:
+            namespace (str): A namespace identifier.
+
+        Returns:
+            bool: `True` if the namespace was found, `False` otherwise.
 
         """
         return namespace in self.raw
 
     def copy(self, to_datetime=None):
-        """Create a copy of this resource info object."""
+        """Create a copy of this resource info object.
+        """
         return Info(
             deepcopy(self.raw),
             to_datetime=to_datetime or self._to_datetime
         )
 
     def make_path(self, dir_path):
-        """
-        Make a path by joining ``dir_path`` with the resource name.
+        """Make a path by joining ``dir_path`` with the resource name.
 
-        :param dir_path: A path to a directory.
-        :type dir_path: str
-        :returns: A path.
-        :rtype: str
+        Arguments:
+            dir_path (str): A path to a directory.
+
+        Returns:
+            str: A path to the resource.
 
         """
         return join(dir_path, self.name)
 
     @property
     def name(self):
-        """
-        Get the resource name.
-
-        :rtype: str
-
+        """`str`: the resource name.
         """
         return self.get('basic', 'name')
 
     @property
     def is_dir(self):
-        """
-        Check if the resource references a directory.
-
-        :rtype: bool
-
+        """`bool`: `True` if the resource references a directory.
         """
         return self.get('basic', 'is_dir')
 
     @property
     def is_file(self):
-        """
-        Check if a resource references a file.
-
-        :rtype: bool
-
+        """`bool`: `True` if the resource references a file.
         """
         return not self.get('basic', 'is_dir')
 
     @property
     def is_link(self):
-        """
-        Check if a resource is a symlink.
-
-        :rtype: bool
-
+        """`bool`: `True` if the resource is a symlink.
         """
         self._require_namespace('link')
         return self.get('link', 'target') is not None
 
     @property
     def type(self):
-        """
-        Get the resource type enumeration.
+        """`~fs.ResourceType`: the type of the resource.
 
         Requires the ``"details"`` namespace.
 
-        :type: :class:`~fs.ResourceType`
-        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the 'details'
+                namespace is not in the Info.
 
         """
         self._require_namespace('details')
@@ -181,15 +175,13 @@ class Info(object):
 
     @property
     def accessed(self):
-        """
-        Get the time this resource was last accessed, or ``None`` if not
-        available.
+        """`~datetime.datetime`: the resource last access time, or `None`.
 
         Requires the ``"details"`` namespace.
 
-        :rtype: datetime
-        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"details"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('details')
@@ -200,15 +192,13 @@ class Info(object):
 
     @property
     def modified(self):
-        """
-        Get the time the resource was modified, or ``None`` if not
-        available.
+        """`~datetime.datetime`: the resource last modification time, or `None`.
 
         Requires the ``"details"`` namespace.
 
-        :rtype: datetime
-        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"details"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('details')
@@ -219,15 +209,13 @@ class Info(object):
 
     @property
     def created(self):
-        """
-        Get the time this resource was created, or ``None`` if not
-        available.
+        """`~datetime.datetime`: the resource creation time, or `None`.
 
         Requires the ``"details"`` namespace.
 
-        :rtype: datetime
-        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"details"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('details')
@@ -238,15 +226,13 @@ class Info(object):
 
     @property
     def metadata_changed(self):
-        """
-        Get the time the metadata changed, or ``None`` if not
-        available.
+        """`~datetime.datetime`: the resource metadata change time, or `None`.
 
         Requires the ``"details"`` namespace.
 
-        :rtype: datetime
-        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"details"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('details')
@@ -257,14 +243,13 @@ class Info(object):
 
     @property
     def permissions(self):
-        """
-        Get a permissions object, or ``None`` if not available.
+        """`Permissions`: the permissions of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
 
-        :rtype: :class:`fs.permissions.Permissions`
-        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"access"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('access')
@@ -276,14 +261,13 @@ class Info(object):
 
     @property
     def size(self):
-        """
-        Get the size of the resource, in bytes.
+        """`int`: the size of the resource, in bytes.
 
         Requires the ``"details"`` namespace.
 
-        :rtype: int
-        :raises ~fs.errors.MissingInfoNamespace: if the 'details'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"details"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('details')
@@ -291,14 +275,13 @@ class Info(object):
 
     @property
     def user(self):
-        """
-        Get the owner of a resource, or ``None`` if not available.
+        """`str`: the owner of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
 
-        :rtype: str
-        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"access"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('access')
@@ -306,14 +289,13 @@ class Info(object):
 
     @property
     def uid(self):
-        """
-        Get the user id of a resource, or ``None`` if not available.
+        """`int`: the user id of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
 
-        :rtype: int
-        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"access"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('access')
@@ -321,15 +303,13 @@ class Info(object):
 
     @property
     def group(self):
-        """
-        Get the group of the resource owner, or ``None`` if not
-        available.
+        """`str`: the group of the resource owner, or `None`.
 
         Requires the ``"access"`` namespace.
 
-        :rtype: str
-        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"access"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('access')
@@ -337,30 +317,27 @@ class Info(object):
 
     @property
     def gid(self):
-        """
-        Get the group id of a resource, or ``None`` if not available.
+        """`int`: the group id of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
 
-        :rtype: int
-        :raises ~fs.errors.MissingInfoNamespace: if the 'access'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"access"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('access')
         return self.get('access', 'gid')
 
     @property
-    def target(self):
-        """
-        Get the link target, if this is a symlink, or ``None`` if this
-        is not a symlink.
+    def target(self):  # noqa: D402
+        """`str`: the link target (if resource is a symlink), or `None`.
 
         Requires the ``"link"`` namespace.
 
-        :rtype: bool
-        :raises ~fs.errors.MissingInfoNamespace: if the 'link'
-            namespace is not in the Info.
+        Raises:
+            ~fs.errors.MissingInfoNamespace: if the ``"link"``
+                namespace is not in the Info.
 
         """
         self._require_namespace('link')

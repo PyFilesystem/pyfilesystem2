@@ -1,7 +1,4 @@
-"""
-Filesystem Constants
-====================
-
+"""Enums used by PyFilesystem.
 """
 
 from __future__ import absolute_import
@@ -13,8 +10,7 @@ from enum import IntEnum, unique
 
 @unique
 class ResourceType(IntEnum):
-    """
-    Resource Types.
+    """Resource Types.
 
     Positive values are reserved, negative values are implementation
     dependent.
@@ -46,10 +42,9 @@ class ResourceType(IntEnum):
 
 @unique
 class Seek(IntEnum):
-    """
-    Constants used by ``file.seek``.
+    """Constants used by `io.IOBase.seek`.
 
-    These match ``os.SEEK_CUR``, ``os.SEEK_END``, and ``os.SEEK_SET``
+    These match `os.SEEK_CUR`, `os.SEEK_END`, and `os.SEEK_SET`
     from the standard library.
 
     """

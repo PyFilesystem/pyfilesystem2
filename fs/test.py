@@ -1,6 +1,5 @@
 # coding: utf-8
-"""
-Base class for tests.
+"""Base class for tests.
 
 All Filesystems should be able to pass these.
 
@@ -240,21 +239,21 @@ Box drawing alignment tests:                                          █
 
 
 class FSTestCases(object):
-    """Basic FS tests."""
+    """Basic FS tests.
+    """
 
     def make_fs(self):
-        """
-        Return an FS instance.
+        """Return an FS instance.
 
         """
         raise NotImplementedError('implement me')
 
     def destroy_fs(self, fs):
-        """
-        Destroy a FS object.
+        """Destroy a FS instance.
 
-        :param fs: A FS instance previously opened by
-            `~fs.test.FSTestCases.make_fs`.
+        Arguments:
+            fs (FS): A filesystem instance previously opened
+                by `~fs.test.FSTestCases.make_fs`.
 
         """
         fs.close()
@@ -267,47 +266,47 @@ class FSTestCases(object):
         del self.fs
 
     def assert_exists(self, path):
-        """
-        Assert a path exists.
+        """Assert a path exists.
 
-        :param str path: A path on the filesystem.
+        Arguments:
+            path (str): A path on the filesystem.
 
         """
         self.assertTrue(self.fs.exists(path))
 
     def assert_not_exists(self, path):
-        """
-        Assert a path does not exist.
+        """Assert a path does not exist.
 
-        :param str path: A path on the filesystem.
+        Arguments:
+            path (str): A path on the filesystem.
 
         """
         self.assertFalse(self.fs.exists(path))
 
     def assert_isfile(self, path):
-        """
-        Assert a path is a file.
+        """Assert a path is a file.
 
-        :param str path: A path on the filesystem.
+        Arguments:
+            path (str): A path on the filesystem.
 
         """
         self.assertTrue(self.fs.isfile(path))
 
     def assert_isdir(self, path):
-        """
-        Assert a path is a directory.
+        """Assert a path is a directory.
 
-        :param str path: A path on the filesystem.
+        Arguments:
+            path (str): A path on the filesystem.
 
         """
         self.assertTrue(self.fs.isdir(path))
 
     def assert_bytes(self, path, contents):
-        """
-        Assert a file contains the given bytes.
+        """Assert a file contains the given bytes.
 
-        :param str path: A path on the filesystem.
-        :param bytes contents: Bytes to compare.
+        Arguments:
+            path (str): A path on the filesystem.
+            contents (bytes): Bytes to compare.
 
         """
         assert isinstance(contents, bytes)
@@ -316,11 +315,11 @@ class FSTestCases(object):
         self.assertIsInstance(data, bytes)
 
     def assert_text(self, path, contents):
-        """
-        Assert a file contains the given text.
+        """Assert a file contains the given text.
 
-        :param str path: A path on the filesystem.
-        :param str contents: Text to compare.
+        Arguments:
+            path (str): A path on the filesystem.
+            contents (str): Text to compare.
 
         """
         assert isinstance(contents, text_type)
@@ -413,7 +412,8 @@ class FSTestCases(object):
             self.assertTrue(self.fs.hasurl('foo'))
 
     def test_geturl_purpose(self):
-        """Check an unknown purpose raises a NoURL error"""
+        """Check an unknown purpose raises a NoURL error.
+        """
         self.fs.create('foo')
         with self.assertRaises(errors.NoURL):
             self.fs.geturl('foo', purpose='__nosuchpurpose__')

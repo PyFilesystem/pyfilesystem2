@@ -1,3 +1,6 @@
+"""Manage other filesystems as a folder hierarchy.
+"""
+
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
@@ -15,16 +18,16 @@ from .mode import validate_openbin_mode
 
 
 class MountError(Exception):
-    """Thrown when mounts conflict."""
+    """Thrown when mounts conflict.
+    """
 
 
 class MountFS(FS):
-    """
-    A virtual filesystem that maps directories on to other file-systems.
+    """A virtual filesystem that maps directories on to other file-systems.
 
-    :param auto_close: If True, the child filesystems will be closed
-        when the ``MountFS`` is closed.
-    :type auto_close: bool
+    Arguments:
+        auto_close (bool, optional): If `True` (the default), the child
+            filesystems will be closed when `MountFS` is closed.
 
     """
 
@@ -49,9 +52,15 @@ class MountFS(FS):
         return "<mountfs>"
 
     def _delegate(self, path):
-        """
-        Get a tuple of (fs, path) for a mounted filesystem, or (None,
-        None) if no filesystem is mounted on the given path.
+        """Get the delegate FS for a given path.
+
+        Arguments:
+            path (str): A path.
+
+        Returns:
+            (FS, str): a tuple of ``(<fs>, <path>)`` for a mounted filesystem,
+            or ``(None, None)`` if no filesystem is mounted on the
+            given ``path``.
 
         """
         _path = forcedir(abspath(normpath(path)))
@@ -64,13 +73,11 @@ class MountFS(FS):
         return self.default_fs, path
 
     def mount(self, path, fs):
-        """
-        Mounts a host FS object on a given path.
+        """Mounts a host FS object on a given path.
 
-        :param path: A path within the MountFS.
-        :type path: str
-        :param fs: A filesystem object or FS URL to mount.
-        :type fs: :class:`~fs.base.FS`
+        Arguments:
+            path (str): A path within the MountFS.
+            fs (FS or str): A filesystem (instance or URL) to mount.
 
         """
         if isinstance(fs, text_type):

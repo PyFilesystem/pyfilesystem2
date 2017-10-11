@@ -1,8 +1,7 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
+"""Render a FS object as text tree views.
 
-"""
-Render a FS object as text tree views.
-
+Color is supported on UNIX terminals.
 """
 
 from __future__ import print_function
@@ -22,27 +21,28 @@ def render(fs,
            dirs_first=True,
            exclude=None,
            filter=None):
-    """
-    Render a directory structure in to a pretty tree.
+    """Render a directory structure in to a pretty tree.
 
-    :param fs: A filesystem.
-    :type fs: A :class:`~fs.base.FS` instance
-    :param file: An open file-like object to render the tree, or
-        ``None`` for stdout.
-    :type file: file or None
-    :type encoding: Unicode encoding, or None to auto-detect.
-    :type encoding: str or None
-    :param int max_levels: Maximum number of levels to display, or None
-        for no maximum.
-    :param bool with_color: Enable terminal color output, or None to
-        auto-detect terminal.
-    :param bool dirs_first: Show directories first.
-    :param list exclude: Option list of directory patterns to exclude
-        from the tree render.
-    :param filter: Optional list of files patterns to match in the tree
-        render.
-    :rtype: tuple
-    :returns: A tuple of ``(<directory count>, <file count>)``.
+    Arguments:
+        fs (~fs.base.FS): A filesystem instance.
+        path (str): The path of the directory to start rendering
+            from (defaults to root folder, i.e. ``'/'``).
+        file (io.IOBase): An open file-like object to render the
+            tree, or `None` for stdout.
+        encoding (str or None): Unicode encoding, or `None` to
+            auto-detect.
+        max_levels (int or None): Maximum number of levels to
+            display, or `None` for no maximum.
+        with_color (bool or None): Enable terminal color output,
+            or `None` to auto-detect terminal.
+        dirs_first (bool): Show directories first.
+        exclude (list or None): Option list of directory patterns
+            to exclude from the tree render.
+        filter (list or None): Optional list of files patterns to
+            match in the tree render.
+
+    Returns:
+        (int, int): A tuple of ``(<directory count>, <file count>)``.
 
     """
     file = file or sys.stdout
@@ -69,29 +69,34 @@ def render(fs,
     line_indent = char_vertline + ' ' * 3
 
     def write(line):
-        """Write a line to the output."""
+        """Write a line to the output.
+        """
         print(line, file=file)
 
     def format_prefix(prefix):
-        """Format the prefix lines."""
+        """Format the prefix lines.
+        """
         if not with_color:
             return prefix
         return '\x1b[32m%s\x1b[0m' % prefix
 
     def format_dirname(dirname):
-        """Format a directory name."""
+        """Format a directory name.
+        """
         if not with_color:
             return dirname
         return '\x1b[1;34m%s\x1b[0m' % dirname
 
     def format_error(msg):
-        """Format an error."""
+        """Format an error.
+        """
         if not with_color:
             return msg
         return '\x1b[31m%s\x1b[0m' % msg
 
     def format_filename(fname):
-        """Format a filename."""
+        """Format a filename.
+        """
         if not with_color:
             return fname
         if fname.startswith('.'):
@@ -99,17 +104,20 @@ def render(fs,
         return fname
 
     def sort_key_dirs_first(info):
-        """Sort key func with directories first."""
+        """Get the info sort function with directories first.
+        """
         return (not info.is_dir, info.name.lower())
 
     def sort_key(info):
-        """Default  key for info."""
+        """Get the default info sort function using resource name.
+        """
         return info.name.lower()
 
     counts = {"dirs": 0, "files": 0}
 
     def format_directory(path, levels):
-        """Recursive directory function."""
+        """Recursive directory function.
+        """
         try:
             directory = sorted(
                 fs.filterdir(path, exclude_dirs=exclude, files=filter),

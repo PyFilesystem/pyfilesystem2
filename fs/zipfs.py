@@ -1,3 +1,6 @@
+"""Manage the filesystem in a Zip archive.
+"""
+
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -20,15 +23,14 @@ from .wrapfs import WrapFS
 
 
 class ZipFS(WrapFS):
-    """
-    Read and write zip files.
+    """Read and write zip files.
 
     There are two ways to open a ZipFS for the use cases of reading
     a zip file, and creating a new one.
 
-    If you open the ZipFS with  ``write`` set to ``False`` (the
-    default), then the filesystem will be a read only filesystem which
-    maps to the files and directories within the zip file. Files are
+    If you open the ZipFS with  ``write`` set to `False` (the default)
+    then the filesystem will be a read only filesystem which maps to
+    the files and directories within the zip file. Files are
     decompressed on the fly when you open them.
 
     Here's how you might extract and print a readme from a zip file::
@@ -36,7 +38,7 @@ class ZipFS(WrapFS):
         with ZipFS('foo.zip') as zip_fs:
             readme = zip_fs.gettext('readme.txt')
 
-    If you open the ZipFS with ``write`` set to ``True``, then the ZipFS
+    If you open the ZipFS with ``write`` set to `True`, then the ZipFS
     will be a empty temporary filesystem. Any files / directories you
     create in the ZipFS will be written in to a zip file when the ZipFS
     is closed.
@@ -51,17 +53,14 @@ class ZipFS(WrapFS):
             )
 
 
-    :param file: An OS filename, or a open file object.
-    :type file: str or file
-    :param write: Set to ``True`` to write a new zip file, or ``False``
-        to read an existing zip file.
-    :type write: bool
-    :param compression:  Compression to use (one of the constants
-        defined in the zipfile module in the stdlib).
-    :type compression: int
-    :param temp_fs: An opener string for the temporary filesystem
-        used to store data prior to zipping.
-    :type temp_fs: str
+    Arguments:
+        file (str or io.IOBase): An OS filename, or an open file object.
+        write (bool, optional): Set to `True` to write a new zip file, or
+            `False` (default) to read an existing zip file.
+        compression (str, optional): Compression to use (one of the constants
+            defined in the `zipfile` module in the stdlib).
+        temp_fs (str, optional): An FS URL for the temporary
+            filesystem used to store data prior to zipping.
 
     """
 
@@ -84,7 +83,8 @@ class ZipFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class WriteZipFS(WrapFS):
-    """A writable zip file."""
+    """A writable zip file.
+    """
 
     def __init__(self,
                  file,
@@ -126,17 +126,19 @@ class WriteZipFS(WrapFS):
         super(WriteZipFS, self).close()
 
     def write_zip(self, file=None, compression=None, encoding=None):
-        """
-        Write zip to a file.
+        """Write zip to a file.
 
-        .. note ::
+        Arguments:
+            file (str or io.IOBase, optional): Destination file, may be
+                a file name or an open file handle.
+            compression (str, optional): Compression to use (one of the
+                constants defined in the `zipfile` module in the stdlib).
+            encoding (str, optional): The character encoding to use
+                (default uses the encoding defined in
+                `~WriteZipFS.__init__`).
+
+        Note:
             This is called automatically when the ZipFS is closed.
-
-        :param file: Destination file, may be a file name or an open
-            file object.
-        :type file: str or file-like
-        :param compression: Compression to use (one of the constants
-            defined in the zipfile module in the stdlib).
 
         """
         if not self.isclosed():
@@ -150,7 +152,8 @@ class WriteZipFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class ReadZipFS(FS):
-    """A readable zip file."""
+    """A readable zip file.
+    """
 
     _meta = {
         'case_insensitive': True,
@@ -176,7 +179,8 @@ class ReadZipFS(FS):
         return "<zipfs '{}'>".format(self._file)
 
     def _path_to_zip_name(self, path):
-        """Convert a path to a zip file name."""
+        """Convert a path to a zip file name.
+        """
         if self._directory.isdir(path):
             return relpath(normpath(path)) + '/'
         else:
@@ -184,10 +188,7 @@ class ReadZipFS(FS):
 
     @property
     def _directory(self):
-        """
-        Make a memory filesystem with the same directory structure
-        as the zip.
-
+        """`MemoryFS`: a filesystem with the same folder hierarchy as the zip.
         """
         self.check()
         with self._lock:

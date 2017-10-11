@@ -1,7 +1,4 @@
-"""
-
-A SubFS represents a directory in a 'parent' filesystem.
-
+"""Manage a directory in a *parent* filesystem.
 """
 
 from __future__ import print_function
@@ -15,12 +12,11 @@ from .path import abspath, join, normpath, relpath
 
 @six.python_2_unicode_compatible
 class SubFS(WrapFS):
-    """
-    A sub-directory on another filesystem.
+    """A sub-directory on another filesystem.
 
     A SubFS is a filesystem object that maps to a sub-directory of
     another filesystem. This is the object that is returned by
-    :meth:`~fs.base.FS.opendir`.
+    `~fs.base.FS.opendir`.
 
     """
 
@@ -50,9 +46,7 @@ class SubFS(WrapFS):
 
 
 class ClosingSubFS(SubFS):
-    """
-    A version of SubFS which will close its parent automatically.
-
+    """A version of `SubFS` which closes its parent when closed.
     """
 
     def close(self):

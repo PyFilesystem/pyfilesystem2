@@ -1,4 +1,5 @@
-"""Match wildcard filenames."""
+"""Match wildcard filenames.
+"""
 # Adapted from https://hg.python.org/cpython/file/2.7/Lib/fnmatch.py
 
 from __future__ import unicode_literals
@@ -13,12 +14,14 @@ _PATTERN_CACHE = LRUCache(_MAXCACHE)
 
 
 def match(pattern, name):
-    """
-    Test whether ``name`` matches ``pattern``.
+    """Test whether a name matches a wildcard pattern.
 
-    :param str pattern: A wildcard pattern. e.g. ``"*.py"``
-    :param str name: A filename
-    :rtype: bool
+    Arguments:
+        pattern (str): A wildcard pattern, e.g. ``"*.py"``.
+        name (bool): A filename.
+
+    Returns:
+        bool: `True` if the filename matches the pattern.
 
     """
     try:
@@ -30,13 +33,14 @@ def match(pattern, name):
 
 
 def imatch(pattern, name):
-    """
-    Test whether ``name`` matches ``pattern``, ignoring
-    case differences.
+    """Test whether a name matches a wildcard pattern (case insensitive).
 
-    :param str pattern: A wildcard pattern. e.g. ``"*.py"``
-    :param str name: A filename
-    :rtype: bool
+    Arguments:
+        pattern (str): A wildcard pattern, e.g. ``"*.py"``.
+        name (bool): A filename.
+
+    Returns:
+        bool: `True` if the filename matches the pattern.
 
     """
     try:
@@ -49,14 +53,17 @@ def imatch(pattern, name):
 
 
 def match_any(patterns, name):
-    """
-    Test if a name matches at least one of a list of patterns. Will
-    return ``True`` if ``patterns`` is an empty list.
+    """Test if a name matches any of a list of patterns.
 
-    :param list patterns: A list of wildcard pattern. e.g. ``["*.py",
-        "*.pyc"]``
-    :param str name: A filename.
-    :rtype: bool
+    Will return `True` if ``patterns`` is an empty list.
+
+    Arguments:
+        patterns (list): A list of wildcard pattern, e.g ``["*.py",
+            "*.pyc"]``
+        name (str): A filename.
+
+    Returns:
+        bool: `True` if the name matches at least one of the patterns.
 
     """
     if not patterns:
@@ -65,15 +72,17 @@ def match_any(patterns, name):
 
 
 def imatch_any(patterns, name):
-    """
-    Test if a name matches at least one of a list of patterns, ignoring
-    case differences. Will return ``True`` if ``patterns`` is an empty
-    list.
+    """Test if a name matches any of a list of patterns (case insensitive).
 
-    :param list patterns: A list of wildcard pattern. e.g. ``["*.py",
-        "*.pyc"]``
-    :param str name: A filename.
-    :rtype: bool
+    Will return `True` if ``patterns`` is an empty list.
+
+    Arguments:
+        patterns (list): A list of wildcard pattern, e.g ``["*.py",
+            "*.pyc"]``
+        name (str): A filename.
+
+    Returns:
+        bool: `True` if the name matches at least one of the patterns.
 
     """
     if not patterns:
@@ -82,24 +91,25 @@ def imatch_any(patterns, name):
 
 
 def get_matcher(patterns, case_sensitive):
-    """
-    Get a callable that checks a list of names matches the given
-    wildcard patterns.
+    """Get a callable that matches names against the given patterns.
 
-    :param list patterns: A list of wildcard pattern. e.g. ``["*.py",
-        "*.pyc"]``
-    :param bool case_sensitive: If True, then the callable will be case
-        sensitive, otherwise it will be case insensitive.
-    :rtype: callable
+    Arguments:
+        patterns (list): A list of wildcard pattern. e.g. ``["*.py",
+            "*.pyc"]``
+        case_sensitive (bool): If `True`, then the callable will be case
+            sensitive, otherwise it will be case insensitive.
 
-    Here's an example::
+    Returns:
+        callable: a matcher that will return `True` if the name given as
+        an argument matches any of the given patterns.
 
-    >>> import wildcard
-    >>> is_python = wildcard.get_macher(['*.py'])
-    >>> is_python('__init__.py')
-    >>> True
-    >>> is_python('foo.txt')
-    >>> False
+    Example:
+        >>> from fs import wildcard
+        >>> is_python = wildcard.get_matcher(['*.py'], True)
+        >>> is_python('__init__.py')
+        True
+        >>> is_python('foo.txt')
+        False
 
     """
     if not patterns:
@@ -111,10 +121,17 @@ def get_matcher(patterns, case_sensitive):
 
 
 def _translate(pattern, case_sensitive=True):
-    """
-    Translate a shell PATTERN to a regular expression.
+    """Translate a wildcard pattern to a regular expression.
 
     There is no way to quote meta-characters.
+
+    Arguments:
+        pattern (str): A wildcard pattern.
+        case_sensitive (bool, optional): Set to `False` to use a
+            case insensitive regex (default `True`).
+
+    Returns:
+        str: A regex equivalent to the given pattern.
 
     """
     if not case_sensitive:
