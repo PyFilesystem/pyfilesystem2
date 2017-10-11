@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   the type is wrong, rather than ValueError
 - More efficient feature detection for FTPFS
 - Fixes for `fs.filesize`
+- Major documentation refactor (Martin Larralde)
 
 ## [2.0.11]
 
