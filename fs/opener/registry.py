@@ -188,8 +188,8 @@ class Registry(object):
             fs_url (FS or str): A filesystem instance or a FS URL.
             create (bool, optional): If `True`, then create the filesystem if
                 it doesn't already exist.
-            writeable (bool, optional): If `True`, then the filesystem should
-                be writeable.
+            writeable (bool, optional): If `True`, then the filesystem
+                must be writeable.
             cwd (str): The current working directory, if opening a
                 `~fs.osfs.OSFS`.
 
