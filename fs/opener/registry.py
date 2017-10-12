@@ -181,7 +181,7 @@ class Registry(object):
         return _fs
 
     @contextlib.contextmanager
-    def manage_fs(self, fs_url, create=False, writeable=True, cwd='.'):  # noqa: D300,D301
+    def manage_fs(self, fs_url, create=False, writeable=False, cwd='.'):  # noqa: D300,D301
         """Get a context manager to open and close a filesystem.
 
         Arguments:
