@@ -418,6 +418,12 @@ class FSTestCases(object):
         with self.assertRaises(errors.NoURL):
             self.fs.geturl('foo', purpose='__nosuchpurpose__')
 
+    def test_validatepath(self):
+        """Check validatepath returns an absolute path.
+        """
+        path = self.fs.validatepath('foo')
+        self.assertEqual(path, '/foo')
+
     def test_invalid_chars(self):
         # Test invalid path method.
         with self.assertRaises(errors.InvalidCharsInPath):

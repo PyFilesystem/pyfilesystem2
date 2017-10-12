@@ -395,3 +395,5 @@ class WrapFS(FS):
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
             _fs.validatepath(_path)
+        path = abspath(normpath(path))
+        return path

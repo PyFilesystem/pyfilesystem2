@@ -320,6 +320,8 @@ class MultiFS(FS):
             self.write_fs.validatepath(path)
         else:
             super(MultiFS, self).validatepath(path)
+        path = abspath(normpath(path))
+        return path
 
     def makedirs(self, path, permissions=None, recreate=False):
         self.check()

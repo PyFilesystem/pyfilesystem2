@@ -217,7 +217,9 @@ class MountFS(FS):
     def validatepath(self, path):
         self.check()
         fs, _path = self._delegate(path)
-        return fs.validatepath(_path)
+        fs.validatepath(_path)
+        path = abspath(normpath(path))
+        return path
 
     def open(self,
              path,

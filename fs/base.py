@@ -1233,7 +1233,8 @@ class FS(object):
                 self.setinfo(path, raw_info)
 
     def validatepath(self, path):
-        """Check if a path is valid, returning a normalized absolute path.
+        """Check if a path is valid, returning a normalized absolute
+        path.
 
         Many filesystems have restrictions on the format of paths they
         support. This method will check that ``path`` is valid on the
