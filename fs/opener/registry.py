@@ -146,7 +146,7 @@ class Registry(object):
 
     def open_fs(self,
                 fs_url,
-                writeable=True,
+                writeable=False,
                 create=False,
                 cwd=".",
                 default_protocol='osfs'):
