@@ -20,3 +20,8 @@ class UnsupportedProtocol(OpenerError):
 class EntryPointError(OpenerError):
     """An entry point could not be loaded.
     """
+
+
+class NotWriteable(OpenerError):
+    """A writable FS could not be created.
+    """

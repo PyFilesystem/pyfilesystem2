@@ -11,6 +11,7 @@ from fs import tarfs
 from fs import errors
 from fs.compress import write_tar
 from fs.opener import open_fs
+from fs.opener.errors import NotWriteable
 from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases
@@ -158,3 +159,10 @@ class TestReadTarFSMem(TestReadTarFS):
 
     def make_source_fs(self):
         return open_fs('mem://')
+
+
+class TestOpener(unittest.TestCase):
+
+    def test_not_writeable(self):
+        with self.assertRaises(NotWriteable):
+            open_fs('tar://foo.zip', writeable=True)
