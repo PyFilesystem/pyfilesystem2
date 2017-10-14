@@ -34,6 +34,10 @@ class Opener(object):
             cwd (str): The current working directory (generally only
                 relevant for OS filesystems).
 
+        Raises:
+            fs.opener.errors.OpenerError: If a filesystem could not
+                be opened for any reason.
+
         Returns:
             `~fs.base.FS`: A filesystem instance.
 

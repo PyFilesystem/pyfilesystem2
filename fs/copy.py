@@ -94,7 +94,7 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
         dst_path (str): Path to a file on the destination filesystem.
 
     """
-    with manage_fs(src_fs, writeable=False) as src_fs:
+    with manage_fs(src_fs) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             if src_fs is dst_fs:
                 # Same filesystem, so we can do a potentially optimized
@@ -128,7 +128,7 @@ def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
         bool: `True` if the file copy was executed, `False` otherwise.
 
     """
-    with manage_fs(src_fs, writeable=False) as src_fs:
+    with manage_fs(src_fs) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             if src_fs is dst_fs:
                 # Same filesystem, so we can do a potentially optimized
@@ -165,7 +165,7 @@ def copy_structure(src_fs, dst_fs, walker=None):
 
     """
     walker = walker or Walker()
-    with manage_fs(src_fs, writeable=False) as src_fs:
+    with manage_fs(src_fs) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
                 for dir_path in walker.dirs(src_fs):
@@ -193,7 +193,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path,
     walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
-    with manage_fs(src_fs, writeable=False) as src_fs:
+    with manage_fs(src_fs) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
                 dst_fs.makedir(_dst_path, recreate=True)
@@ -245,7 +245,7 @@ def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path,
     walker = walker or Walker()
     _src_path = abspath(normpath(src_path))
     _dst_path = abspath(normpath(dst_path))
-    with manage_fs(src_fs, writeable=False) as src_fs:
+    with manage_fs(src_fs) as src_fs:
         with manage_fs(dst_fs, create=True) as dst_fs:
             with src_fs.lock(), dst_fs.lock():
                 dst_fs.makedir(_dst_path, recreate=True)

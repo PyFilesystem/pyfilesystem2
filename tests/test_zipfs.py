@@ -8,6 +8,7 @@ import zipfile
 from fs import zipfs
 from fs.compress import write_zip
 from fs.opener import open_fs
+from fs.opener.errors import NotWriteable
 from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases
@@ -74,4 +75,10 @@ class TestDirsZipFS(unittest.TestCase):
         finally:
             os.remove(path)
 
+
+class TestOpener(unittest.TestCase):
+
+    def test_not_writeable(self):
+        with self.assertRaises(NotWriteable):
+            open_fs('zip://foo.zip', writeable=True)
 

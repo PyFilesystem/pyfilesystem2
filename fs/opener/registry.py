@@ -146,7 +146,7 @@ class Registry(object):
 
     def open_fs(self,
                 fs_url,
-                writeable=True,
+                writeable=False,
                 create=False,
                 cwd=".",
                 default_protocol='osfs'):
@@ -181,15 +181,15 @@ class Registry(object):
         return _fs
 
     @contextlib.contextmanager
-    def manage_fs(self, fs_url, create=False, writeable=True, cwd='.'):  # noqa: D300,D301
+    def manage_fs(self, fs_url, create=False, writeable=False, cwd='.'):  # noqa: D300,D301
         """Get a context manager to open and close a filesystem.
 
         Arguments:
             fs_url (FS or str): A filesystem instance or a FS URL.
             create (bool, optional): If `True`, then create the filesystem if
                 it doesn't already exist.
-            writeable (bool, optional): If `True`, then the filesystem should
-                be writeable.
+            writeable (bool, optional): If `True`, then the filesystem
+                must be writeable.
             cwd (str): The current working directory, if opening a
                 `~fs.osfs.OSFS`.
 

@@ -253,7 +253,7 @@ class TestOpeners(unittest.TestCase):
             with opener.open_fs('zip://' + zip_name, create=True) as make_zip:
                 make_zip.settext('foo.txt', 'foofoo')
             # Test opening zip
-            with opener.open_fs('zip://' + zip_name) as zip_fs:
+            with opener.open_fs('zip://' + zip_name, writeable=False) as zip_fs:
                 self.assertEqual(zip_fs.gettext('foo.txt'), 'foofoo')
         finally:
             os.remove(zip_name)
@@ -267,7 +267,7 @@ class TestOpeners(unittest.TestCase):
                 self.assertEqual(make_tar.compression, 'gz')
                 make_tar.settext('foo.txt', 'foofoo')
             # Test opening tar
-            with opener.open_fs('tar://' + tar_name) as tar_fs:
+            with opener.open_fs('tar://' + tar_name, writeable=False) as tar_fs:
                 self.assertEqual(tar_fs.gettext('foo.txt'), 'foofoo')
         finally:
             os.remove(tar_name)
