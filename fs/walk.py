@@ -135,15 +135,35 @@ class Walker(WalkerBase):
         if search not in ('breadth', 'depth'):
             raise ValueError("search must be 'breadth' or 'depth'")
         self.ignore_errors = ignore_errors
-        if ignore_errors:
-            assert on_error is None,\
-                'on_error is invalid when ignore_errors==True'
-            on_error = lambda path, error: True
-        self.on_error = on_error or (lambda path, error: True)
+        if on_error:
+            if ignore_errors:
+                raise ValueError(
+                    'on_error is invalid when ignore_errors==True'
+                )
+        else:
+            on_error = (
+                self._ignore_errors
+                if ignore_errors
+                else self._raise_errors
+            )
+        if not callable(on_error):
+            raise TypeError('on_error must be callable')
+
+        self.on_error = on_error
         self.search = search
         self.filter = filter
         self.exclude_dirs = exclude_dirs
         super(Walker, self).__init__()
+
+    @classmethod
+    def _ignore_errors(cls, path, error):
+        """Default on_error callback."""
+        return True
+
+    @classmethod
+    def _raise_errors(cls, path, error):
+        """Callback to re-raise dir scan errors."""
+        return False
 
     @classmethod
     def bind(cls, fs):
@@ -260,11 +280,11 @@ class Walker(WalkerBase):
 
         """
         try:
-            return fs.scandir(dir_path, namespaces=namespaces)
+            for info in fs.scandir(dir_path, namespaces=namespaces):
+                yield info
         except FSError as error:
-            if self.on_error(dir_path, error):
-                return iter(())
-            six.reraise(type(error), error)
+            if not self.on_error(dir_path, error):
+                six.reraise(type(error), error)
 
     def walk(self, fs, path='/', namespaces=None):
         """Walk the directory structure of a filesystem.

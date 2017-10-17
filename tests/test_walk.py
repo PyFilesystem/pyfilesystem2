@@ -24,7 +24,7 @@ class TestWalker(unittest.TestCase):
         repr(self.walker)
 
     def test_create(self):
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             walk.Walker(ignore_errors=True, on_error=lambda path, error: True)
         walk.Walker(ignore_errors=True)
 
@@ -141,7 +141,7 @@ class TestWalk(unittest.TestCase):
 
         self.fs.scandir = broken_scandir
 
-        files = list(self.fs.walk.files(search="depth"))
+        files = list(self.fs.walk.files(search="depth", ignore_errors=True))
         self.assertEqual(
             files,
             [
@@ -156,3 +156,7 @@ class TestWalk(unittest.TestCase):
                     on_error=lambda path, error: False
                 )
             )
+
+    def test_on_error_invalid(self):
+        with self.assertRaises(TypeError):
+            walk.Walker(on_error='nope')
