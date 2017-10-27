@@ -61,7 +61,7 @@ class OSFS(FS):
 
     Raises:
         `fs.errors.CreateFailed`: If ``root_path`` does not
-            exists, or could not be created.
+            exist, or could not be created.
 
     Examples:
         >>> current_directory_fs = OSFS('.')
@@ -93,7 +93,7 @@ class OSFS(FS):
         else:
             if not os.path.isdir(_root_path):
                 raise errors.CreateFailed(
-                    'root path does not exists'
+                    'root path does not exist'
                 )
 
         _meta = self._meta = {
