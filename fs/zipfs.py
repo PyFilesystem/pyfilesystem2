@@ -31,12 +31,28 @@ class _ZipExtFile(RawWrapper):
         super(_ZipExtFile, self).__init__(_zip.open(name), 'r', name)
 
     def read(self, size=-1):
-        buf = self._f.read(size)
+        if size is None or size < 0:
+            size = self._end - self._pos
+            buf = b''.join([self._f.read(size-1), self._f._readbuffer[-1:]])
+            self._f._offset += 1
+        elif self._f._offset + size <= len(self._f._readbuffer):
+            buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
+            self._f._offset += size
+        else:
+            buf = self._f.read(size)
         self._pos += len(buf)
         return buf
 
     def read1(self, size=-1):
-        buf = self._f.read1(size)
+        if size is None or size < 0:
+            size = self._end - self._pos
+            buf = b''.join([self._f.read1(size-1), self._f._readbuffer[-1:]])
+            self._f._offset += 1
+        if self._f._offset + size <= len(self._f._readbuffer):
+            buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
+            self._f._offset += size
+        else:
+            buf = self._f.read1(size)
         self._pos += len(buf)
         return buf
 
