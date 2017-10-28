@@ -65,9 +65,10 @@ class ArchiveTestCases(object):
         self.assertEqual(root.name, '')
         self.assertTrue(root.is_dir)
 
-        top = self.fs.getinfo('top.txt', 'details')
+        top = self.fs.getinfo('top.txt', ['details', 'access'])
         self.assertEqual(top.size, 12)
         self.assertFalse(top.is_dir)
+
 
     def test_listdir(self):
         self.assertEqual(
@@ -130,4 +131,3 @@ class ArchiveTestCases(object):
     def test_implied_dir(self):
         self.fs.getinfo('foo/bar')
         self.fs.getinfo('foo')
-

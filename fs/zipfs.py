@@ -4,8 +4,10 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from datetime import datetime
 import zipfile
+import stat
+
+from datetime import datetime
 
 import six
 
@@ -15,6 +17,7 @@ from .compress import write_zip
 from .enums import ResourceType, Seek
 from .info import Info
 from .iotools import RawWrapper
+from .permissions import Permissions
 from .memoryfs import MemoryFS
 from .opener import open_fs
 from .path import dirname, normpath, relpath
@@ -290,63 +293,62 @@ class ReadZipFS(FS):
             return self._directory_fs
 
     def getinfo(self, path, namespaces=None):
-        self.check()
+        _path = self.validatepath(path)
         namespaces = namespaces or ()
-        _path = normpath(path)
+        raw_info = {}
+
         if _path == '/':
-            raw_info = {
-                "basic":
-                {
-                    "name": "",
-                    "is_dir": True,
-                },
-                "details":
-                {
+            raw_info["basic"] = {
+                "name": "",
+                "is_dir": True,
+            }
+            if "details" in namespaces:
+                raw_info["details"] = {
                     "type": int(ResourceType.directory)
                 }
-            }
+
         else:
             basic_info = self._directory.getinfo(_path)
-            zip_name = self._path_to_zip_name(path)
-            try:
-                zip_info = self._zip.getinfo(zip_name)
-            except KeyError:
-                # Can occur if there is an implied directory in the zip
-                raw_info = {
-                    "basic":
-                    {
-                        "name": basic_info.name,
-                        "is_dir": basic_info.is_dir
-                    }
-                }
-            else:
-                modified_epoch = datetime_to_epoch(
-                    datetime(*zip_info.date_time)
-                )
-                raw_zip_info = {
-                    k: getattr(zip_info, k)
-                    for k in dir(zip_info)
-                    if (not k.startswith('_') and
-                        not callable(getattr(zip_info, k)))
-                }
-                raw_info = {
-                    "basic":
-                    {
-                        "name": basic_info.name,
-                        "is_dir": basic_info.is_dir,
-                    },
-                    "details":
-                    {
-                        "size": zip_info.file_size,
-                        "type": int(
-                            ResourceType.directory
-                            if basic_info.is_dir else
-                            ResourceType.file
-                        ),
-                        "modified": modified_epoch
-                    },
-                    "zip": raw_zip_info
-                }
+            raw_info["basic"] = {
+                "name": basic_info.name,
+                "is_dir": basic_info.is_dir,
+            }
+
+            if not {"details", "access", "zip"}.isdisjoint(namespaces):
+                zip_name = self._path_to_zip_name(path)
+                try:
+                    zip_info = self._zip.getinfo(zip_name)
+                except KeyError:
+                    # Can occur if there is an implied directory in the zip
+                    pass
+                else:
+                    if "details" in namespaces:
+                        raw_info["details"] = {
+                            "size": zip_info.file_size,
+                            "type": int(
+                                ResourceType.directory
+                                if basic_info.is_dir else
+                                ResourceType.file
+                            ),
+                            "modified": datetime_to_epoch(
+                                datetime(*zip_info.date_time)
+                            )
+                        }
+                    if "zip" in namespaces:
+                        raw_info["zip"] = {
+                            k: getattr(zip_info, k)
+                            for k in dir(zip_info)
+                            if (not k.startswith('_') and
+                                not callable(getattr(zip_info, k)))
+                        }
+                    if "access" in namespaces:
+                        # check the zip was created on UNIX to get permissions
+                        if zip_info.create_system == 3:
+                            raw_info["access"] = {
+                                "permissions": Permissions(
+                                    mode=zip_info.external_attr >> 16 & 0xFFF
+                                )
+                            }
 
         return Info(raw_info)
 

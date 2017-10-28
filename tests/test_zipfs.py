@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import os
+import sys
 import tempfile
 import unittest
 import zipfile
@@ -49,6 +50,12 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
 
     def remove_archive(self):
         os.remove(self._temp_path)
+
+    def test_getinfo(self):
+        super(TestReadZipFS, self).test_getinfo()
+        top = self.fs.getinfo('top.txt', ['zip'])
+        if sys.platform in ('linux', 'darwin'):
+            self.assertEqual(top.get('zip', 'create_system'), 3)
 
     def test_openbin(self):
         with self.fs.openbin('top.txt') as f:
@@ -119,8 +126,6 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
             self.assertEqual(f.seek(-7, Seek.end), 5)
             self.assertEqual(f.seek(-5, Seek.end), 7)
             self.assertEqual(f.read(), b'World')
-
-
 
 
 class TestReadZipFSMem(TestReadZipFS):
