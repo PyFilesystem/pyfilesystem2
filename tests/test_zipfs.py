@@ -60,6 +60,24 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
         with self.fs.openbin('top.txt') as f:
             self.assertRaises(ValueError, f.seek, 0, 5)
 
+    def test_read(self):
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.read(), b'Hello, World')
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.read(5), b'Hello')
+            self.assertEqual(f.read(7), b', World')
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.read(12), b'Hello, World')
+
+    def test_read1(self):
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.read1(), b'Hello, World')
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.read1(5), b'Hello')
+            self.assertEqual(f.read1(7), b', World')
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.read1(12), b'Hello, World')
+
     def test_seek_set(self):
         with self.fs.openbin('top.txt') as f:
             self.assertEqual(f.tell(), 0)
@@ -90,6 +108,8 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
             self.assertEqual(f.tell(), 12)
             self.assertEqual(f.seek(-1, Seek.current), 11)
             self.assertEqual(f.read(), b'd')
+        with self.fs.openbin('top.txt') as f:
+            self.assertRaises(ValueError, f.seek, -1, Seek.current)
 
     def test_seek_end(self):
         with self.fs.openbin('top.txt') as f:

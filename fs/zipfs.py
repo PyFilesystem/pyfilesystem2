@@ -81,12 +81,11 @@ class _ZipExtFile(RawWrapper):
                 else:
                     self._f.read(offset)
                 self._pos += offset
+            elif self._f._offset + offset >= 0:
+                self._f._offset += offset
+                self._pos += offset
             else:
-                if self._f._offset + offset >= 0:
-                    self._f._offset += offset
-                    self._pos += offset
-                else:
-                    self.seek(self._pos + offset, Seek.set)
+                self.seek(self._pos + offset, Seek.set)
 
         elif whence == Seek.end:
             if offset > 0:
