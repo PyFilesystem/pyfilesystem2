@@ -12,7 +12,7 @@ import six
 from . import errors
 from .base import FS
 from .compress import write_zip
-from .enums import ResourceType
+from .enums import ResourceType, Seek
 from .info import Info
 from .iotools import RawWrapper
 from .memoryfs import MemoryFS
@@ -20,6 +20,68 @@ from .opener import open_fs
 from .path import dirname, normpath, relpath
 from .time import datetime_to_epoch
 from .wrapfs import WrapFS
+
+
+class _ZipExtFile(RawWrapper):
+
+    def __init__(self, fs, name):
+        self._zip = _zip = fs._zip
+        self._end = _zip.getinfo(name).file_size
+        self._pos = 0
+        super(_ZipExtFile, self).__init__(_zip.open(name), 'r', name)
+
+    def read(self, size=-1):
+        buf = self._f.read(size)
+        self._pos += len(buf)
+        return buf
+
+    def read1(self, size=-1):
+        buf = self._f.read1(size)
+        self._pos += len(buf)
+        return buf
+
+    def seek(self, offset, whence=Seek.set):
+
+        if whence == Seek.set:
+            if offset < 0:
+                raise ValueError("Negative seek position {}".format(offset))
+            elif offset >= self._pos:
+                self.seek(offset - self._pos, Seek.current)
+            else:
+                self._f = self._zip.open(self.name)
+                self._pos = 0
+                self.seek(offset, Seek.set)
+
+        elif whence == Seek.current:
+            if offset > 0:
+                if self._f._offset + offset < len(self._f._readbuffer):
+                    self._f._offset += offset
+                else:
+                    self._f.read(offset)
+                self._pos += offset
+            else:
+                if self._f._offset + offset >= 0:
+                    self._f._offset += offset
+                    self._pos += offset
+                else:
+                    self.seek(self._pos + offset, Seek.set)
+
+        elif whence == Seek.end:
+            if offset > 0:
+                raise ValueError("Positive seek position {}".format(offset))
+            self.seek(self._end + offset, Seek.set)
+
+        else:
+            raise ValueError(
+                "Invalid whence ({}, should be {}, {} or {})".format(
+                    whence, Seek.set, Seek.current, Seek.end
+                )
+            )
+
+        return self._pos
+
+    def tell(self):
+        return self._pos
 
 
 class ZipFS(WrapFS):
@@ -290,8 +352,7 @@ class ReadZipFS(FS):
             raise errors.FileExpected(path)
 
         zip_name = self._path_to_zip_name(path)
-        bin_file = self._zip.open(zip_name, 'r')
-        return RawWrapper(bin_file)
+        return _ZipExtFile(self, zip_name)
 
     def remove(self, path):
         self.check()
