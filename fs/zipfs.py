@@ -33,6 +33,7 @@ class _ZipExtFile(RawWrapper):
     def read(self, size=-1):
         if size is None or size < 0:
             size = self._end - self._pos
+            # NB(@althonos): do NOT replace by self._f.read() !
             buf = b''.join([self._f.read(size-1), self._f._readbuffer[-1:]])
             self._f._offset += 1
         elif self._f._offset + size <= len(self._f._readbuffer):
@@ -46,9 +47,10 @@ class _ZipExtFile(RawWrapper):
     def read1(self, size=-1):
         if size is None or size < 0:
             size = self._end - self._pos
+            # NB(@althonos): do NOT replace by self._f.read1() !
             buf = b''.join([self._f.read1(size-1), self._f._readbuffer[-1:]])
             self._f._offset += 1
-        if self._f._offset + size <= len(self._f._readbuffer):
+        elif self._f._offset + size <= len(self._f._readbuffer):
             buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
             self._f._offset += size
         else:
