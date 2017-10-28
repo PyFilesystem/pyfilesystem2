@@ -5,6 +5,7 @@ from six import text_type
 from fs.opener import open_fs
 from fs import walk
 from fs import errors
+from fs.memoryfs import MemoryFS
 from fs.test import UNICODE_TEXT
 
 
@@ -68,7 +69,8 @@ class ArchiveTestCases(object):
         top = self.fs.getinfo('top.txt', ['details', 'access'])
         self.assertEqual(top.size, 12)
         self.assertFalse(top.is_dir)
-
+        if not isinstance(self.source_fs, MemoryFS):
+            self.assertEqual(top.permissions.mode, 0o644)
 
     def test_listdir(self):
         self.assertEqual(

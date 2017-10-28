@@ -344,10 +344,11 @@ class ReadZipFS(FS):
                     if "access" in namespaces:
                         # check the zip was created on UNIX to get permissions
                         if zip_info.create_system == 3:
+                            mode = zip_info.external_attr >> 16 & 0xFFF
                             raw_info["access"] = {
                                 "permissions": Permissions(
-                                    mode=zip_info.external_attr >> 16 & 0xFFF
-                                ).dump()
+                                    mode=mode or 0o600  # default permission
+                                ).dump(),
                             }
 
         return Info(raw_info)
