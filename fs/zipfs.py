@@ -347,7 +347,7 @@ class ReadZipFS(FS):
                             raw_info["access"] = {
                                 "permissions": Permissions(
                                     mode=zip_info.external_attr >> 16 & 0xFFF
-                                )
+                                ).dump()
                             }
 
         return Info(raw_info)
