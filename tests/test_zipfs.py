@@ -11,7 +11,7 @@ from fs.compress import write_zip
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
 from fs.test import FSTestCases
-from fs.enums import Seek
+from fs.enums import Seek, ResourceType
 
 from .test_archives import ArchiveTestCases
 
@@ -141,15 +141,14 @@ class TestDirsZipFS(unittest.TestCase):
         fh, path = tempfile.mkstemp('testzip.zip')
         try:
             os.close(fh)
-            _zip_file = zipfile.ZipFile(path, mode='w')
-            _zip_file.writestr('foo/bar/baz/egg', b'hello')
-            _zip_file.close()
-            zip_fs = zipfs.ZipFS(path)
-            zip_fs.getinfo('foo')
-            zip_fs.getinfo('foo/bar')
-            zip_fs.getinfo('foo/bar/baz')
-            self.assertTrue(zip_fs.isdir('foo/bar/baz'))
-            self.assertTrue(zip_fs.isfile('foo/bar/baz/egg'))
+            with zipfile.ZipFile(path, mode='w') as z:
+                z.writestr('foo/bar/baz/egg', b'hello')
+            with zipfs.ReadZipFS(path) as zip_fs:
+                foo = zip_fs.getinfo('foo', ['details'])
+                bar = zip_fs.getinfo('foo/bar')
+                baz = zip_fs.getinfo('foo/bar/baz')
+                self.assertTrue(foo.is_dir)
+                self.assertTrue(zip_fs.isfile('foo/bar/baz/egg'))
         finally:
             os.remove(path)
 
