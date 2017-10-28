@@ -10,6 +10,7 @@ from fs.compress import write_zip
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
 from fs.test import FSTestCases
+from fs.enums import Seek
 
 from .test_archives import ArchiveTestCases
 
@@ -49,6 +50,58 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
     def remove_archive(self):
         os.remove(self._temp_path)
 
+    def test_openbin(self):
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.name, 'top.txt')
+        with self.fs.openbin('top.txt') as f:
+            self.assertRaises(ValueError, f.seek, -2, Seek.set)
+        with self.fs.openbin('top.txt') as f:
+            self.assertRaises(ValueError, f.seek, 2, Seek.end)
+        with self.fs.openbin('top.txt') as f:
+            self.assertRaises(ValueError, f.seek, 0, 5)
+
+    def test_seek_set(self):
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.tell(), 0)
+            self.assertEqual(f.read(), b'Hello, World')
+            self.assertEqual(f.tell(), 12)
+            self.assertEqual(f.read(), b'')
+            self.assertEqual(f.tell(), 12)
+            self.assertEqual(f.seek(0), 0)
+            self.assertEqual(f.tell(), 0)
+            self.assertEqual(f.read1(), b'Hello, World')
+            self.assertEqual(f.tell(), 12)
+            self.assertEqual(f.seek(1), 1)
+            self.assertEqual(f.tell(), 1)
+            self.assertEqual(f.read(), b'ello, World')
+            self.assertEqual(f.tell(), 12)
+            self.assertEqual(f.seek(7), 7)
+            self.assertEqual(f.tell(), 7)
+            self.assertEqual(f.read(), b'World')
+            self.assertEqual(f.tell(), 12)
+
+    def test_seek_current(self):
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.tell(), 0)
+            self.assertEqual(f.read(5), b'Hello')
+            self.assertEqual(f.tell(), 5)
+            self.assertEqual(f.seek(2, Seek.current), 7)
+            self.assertEqual(f.read1(), b'World')
+            self.assertEqual(f.tell(), 12)
+            self.assertEqual(f.seek(-1, Seek.current), 11)
+            self.assertEqual(f.read(), b'd')
+
+    def test_seek_end(self):
+        with self.fs.openbin('top.txt') as f:
+            self.assertEqual(f.tell(), 0)
+            self.assertEqual(f.seek(-12, Seek.end), 0)
+            self.assertEqual(f.read1(5), b'Hello')
+            self.assertEqual(f.seek(-7, Seek.end), 5)
+            self.assertEqual(f.seek(-5, Seek.end), 7)
+            self.assertEqual(f.read(), b'World')
+
+
+
 
 class TestReadZipFSMem(TestReadZipFS):
 
@@ -81,4 +134,3 @@ class TestOpener(unittest.TestCase):
     def test_not_writeable(self):
         with self.assertRaises(NotWriteable):
             open_fs('zip://foo.zip', writeable=True)
-
