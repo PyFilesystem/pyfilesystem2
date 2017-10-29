@@ -18,6 +18,16 @@ from .path import dirname, normpath, relpath, basename
 from .wrapfs import WrapFS
 from .permissions import Permissions
 
+__all__ = ['TarFS', 'WriteTarFS', 'ReadTarFS']
+
+
+if six.PY2:
+    def _get_member_info(member, encoding):
+        return member.get_info(encoding, None)
+else:
+    def _get_member_info(member, encoding):
+        return member.get_info()
+
 
 class TarFS(WrapFS):
     """Read and write tar files.
@@ -208,7 +218,7 @@ class ReadTarFS(FS):
         namespaces = namespaces or ()
         raw_info = {}
 
-        if _path in '/':
+        if not _path:
             raw_info['basic'] = {
                 "name": "",
                 "is_dir": True,
@@ -244,9 +254,7 @@ class ReadTarFS(FS):
                     "user": member.uname,
                 }
             if "tar" in namespaces:
-                raw_info["tar"] = raw_tar_info = member.get_info(*(
-                    [self.encoding, None] if six.PY2 else []
-                ))
+                raw_info["tar"] = _get_member_info(member, self.encoding)
                 raw_info["tar"].update({
                     k.replace('is', 'is_'):getattr(member, k)()
                     for k in dir(member)
