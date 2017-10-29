@@ -337,17 +337,16 @@ class ReadZipFS(FS):
                     if "zip" in namespaces:
                         raw_info["zip"] = {
                             k: getattr(zip_info, k)
-                            for k in dir(zip_info)
-                            if (not k.startswith('_') and
-                                not callable(getattr(zip_info, k)))
+                            for k in zip_info.__slots__
+                            if not k.startswith('_')
                         }
                     if "access" in namespaces:
                         # check the zip was created on UNIX to get permissions
-                        if zip_info.create_system == 3:
-                            mode = zip_info.external_attr >> 16 & 0xFFF
+                        if zip_info.external_attr \
+                                and zip_info.create_system == 3:
                             raw_info["access"] = {
                                 "permissions": Permissions(
-                                    mode=mode or 0o600  # default permission
+                                    mode=zip_info.external_attr >> 16 & 0xFFF
                                 ).dump(),
                             }
 
