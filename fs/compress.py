@@ -80,7 +80,7 @@ def write_zip(src_fs,
             try:
                 zip_info.external_attr = info.permissions.mode << 16
             except MissingInfoNamespace:
-                zip_info.external_attr = 0o600
+                pass
 
             if info.is_dir:
                 zip_info.external_attr |= 0x10
