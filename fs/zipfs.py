@@ -39,7 +39,7 @@ class _ZipExtFile(RawWrapper):
         elif size is None or size < 0:
             size = self._end - self._pos
             # NB(@althonos): do NOT replace by self._f.read() !
-            buf = b''.join([self._f.read(size-1), self._f._readbuffer[-1:]])
+            buf = self._f.read(size-1) + self._f._readbuffer[-1:]
             self._f._offset += 1
         elif self._f._offset + size <= len(self._f._readbuffer):
             buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
@@ -55,7 +55,7 @@ class _ZipExtFile(RawWrapper):
         if size is None or size < 0:
             size = self._end - self._pos
             # NB(@althonos): do NOT replace by self._f.read1() !
-            buf = b''.join([self._f.read1(size-1), self._f._readbuffer[-1:]])
+            buf = self._f.read1(size-1) + self._f._readbuffer[-1:]
             self._f._offset += 1
         elif self._f._offset + size <= len(self._f._readbuffer):
             buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
@@ -66,7 +66,37 @@ class _ZipExtFile(RawWrapper):
         return buf
 
     def seek(self, offset, whence=Seek.set):
+        """Change stream position.
 
+        Change the stream position to the given byte offset. The
+        offset is interpreted relative to the position indicated by
+        ``whence``.
+
+        Arguments:
+            offset (int): the offset to the new position, in bytes.
+            whence (int): the position reference. Possible values are:
+                * `Seek.set`: start of stream (the default).
+                * `Seek.current`: current position; offset may be negative.
+                * `Seek.end`: end of stream; offset must be negative.
+
+        Returns:
+            int: the new absolute position.
+
+        Raises:
+            ValueError: when ``whence`` is not known, or ``offset``
+                is invalid.
+
+        Note:
+            Zip compression does not support seeking, so the seeking
+            is emulated. The internal decompression buffer will be used
+            as much as possible, but sometimes it way be necessary to:
+                * reopen the file and restart decompression
+                * read and discard data to advance in the file
+
+            The size of the zip buffer can be changed by setting the
+            `zipfile.ZipExtFile.MIN_READ_SIZE` attribute.
+
+        """
         if whence == Seek.set:
             if offset < 0:
                 raise ValueError("Negative seek position {}".format(offset))
@@ -76,7 +106,6 @@ class _ZipExtFile(RawWrapper):
                 self._f = self._zip.open(self.name)
                 self._pos = 0
                 self.seek(offset, Seek.set)
-
         elif whence == Seek.current:
             if offset > 0:
                 if self._f._offset + offset < len(self._f._readbuffer):
@@ -89,19 +118,16 @@ class _ZipExtFile(RawWrapper):
                 self._pos += offset
             else:
                 self.seek(self._pos + offset, Seek.set)
-
         elif whence == Seek.end:
             if offset > 0:
                 raise ValueError("Positive seek position {}".format(offset))
             self.seek(self._end + offset, Seek.set)
-
         else:
             raise ValueError(
                 "Invalid whence ({}, should be {}, {} or {})".format(
                     whence, Seek.set, Seek.current, Seek.end
                 )
             )
-
         return self._pos
 
     def tell(self):
