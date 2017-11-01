@@ -4,6 +4,7 @@ import os
 import six
 import gzip
 import tarfile
+import getpass
 import tempfile
 import unittest
 
@@ -153,7 +154,13 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         try:
             tarfs.TarFS(self._temp_path)
         except:
-            self.fail("Couldn't open tarfs from fileobject")
+            self.fail("Couldn't open tarfs from filename")
+
+    def test_getinfo(self):
+        super(TestReadTarFS, self).test_getinfo()
+        top = self.fs.getinfo('top.txt', ['tar'])
+        self.assertTrue(top.get('tar', 'is_file'))
+
 
 class TestReadTarFSMem(TestReadTarFS):
 
