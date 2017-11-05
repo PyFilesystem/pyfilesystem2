@@ -18,6 +18,16 @@ from .path import dirname, normpath, relpath, basename
 from .wrapfs import WrapFS
 from .permissions import Permissions
 
+__all__ = ['TarFS', 'WriteTarFS', 'ReadTarFS']
+
+
+if six.PY2:
+    def _get_member_info(member, encoding):
+        return member.get_info(encoding, None)
+else:
+    def _get_member_info(member, encoding):
+        return member.get_info()
+
 
 class TarFS(WrapFS):
     """Read and write tar files.
@@ -204,59 +214,53 @@ class ReadTarFS(FS):
         return "<TarFS '{}'>".format(self._file)
 
     def getinfo(self, path, namespaces=None):
-        self.check()
+        _path = relpath(self.validatepath(path))
         namespaces = namespaces or ()
-        path = relpath(normpath(path))
-        if not path:
-            raw_info = {
-                "basic":
-                {
-                    "name": "",
-                    "is_dir": True,
-                },
-                "details":
-                {
+        raw_info = {}
+
+        if not _path:
+            raw_info['basic'] = {
+                "name": "",
+                "is_dir": True,
+            }
+            if 'details' in namespaces:
+                raw_info['details'] = {
                     "type": int(ResourceType.directory)
                 }
-            }
+
         else:
             try:
-                member = self._tar.getmember(path)
+                member = self._tar.getmember(_path)
             except KeyError:
                 raise errors.ResourceNotFound(path)
 
+            raw_info["basic"] = {
+                "name": basename(member.name),
+                "is_dir": member.isdir(),
+            }
 
-            raw_tar_info = member.get_info(*(
-                [self.encoding, None] if six.PY2 else []
-            ))
-
-            raw_tar_info.update({
-                k.replace('is', 'is_'):getattr(member, k)()
-                for k in dir(member)
-                if k.startswith('is')
-            })
-            raw_info = {
-                "basic":
-                {
-                    "name": basename(member.name),
-                    "is_dir": member.isdir(),
-                },
-                "details":
-                {
+            if "details" in namespaces:
+                raw_info["details"] = {
                     "size": member.size,
                     "type": int(self.type_map[member.type]),
                     "modified": member.mtime,
-                },
-                "access":
-                {
+                }
+            if "access" in namespaces:
+                raw_info["access"] = {
                     "gid": member.gid,
                     "group": member.gname,
                     "permissions": Permissions(mode=member.mode).dump(),
                     "uid": member.uid,
                     "user": member.uname,
-                },
-                "tar": raw_tar_info,
-            }
+                }
+            if "tar" in namespaces:
+                raw_info["tar"] = _get_member_info(member, self.encoding)
+                raw_info["tar"].update({
+                    k.replace('is', 'is_'):getattr(member, k)()
+                    for k in dir(member)
+                    if k.startswith('is')
+                })
+
         return Info(raw_info)
 
     def setinfo(self, path, info):

@@ -3,8 +3,10 @@ from __future__ import unicode_literals
 from six import text_type
 
 from fs.opener import open_fs
+from fs.enums import ResourceType
 from fs import walk
 from fs import errors
+from fs.memoryfs import MemoryFS
 from fs.test import UNICODE_TEXT
 
 
@@ -61,13 +63,22 @@ class ArchiveTestCases(object):
             self.fs.setinfo('foo.txt', {})
 
     def test_getinfo(self):
-        root = self.fs.getinfo('/')
+        root = self.fs.getinfo('/', ["details"])
         self.assertEqual(root.name, '')
         self.assertTrue(root.is_dir)
+        self.assertEqual(root.get('details', 'type'), ResourceType.directory)
 
-        top = self.fs.getinfo('top.txt', 'details')
+        bar = self.fs.getinfo('foo/bar', ['details'])
+        self.assertEqual(bar.name, 'bar')
+        self.assertTrue(bar.is_dir)
+        self.assertEqual(bar.get('details', 'type'), ResourceType.directory)
+
+        top = self.fs.getinfo('top.txt', ['details', 'access'])
         self.assertEqual(top.size, 12)
         self.assertFalse(top.is_dir)
+        if not isinstance(self.source_fs, MemoryFS):
+            self.assertEqual(top.permissions.mode, 0o644)
+        self.assertEqual(top.get('details', 'type'), ResourceType.file)
 
     def test_listdir(self):
         self.assertEqual(
@@ -130,4 +141,3 @@ class ArchiveTestCases(object):
     def test_implied_dir(self):
         self.fs.getinfo('foo/bar')
         self.fs.getinfo('foo')
-

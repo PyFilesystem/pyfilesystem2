@@ -18,7 +18,7 @@ import six
 from .enums import ResourceType
 from .path import relpath
 from .time import datetime_to_epoch
-from .errors import NoSysPath
+from .errors import NoSysPath, MissingInfoNamespace
 from .walk import Walker
 
 
@@ -51,7 +51,8 @@ def write_zip(src_fs,
     )
     walker = walker or Walker()
     with _zip:
-        gen_walk = walker.info(src_fs, namespaces=["details", "stat"])
+        gen_walk = walker.info(
+            src_fs, namespaces=["details", "stat", "access"])
         for path, info in gen_walk:
             # Zip names must be relative, directory names must end
             # with a slash.
@@ -76,7 +77,13 @@ def write_zip(src_fs,
                 )
             zip_info = zipfile.ZipInfo(zip_name, zip_time)
 
+            try:
+                zip_info.external_attr = info.permissions.mode << 16
+            except MissingInfoNamespace:
+                pass
+
             if info.is_dir:
+                zip_info.external_attr |= 0x10
                 # This is how to record directories with zipfile
                 _zip.writestr(zip_info, b'')
             else:
