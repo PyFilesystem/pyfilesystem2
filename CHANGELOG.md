@@ -4,11 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.0.14] - 2017-11-05
+## [2.0.15] - 2017-11-05
 
 ### Changed
 
 - ZipFS files are now seekable (Martin Larralde)
+
+## [2.0.14] - 2016-11-05
+
+No changes, pushed wrong branch to PyPi.
 
 ## [2.0.13] - 2017-10-17
 
