@@ -96,7 +96,7 @@ class WalkerBase(object):
                 to add to the `Info` objects.
 
         Yields:
-            (str, Info): a couple of ``(<absolute path>, <resource info>)``.
+            (str, Info): a tuple of ``(<absolute path>, <resource info>)``.
 
         """
         _walk = self.walk(fs, path=path, namespaces=namespaces)

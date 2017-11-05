@@ -212,11 +212,16 @@ class MemoryFS(FS):
     """A filesystem that stored in memory.
 
     Memory filesystems are useful for caches, temporary data stores,
-    unit testing, etc. They do require no parameters to their constructor.
-    They are very fast, but non-permanent.
+    unit testing, etc. Since all the data is in memory, they are very
+    fast, but non-permanent. The `MemoryFS` constructor takes no
+    arguments.
 
     Example:
         >>> mem_fs = MemoryFS()
+
+    Or via an FS URL:
+        >>> import fs
+        >>> mem_fs = fs.open_fs('mem://')
 
     """
 
