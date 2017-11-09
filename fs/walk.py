@@ -388,6 +388,7 @@ class Walker(WalkerBase):
         # No recursion!
 
         def scan(path):
+            """Perform scan."""
             return self._scan(fs, path, namespaces=namespaces)
 
         depth = self._calculate_depth(path)
