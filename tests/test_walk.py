@@ -65,6 +65,19 @@ class TestWalk(unittest.TestCase):
         expected = [(u'/', [u'foo1', u'foo2', u'foo3'], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo3', [], []), (u'/foo1/bar1', [], []), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
         self.assertEqual(_walk, expected)
 
+    def test_walk_directory(self):
+        _walk = []
+        for step in self.fs.walk('foo2'):
+            self.assertIsInstance(step, walk.Step)
+            path, dirs, files = step
+            _walk.append((
+                path,
+                sorted(info.name for info in dirs),
+                sorted(info.name for info in files)
+            ))
+        expected = [(u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
+        self.assertEqual(_walk, expected)
+
     def test_walk_levels_1(self):
         results = list(self.fs.walk(max_depth=1))
         self.assertEqual(len(results), 1)
