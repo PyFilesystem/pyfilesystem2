@@ -19,7 +19,6 @@ from .errors import FSError
 from .path import abspath
 from .path import join
 from .path import normpath
-from .path import parts
 
 
 Step = namedtuple('Step', 'path, dirs, files')
