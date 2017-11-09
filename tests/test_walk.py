@@ -53,15 +53,38 @@ class TestWalk(unittest.TestCase):
         repr(self.fs.walk)
 
     def test_walk(self):
-        walk = []
-        for path, dirs, files in self.fs.walk():
-            walk.append((
+        _walk = []
+        for step in self.fs.walk():
+            self.assertIsInstance(step, walk.Step)
+            path, dirs, files = step
+            _walk.append((
                 path,
-                [info.name for info in dirs],
-                [info.name for info in files]
+                sorted(info.name for info in dirs),
+                sorted(info.name for info in files)
             ))
         expected = [(u'/', [u'foo1', u'foo2', u'foo3'], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo3', [], []), (u'/foo1/bar1', [], []), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
-        self.assertEqual(walk, expected)
+        self.assertEqual(_walk, expected)
+
+    def test_walk_levels_1(self):
+        results = list(self.fs.walk(max_depth=1))
+        self.assertEqual(len(results), 1)
+        dirs = sorted(info.name for info in results[0].dirs)
+        self.assertEqual(dirs, ['foo1', 'foo2', 'foo3'])
+        files = sorted(info.name for info in results[0].files)
+        self.assertEqual(files, [])
+
+    def test_walk_levels_2(self):
+        _walk = []
+        for step in self.fs.walk(max_depth=2):
+            self.assertIsInstance(step, walk.Step)
+            path, dirs, files = step
+            _walk.append((
+                path,
+                sorted(info.name for info in dirs),
+                sorted(info.name for info in files)
+            ))
+        expected = [(u'/', [u'foo1', u'foo2', u'foo3'], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo3', [], [])]
+        self.assertEqual(_walk, expected)
 
     def test_walk_files(self):
         files = list(self.fs.walk.files())

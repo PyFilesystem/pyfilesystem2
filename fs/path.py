@@ -32,6 +32,7 @@ __all__ = [
     "iteratepath",
     "join",
     "normpath",
+    "parts",
     "recursepath",
     "relativefrom",
     "relpath",
@@ -254,6 +255,29 @@ def combine(path1, path2):
     if not path1:
         return path2.lstrip()
     return "{}/{}".format(path1.rstrip('/'), path2.lstrip('/'))
+
+
+def parts(path):
+    """Split a path in to its component parts.
+
+    Arguments:
+        path (str): Path to split in to parts.
+
+    Returns:
+        list: List of components
+
+    Example:
+        >>> parts('/foo/bar/baz')
+        ['/', 'foo', 'bar', 'baz']
+
+    """
+    _path = normpath(path)
+    components = _path.strip('/')
+
+    _parts = ['/' if _path.startswith('/') else './']
+    if components:
+        _parts += components.split('/')
+    return _parts
 
 
 def split(path):
