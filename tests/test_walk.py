@@ -59,8 +59,8 @@ class TestWalk(unittest.TestCase):
             path, dirs, files = step
             _walk.append((
                 path,
-                sorted(info.name for info in dirs),
-                sorted(info.name for info in files)
+                [info.name for info in dirs],
+                [info.name for info in files]
             ))
         expected = [(u'/', [u'foo1', u'foo2', u'foo3'], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo3', [], []), (u'/foo1/bar1', [], []), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
         self.assertEqual(_walk, expected)
@@ -72,8 +72,8 @@ class TestWalk(unittest.TestCase):
             path, dirs, files = step
             _walk.append((
                 path,
-                sorted(info.name for info in dirs),
-                sorted(info.name for info in files)
+                [info.name for info in dirs],
+                [info.name for info in files]
             ))
         expected = [(u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
         self.assertEqual(_walk, expected)

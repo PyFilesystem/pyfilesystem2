@@ -123,6 +123,7 @@ class Walker(WalkerBase):
             be returned if the final component matches one of the patterns.
         exclude_dirs (list, optional): A list of patterns that will be used
             to filter out directories from the walk. e.g. ``['*.svn', '*.git']``.
+        max_depth (int, optional): Maximum directory depth to walk.
 
     """
 
@@ -487,6 +488,7 @@ class BoundWalker(object):
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
+            max_depth (int, optional): Maximum directory depth to walk.
 
         Returns:
             ~collections.Iterator: an iterator of ``(<path>, <dirs>, <files>)``
@@ -534,6 +536,7 @@ class BoundWalker(object):
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
+            max_depth (int, optional): Maximum directory depth to walk.
 
         Returns:
             ~collections.Iterable: An iterable of file paths (absolute
@@ -564,6 +567,7 @@ class BoundWalker(object):
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
+            max_depth (int, optional): Maximum directory depth to walk.
 
         Returns:
             ~collections.iterable: an iterable of directory paths
@@ -601,6 +605,7 @@ class BoundWalker(object):
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
+            max_depth (int, optional): Maximum directory depth to walk.
 
         Returns:
             ~collections.Iterable: an iterable yielding tuples of
