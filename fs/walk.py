@@ -244,6 +244,13 @@ class Walker(WalkerBase):
             if _check_file(fs, info)
         ]
 
+    def _check_open_dir(self, fs, path, info):
+        """Check if a directory should be considered in the walk.
+        """
+        if (self.exclude_dirs is not None and
+            fs.match(self.exclude_dirs, info.name)):
+            return False
+        return self.check_open_dir(fs, path, info)
 
     def check_open_dir(self, fs, path, info):
         """Check if a directory should be opened.
@@ -259,12 +266,15 @@ class Walker(WalkerBase):
             bool: `True` if the directory should be opened.
 
         """
+        return True
 
-        if self.exclude_dirs is None:
-            return True
-        return not fs.match(self.exclude_dirs, info.name)
+    def _check_scan_dir(self, fs, path, info, depth):
+        """Check if a directory contents should be scanned."""
+        if self.max_depth is not None and depth >= self.max_depth:
+            return False
+        return self.check_scan_dir(fs, path, info)
 
-    def check_scan_dir(self, fs, path, info, depth):
+    def check_scan_dir(self, fs, path, info):
         """Check if a directory should be scanned.
 
         Override to omit scanning of certain directories. If a directory
@@ -275,13 +285,12 @@ class Walker(WalkerBase):
             fs (FS): A filesystem instance.
             path (str): Path to directory.
             info (Info): A resource info object for the directory.
-            depth (int): Number of directories recursed.
 
         Returns:
             bool: `True` if the directory should be scanned.
 
         """
-        return self.max_depth is None or depth < self.max_depth
+        return True
 
     def check_file(self, fs, info):
         """Check if a filename should be included.
@@ -371,9 +380,9 @@ class Walker(WalkerBase):
             for info in self._scan(fs, dir_path, namespaces=namespaces):
                 if info.is_dir:
                     _depth = self._calculate_depth(dir_path) - depth + 1
-                    if self.check_open_dir(fs, dir_path, info):
+                    if self._check_open_dir(fs, dir_path, info):
                         dirs.append(info)
-                        if self.check_scan_dir(fs, dir_path, info, _depth):
+                        if self._check_scan_dir(fs, dir_path, info, _depth):
                             push(join(dir_path, info.name))
                 else:
                     files.append(info)
@@ -412,9 +421,9 @@ class Walker(WalkerBase):
             else:
                 if info.is_dir:
                     _depth = self._calculate_depth(dir_path) - depth + 1
-                    if self.check_open_dir(fs, dir_path, info):
+                    if self._check_open_dir(fs, dir_path, info):
                         dirs.append(info)
-                        if self.check_scan_dir(fs, dir_path, info, _depth):
+                        if self._check_scan_dir(fs, dir_path, info, _depth):
                             _path = join(dir_path, info.name)
                             push((
                                 _path, scan(_path), [], []
