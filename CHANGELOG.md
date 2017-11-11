@@ -4,6 +4,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.16] - 2017-11-11
+
+### Added
+
+- fs.parts
+
+### Fixed
+
+- Walk now yields Step named tuples as advertised
+
+### Added
+
+- Added max_depth parameter to fs.walk
+
 ## [2.0.15] - 2017-11-05
 
 ### Changed

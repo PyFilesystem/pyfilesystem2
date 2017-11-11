@@ -109,6 +109,14 @@ class TestPathFunctions(unittest.TestCase):
         self.assertEqual(combine('', 'bar'), 'bar')
         self.assertEqual(combine('foo', 'bar'), 'foo/bar')
 
+    def test_parts(self):
+        self.assertEqual(parts('/'), ['/'])
+        self.assertEqual(parts(''), ['./'])
+        self.assertEqual(parts('/foo'), ['/', 'foo'])
+        self.assertEqual(parts('/foo/bar'), ['/', 'foo', 'bar'])
+        self.assertEqual(parts('/foo/bar/'), ['/', 'foo', 'bar'])
+        self.assertEqual(parts('./foo/bar/'), ['./', 'foo', 'bar'])
+
     def test_pathsplit(self):
         tests = [
             ("a/b", ("a", "b")),

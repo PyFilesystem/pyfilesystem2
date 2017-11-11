@@ -123,6 +123,7 @@ class Walker(WalkerBase):
             be returned if the final component matches one of the patterns.
         exclude_dirs (list, optional): A list of patterns that will be used
             to filter out directories from the walk. e.g. ``['*.svn', '*.git']``.
+        max_depth (int, optional): Maximum directory depth to walk.
 
     """
 
@@ -131,7 +132,8 @@ class Walker(WalkerBase):
                  on_error=None,
                  search="breadth",
                  filter=None,
-                 exclude_dirs=None):
+                 exclude_dirs=None,
+                 max_depth=None):
         if search not in ('breadth', 'depth'):
             raise ValueError("search must be 'breadth' or 'depth'")
         self.ignore_errors = ignore_errors
@@ -153,6 +155,7 @@ class Walker(WalkerBase):
         self.search = search
         self.filter = filter
         self.exclude_dirs = exclude_dirs
+        self.max_depth = max_depth
         super(Walker, self).__init__()
 
     @classmethod
@@ -164,6 +167,14 @@ class Walker(WalkerBase):
     def _raise_errors(cls, path, error):
         """Callback to re-raise dir scan errors."""
         return False
+
+    @classmethod
+    def _calculate_depth(cls, path):
+        """Calculate the 'depth' of a directory path (number of
+        components).
+        """
+        _path = path.strip('/')
+        return _path.count('/') + 1 if _path else 0
 
     @classmethod
     def bind(cls, fs):
@@ -208,7 +219,8 @@ class Walker(WalkerBase):
             on_error=(self.on_error, None),
             search=(self.search, 'breadth'),
             filter=(self.filter, None),
-            exclude_dirs=(self.exclude_dirs, None)
+            exclude_dirs=(self.exclude_dirs, None),
+            max_depth=(self.max_depth, None)
         )
 
     def filter_files(self, fs, infos):
@@ -232,23 +244,53 @@ class Walker(WalkerBase):
             if _check_file(fs, info)
         ]
 
+    def _check_open_dir(self, fs, path, info):
+        """Check if a directory should be considered in the walk.
+        """
+        if (self.exclude_dirs is not None and
+            fs.match(self.exclude_dirs, info.name)):
+            return False
+        return self.check_open_dir(fs, path, info)
 
-    def check_open_dir(self, fs, info):
+    def check_open_dir(self, fs, path, info):
         """Check if a directory should be opened.
 
         Override to exclude directories from the walk.
 
         Arguments:
             fs (FS): A filesystem instance.
-            info (Info): A resource info object.
+            path (str): Path to directory.
+            info (Info): A resource info object for the directory.
 
         Returns:
             bool: `True` if the directory should be opened.
 
         """
-        if self.exclude_dirs is None:
-            return True
-        return not fs.match(self.exclude_dirs, info.name)
+        return True
+
+    def _check_scan_dir(self, fs, path, info, depth):
+        """Check if a directory contents should be scanned."""
+        if self.max_depth is not None and depth >= self.max_depth:
+            return False
+        return self.check_scan_dir(fs, path, info)
+
+    def check_scan_dir(self, fs, path, info):
+        """Check if a directory should be scanned.
+
+        Override to omit scanning of certain directories. If a directory
+        is omitted, it will appear in the walk but its files and
+        sub-directories will not.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str): Path to directory.
+            info (Info): A resource info object for the directory.
+
+        Returns:
+            bool: `True` if the directory should be scanned.
+
+        """
+        return True
 
     def check_file(self, fs, info):
         """Check if a filename should be included.
@@ -329,6 +371,7 @@ class Walker(WalkerBase):
         queue = deque([path])
         push = queue.appendleft
         pop = queue.pop
+        depth = self._calculate_depth(path)
 
         while queue:
             dir_path = pop()
@@ -336,12 +379,14 @@ class Walker(WalkerBase):
             files = []
             for info in self._scan(fs, dir_path, namespaces=namespaces):
                 if info.is_dir:
-                    if self.check_open_dir(fs, info):
+                    _depth = self._calculate_depth(dir_path) - depth + 1
+                    if self._check_open_dir(fs, dir_path, info):
                         dirs.append(info)
-                        push(join(dir_path, info.name))
+                        if self._check_scan_dir(fs, dir_path, info, _depth):
+                            push(join(dir_path, info.name))
                 else:
                     files.append(info)
-            yield (
+            yield Step(
                 dir_path,
                 dirs,
                 self.filter_files(fs, files)
@@ -353,8 +398,10 @@ class Walker(WalkerBase):
         # No recursion!
 
         def scan(path):
+            """Perform scan."""
             return self._scan(fs, path, namespaces=namespaces)
 
+        depth = self._calculate_depth(path)
         stack = [(
             path, scan(path), [], []
         )]
@@ -365,7 +412,7 @@ class Walker(WalkerBase):
             try:
                 info = next(iter_files)
             except StopIteration:
-                yield (
+                yield Step(
                     dir_path,
                     dirs,
                     self.filter_files(fs, files)
@@ -373,12 +420,14 @@ class Walker(WalkerBase):
                 del stack[-1]
             else:
                 if info.is_dir:
-                    if self.check_open_dir(fs, info):
+                    _depth = self._calculate_depth(dir_path) - depth + 1
+                    if self._check_open_dir(fs, dir_path, info):
                         dirs.append(info)
-                        _path = join(dir_path, info.name)
-                        push((
-                            _path, scan(_path), [], []
-                        ))
+                        if self._check_scan_dir(fs, dir_path, info, _depth):
+                            _path = join(dir_path, info.name)
+                            push((
+                                _path, scan(_path), [], []
+                            ))
                 else:
                     files.append(info)
 
@@ -448,6 +497,7 @@ class BoundWalker(object):
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
+            max_depth (int, optional): Maximum directory depth to walk.
 
         Returns:
             ~collections.Iterator: an iterator of ``(<path>, <dirs>, <files>)``
@@ -495,6 +545,7 @@ class BoundWalker(object):
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
+            max_depth (int, optional): Maximum directory depth to walk.
 
         Returns:
             ~collections.Iterable: An iterable of file paths (absolute
@@ -525,6 +576,7 @@ class BoundWalker(object):
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
+            max_depth (int, optional): Maximum directory depth to walk.
 
         Returns:
             ~collections.iterable: an iterable of directory paths
@@ -562,6 +614,7 @@ class BoundWalker(object):
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
+            max_depth (int, optional): Maximum directory depth to walk.
 
         Returns:
             ~collections.Iterable: an iterable yielding tuples of
