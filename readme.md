@@ -8,7 +8,7 @@ Python's Filesystem abstraction layer.
 [![Build Status](https://travis-ci.org/PyFilesystem/pyfilesystem2.svg?branch=master)](https://travis-ci.org/PyFilesystem/pyfilesystem2)
 [![Coverage Status](https://coveralls.io/repos/github/PyFilesystem/pyfilesystem2/badge.svg)](https://coveralls.io/github/PyFilesystem/pyfilesystem2)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PyFilesystem/pyfilesystem2&amp;utm_campaign=Badge_Grade)
-
+![Code Health](https://landscape.io/github/PyFilesystem/pyfilesystem2/master/landscape.svg?style=flat)](https://landscape.io/github/PyFilesystem/pyfilesystem2/master)
 
 Documentation
 -------------
