@@ -508,7 +508,7 @@ class BoundWalker(object):
         Example:
             >>> home_fs = open_fs('~/')
             >>> walker = Walker(filter=['*.py'])
-            >>> for path, dirs, files in walker.walk(home_fs, ['details']):
+            >>> for path, dirs, files in walker.walk(home_fs, namespaces=['details']):
             ...     print("[{}]".format(path))
             ...     print("{} directories".format(len(dirs)))
             ...     total = sum(info.size for info in files)

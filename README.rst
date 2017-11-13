@@ -4,6 +4,7 @@ PyFilesystem2
 Python's Filesystem abstraction layer.
 
 |PyPI version| |PyPI| |Build Status| |Coverage Status| |Codacy Badge|
+|Code Health|
 
 Documentation
 -------------
@@ -112,3 +113,5 @@ missing here.
    :target: https://coveralls.io/github/PyFilesystem/pyfilesystem2
 .. |Codacy Badge| image:: https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee
    :target: https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&utm_medium=referral&utm_content=PyFilesystem/pyfilesystem2&utm_campaign=Badge_Grade
+.. |Code Health| image:: https://landscape.io/github/PyFilesystem/pyfilesystem2/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/PyFilesystem/pyfilesystem2/master
