@@ -35,16 +35,21 @@ class _ZipExtFile(RawWrapper):
     def read(self, size=-1):
         if self._pos >= self._end:
             return b''
-        elif size is None or size < 0:
+        if size is None or size < 0:
             size = self._end - self._pos
-            # NB(@althonos): do NOT replace by self._f.read() !
-            buf = self._f.read(size-1) + self._f._readbuffer[-1:]
-            self._f._offset += 1
-        elif self._f._offset + size <= len(self._f._readbuffer):
+        if self._f._offset + size <= len(self._f._readbuffer):
             buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
             self._f._offset += size
-        else:
+        elif size < self._end - self._pos < self._f.MIN_READ_SIZE:
             buf = self._f.read(size)
+        elif size < self._f.MIN_READ_SIZE:
+            buf = self._f.read(size-1) + self._f._readbuffer[-1:]
+        else:
+            buf = bytearray()
+            size -= self._f.MIN_READ_SIZE
+            buf.extend(self._f.read(size))
+            buf.extend(self._f.read1(self._f.MIN_READ_SIZE-1))
+            buf.extend(self._f._readbuffer[-1:])
         self._pos += len(buf)
         return buf
 
@@ -53,14 +58,17 @@ class _ZipExtFile(RawWrapper):
             return b''
         if size is None or size < 0:
             size = self._end - self._pos
-            # NB(@althonos): do NOT replace by self._f.read1() !
-            buf = self._f.read1(size-1) + self._f._readbuffer[-1:]
-            self._f._offset += 1
-        elif self._f._offset + size <= len(self._f._readbuffer):
+        if self._f._offset + size <= len(self._f._readbuffer):
             buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
             self._f._offset += size
-        else:
+        elif size < self._end - self._pos < self._f.MIN_READ_SIZE:
             buf = self._f.read1(size)
+        elif size < self._f.MIN_READ_SIZE:
+            buf = self._f.read(size-1) + self._f._readbuffer[-1:]
+        else:
+            # NB(@althonos): max size to be read while maintaining a buffer
+            # without doing more than 1 read/read1 call
+            buf = self._f.read1(self._f.MIN_READ_SIZE-1)
         self._pos += len(buf)
         return buf
 

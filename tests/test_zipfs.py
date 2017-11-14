@@ -51,6 +51,21 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
     def remove_archive(self):
         os.remove(self._temp_path)
 
+    def test_large_read(self):
+        """Regression test for #108
+        """
+        # create a large file
+        test_fs = open_fs('mem://')
+        test_fs.setbytes('test.bin', b'a'*50000)
+        write_zip(test_fs, self._temp_path)
+        # test it has the right size
+        with self.load_archive().openbin('test.bin') as f:
+            self.assertEqual(f.read(50000).count(b'a'), 50000)
+            self.assertTrue(f._f._readbuffer)
+            self.assertEqual(f.seek(0), 0)
+            self.assertLessEqual(f.read1(50000).count(b'a'), 50000)
+            self.assertTrue(f._f._readbuffer)
+
     def test_getinfo(self):
         super(TestReadZipFS, self).test_getinfo()
         top = self.fs.getinfo('top.txt', ['zip'])
@@ -70,20 +85,28 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
     def test_read(self):
         with self.fs.openbin('top.txt') as f:
             self.assertEqual(f.read(), b'Hello, World')
+            self.assertTrue(f._f._readbuffer)
         with self.fs.openbin('top.txt') as f:
             self.assertEqual(f.read(5), b'Hello')
+            self.assertTrue(f._f._readbuffer)
             self.assertEqual(f.read(7), b', World')
+            self.assertTrue(f._f._readbuffer)
         with self.fs.openbin('top.txt') as f:
             self.assertEqual(f.read(12), b'Hello, World')
+            self.assertTrue(f._f._readbuffer)
 
     def test_read1(self):
         with self.fs.openbin('top.txt') as f:
             self.assertEqual(f.read1(), b'Hello, World')
+            self.assertTrue(f._f._readbuffer)
         with self.fs.openbin('top.txt') as f:
             self.assertEqual(f.read1(5), b'Hello')
+            self.assertTrue(f._f._readbuffer)
             self.assertEqual(f.read1(7), b', World')
+            self.assertTrue(f._f._readbuffer)
         with self.fs.openbin('top.txt') as f:
             self.assertEqual(f.read1(12), b'Hello, World')
+            self.assertTrue(f._f._readbuffer)
 
     def test_seek_set(self):
         with self.fs.openbin('top.txt') as f:
