@@ -51,6 +51,22 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
     def remove_archive(self):
         os.remove(self._temp_path)
 
+    def test_large(self):
+        test_fs = open_fs('mem://')
+        test_fs.setbytes('test.bin', b'a'*50000)
+        write_zip(test_fs, self._temp_path)
+
+        self.fs = self.load_archive()
+
+        with self.fs.openbin('test.bin') as f:
+            self.assertEqual(f.read(), b'a'*50000)
+        with self.fs.openbin('test.bin') as f:
+            self.assertEqual(f.read(50000), b'a'*50000)
+        with self.fs.openbin('test.bin') as f:
+            self.assertEqual(f.read1(), b'a'*50000)
+        with self.fs.openbin('test.bin') as f:
+            self.assertEqual(f.read1(50000), b'a'*50000)
+
     def test_getinfo(self):
         super(TestReadZipFS, self).test_getinfo()
         top = self.fs.getinfo('top.txt', ['zip'])
