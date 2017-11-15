@@ -33,34 +33,12 @@ class _ZipExtFile(RawWrapper):
         super(_ZipExtFile, self).__init__(_zip.open(name), 'r', name)
 
     def read(self, size=-1):
-        if self._pos >= self._end:
-            return b''
-        elif size is None or size < 0:
-            size = self._end - self._pos
-            # NB(@althonos): do NOT replace by self._f.read() !
-            buf = self._f.read(size-1) + self._f._readbuffer[-1:]
-            self._f._offset += 1
-        elif self._f._offset + size <= len(self._f._readbuffer):
-            buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
-            self._f._offset += size
-        else:
-            buf = self._f.read(size)
+        buf = self._f.read(-1 if size is None else size)
         self._pos += len(buf)
         return buf
 
     def read1(self, size=-1):
-        if self._pos >= self._end:
-            return b''
-        if size is None or size < 0:
-            size = self._end - self._pos
-            # NB(@althonos): do NOT replace by self._f.read1() !
-            buf = self._f.read1(size-1) + self._f._readbuffer[-1:]
-            self._f._offset += 1
-        elif self._f._offset + size <= len(self._f._readbuffer):
-            buf = self._f._readbuffer[self._f._offset:size+self._f._offset]
-            self._f._offset += size
-        else:
-            buf = self._f.read1(size)
+        buf = self._f.read1(-1 if size is None else size)
         self._pos += len(buf)
         return buf
 
@@ -87,46 +65,32 @@ class _ZipExtFile(RawWrapper):
 
         Note:
             Zip compression does not support seeking, so the seeking
-            is emulated. The internal decompression buffer will be used
-            as much as possible, but sometimes it way be necessary to:
+            is emulated. Seeking somewhere else than the current position
+            will need to either:
                 * reopen the file and restart decompression
                 * read and discard data to advance in the file
 
-            The size of the zip buffer can be changed by setting the
-            `zipfile.ZipExtFile.MIN_READ_SIZE` attribute.
-
         """
-        if whence == Seek.set:
+        if whence == Seek.current:
+            offset += self._pos
+        if whence == Seek.current or whence == Seek.set:
             if offset < 0:
-                raise ValueError("Negative seek position {}".format(offset))
-            elif offset >= self._pos:
-                self.seek(offset - self._pos, Seek.current)
-            else:
-                self._f = self._zip.open(self.name)
-                self._pos = 0
-                self.seek(offset, Seek.set)
-        elif whence == Seek.current:
-            if offset > 0:
-                if self._f._offset + offset < len(self._f._readbuffer):
-                    self._f._offset += offset
-                else:
-                    self._f.read(offset)
-                self._pos += offset
-            elif self._f._offset + offset >= 0:
-                self._f._offset += offset
-                self._pos += offset
-            else:
-                self.seek(self._pos + offset, Seek.set)
+                 raise ValueError("Negative seek position {}".format(offset))
         elif whence == Seek.end:
             if offset > 0:
                 raise ValueError("Positive seek position {}".format(offset))
-            self.seek(self._end + offset, Seek.set)
+            offset += self._end
         else:
             raise ValueError(
                 "Invalid whence ({}, should be {}, {} or {})".format(
                     whence, Seek.set, Seek.current, Seek.end
                 )
             )
+
+        if offset < self._pos:
+            self._f = self._zip.open(self.name)
+            self._pos = 0
+        self.read(offset - self._pos)
         return self._pos
 
     def tell(self):
