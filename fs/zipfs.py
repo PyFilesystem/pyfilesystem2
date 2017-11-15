@@ -65,13 +65,10 @@ class _ZipExtFile(RawWrapper):
 
         Note:
             Zip compression does not support seeking, so the seeking
-            is emulated. The internal decompression buffer will be used
-            as much as possible, but sometimes it way be necessary to:
+            is emulated. Seeking somewhere else than the current position
+            will need to either:
                 * reopen the file and restart decompression
                 * read and discard data to advance in the file
-
-            The size of the zip buffer can be changed by setting the
-            `zipfile.ZipExtFile.MIN_READ_SIZE` attribute.
 
         """
         if whence == Seek.current:
