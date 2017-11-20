@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.17] - 2017-11-20
+
+### Fixed
+
+- Issue with ZipFS files missing a byte
+
 ## [2.0.16] - 2017-11-11
 
 ### Added
