@@ -1,21 +1,25 @@
 from __future__ import unicode_literals
 
 from datetime import datetime
+import mock
 import time
 import unittest
 
 from fs import _ftp_parse as ftp_parse
 
+time2017 = time.struct_time([2017, 11, 28, 1, 1, 1, 1, 332, 0])
+
 
 class TestFTPParse(unittest.TestCase):
 
-    def test_parse_time(self):
+    @mock.patch("time.localtime")
+    def test_parse_time(self, mock_localtime):
         self.assertEqual(
             ftp_parse._parse_time('JUL 05 1974'),
             142214400.0
         )
 
-        year = time.localtime().tm_year
+        mock_localtime.return_value = time2017
         self.assertEqual(
             ftp_parse._parse_time('JUL 05 02:00'),
             1499220000.0
@@ -32,7 +36,9 @@ class TestFTPParse(unittest.TestCase):
     def test_parse_line(self):
         self.assertIs(ftp_parse.parse_line('not a dir'), None)
 
-    def test_decode_linux(self):
+    @mock.patch("time.localtime")
+    def test_decode_linux(self, mock_localtime):
+        mock_localtime.return_value = time2017
         directory = """\
 lrwxrwxrwx    1 0        0              19 Jan 18  2006 debian -> ./pub/mirror/debian
 drwxr-xr-x   10 0        0            4096 Aug 03 09:21 debian-archive
