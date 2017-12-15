@@ -437,7 +437,7 @@ def isbase(path1, path2):
     """
     _path1 = forcedir(abspath(path1))
     _path2 = forcedir(abspath(path2))
-    return _path1.startswith(_path2)
+    return _path2.startswith(_path1) # longer one is child
 
 
 def isparent(path1, path2):
