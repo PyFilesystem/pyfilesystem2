@@ -397,3 +397,8 @@ class WrapFS(FS):
             _fs.validatepath(_path)
         path = abspath(normpath(path))
         return path
+
+    @property
+    def walk(self):
+        return self._wrap_fs.walker_class.bind(self)
+
