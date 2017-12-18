@@ -6,6 +6,7 @@ from fs.errors import FSError
 from fs.memoryfs import MemoryFS
 from fs import walk
 from fs.wrap import read_only
+import six
 
 
 class TestWalkerBase(unittest.TestCase):
@@ -215,12 +216,12 @@ class TestWalk(unittest.TestCase):
         base_fs.settext("b/d", "d")
         base_walker=base_fs.walk
         self.assertEqual(base_walker.walker_class, CustomWalker)
-        self.assertCountEqual(["/a", "/b/c", "/b/d"], base_walker.files())
+        six.assertCountEqual(self, ["/a", "/b/c", "/b/d"], base_walker.files())
 
         sub_fs=base_fs.opendir("b")
         sub_walker=sub_fs.walk
         self.assertEqual(sub_walker.walker_class, CustomWalker)
-        self.assertCountEqual(["/c", "/d"], sub_walker.files())
+        six.assertCountEqual(self, ["/c", "/d"], sub_walker.files())
 
     def test_readonly_wrapper_uses_same_walker(self):
         class CustomWalker(walk.Walker):
