@@ -146,9 +146,9 @@ class OSFS(FS):
 
         if _NIX_PLATFORM:
             root_path = self.root_path_native
-            path = path and fsencode(path) or path
-            sep = six.binary_type(sep)
-            os_sep = six.binary_type(os_sep)
+            path = fsencode(path)
+            sep = b'/'
+            os_sep = fsencode(os_sep)
 
         sys_path = os.path.join(
             root_path,

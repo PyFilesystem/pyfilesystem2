@@ -96,10 +96,12 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             shutil.rmtree(dir_path)
 
     def test_non_decodable_unicode_paths(self):
+        from fs._fscompat import fsencode, fsdecode
+
         dir_path = tempfile.mkdtemp()
         try:
-            fs_dir_bytes = os.path.join(bytes(dir_path), b'some')
-            fs_dir_unicode = unicode(fs_dir_bytes)
+            fs_dir_bytes = os.path.join(fsencode(dir_path), b'some')
+            fs_dir_unicode = fsdecode(fs_dir_bytes)
             os.mkdir(fs_dir_bytes)
             with open(os.path.join(fs_dir_bytes, b'foo\xb1bar'), 'wb') as uf:
                 uf.write(b'')
@@ -110,10 +112,12 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             shutil.rmtree(dir_path)
 
     def test_can_open_non_decodable_unicode_paths(self):
+        from fs._fscompat import fsencode, fsdecode
+
         dir_path = tempfile.mkdtemp()
         try:
-            fs_dir_bytes = os.path.join(bytes(dir_path), b'some')
-            fs_dir_unicode = unicode(fs_dir_bytes)
+            fs_dir_bytes = os.path.join(fsencode(dir_path), b'some')
+            fs_dir_unicode = fsdecode(fs_dir_bytes)
             os.mkdir(fs_dir_bytes)
             with open(os.path.join(fs_dir_bytes, b'foo\xb1bar'), 'wb') as uf:
                 uf.write(b'')
