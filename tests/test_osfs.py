@@ -13,7 +13,7 @@ from fs import errors
 
 from fs.test import FSTestCases
 
-
+from six import binary_type
 from six import text_type
 
 
@@ -92,6 +92,34 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             os.mkdir(fs_dir)
             with osfs.OSFS(fs_dir):
                 self.assertTrue(os.path.isdir(fs_dir))
+        finally:
+            shutil.rmtree(dir_path)
+
+    def test_non_decodable_unicode_paths(self):
+        dir_path = tempfile.mkdtemp()
+        try:
+            fs_dir_bytes = os.path.join(bytes(dir_path), b'some')
+            fs_dir_unicode = unicode(fs_dir_bytes)
+            os.mkdir(fs_dir_bytes)
+            with open(os.path.join(fs_dir_bytes, b'foo\xb1bar'), 'wb') as uf:
+                uf.write(b'')
+            with osfs.OSFS(fs_dir_unicode) as tfs:
+                f = tfs.listdir(u'.')[0]
+                self.assertFalse(isinstance(f , binary_type))
+        finally:
+            shutil.rmtree(dir_path)
+
+    def test_can_open_non_decodable_unicode_paths(self):
+        dir_path = tempfile.mkdtemp()
+        try:
+            fs_dir_bytes = os.path.join(bytes(dir_path), b'some')
+            fs_dir_unicode = unicode(fs_dir_bytes)
+            os.mkdir(fs_dir_bytes)
+            with open(os.path.join(fs_dir_bytes, b'foo\xb1bar'), 'wb') as uf:
+                uf.write(b'')
+            with osfs.OSFS(fs_dir_unicode) as tfs:
+                with tfs.open(b'foo\xb1bar') as tf:
+                    tf.read()
         finally:
             shutil.rmtree(dir_path)
 
