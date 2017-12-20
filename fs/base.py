@@ -599,14 +599,16 @@ class FS(object):
         size = self.getdetails(path).size
         return size
 
-    def getsyspath(self, path):
+    def getsyspath(self, path, as_bytes=False):
         """Get the *system path* of a resource.
 
         Parameters:
             path (str): A path on the filesystem.
+            as_bytes (bool, optional): If `True`, return the path as bytes using
+                the native filesystem encoding. (defaults to `False`).
 
         Returns:
-            str: the *system path* of the resource, if any.
+            str: the *system path* of the resource, if any, always as Unicode.
 
         Raises:
             fs.errors.NoSysPath: If there is no corresponding system path.
