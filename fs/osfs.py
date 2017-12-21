@@ -45,6 +45,7 @@ _WINDOWS_PLATFORM = ps == 'Windows'
 _MAC_PLATFORM = ps == 'Darwin'
 _NIX_PLATFORM = ps != _WINDOWS_PLATFORM and ps != _MAC_PLATFORM
 del ps
+_NIX_PY2 = _NIX_PLATFORM and six.PY2
 
 
 @six.python_2_unicode_compatible
@@ -138,13 +139,13 @@ class OSFS(FS):
 
     def _to_sys_path(self, path, as_bytes=False):
         """Convert a FS path to a path on the OS.
-        If `as_bytes` is True, return bytes on *nix and unicode elsewhere.
+        If `as_bytes` is True, return fsencoded-bytes instead of Unicode.
         """
         root_path = self.root_path
         sep = '/'
         os_sep = os.sep
 
-        if _NIX_PLATFORM:
+        if _NIX_PY2:
             root_path = self.root_path_native
             path = fsencode(path)
             sep = b'/'
@@ -154,14 +155,13 @@ class OSFS(FS):
             root_path,
             path.lstrip(sep).replace(sep, os_sep)
         )
-        if as_bytes:
-            if _NIX_PLATFORM:
-                return sys_path
-            else:
-                return fsencode(sys_path)
 
-        if _NIX_PLATFORM:
+        if as_bytes:
+            return fsencode(sys_path)
+
+        if _NIX_PY2:
             return fsdecode(sys_path)
+
         return sys_path
 
     @classmethod
@@ -234,14 +234,14 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def _gettarget(self, sys_path):
-        if _NIX_PLATFORM:
+        if _NIX_PY2:
             sys_path = fsencode(sys_path)
         try:
             target = os.readlink(sys_path)
         except OSError:
             return None
         else:
-            if _NIX_PLATFORM and target:
+            if _NIX_PY2 and target:
                 target = fsdecode(target)
             return target
 
@@ -257,7 +257,7 @@ class OSFS(FS):
         namespaces = namespaces or ()
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         _lstat = None
         with convert_os_errors('getinfo', path):
             _stat = os.stat(sys_path)
@@ -293,7 +293,7 @@ class OSFS(FS):
         self.check()
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         with convert_os_errors('listdir', path, directory=True):
             names = [fsdecode(f) for f in os.listdir(sys_path)]
         return names
@@ -303,7 +303,7 @@ class OSFS(FS):
         mode = Permissions.get_mode(permissions)
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         with convert_os_errors('makedir', path, directory=True):
             try:
                 os.mkdir(sys_path, mode)
@@ -322,7 +322,7 @@ class OSFS(FS):
         self.check()
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         with convert_os_errors('openbin', path):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise errors.FileExists(path)
@@ -338,7 +338,7 @@ class OSFS(FS):
         self.check()
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         with convert_os_errors('remove', path):
             try:
                 os.remove(sys_path)
@@ -359,7 +359,7 @@ class OSFS(FS):
         _path = self.validatepath(path)
         if _path == '/':
             raise errors.RemoveRootError()
-        sys_path = self._to_sys_path(path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(path, as_bytes=_NIX_PY2)
         with convert_os_errors('removedir', path, directory=True):
             os.rmdir(sys_path)
 
@@ -376,8 +376,8 @@ class OSFS(FS):
         if purpose != 'download':
             raise NoURL(path, purpose)
         path = path and fsdecode(path) or path
-        syspath = self.getsyspath(path, as_bytes=_NIX_PLATFORM)
-        if _NIX_PLATFORM:
+        syspath = self.getsyspath(path, as_bytes=_NIX_PY2)
+        if _NIX_PY2:
             syspath = fsdecode(syspath)
         # FIXME: segments might need to be URL/percent-encoded instead
         return "file://" + self.getsyspath(path)
@@ -385,7 +385,7 @@ class OSFS(FS):
     def gettype(self, path):
         self.check()
         path = path and fsdecode(path) or path
-        sys_path = self._to_sys_path(path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(path, as_bytes=_NIX_PY2)
         with convert_os_errors('gettype', path):
             stat = os.stat(sys_path)
         resource_type = self._get_type_from_stat(stat)
@@ -395,7 +395,7 @@ class OSFS(FS):
         self.check()
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
         with convert_os_errors('islink', path):
@@ -415,7 +415,7 @@ class OSFS(FS):
         self.check()
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         with convert_os_errors('open', path):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise FileExists(path)
@@ -434,7 +434,7 @@ class OSFS(FS):
         self.check()
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         if not os.path.exists(sys_path):
             raise errors.ResourceNotFound(path)
         if 'details' in info:
@@ -454,7 +454,7 @@ class OSFS(FS):
             namespaces = namespaces or ()
             path = path and fsdecode(path) or path
             _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+            sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
             with convert_os_errors('scandir', path, directory=True):
                 for dir_entry in scandir(sys_path):
                     info = {
@@ -481,7 +481,7 @@ class OSFS(FS):
                         }
                     if 'link' in namespaces:
                         dir_entry_name = dir_entry.name
-                        if _NIX_PLATFORM:
+                        if _NIX_PY2:
                             dir_entry_name = fsencode(dir_entry_name)
                         info['link'] = self._make_link_info(
                             fsdecode(os.path.join(sys_path, dir_entry_name))
@@ -500,7 +500,7 @@ class OSFS(FS):
             namespaces = namespaces or ()
             path = path and fsdecode(path) or path
             _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path, as_bytes=_NIX_PLATFORM)
+            sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
             with convert_os_errors('scandir', path, directory=True):
                 for entry_name in os.listdir(sys_path):
                     entry_name_u = fsdecode(entry_name)
