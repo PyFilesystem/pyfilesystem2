@@ -252,12 +252,18 @@ class OSFS(FS):
         }
         return link
 
+    def _get_validated_syspath(self, path):
+        """Return a validated, normalized and eventually encoded string or byte
+           path.
+        """
+        path = path and fsdecode(path) or path
+        _path = self.validatepath(path)
+        return self._to_sys_path(_path, as_bytes=_NIX_PY2)
+
     def getinfo(self, path, namespaces=None):
         self.check()
         namespaces = namespaces or ()
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(path)
         _lstat = None
         with convert_os_errors('getinfo', path):
             _stat = os.stat(sys_path)
@@ -266,7 +272,7 @@ class OSFS(FS):
 
         info = {
             'basic': {
-                'name': basename(_path),
+                'name': fsdecode(basename(sys_path)),
                 'is_dir': stat.S_ISDIR(_stat.st_mode)
             }
         }
@@ -291,9 +297,7 @@ class OSFS(FS):
 
     def listdir(self, path):
         self.check()
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('listdir', path, directory=True):
             names = [fsdecode(f) for f in os.listdir(sys_path)]
         return names
@@ -303,7 +307,7 @@ class OSFS(FS):
         mode = Permissions.get_mode(permissions)
         path = path and fsdecode(path) or path
         _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(_path)
         with convert_os_errors('makedir', path, directory=True):
             try:
                 os.mkdir(sys_path, mode)
@@ -321,8 +325,7 @@ class OSFS(FS):
         _mode.validate_bin()
         self.check()
         path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('openbin', path):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise errors.FileExists(path)
@@ -336,9 +339,7 @@ class OSFS(FS):
 
     def remove(self, path):
         self.check()
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('remove', path):
             try:
                 os.remove(sys_path)
@@ -367,25 +368,20 @@ class OSFS(FS):
     # Optional Methods
     # --------------------------------------------------------
 
-    def getsyspath(self, path, as_bytes=False):
+    def getsyspath(self, path):
         path = path and fsdecode(path) or path
-        sys_path = self._to_sys_path(path, as_bytes=as_bytes)
+        sys_path = self._to_sys_path(path, as_bytes=False)
         return sys_path
 
     def geturl(self, path, purpose='download'):
         if purpose != 'download':
             raise NoURL(path, purpose)
-        path = path and fsdecode(path) or path
-        syspath = self.getsyspath(path, as_bytes=_NIX_PY2)
-        if _NIX_PY2:
-            syspath = fsdecode(syspath)
         # FIXME: segments might need to be URL/percent-encoded instead
         return "file://" + self.getsyspath(path)
 
     def gettype(self, path):
         self.check()
-        path = path and fsdecode(path) or path
-        sys_path = self._to_sys_path(path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('gettype', path):
             stat = os.stat(sys_path)
         resource_type = self._get_type_from_stat(stat)
@@ -393,9 +389,7 @@ class OSFS(FS):
 
     def islink(self, path):
         self.check()
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(path)
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
         with convert_os_errors('islink', path):
@@ -411,11 +405,10 @@ class OSFS(FS):
              line_buffering=False,
              **options):
         _mode = Mode(mode)
+
         validate_open_mode(mode)
         self.check()
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('open', path):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise FileExists(path)
@@ -432,9 +425,7 @@ class OSFS(FS):
 
     def setinfo(self, path, info):
         self.check()
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+        sys_path = self._get_validated_syspath(path)
         if not os.path.exists(sys_path):
             raise errors.ResourceNotFound(path)
         if 'details' in info:
@@ -452,9 +443,7 @@ class OSFS(FS):
         def _scandir(self, path, namespaces=None):
             self.check()
             namespaces = namespaces or ()
-            path = path and fsdecode(path) or path
-            _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+            sys_path = self._get_validated_syspath(path)
             with convert_os_errors('scandir', path, directory=True):
                 for dir_entry in scandir(sys_path):
                     info = {
@@ -498,9 +487,7 @@ class OSFS(FS):
         def _scandir(self, path, namespaces=None):
             self.check()
             namespaces = namespaces or ()
-            path = path and fsdecode(path) or path
-            _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
+            sys_path = self._get_validated_syspath(path)
             with convert_os_errors('scandir', path, directory=True):
                 for entry_name in os.listdir(sys_path):
                     entry_name_u = fsdecode(entry_name)
