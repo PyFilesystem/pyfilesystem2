@@ -599,7 +599,7 @@ class FS(object):
         size = self.getdetails(path).size
         return size
 
-    def getsyspath(self, path, as_bytes=False):
+    def getsyspath(self, path):
         """Get the *system path* of a resource.
 
         Parameters:
