@@ -604,8 +604,6 @@ class FS(object):
 
         Parameters:
             path (str): A path on the filesystem.
-            as_bytes (bool, optional): If `True`, return the path as bytes using
-                the native filesystem encoding. (defaults to `False`).
 
         Returns:
             str: the *system path* of the resource, if any, always as Unicode.
@@ -630,6 +628,14 @@ class FS(object):
             A filesystem may return a system path even if no
             resource is referenced by that path -- as long as it can
             be certain what that system path would be.
+
+        Note:
+            The returned value is always Unicode. Some filesystems 
+            such as on Linux only deal with bytes. If you need to use
+            a path outside of Python, or if you are running Python 2
+            on Linux, you can get a proper byte value from a Unicode
+            path using the os.fsencode function on Python 3 or its
+            Pythyon 2 backport available here.
 
         """
         raise errors.NoSysPath(path=path)
