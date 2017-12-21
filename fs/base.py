@@ -43,6 +43,9 @@ class FS(object):
 
     # This is the "standard" meta namespace.
     _meta = {}
+    
+    # most FS will use default walking algorithms
+    walker_class=Walker
 
     def __init__(self):
         """Create a filesystem. See help(type(self)) for accurate signature.
@@ -65,7 +68,7 @@ class FS(object):
     def walk(self):
         """`~fs.walk.BoundWalker`: a walker bound to this filesystem.
         """
-        return Walker.bind(self)
+        return self.walker_class.bind(self)
 
     # ---------------------------------------------------------------- #
     # Required methods                                                 #

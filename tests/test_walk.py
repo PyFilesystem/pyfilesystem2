@@ -5,6 +5,8 @@ import unittest
 from fs.errors import FSError
 from fs.memoryfs import MemoryFS
 from fs import walk
+from fs.wrap import read_only
+import six
 
 
 class TestWalkerBase(unittest.TestCase):
@@ -196,3 +198,46 @@ class TestWalk(unittest.TestCase):
     def test_on_error_invalid(self):
         with self.assertRaises(TypeError):
             walk.Walker(on_error='nope')
+    
+    def test_subdir_uses_same_walker(self):
+        class CustomWalker(walk.Walker):
+
+            @classmethod
+            def bind(cls, fs):
+                return walk.BoundWalker(fs, walker_class=CustomWalker)
+
+        class CustomizedMemoryFS(MemoryFS):
+            walker_class=CustomWalker
+
+        base_fs=CustomizedMemoryFS()
+        base_fs.settext("a", "a")
+        base_fs.makedirs("b")
+        base_fs.settext("b/c", "c")
+        base_fs.settext("b/d", "d")
+        base_walker=base_fs.walk
+        self.assertEqual(base_walker.walker_class, CustomWalker)
+        six.assertCountEqual(self, ["/a", "/b/c", "/b/d"], base_walker.files())
+
+        sub_fs=base_fs.opendir("b")
+        sub_walker=sub_fs.walk
+        self.assertEqual(sub_walker.walker_class, CustomWalker)
+        six.assertCountEqual(self, ["/c", "/d"], sub_walker.files())
+
+    def test_readonly_wrapper_uses_same_walker(self):
+        class CustomWalker(walk.Walker):
+
+            @classmethod
+            def bind(cls, fs):
+                return walk.BoundWalker(fs, walker_class=CustomWalker)
+
+        class CustomizedMemoryFS(MemoryFS):
+            walker_class=CustomWalker
+
+        base_fs=CustomizedMemoryFS()
+        base_walker=base_fs.walk
+        self.assertEqual(base_walker.walker_class, CustomWalker)
+
+        readonly_fs=read_only(CustomizedMemoryFS())
+        readonly_walker=readonly_fs.walk
+        self.assertEqual(readonly_walker.walker_class, CustomWalker)
+
