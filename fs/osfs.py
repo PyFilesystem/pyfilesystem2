@@ -142,25 +142,25 @@ class OSFS(FS):
         If `as_bytes` is True, return fsencoded-bytes instead of Unicode.
         """
         root_path = self.root_path
+        _path = path
         sep = '/'
         os_sep = os.sep
 
         if _NIX_PY2:
             root_path = self.root_path_native
-            path = fsencode(path)
+            _path = fsencode(path)
             sep = b'/'
             os_sep = fsencode(os_sep)
 
         sys_path = os.path.join(
             root_path,
-            path.lstrip(sep).replace(sep, os_sep)
+            _path.lstrip(sep).replace(sep, os_sep)
         )
+
+        sys_path = fsdecode(sys_path)
 
         if as_bytes:
             return fsencode(sys_path)
-
-        if _NIX_PY2:
-            return fsdecode(sys_path)
 
         return sys_path
 
@@ -234,10 +234,11 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def _gettarget(self, sys_path):
+        _sys_path = sys_path
         if _NIX_PY2:
-            sys_path = fsencode(sys_path)
+            _sys_path = fsencode(_sys_path)
         try:
-            target = os.readlink(sys_path)
+            target = os.readlink(_sys_path)
         except OSError:
             return None
         else:
@@ -248,7 +249,7 @@ class OSFS(FS):
     def _make_link_info(self, sys_path):
         _target = self._gettarget(sys_path)
         link = {
-            'target': _target and fsdecode(_target) or _target,
+            'target': fsdecode(_target) if _target else _target,
         }
         return link
 
@@ -256,8 +257,8 @@ class OSFS(FS):
         """Return a validated, normalized and eventually encoded string or byte
            path.
         """
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
+        _path = fsdecode(path) if path else path
+        _path = self.validatepath(_path)
         return self._to_sys_path(_path, as_bytes=_NIX_PY2)
 
     def getinfo(self, path, namespaces=None):
@@ -305,8 +306,8 @@ class OSFS(FS):
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
         mode = Permissions.get_mode(permissions)
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
+        _path = fsdecode(path) if path else path
+        _path = self.validatepath(_path)
         sys_path = self._get_validated_syspath(_path)
         with convert_os_errors('makedir', path, directory=True):
             try:
@@ -324,10 +325,10 @@ class OSFS(FS):
         _mode = Mode(mode)
         _mode.validate_bin()
         self.check()
-        path = path and fsdecode(path) or path
-        sys_path = self._get_validated_syspath(path)
+        _path = fsdecode(path) if path else path
+        sys_path = self._get_validated_syspath(_path)
         with convert_os_errors('openbin', path):
-            if six.PY2 and _mode.exclusive and self.exists(path):
+            if six.PY2 and _mode.exclusive and self.exists(_path):
                 raise errors.FileExists(path)
             binary_file = io.open(
                 sys_path,
@@ -356,11 +357,12 @@ class OSFS(FS):
 
     def removedir(self, path):
         self.check()
-        path = path and fsdecode(path) or path
-        _path = self.validatepath(path)
+        _path = fsdecode(path) if path else path
+        _path = self.validatepath(_path)
         if _path == '/':
             raise errors.RemoveRootError()
-        sys_path = self._to_sys_path(path, as_bytes=_NIX_PY2)
+
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         with convert_os_errors('removedir', path, directory=True):
             os.rmdir(sys_path)
 
@@ -369,8 +371,8 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def getsyspath(self, path):
-        path = path and fsdecode(path) or path
-        sys_path = self._to_sys_path(path, as_bytes=False)
+        _path = fsdecode(path) if path else path
+        sys_path = self._to_sys_path(_path, as_bytes=False)
         return sys_path
 
     def geturl(self, path, purpose='download'):
@@ -446,9 +448,14 @@ class OSFS(FS):
             sys_path = self._get_validated_syspath(path)
             with convert_os_errors('scandir', path, directory=True):
                 for dir_entry in scandir(sys_path):
+                    entry_name_u = fsdecode(dir_entry.name)
+                    entry_name_b = fsencode(entry_name_u)
+                    entry_path_b = os.path.join(sys_path, entry_name_b)
+                    entry_path_u = fsdecode(entry_path_b)
+
                     info = {
                         "basic": {
-                            "name": fsdecode(dir_entry.name),
+                            "name": entry_name_u,
                             "is_dir": dir_entry.is_dir()
                         }
                     }
@@ -469,12 +476,7 @@ class OSFS(FS):
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        dir_entry_name = dir_entry.name
-                        if _NIX_PY2:
-                            dir_entry_name = fsencode(dir_entry_name)
-                        info['link'] = self._make_link_info(
-                            fsdecode(os.path.join(sys_path, dir_entry_name))
-                        )
+                        info['link'] = self._make_link_info(entry_path_u)
                     if 'access' in namespaces:
                         stat_result = dir_entry.stat()
                         info['access'] = \
@@ -491,8 +493,11 @@ class OSFS(FS):
             with convert_os_errors('scandir', path, directory=True):
                 for entry_name in os.listdir(sys_path):
                     entry_name_u = fsdecode(entry_name)
-                    entry_path = os.path.join(sys_path, entry_name)
-                    stat_result = os.stat(entry_path)
+                    entry_name_b = fsencode(entry_name)
+                    entry_path_b = os.path.join(sys_path, entry_name_b)
+                    entry_path_u = fsdecode(entry_path_b)
+                    stat_result = os.stat(entry_path_b)
+
                     info = {
                         "basic": {
                             "name": entry_name_u,
@@ -508,15 +513,13 @@ class OSFS(FS):
                             for k in dir(stat_result) if k.startswith('st_')
                         }
                     if 'lstat' in namespaces:
-                        lstat_result = os.lstat(entry_path)
+                        lstat_result = os.lstat(entry_path_b)
                         info['lstat'] = {
                             k: getattr(lstat_result, k)
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        info['link'] = self._make_link_info(
-                            fsdecode(os.path.join(sys_path, entry_name))
-                        )
+                        info['link'] = self._make_link_info(entry_path_u)
                     if 'access' in namespaces:
                         info['access'] = \
                             self._make_access_from_stat(stat_result)
@@ -525,7 +528,7 @@ class OSFS(FS):
 
 
     def scandir(self, path, namespaces=None, page=None):
-        path = path and fsdecode(path) or path
+        path = fsdecode(path) if path else path
         iter_info = self._scandir(path, namespaces=namespaces)
         if page is not None:
             start, end = page
