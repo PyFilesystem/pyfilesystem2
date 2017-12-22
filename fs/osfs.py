@@ -446,16 +446,13 @@ class OSFS(FS):
             self.check()
             namespaces = namespaces or ()
             sys_path = self._get_validated_syspath(path)
+            sys_path_u = fsdecode(sys_path)
             with convert_os_errors('scandir', path, directory=True):
                 for dir_entry in scandir(sys_path):
-                    entry_name_u = fsdecode(dir_entry.name)
-                    entry_name_b = fsencode(entry_name_u)
-                    entry_path_b = os.path.join(sys_path, entry_name_b)
-                    entry_path_u = fsdecode(entry_path_b)
-
+                    entry_name = fsdecode(dir_entry.name)
                     info = {
                         "basic": {
-                            "name": entry_name_u,
+                            "name": entry_name,
                             "is_dir": dir_entry.is_dir()
                         }
                     }
@@ -476,7 +473,8 @@ class OSFS(FS):
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        info['link'] = self._make_link_info(entry_path_u)
+                        entry_path = os.path.join(sys_path_u, entry_name)
+                        info['link'] = self._make_link_info(entry_path)
                     if 'access' in namespaces:
                         stat_result = dir_entry.stat()
                         info['access'] = \
@@ -490,17 +488,17 @@ class OSFS(FS):
             self.check()
             namespaces = namespaces or ()
             sys_path = self._get_validated_syspath(path)
+            sys_path_u = fsdecode(sys_path)
             with convert_os_errors('scandir', path, directory=True):
                 for entry_name in os.listdir(sys_path):
-                    entry_name_u = fsdecode(entry_name)
-                    entry_name_b = fsencode(entry_name)
-                    entry_path_b = os.path.join(sys_path, entry_name_b)
-                    entry_path_u = fsdecode(entry_path_b)
+                    entry_name = fsdecode(entry_name)
+                    entry_path = os.path.join(sys_path_u, entry_name)
+                    entry_path_b = fsdecode(entry_path)
                     stat_result = os.stat(entry_path_b)
 
                     info = {
                         "basic": {
-                            "name": entry_name_u,
+                            "name": entry_name,
                             "is_dir": stat.S_ISDIR(stat_result.st_mode),
                         }
                     }
@@ -519,7 +517,7 @@ class OSFS(FS):
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        info['link'] = self._make_link_info(entry_path_u)
+                        info['link'] = self._make_link_info(entry_path)
                     if 'access' in namespaces:
                         info['access'] = \
                             self._make_access_from_stat(stat_result)
