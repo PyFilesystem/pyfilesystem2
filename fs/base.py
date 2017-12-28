@@ -404,17 +404,20 @@ class FS(object):
         else:
             return True
 
-    def extract(self, path, file, **options):
-        """Copies a file from the filesystem to an binary file-like
-        object.
+    def extract(self, path, file, chunk_size=None, **options):
+        """Copies a file from the filesystem to a file-like object,
+        open for writing in binary mode.
 
         This may be more efficient that opening and copying files
         manually if the filesystem supplies an optimized method.
 
         Arguments:
-            path (str): Path to a resource
+            path (str): Path to a resource.
             file (file-link): A file-like object open for writing in
                 binary mode.
+            chunk_size (int, optional): Number of bytes to read at a
+                time, if a simple copy is used, or `None` to use
+                sensible default.
             options: Implementation specific options required to open
                 the source file.
 
@@ -422,13 +425,17 @@ class FS(object):
         method. Take care to close it after this method completes
         (ideally with a context manager).
 
-         Example:
+        Example:
             >>> with open('starwars.mov', 'wb') as write_file:
             ...     my_fs.extract('starwars.mov', write_file)
 
         """
         with self.openbin(path, **options) as read_file:
-            tools.copy_file_data(read_file, file)
+            tools.copy_file_data(
+                read_file,
+                file,
+                chunk_size=chunk_size
+            )
 
     def filterdir(self,
                   path,
