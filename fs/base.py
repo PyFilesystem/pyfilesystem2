@@ -413,7 +413,7 @@ class FS(object):
 
         Arguments:
             path (str): Path to a resource.
-            file (file-link): A file-like object open for writing in
+            file (file-like): A file-like object open for writing in
                 binary mode.
             chunk_size (int, optional): Number of bytes to read at a
                 time, if a simple copy is used, or `None` to use
