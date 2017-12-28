@@ -79,7 +79,6 @@ class TestFTPErrors(unittest.TestCase):
             with ftp_errors(mem_fs):
                 raise error_perm('999 foo')
 
-
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     user = 'user'
