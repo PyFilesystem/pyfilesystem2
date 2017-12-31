@@ -103,7 +103,7 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
             else:
                 # Standard copy
                 with src_fs.lock(), dst_fs.lock():
-                    with src_fs.open(src_path, 'rb') as read_file:
+                    with src_fs.openbin(src_path) as read_file:
                         # There may be an optimized copy available on
                         # dst_fs
                         dst_fs.setbinfile(dst_path, read_file)
@@ -143,14 +143,13 @@ def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
                 with src_fs.lock(), dst_fs.lock():
                     if _source_is_newer(src_fs, src_path,
                                         dst_fs, dst_path):
-                        with src_fs.open(src_path, 'rb') as read_file:
+                        with src_fs.openbin(src_path) as read_file:
                             # There may be an optimized copy available
                             # on dst_fs
                             dst_fs.setbinfile(dst_path, read_file)
                             return True
                     else:
                         return False
-
 
 
 def copy_structure(src_fs, dst_fs, walker=None):
