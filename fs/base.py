@@ -526,12 +526,13 @@ class FS(object):
             ...     my_fs.getfile('/movies/starwars.mov', write_file)
 
         """
-        with self.openbin(path, **options) as read_file:
-            tools.copy_file_data(
-                read_file,
-                file,
-                chunk_size=chunk_size
-            )
+        with self._lock:
+            with self.openbin(path, **options) as read_file:
+                tools.copy_file_data(
+                    read_file,
+                    file,
+                    chunk_size=chunk_size
+                )
 
     def gettext(self, path, encoding=None, errors=None, newline=''):
         """Get the contents of a file as a string.
