@@ -520,16 +520,6 @@ class FSTestCases(object):
         self.assertTrue(self.fs.exists('/'))
         self.assertTrue(self.fs.exists(''))
 
-    def test_extract(self):
-        test_bytes = b'Hello, World'
-        self.fs.setbytes('hello.bin', test_bytes)
-        write_file = io.BytesIO()
-        self.fs.extract('hello.bin', write_file)
-        self.assertEqual(write_file.getvalue(), test_bytes)
-
-        with self.assertRaises(errors.ResourceNotFound):
-            self.fs.extract('foo.bin', write_file)
-
     def test_listdir(self):
         # Check listing directory that doesn't exist
         with self.assertRaises(errors.ResourceNotFound):
@@ -1340,6 +1330,16 @@ class FSTestCases(object):
         self.fs.makedir('baz')
         with self.assertRaises(errors.FileExpected):
             self.fs.getbytes('baz')
+
+    def test_getfile(self):
+        test_bytes = b'Hello, World'
+        self.fs.setbytes('hello.bin', test_bytes)
+        write_file = io.BytesIO()
+        self.fs.getfile('hello.bin', write_file)
+        self.assertEqual(write_file.getvalue(), test_bytes)
+
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.getfile('foo.bin', write_file)
 
     def test_isempty(self):
         self.assertTrue(self.fs.isempty('/'))
