@@ -43,7 +43,7 @@ class FS(object):
 
     # This is the "standard" meta namespace.
     _meta = {}
-    
+
     # most FS will use default walking algorithms
     walker_class=Walker
 
@@ -500,6 +500,39 @@ class FS(object):
         with closing(self.open(path, mode='rb')) as read_file:
             contents = read_file.read()
         return contents
+
+    def getfile(self, path, file, chunk_size=None, **options):
+        """Copies a file from the filesystem to a file-like object.
+
+        This may be more efficient that opening and copying files
+        manually if the filesystem supplies an optimized method.
+
+        Arguments:
+            path (str): Path to a resource.
+            file (file-like): A file-like object open for writing in
+                binary mode.
+            chunk_size (int, optional): Number of bytes to read at a
+                time, if a simple copy is used, or `None` to use
+                sensible default.
+            **options: Implementation specific options required to open
+                the source file.
+
+        Note that the file object ``file`` will *not* be closed by this
+        method. Take care to close it after this method completes
+        (ideally with a context manager).
+
+        Example:
+            >>> with open('starwars.mov', 'wb') as write_file:
+            ...     my_fs.getfile('/movies/starwars.mov', write_file)
+
+        """
+        with self._lock:
+            with self.openbin(path, **options) as read_file:
+                tools.copy_file_data(
+                    read_file,
+                    file,
+                    chunk_size=chunk_size
+                )
 
     def gettext(self, path, encoding=None, errors=None, newline=''):
         """Get the contents of a file as a string.
