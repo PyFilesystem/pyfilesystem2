@@ -20,10 +20,17 @@ class FTPOpener(Opener):
         ftp_host, _, dir_path = parse_result.resource.partition('/')
         ftp_host, _, ftp_port = ftp_host.partition(':')
         ftp_port = int(ftp_port) if ftp_port.isdigit() else 21
+
+        try:
+            username = '{}@{}'.format(parse_result.username, ftp_host)
+            ftp_host = parse_result.params['proxy']
+        except KeyError:
+            username = parse_result.username
+
         ftp_fs = FTPFS(
             ftp_host,
             port=ftp_port,
-            user=parse_result.username,
+            user=username,
             passwd=parse_result.password,
         )
         ftp_fs = (
