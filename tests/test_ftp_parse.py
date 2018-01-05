@@ -46,6 +46,7 @@ lrwxrwxrwx    1 0        0              27 Nov 30  2015 debian-backports -> pub/
 drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub
 -rw-r--r--    1 0        0              26 Mar 04  2010 robots.txt
 drwxr-xr-x   8 foo      bar          4096 Oct  4 09:05 test
+drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485
 """
 
         expected = [{u'access': {u'group': u'0',
@@ -117,7 +118,19 @@ drwxr-xr-x   8 foo      bar          4096 Oct  4 09:05 test
               u'user': u'foo'},
   u'basic': {u'is_dir': True, u'name': u'test'},
   u'details': {u'modified': 1507107900.0, u'size': 4096, u'type': 1},
-  u'ftp': {u'ls': u'drwxr-xr-x   8 foo      bar          4096 Oct  4 09:05 test'}}]
+  u'ftp': {u'ls': u'drwxr-xr-x   8 foo      bar          4096 Oct  4 09:05 test'}},
+{u'access': {u'group': u'foo-group',
+              u'permissions': [u'g_r',
+                               u'g_x',
+                               u'o_r',
+                               u'o_x',
+                               u'u_r',
+                               u'u_w',
+                               u'u_x'],
+              u'user': u'foo-user'},
+  u'basic': {u'is_dir': True, u'name': u'240485'},
+  u'details': {u'modified': 1483617540.0, u'size': 0, u'type': 1},
+  u'ftp': {u'ls': u'drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485'}}]
 
         parsed = ftp_parse.parse(directory.splitlines())
         self.assertEqual(parsed, expected)
