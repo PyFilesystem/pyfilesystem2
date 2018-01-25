@@ -407,15 +407,15 @@ class Walker(WalkerBase):
         _path = abspath(normpath(path))
 
         if self.search == 'breadth':
-            walk = self._walk_breadth(fs, _path, namespaces=namespaces)
-            for dir_path, info in walk:
+            _walk = self._walk_breadth(fs, _path, namespaces=namespaces)
+            for dir_path, info in _walk:
                 if info is not None:
                     yield dir_path, info
 
         elif self.search == 'depth':
             dir_info = defaultdict(list)
-            walk = self._walk_depth(fs, _path, namespaces=namespaces)
-            for dir_path, info in walk:
+            _walk = self._walk_depth(fs, _path, namespaces=namespaces)
+            for dir_path, info in _walk:
                 if info is None:
                     for _info in dir_info[dir_path]:
                         yield dir_path, _info
