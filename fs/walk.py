@@ -380,14 +380,13 @@ class Walker(WalkerBase):
 
         dir_info = defaultdict(list)
         for dir_path, info in do_walk(fs, _path, namespaces=namespaces):
-
             if info is None:
                 dirs = []
                 files = []
                 for _info in dir_info[dir_path]:
                     (dirs if _info.is_dir else files).append(_info)
                 yield Step(dir_path, dirs, files)
-                dir_info.pop(dir_path)
+                del dir_info[dir_path]
             else:
                 dir_info[dir_path].append(info)
 
