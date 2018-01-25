@@ -457,9 +457,7 @@ class Walker(WalkerBase):
             return self._scan(fs, path, namespaces=namespaces)
 
         depth = self._calculate_depth(path)
-        stack = [(
-            path, scan(path)
-        )]
+        stack = [(path, scan(path))]
         push = stack.append
 
         while stack:
@@ -476,9 +474,7 @@ class Walker(WalkerBase):
                         yield dir_path, info
                         if self._check_scan_dir(fs, dir_path, info, _depth):
                             _path = join(dir_path, info.name)
-                            push((
-                                _path, scan(_path)
-                            ))
+                            push((_path, scan(_path)))
                 else:
                     yield dir_path, info
 
