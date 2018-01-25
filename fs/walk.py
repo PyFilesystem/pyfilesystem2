@@ -249,8 +249,8 @@ class Walker(WalkerBase):
             infos (list): A list of `~fs.info.Info` instances.
 
         Returns:
-            list: An iterator of `Info` objects passing the ``check_file``
-            validation.
+            ~collections.Iterator: An iterator of `Info` objects passing
+            the ``check_file`` validation.
 
         """
         _check_file = self.check_file
