@@ -115,8 +115,8 @@ class WalkerBase(object):
             (str, Info): a tuple of ``(<absolute path>, <resource info>)``.
 
         """
-        walk = self.walk_info(fs, path=path, namespaces=namespaces)
-        for _path, info in walk:
+        _walk = self.walk_info(fs, path=path, namespaces=namespaces)
+        for _path, info in _walk:
             yield join(_path, info.name), info
 
 
