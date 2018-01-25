@@ -419,7 +419,7 @@ class Walker(WalkerBase):
                 if info is None:
                     for _info in dir_info[dir_path]:
                         yield dir_path, _info
-                    dir_info.pop(dir_path)
+                    del dir_info[dir_path]
                 else:
                     dir_info[dir_path].append(info)
 
