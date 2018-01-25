@@ -166,7 +166,8 @@ class TestWalk(unittest.TestCase):
         walk = []
         for path, info in self.fs.walk.info():
             walk.append((path, info.is_dir, info.name))
-        expected = [(u'/foo1', True, u'foo1'), (u'/foo2', True, u'foo2'), (u'/foo3', True, u'foo3'), (u'/foo1/bar1', True, u'bar1'), (u'/foo1/top1.txt', False, u'top1.txt'), (u'/foo1/top2.txt', False, u'top2.txt'), (u'/foo2/bar2', True, u'bar2'), (u'/foo2/top3.txt', False, u'top3.txt'), (u'/foo2/bar2/bar3', True, u'bar3'), (u'/foo2/bar2/bar3/test.txt', False, u'test.txt')]
+
+        expected = [(u'/foo1', True, u'foo1'), (u'/foo2', True, u'foo2'), (u'/foo3', True, u'foo3'), (u'/foo1/top1.txt', False, u'top1.txt'), (u'/foo1/top2.txt', False, u'top2.txt'), (u'/foo1/bar1', True, u'bar1'), (u'/foo2/bar2', True, u'bar2'), (u'/foo2/top3.txt', False, u'top3.txt'), (u'/foo2/bar2/bar3', True, u'bar3'), (u'/foo2/bar2/bar3/test.txt', False, u'test.txt')]
         self.assertEqual(walk, expected)
 
     def test_broken(self):
@@ -198,7 +199,7 @@ class TestWalk(unittest.TestCase):
     def test_on_error_invalid(self):
         with self.assertRaises(TypeError):
             walk.Walker(on_error='nope')
-    
+
     def test_subdir_uses_same_walker(self):
         class CustomWalker(walk.Walker):
 
