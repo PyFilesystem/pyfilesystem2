@@ -458,34 +458,29 @@ class Walker(WalkerBase):
 
         depth = self._calculate_depth(path)
         stack = [(
-            path, scan(path), [], []
+            path, scan(path)
         )]
         push = stack.append
 
         while stack:
-            dir_path, iter_files, dirs, files = stack[-1]
+            dir_path, iter_files = stack[-1]
             try:
                 info = next(iter_files)
             except StopIteration:
-                for info in dirs:
-                    yield dir_path, info
-                for info in self.filter_files(fs, files):
-                    yield dir_path, info
                 yield dir_path, None
-
                 del stack[-1]
             else:
                 if info.is_dir:
                     _depth = self._calculate_depth(dir_path) - depth + 1
                     if self._check_open_dir(fs, dir_path, info):
-                        dirs.append(info)
+                        yield dir_path, info
                         if self._check_scan_dir(fs, dir_path, info, _depth):
                             _path = join(dir_path, info.name)
                             push((
-                                _path, scan(_path), [], []
+                                _path, scan(_path)
                             ))
                 else:
-                    files.append(info)
+                    yield dir_path, info
 
 
 class BoundWalker(object):
