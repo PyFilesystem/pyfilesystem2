@@ -42,7 +42,8 @@ class Walker(object):
             list of filename patterns, e.g. ``['*.py']``. Files will only
             be returned if the final component matches one of the patterns.
         exclude_dirs (list, optional): A list of patterns that will be used
-            to filter out directories from the walk. e.g. ``['*.svn', '*.git']``.
+            to filter out directories from the walk. e.g.
+            ``['*.svn', '*.git']``.
         max_depth (int, optional): Maximum directory depth to walk.
 
     """
@@ -322,7 +323,6 @@ class Walker(object):
         for _path, info in self.walk_info(fs, path=path):
             if not info.is_dir:
                 yield join(_path, info.name)
-
 
     def dirs(self, fs, path='/'):
         """Walk a filesystem, yielding absolute paths to directories.
