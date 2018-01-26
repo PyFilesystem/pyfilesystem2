@@ -144,6 +144,15 @@ class Walker(object):
             max_depth=(self.max_depth, None)
         )
 
+    @property
+    def _iter_walk(self):
+        """Get the walk generator."""
+        return (
+            self._walk_breadth
+            if self.search == 'breadth' else
+            self._walk_depth
+        )
+
     def _check_open_dir(self, fs, path, info):
         """Check if a directory should be considered in the walk.
         """
@@ -257,14 +266,9 @@ class Walker(object):
 
         """
         _path = abspath(normpath(path))
-
-        if self.search == 'breadth':
-            do_walk = self._walk_breadth
-        elif self.search == 'depth':
-            do_walk = self._walk_depth
-
         dir_info = defaultdict(list)
-        for dir_path, info in do_walk(fs, _path, namespaces=namespaces):
+        _walk = self._iter_walk(fs, _path, namespaces=namespaces)
+        for dir_path, info in _walk:
             if info is None:
                 dirs = []
                 files = []
@@ -277,7 +281,8 @@ class Walker(object):
 
     def walk_info(self, fs, path='/', namespaces=None):
         """Walk the directory structure of a filesystem, yielding
-        tuples of an absolute paths and a `~fs.info.Info` object.
+        tuples of an absolute paths to he current directory and a
+        `~fs.info.Info` object.
 
         Arguments:
             fs (FS): A filesystem instance.
@@ -290,23 +295,10 @@ class Walker(object):
 
         """
         _path = abspath(normpath(path))
-
-        if self.search == 'breadth':
-            _walk = self._walk_breadth(fs, _path, namespaces=namespaces)
-            for dir_path, info in _walk:
-                if info is not None:
-                    yield dir_path, info
-
-        elif self.search == 'depth':
-            dir_info = defaultdict(list)
-            _walk = self._walk_depth(fs, _path, namespaces=namespaces)
-            for dir_path, info in _walk:
-                if info is None:
-                    for _info in dir_info[dir_path]:
-                        yield dir_path, _info
-                    del dir_info[dir_path]
-                else:
-                    dir_info[dir_path].append(info)
+        _walk = self._iter_walk(fs, _path, namespaces=namespaces)
+        for dir_path, info in _walk:
+            if info is not None:
+                yield dir_path, info
 
     def files(self, fs, path='/'):
         """Walk a filesystem, yielding absolute paths to files.
@@ -389,22 +381,24 @@ class Walker(object):
             return self._scan(fs, path, namespaces=namespaces)
 
         depth = self._calculate_depth(path)
-        stack = [(path, scan(path))]
+        stack = [(path, scan(path), [])]
         push = stack.append
 
         while stack:
-            dir_path, iter_files = stack[-1]
+            dir_path, iter_files, defered = stack[-1]
             info = next(iter_files, None)
             if info is None:
+                for item in defered:
+                    yield item
                 yield dir_path, None
                 del stack[-1]
             elif info.is_dir:
                 _depth = self._calculate_depth(dir_path) - depth + 1
                 if self._check_open_dir(fs, dir_path, info):
-                    yield dir_path, info
+                    defered.append((dir_path, info))
                     if self._check_scan_dir(fs, dir_path, info, _depth):
                         _path = join(dir_path, info.name)
-                        push((_path, scan(_path)))
+                        push((_path, scan(_path), []))
             else:
                 if self.check_file(fs, info):
                     yield dir_path, info
