@@ -279,27 +279,6 @@ class Walker(object):
             else:
                 dir_info[dir_path].append(info)
 
-    def walk_info(self, fs, path='/', namespaces=None):
-        """Walk the directory structure of a filesystem, yielding
-        tuples of an absolute paths to he current directory and a
-        `~fs.info.Info` object.
-
-        Arguments:
-            fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
-            namespaces(list, optional): A list of additional namespaces
-                to add to the `~fs.info.Info` objects.
-
-        Returns: ~collections.Iterator: iterator of (path,
-            `~fs.info.Info`) tuples.
-
-        """
-        _path = abspath(normpath(path))
-        _walk = self._iter_walk(fs, _path, namespaces=namespaces)
-        for dir_path, info in _walk:
-            if info is not None:
-                yield dir_path, info
-
     def files(self, fs, path='/'):
         """Walk a filesystem, yielding absolute paths to files.
 
@@ -312,8 +291,8 @@ class Walker(object):
             recursively within the given directory.
 
         """
-        for _path, info in self.walk_info(fs, path=path):
-            if not info.is_dir:
+        for _path, info in self._iter_walk(fs, path=path):
+            if info is not None and not info.is_dir:
                 yield join(_path, info.name)
 
     def dirs(self, fs, path='/'):
@@ -328,8 +307,8 @@ class Walker(object):
             recursively within the given directory.
 
         """
-        for _path, info in self.walk_info(fs, path=path):
-            if info.is_dir:
+        for _path, info in self._iter_walk(fs, path=path):
+            if info is not None and info.is_dir:
                 yield join(_path, info.name)
 
     def info(self, fs, path='/', namespaces=None):
@@ -345,9 +324,10 @@ class Walker(object):
             (str, Info): a tuple of ``(<absolute path>, <resource info>)``.
 
         """
-        _walk = self.walk_info(fs, path=path, namespaces=namespaces)
+        _walk = self._iter_walk(fs, path=path, namespaces=namespaces)
         for _path, info in _walk:
-            yield join(_path, info.name), info
+            if info is not None:
+                yield join(_path, info.name), info
 
     def _walk_breadth(self, fs, path, namespaces=None):
         """Walk files using a *breadth first* search.
