@@ -25,102 +25,7 @@ Step = namedtuple('Step', 'path, dirs, files')
 """
 
 
-class WalkerBase(object):
-    """The base class for a Walker.
-
-    To create a custom walker, implement `~fs.walk.WalkerBase.walk`
-    in a sub-class.
-
-    See `~fs.walk.Walker` for a fully featured walker object that
-    should be adequate for all but your most exotic directory walking
-    needs.
-
-    """
-
-    def walk(self, fs, path='/', namespaces=None):
-        """Walk the directory structure of a filesystem.
-
-        Arguments:
-            fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
-            namespaces(list, optional): A list of additional namespaces
-                to add to the `~fs.info.Info` objects.
-
-        Returns:
-            ~collections.Iterator: iterator of `~fs.walk.Step` named tuples.
-
-        """
-        raise NotImplementedError
-
-    def walk_info(self, fs, path='/', namespaces=None):
-        """Walk the directory structure of a filesystem, yielding
-        tuples of absolute paths and a `~fs.info.Info` object.
-
-        Arguments:
-            fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
-            namespaces(list, optional): A list of additional namespaces
-                to add to the `~fs.info.Info` objects.
-
-        Returns: ~collections.Iterator: iterator of (path,
-            `~fs.info.Info`) tuples.
-
-        """
-
-        raise NotImplementedError
-
-    def files(self, fs, path='/'):
-        """Walk a filesystem, yielding absolute paths to files.
-
-        Arguments:
-            fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
-
-        Yields:
-            str: absolute path to files on the filesystem found
-            recursively within the given directory.
-
-        """
-        for _path, info in self.walk_info(fs, path=path):
-            if not info.is_dir:
-                yield join(_path, info.name)
-
-
-    def dirs(self, fs, path='/'):
-        """Walk a filesystem, yielding absolute paths to directories.
-
-        Arguments:
-            fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
-
-        Yields:
-            str: absolute path to directories on the filesystem found
-            recursively within the given directory.
-
-        """
-        for _path, info in self.walk_info(fs, path=path):
-            if info.is_dir:
-                yield join(_path, info.name)
-
-    def info(self, fs, path='/', namespaces=None):
-        """Walk a filesystem, yielding tuples of ``(<path>, <info>)``.
-
-        Arguments:
-            fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
-            namespaces (list, optional): A list of additional namespaces
-                to add to the `Info` objects.
-
-        Yields:
-            (str, Info): a tuple of ``(<absolute path>, <resource info>)``.
-
-        """
-        _walk = self.walk_info(fs, path=path, namespaces=namespaces)
-        for _path, info in _walk:
-            yield join(_path, info.name), info
-
-
-class Walker(WalkerBase):
+class Walker(object):
     """A walker object recursively lists directories in a filesystem.
 
     Arguments:
@@ -236,27 +141,6 @@ class Walker(WalkerBase):
             filter=(self.filter, None),
             exclude_dirs=(self.exclude_dirs, None),
             max_depth=(self.max_depth, None)
-        )
-
-    def filter_files(self, fs, infos):
-        """Filter a sequence of resource `Info` objects.
-
-        The default implementation filters those files for which
-        `~fs.walk.Walker.check_file` returns `True`.
-
-        Arguments:
-            fs (FS): a filesystem instance.
-            infos (list): A list of `~fs.info.Info` instances.
-
-        Returns:
-            ~collections.Iterator: An iterator of `Info` objects passing
-            the ``check_file`` validation.
-
-        """
-        _check_file = self.check_file
-        return (
-            info for info in infos
-            if _check_file(fs, info)
         )
 
     def _check_open_dir(self, fs, path, info):
@@ -423,6 +307,56 @@ class Walker(WalkerBase):
                 else:
                     dir_info[dir_path].append(info)
 
+    def files(self, fs, path='/'):
+        """Walk a filesystem, yielding absolute paths to files.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str, optional): A path to a directory on the filesystem.
+
+        Yields:
+            str: absolute path to files on the filesystem found
+            recursively within the given directory.
+
+        """
+        for _path, info in self.walk_info(fs, path=path):
+            if not info.is_dir:
+                yield join(_path, info.name)
+
+
+    def dirs(self, fs, path='/'):
+        """Walk a filesystem, yielding absolute paths to directories.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str, optional): A path to a directory on the filesystem.
+
+        Yields:
+            str: absolute path to directories on the filesystem found
+            recursively within the given directory.
+
+        """
+        for _path, info in self.walk_info(fs, path=path):
+            if info.is_dir:
+                yield join(_path, info.name)
+
+    def info(self, fs, path='/', namespaces=None):
+        """Walk a filesystem, yielding tuples of ``(<path>, <info>)``.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str, optional): A path to a directory on the filesystem.
+            namespaces (list, optional): A list of additional namespaces
+                to add to the `Info` objects.
+
+        Yields:
+            (str, Info): a tuple of ``(<absolute path>, <resource info>)``.
+
+        """
+        _walk = self.walk_info(fs, path=path, namespaces=namespaces)
+        for _path, info in _walk:
+            yield join(_path, info.name), info
+
     def _walk_breadth(self, fs, path, namespaces=None):
         """Walk files using a *breadth first* search.
         """
@@ -430,7 +364,6 @@ class Walker(WalkerBase):
         push = queue.appendleft
         pop = queue.pop
         depth = self._calculate_depth(path)
-        _check_file = self.check_file
 
         while queue:
             dir_path = pop()
@@ -442,10 +375,9 @@ class Walker(WalkerBase):
                         if self._check_scan_dir(fs, dir_path, info, _depth):
                             push(join(dir_path, info.name))
                 else:
-                    if _check_file(fs, info):
+                    if self.check_file(fs, info):
                         yield dir_path, info  # Found a file
             yield dir_path, None  # End of directory
-
 
     def _walk_depth(self, fs, path, namespaces=None):
         """Walk files using a *depth first* search.
@@ -462,20 +394,19 @@ class Walker(WalkerBase):
 
         while stack:
             dir_path, iter_files = stack[-1]
-            try:
-                info = next(iter_files)
-            except StopIteration:
+            info = next(iter_files, None)
+            if info is None:
                 yield dir_path, None
                 del stack[-1]
+            elif info.is_dir:
+                _depth = self._calculate_depth(dir_path) - depth + 1
+                if self._check_open_dir(fs, dir_path, info):
+                    yield dir_path, info
+                    if self._check_scan_dir(fs, dir_path, info, _depth):
+                        _path = join(dir_path, info.name)
+                        push((_path, scan(_path)))
             else:
-                if info.is_dir:
-                    _depth = self._calculate_depth(dir_path) - depth + 1
-                    if self._check_open_dir(fs, dir_path, info):
-                        yield dir_path, info
-                        if self._check_scan_dir(fs, dir_path, info, _depth):
-                            _path = join(dir_path, info.name)
-                            push((_path, scan(_path)))
-                else:
+                if self.check_file(fs, info):
                     yield dir_path, info
 
 
