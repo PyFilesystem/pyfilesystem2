@@ -103,10 +103,12 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
             else:
                 # Standard copy
                 with src_fs.lock(), dst_fs.lock():
-                    with src_fs.openbin(src_path) as read_file:
-                        # There may be an optimized copy available on
-                        # dst_fs
-                        dst_fs.setbinfile(dst_path, read_file)
+                    if src_fs.getmeta().get('network', False):
+                        with dst_fs.openbin(dst_path, 'w') as write_file:
+                            src_fs.getfile(src_path, write_file)
+                    else:
+                        with src_fs.openbin(src_path) as read_file:
+                            dst_fs.setbinfile(dst_path, read_file)
 
 
 def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):

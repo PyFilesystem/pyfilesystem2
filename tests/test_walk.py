@@ -93,6 +93,15 @@ class TestWalk(unittest.TestCase):
         files = sorted(info.name for info in results[0].files)
         self.assertEqual(files, [])
 
+    def test_walk_levels_1_depth(self):
+        results = list(self.fs.walk(max_depth=1, search='depth'))
+        self.assertEqual(len(results), 1)
+        dirs = sorted(info.name for info in results[0].dirs)
+        self.assertEqual(dirs, ['foo1', 'foo2', 'foo3'])
+        files = sorted(info.name for info in results[0].files)
+        self.assertEqual(files, [])
+
+
     def test_walk_levels_2(self):
         _walk = []
         for step in self.fs.walk(max_depth=2):
