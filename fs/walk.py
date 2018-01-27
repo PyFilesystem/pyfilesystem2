@@ -375,10 +375,11 @@ class Walker(object):
             elif info.is_dir:
                 _depth = self._calculate_depth(dir_path) - depth + 1
                 if self._check_open_dir(fs, dir_path, info):
-                    defered.append((dir_path, info))
                     if self._check_scan_dir(fs, dir_path, info, _depth):
                         _path = join(dir_path, info.name)
-                        push((_path, scan(_path), []))
+                        push((_path, scan(_path), [(dir_path, info)]))
+                    else:
+                        yield dir_path, info
             else:
                 if self.check_file(fs, info):
                     yield dir_path, info

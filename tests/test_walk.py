@@ -149,9 +149,9 @@ class TestWalk(unittest.TestCase):
             dirs,
             [
                 '/foo1/bar1',
+                '/foo1',
                 '/foo2/bar2/bar3',
                 '/foo2/bar2',
-                '/foo1',
                 '/foo2',
                 '/foo3'
             ]
