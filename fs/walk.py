@@ -361,15 +361,15 @@ class Walker(object):
             return self._scan(fs, path, namespaces=namespaces)
 
         depth = self._calculate_depth(path)
-        stack = [(path, scan(path), [])]
+        stack = [(path, scan(path), None)]
         push = stack.append
 
         while stack:
-            dir_path, iter_files, defered = stack[-1]
+            dir_path, iter_files, parent = stack[-1]
             info = next(iter_files, None)
             if info is None:
-                for item in defered:
-                    yield item
+                if parent is not None:
+                    yield parent
                 yield dir_path, None
                 del stack[-1]
             elif info.is_dir:
@@ -377,7 +377,7 @@ class Walker(object):
                 if self._check_open_dir(fs, dir_path, info):
                     if self._check_scan_dir(fs, dir_path, info, _depth):
                         _path = join(dir_path, info.name)
-                        push((_path, scan(_path), [(dir_path, info)]))
+                        push((_path, scan(_path), (dir_path, info)))
                     else:
                         yield dir_path, info
             else:
