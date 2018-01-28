@@ -259,6 +259,10 @@ class MultiFS(FS):
             raise errors.ResourceNotFound(path)
         return fs.getbytes(path)
 
+    def getfile(self, path, file, chunk_size=None, **options):
+        fs = self._delegate_required(path)
+        return fs.getfile(path, file, chunk_size=chunk_size, **options)
+
     def gettext(self, path, encoding=None, errors=None, newline=''):
         self.check()
         fs = self._delegate_required(path)
