@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - Modified walk to use iterators internally (for more efficient walking)
+- Modified fs.copy to use getfile
 
 ## [2.0.17] - 2017-11-20
 
