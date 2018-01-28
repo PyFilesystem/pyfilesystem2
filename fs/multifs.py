@@ -291,13 +291,13 @@ class MultiFS(FS):
 
     def hassyspath(self, path):
         self.check()
-        fs = self._delegate_required(path)
-        return fs.hassyspath(path)
+        fs = self._delegate(path)
+        return fs is not None and fs.hassyspath(path)
 
     def hasurl(self, path, purpose='download'):
         self.check()
-        fs = self._delegate_required(path)
-        return fs.hasurl(path, purpose=purpose)
+        fs = self._delegate(path)
+        return fs is not None and fs.hasurl(path, purpose=purpose)
 
     def isdir(self, path):
         self.check()

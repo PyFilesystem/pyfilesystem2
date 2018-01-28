@@ -103,12 +103,39 @@ def copy_file(src_fs, src_path, dst_fs, dst_path):
             else:
                 # Standard copy
                 with src_fs.lock(), dst_fs.lock():
-                    if src_fs.getmeta().get('network', False):
+                    if dst_fs.hassyspath(dst_path):
                         with dst_fs.openbin(dst_path, 'w') as write_file:
                             src_fs.getfile(src_path, write_file)
                     else:
                         with src_fs.openbin(src_path) as read_file:
                             dst_fs.setbinfile(dst_path, read_file)
+
+
+def copy_file_internal(src_fs, src_path, dst_fs, dst_path):
+    """Low level copy, that doesn't call manage_fs or lock.
+
+    If the destination exists, and is a file, it will be first truncated.
+
+    This method exists to optimize copying in loops. In general you
+    should prefer `copy_file`.
+
+    Arguments:
+        src_fs (FS or str): Source filesystem.
+        src_path (str): Path to a file on the source filesystem.
+        dst_fs (FS or str): Destination filesystem.
+        dst_path (str): Path to a file on the destination filesystem.
+
+    """
+    if src_fs is dst_fs:
+        # Same filesystem, so we can do a potentially optimized
+        # copy
+        src_fs.copy(src_path, dst_path, overwrite=True)
+    elif dst_fs.hassyspath(dst_path):
+        with dst_fs.openbin(dst_path, 'w') as write_file:
+            src_fs.getfile(src_path, write_file)
+    else:
+        with src_fs.openbin(src_path) as read_file:
+            dst_fs.setbinfile(dst_path, read_file)
 
 
 def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
@@ -145,11 +172,8 @@ def copy_file_if_newer(src_fs, src_path, dst_fs, dst_path):
                 with src_fs.lock(), dst_fs.lock():
                     if _source_is_newer(src_fs, src_path,
                                         dst_fs, dst_path):
-                        with src_fs.openbin(src_path) as read_file:
-                            # There may be an optimized copy available
-                            # on dst_fs
-                            dst_fs.setbinfile(dst_path, read_file)
-                            return True
+                        copy_file_internal(src_fs, src_path, dst_fs, dst_path)
+                        return True
                     else:
                         return False
 
@@ -211,7 +235,7 @@ def copy_dir(src_fs, src_path, dst_fs, dst_path,
                     for info in files:
                         src_path = info.make_path(dir_path)
                         dst_path = info.make_path(copy_path)
-                        copy_file(
+                        copy_file_internal(
                             src_fs,
                             src_path,
                             dst_fs,
@@ -278,5 +302,5 @@ def copy_dir_if_newer(src_fs, src_path, dst_fs, dst_path,
                             src_modified > dst_state[dir_path].modified
                         )
                         if do_copy:
-                            copy_file(src_fs, dir_path, dst_fs, copy_path)
+                            copy_file_internal(src_fs, dir_path, dst_fs, copy_path)
                             on_copy(src_fs, dir_path, dst_fs, copy_path)

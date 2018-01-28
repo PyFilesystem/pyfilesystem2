@@ -144,14 +144,12 @@ class Walker(object):
             max_depth=(self.max_depth, None)
         )
 
-    @property
-    def _iter_walk(self):
+    def _iter_walk(self, fs, path, namespaces=None):
         """Get the walk generator."""
-        return (
-            self._walk_breadth
-            if self.search == 'breadth' else
-            self._walk_depth
-        )
+        if self.search == 'breadth':
+            return self._walk_breadth(fs, path, namespaces=namespaces)
+        else:
+            return self._walk_depth(fs, path, namespaces=namespaces)
 
     def _check_open_dir(self, fs, path, info):
         """Check if a directory should be considered in the walk.

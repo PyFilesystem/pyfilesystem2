@@ -401,6 +401,8 @@ class FSTestCases(object):
             self.assertFalse(self.fs.hassyspath('foo'))
         else:
             self.assertTrue(self.fs.hassyspath('foo'))
+        # Should not throw an error
+        self.fs.hassyspath('a/b/c/foo/bar')
 
     def test_geturl(self):
         self.fs.create('foo')
@@ -410,6 +412,8 @@ class FSTestCases(object):
             self.assertFalse(self.fs.hasurl('foo'))
         else:
             self.assertTrue(self.fs.hasurl('foo'))
+        # Should not throw an error
+        self.fs.hasurl('a/b/c/foo/bar')
 
     def test_geturl_purpose(self):
         """Check an unknown purpose raises a NoURL error.
