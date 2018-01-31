@@ -401,6 +401,8 @@ class FSTestCases(object):
             self.assertFalse(self.fs.hassyspath('foo'))
         else:
             self.assertTrue(self.fs.hassyspath('foo'))
+        # Should not throw an error
+        self.fs.hassyspath('a/b/c/foo/bar')
 
     def test_geturl(self):
         self.fs.create('foo')
@@ -410,6 +412,8 @@ class FSTestCases(object):
             self.assertFalse(self.fs.hasurl('foo'))
         else:
             self.assertTrue(self.fs.hasurl('foo'))
+        # Should not throw an error
+        self.fs.hasurl('a/b/c/foo/bar')
 
     def test_geturl_purpose(self):
         """Check an unknown purpose raises a NoURL error.
@@ -1075,8 +1079,14 @@ class FSTestCases(object):
 
     def test_removetree(self):
         self.fs.makedirs('foo/bar/baz')
+        self.fs.makedirs('foo/egg')
+        self.fs.makedirs('foo/a/b/c/d/e')
         self.fs.create('foo/egg.txt')
         self.fs.create('foo/bar/egg.bin')
+        self.fs.create('foo/bar/baz/egg.txt')
+        self.fs.create('foo/a/b/c/1.txt')
+        self.fs.create('foo/a/b/c/2.txt')
+        self.fs.create('foo/a/b/c/3.txt')
 
         self.assert_exists('foo/egg.txt')
         self.assert_exists('foo/bar/egg.bin')

@@ -9,7 +9,6 @@ python:
 
 os:
   - linux
-  - osx
 
 before_install:
   - pip install setuptools pip -U

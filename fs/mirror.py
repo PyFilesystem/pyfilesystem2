@@ -20,7 +20,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 
-from .copy import copy_file
+from .copy import copy_file_internal
 from .errors import ResourceNotFound
 from .walk import Walker
 from .opener import manage_fs
@@ -92,7 +92,7 @@ def _mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
                     # Compare file info
                     if copy_if_newer and not _compare(_file, dst_file):
                         continue
-            copy_file(src_fs, _path, dst_fs, _path)
+            copy_file_internal(src_fs, _path, dst_fs, _path)
 
         # Make directories
         for _dir in dirs:

@@ -159,6 +159,10 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.getbytes(_path)
 
+    def getfile(self, path, file, chunk_size=None, **options):
+        fs, _path = self._delegate(path)
+        return fs.getfile(_path, file, chunk_size=chunk_size, **options)
+
     def gettext(self, path, encoding=None, errors=None, newline=None):
         self.check()
         fs, _path = self._delegate(path)

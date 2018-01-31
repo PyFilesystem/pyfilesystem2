@@ -102,7 +102,6 @@ def write_zip(src_fs,
                     _zip.write(sys_path, zip_name)
 
 
-
 def write_tar(src_fs,
               file,
               compression=None,

@@ -9,14 +9,6 @@ from fs.wrap import read_only
 import six
 
 
-class TestWalkerBase(unittest.TestCase):
-
-    def test_not_implemented(self):
-        walker = walk.WalkerBase()
-        with self.assertRaises(NotImplementedError):
-            walker.walk(None, path='/')
-
-
 class TestWalker(unittest.TestCase):
 
     def setUp(self):
@@ -45,7 +37,7 @@ class TestWalk(unittest.TestCase):
         self.fs.makedir('foo2/bar2')
         self.fs.makedir('foo2/bar2/bar3')
         self.fs.create('foo2/bar2/bar3/test.txt')
-        self.fs.create('foo2/top3.txt')
+        self.fs.create('foo2/top3.bin')
 
     def test_invalid(self):
         with self.assertRaises(ValueError):
@@ -64,7 +56,20 @@ class TestWalk(unittest.TestCase):
                 [info.name for info in dirs],
                 [info.name for info in files]
             ))
-        expected = [(u'/', [u'foo1', u'foo2', u'foo3'], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo3', [], []), (u'/foo1/bar1', [], []), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
+        expected = [(u'/', [u'foo1', u'foo2', u'foo3'], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2', [u'bar2'], [u'top3.bin']), (u'/foo3', [], []), (u'/foo1/bar1', [], []), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
+        self.assertEqual(_walk, expected)
+
+    def test_walk_depth(self):
+        _walk = []
+        for step in self.fs.walk(search='depth'):
+            self.assertIsInstance(step, walk.Step)
+            path, dirs, files = step
+            _walk.append((
+                path,
+                [info.name for info in dirs],
+                [info.name for info in files]
+            ))
+        expected = [(u'/foo1/bar1', [], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2/bar2/bar3', [], [u'test.txt']), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2', [u'bar2'], [u'top3.bin']), (u'/foo3', [], []), (u'/', [u'foo1', u'foo2', u'foo3'], [])]
         self.assertEqual(_walk, expected)
 
     def test_walk_directory(self):
@@ -77,7 +82,7 @@ class TestWalk(unittest.TestCase):
                 [info.name for info in dirs],
                 [info.name for info in files]
             ))
-        expected = [(u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
+        expected = [(u'/foo2', [u'bar2'], [u'top3.bin']), (u'/foo2/bar2', [u'bar3'], []), (u'/foo2/bar2/bar3', [], [u'test.txt'])]
         self.assertEqual(_walk, expected)
 
     def test_walk_levels_1(self):
@@ -87,6 +92,15 @@ class TestWalk(unittest.TestCase):
         self.assertEqual(dirs, ['foo1', 'foo2', 'foo3'])
         files = sorted(info.name for info in results[0].files)
         self.assertEqual(files, [])
+
+    def test_walk_levels_1_depth(self):
+        results = list(self.fs.walk(max_depth=1, search='depth'))
+        self.assertEqual(len(results), 1)
+        dirs = sorted(info.name for info in results[0].dirs)
+        self.assertEqual(dirs, ['foo1', 'foo2', 'foo3'])
+        files = sorted(info.name for info in results[0].files)
+        self.assertEqual(files, [])
+
 
     def test_walk_levels_2(self):
         _walk = []
@@ -98,7 +112,7 @@ class TestWalk(unittest.TestCase):
                 sorted(info.name for info in dirs),
                 sorted(info.name for info in files)
             ))
-        expected = [(u'/', [u'foo1', u'foo2', u'foo3'], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2', [u'bar2'], [u'top3.txt']), (u'/foo3', [], [])]
+        expected = [(u'/', [u'foo1', u'foo2', u'foo3'], []), (u'/foo1', [u'bar1'], [u'top1.txt', u'top2.txt']), (u'/foo2', [u'bar2'], [u'top3.bin']), (u'/foo3', [], [])]
         self.assertEqual(_walk, expected)
 
     def test_walk_files(self):
@@ -109,7 +123,7 @@ class TestWalk(unittest.TestCase):
             [
                 '/foo1/top1.txt',
                 '/foo1/top2.txt',
-                '/foo2/top3.txt',
+                '/foo2/top3.bin',
                 '/foo2/bar2/bar3/test.txt',
             ]
         )
@@ -121,7 +135,7 @@ class TestWalk(unittest.TestCase):
                 '/foo1/top1.txt',
                 '/foo1/top2.txt',
                 '/foo2/bar2/bar3/test.txt',
-                '/foo2/top3.txt',
+                '/foo2/top3.bin',
             ]
         )
 
@@ -144,9 +158,9 @@ class TestWalk(unittest.TestCase):
             dirs,
             [
                 '/foo1/bar1',
+                '/foo1',
                 '/foo2/bar2/bar3',
                 '/foo2/bar2',
-                '/foo1',
                 '/foo2',
                 '/foo3'
             ]
@@ -162,11 +176,49 @@ class TestWalk(unittest.TestCase):
             ]
         )
 
+    def test_walk_files_filter(self):
+        files = list(self.fs.walk.files(filter=['*.txt']))
+
+        self.assertEqual(
+            files,
+            [
+                '/foo1/top1.txt',
+                '/foo1/top2.txt',
+                '/foo2/bar2/bar3/test.txt',
+            ]
+        )
+
+        files = list(self.fs.walk.files(search="depth", filter=['*.txt']))
+        self.assertEqual(
+            files,
+            [
+                '/foo1/top1.txt',
+                '/foo1/top2.txt',
+                '/foo2/bar2/bar3/test.txt',
+            ]
+        )
+
+        files = list(self.fs.walk.files(filter=['*.bin']))
+
+        self.assertEqual(
+            files,
+            [
+                '/foo2/top3.bin'
+            ]
+        )
+
+        files = list(self.fs.walk.files(filter=['*.nope']))
+
+        self.assertEqual(
+            files, []
+        )
+
     def test_walk_info(self):
         walk = []
         for path, info in self.fs.walk.info():
             walk.append((path, info.is_dir, info.name))
-        expected = [(u'/foo1', True, u'foo1'), (u'/foo2', True, u'foo2'), (u'/foo3', True, u'foo3'), (u'/foo1/bar1', True, u'bar1'), (u'/foo1/top1.txt', False, u'top1.txt'), (u'/foo1/top2.txt', False, u'top2.txt'), (u'/foo2/bar2', True, u'bar2'), (u'/foo2/top3.txt', False, u'top3.txt'), (u'/foo2/bar2/bar3', True, u'bar3'), (u'/foo2/bar2/bar3/test.txt', False, u'test.txt')]
+
+        expected = [(u'/foo1', True, u'foo1'), (u'/foo2', True, u'foo2'), (u'/foo3', True, u'foo3'), (u'/foo1/top1.txt', False, u'top1.txt'), (u'/foo1/top2.txt', False, u'top2.txt'), (u'/foo1/bar1', True, u'bar1'), (u'/foo2/bar2', True, u'bar2'), (u'/foo2/top3.bin', False, u'top3.bin'), (u'/foo2/bar2/bar3', True, u'bar3'), (u'/foo2/bar2/bar3/test.txt', False, u'test.txt')]
         self.assertEqual(walk, expected)
 
     def test_broken(self):
@@ -198,7 +250,7 @@ class TestWalk(unittest.TestCase):
     def test_on_error_invalid(self):
         with self.assertRaises(TypeError):
             walk.Walker(on_error='nope')
-    
+
     def test_subdir_uses_same_walker(self):
         class CustomWalker(walk.Walker):
 
