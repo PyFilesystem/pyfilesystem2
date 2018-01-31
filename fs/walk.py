@@ -155,7 +155,7 @@ class Walker(object):
         """Check if a directory should be considered in the walk.
         """
         if (self.exclude_dirs is not None and
-            fs.match(self.exclude_dirs, info.name)):
+                fs.match(self.exclude_dirs, info.name)):
             return False
         return self.check_open_dir(fs, path, info)
 
