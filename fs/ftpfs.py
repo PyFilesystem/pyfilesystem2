@@ -28,6 +28,7 @@ from .info import Info
 from .iotools import line_iterator
 from .mode import Mode
 from .path import abspath
+from .path import dirname
 from .path import basename
 from .path import normpath
 from .path import split
@@ -587,6 +588,8 @@ class FTPFS(FS):
                 info = self.getinfo(_path)
             except errors.ResourceNotFound:
                 if _mode.reading:
+                    raise errors.ResourceNotFound(path)
+                if _mode.writing and not self.isdir(dirname(_path)):
                     raise errors.ResourceNotFound(path)
             else:
                 if info.is_dir:

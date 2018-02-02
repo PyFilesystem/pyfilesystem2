@@ -979,6 +979,10 @@ class FSTestCases(object):
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.openbin('/egg/bar')
 
+        # Opening a file in a directory which doesn't exist
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.openbin('/egg/bar', 'w')
+
         # Opening with a invalid mode
         with self.assertRaises(ValueError):
             self.fs.openbin('foo.bin', 'h')
