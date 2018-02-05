@@ -13,6 +13,8 @@ import time
 import unittest
 import uuid
 
+from nose.plugins.attrib import attr
+
 from six import text_type
 
 from ftplib import error_perm
@@ -79,6 +81,7 @@ class TestFTPErrors(unittest.TestCase):
             with ftp_errors(mem_fs):
                 raise error_perm('999 foo')
 
+@attr('slow')
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     user = 'user'

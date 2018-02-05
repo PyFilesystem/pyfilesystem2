@@ -1,3 +1,4 @@
+# -*- encoding: UTF-8
 from __future__ import unicode_literals
 
 import os
@@ -14,6 +15,27 @@ from fs.test import FSTestCases
 from fs.enums import Seek, ResourceType
 
 from .test_archives import ArchiveTestCases
+
+
+
+class TestWriteReadZipFS(unittest.TestCase):
+
+    def setUp(self):
+        fh, self._temp_path = tempfile.mkstemp()
+
+    def tearDown(self):
+        os.remove(self._temp_path)
+
+    def test_unicode_paths(self):
+        # https://github.com/PyFilesystem/pyfilesystem2/issues/135
+        with zipfs.ZipFS(self._temp_path, write=True) as zip_fs:
+            zip_fs.settext("Файл", "some content")
+
+        with zipfs.ZipFS(self._temp_path) as zip_fs:
+            paths = list(zip_fs.walk.files())
+            for path in paths:
+                with zip_fs.openbin(path) as f:
+                    f.read()
 
 
 class TestWriteZipFS(FSTestCases, unittest.TestCase):

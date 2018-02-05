@@ -539,6 +539,10 @@ class FSTestCases(object):
         self.fs.setbytes('bar', b'egg')
         self.fs.setbytes('baz', b'egg')
 
+        # Check paths are unicode
+        for name in self.fs.listdir('/'):
+            self.assertIsInstance(name, six.text_type)
+
         # Check list works
         six.assertCountEqual(self,
                              self.fs.listdir('/'),

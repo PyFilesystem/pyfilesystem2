@@ -9,6 +9,7 @@ import zipfile
 from datetime import datetime
 
 import six
+from six import PY2
 
 from . import errors
 from .base import FS
@@ -257,9 +258,14 @@ class ReadZipFS(FS):
         """Convert a path to a zip file name.
         """
         if self._directory.isdir(path):
-            return relpath(normpath(path)) + '/'
+            _path = relpath(normpath(path)) + '/'
         else:
-            return relpath(normpath(path))
+            _path = relpath(normpath(path))
+        return (
+            _path.encode(self.encoding)
+            if PY2 else
+            _path
+        )
 
     @property
     def _directory(self):
