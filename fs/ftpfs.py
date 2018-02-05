@@ -285,7 +285,7 @@ class FTPFS(FS):
         timeout (int, optional): Timeout for contacting server (in seconds,
             defaults to 10).
         port (int, optional): FTP port number (default 21).
-        proxy (str): An ftp proxy, or ``None`` (default) for no proxy.
+        proxy (str): An FTP proxy, or ``None`` (default) for no proxy.
 
     """
 
