@@ -342,9 +342,9 @@ class FTPFS(FS):
     @property
     def host(self):
         return (
-            self.proxy
-            if self.proxy is not None else
             self._host
+            if self.proxy is None else
+            self.proxy
         )
 
     @classmethod

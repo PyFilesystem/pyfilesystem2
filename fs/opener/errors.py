@@ -2,6 +2,7 @@
 """Errors raised when attempting to open a filesystem.
 """
 
+
 class ParseError(ValueError):
     """Attempt to parse an invalid FS URL.
     """

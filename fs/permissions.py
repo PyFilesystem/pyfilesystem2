@@ -16,7 +16,6 @@ def make_mode(init):
 class _PermProperty(object):
     """Creates simple properties to get/set permissions.
     """
-    
     def __init__(self, name):
         self._name = name
         self.__doc__ = "Boolean for '{}' permission.".format(name)

@@ -76,7 +76,7 @@ class _ZipExtFile(RawWrapper):
             offset += self._pos
         if whence == Seek.current or whence == Seek.set:
             if offset < 0:
-                 raise ValueError("Negative seek position {}".format(offset))
+                raise ValueError("Negative seek position {}".format(offset))
         elif whence == Seek.end:
             if offset > 0:
                 raise ValueError("Positive seek position {}".format(offset))
@@ -391,22 +391,3 @@ class ReadZipFS(FS):
         zip_name = self._path_to_zip_name(path)
         zip_bytes = self._zip.read(zip_name)
         return zip_bytes
-
-
-if __name__ == "__main__":  # pragma: nocover
-    from fs.tree import render
-    from fs.opener import open_fs
-
-    with ZipFS('tests.zip') as zip_fs:
-        print(zip_fs.listdir('/'))
-        print(zip_fs.listdir('/tests/'))
-        print(zip_fs.gettext('tests/ttt/settings.ini'))
-        render(zip_fs)
-        print(zip_fs)
-        print(repr(zip_fs))
-
-    with ZipFS("zipfs.zip", write=True) as zip_fs:
-        zip_fs.makedirs('foo/bar')
-        zip_fs.settext('foo/bar/baz.txt', 'Hello, World')
-        print(zip_fs)
-        print(repr(zip_fs))
