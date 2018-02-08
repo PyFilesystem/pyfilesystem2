@@ -118,7 +118,7 @@ user             str                 The user name of the owner.
 
 This namespace is optional, as not all filesystems have a concept of
 ownership or permissions. It is supported by :class:`~fs.osfs.OSFS`. Some
-values may be ``None`` if the aren't supported by the filesystem.
+values may be ``None`` if they aren't supported by the filesystem.
 
 Stat Namespace
 ~~~~~~~~~~~~~~
