@@ -147,3 +147,7 @@ class ArchiveTestCases(object):
     def test_listdir(self):
         for name in self.fs.listdir('/'):
             self.assertIsInstance(name, text_type)
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.listdir('nope')
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.listdir('top.txt')

@@ -87,11 +87,10 @@ class TarFS(WrapFS):
                 temp_fs="temp://__tartemp__"):
 
         if isinstance(file, (six.text_type, six.binary_type)):
+            file = os.path.expanduser(file)
             filename = file
         else:
             filename = getattr(file, 'name', '')
-        if not hasattr(file, 'read'):
-            file = os.path.expanduser(file)
 
         if write and compression is None:
             compression = None
@@ -299,7 +298,7 @@ class ReadTarFS(FS):
         if _path:
             if info is None:
                 raise errors.ResourceNotFound(path)
-            if not info.isdir:
+            if not info.isdir():
                 raise errors.DirectoryExpected(path)
         dir_list = [
             basename(name)
