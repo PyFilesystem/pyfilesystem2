@@ -86,7 +86,10 @@ class TarFS(WrapFS):
                 encoding="utf-8",
                 temp_fs="temp://__tartemp__"):
 
-        filename = getattr(file, 'name', file)
+        if isinstance(file, (six.text_type, six.binary_type)):
+            filename = file
+        else:
+            filename = getattr(file, 'name', '')
         if not hasattr(file, 'read'):
             file = os.path.expanduser(file)
 
@@ -102,8 +105,8 @@ class TarFS(WrapFS):
                               compression=compression,
                               encoding=encoding,
                               temp_fs=temp_fs)
-        # else:
-        return ReadTarFS(file, encoding=encoding)
+        else:
+            return ReadTarFS(file, encoding=encoding)
 
 
 @six.python_2_unicode_compatible
@@ -209,17 +212,9 @@ class ReadTarFS(FS):
             self._tar = tarfile.open(fileobj=file, mode='r')
         else:
             self._tar = tarfile.open(file, mode='r')
-        def _decode(s):
-            return (
-                s.decode(self.encoding, 'replace')
-                if isinstance(s, bytes) else s
-            )
-        # _directory = (
-        #     _get_member_info(info, self.encoding) for info in self._tar
-        # )
 
         self._directory = {
-            relpath(_decode(info.name)).rstrip('/'): info
+            relpath(self._decode(info.name)).rstrip('/'): info
             for info in self._tar
         }
 
