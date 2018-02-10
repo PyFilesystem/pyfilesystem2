@@ -4,6 +4,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import os
 import tarfile
 import six
 
@@ -85,7 +86,9 @@ class TarFS(WrapFS):
                 encoding="utf-8",
                 temp_fs="temp://__tartemp__"):
 
-        filename = str(getattr(file, 'name', file))
+        filename = getattr(file, 'name', file)
+        if not hasattr(file, 'read'):
+            file = os.path.expanduser(file)
 
         if write and compression is None:
             compression = None
