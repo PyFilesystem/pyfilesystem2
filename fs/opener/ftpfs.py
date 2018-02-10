@@ -25,6 +25,7 @@ class FTPOpener(Opener):
             port=ftp_port,
             user=parse_result.username,
             passwd=parse_result.password,
+            proxy=parse_result.params.get('proxy')
         )
         ftp_fs = (
             ftp_fs.opendir(dir_path, factory=ClosingSubFS)

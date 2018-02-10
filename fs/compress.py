@@ -148,7 +148,10 @@ def write_tar(src_fs,
     current_time = time.time()
     walker = walker or Walker()
     with _tar:
-        gen_walk = walker.info(src_fs, namespaces=["details", "stat", "access"])
+        gen_walk = walker.info(
+            src_fs,
+            namespaces=["details", "stat", "access"]
+        )
         for path, info in gen_walk:
             # Tar names must be relative
             tar_name = relpath(path)

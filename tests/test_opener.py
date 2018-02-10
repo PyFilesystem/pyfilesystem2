@@ -306,3 +306,13 @@ class TestOpeners(unittest.TestCase):
         user_data_fs_foo_dir = open_fs('userdata://fstest:willmcgugan:1.0/foo/')
         self.assertEqual(user_data_fs_foo_dir.gettext('bar.txt'), 'baz')
 
+    @mock.patch("fs.ftpfs.FTPFS")
+    def test_open_ftp(self, mock_FTPFS):
+        open_fs('ftp://foo:bar@ftp.example.org')
+        mock_FTPFS.assert_called_once_with('ftp.example.org', passwd='bar', port=21, user='foo', proxy=None)
+
+    @mock.patch("fs.ftpfs.FTPFS")
+    def test_open_ftp_proxy(self, mock_FTPFS):
+        open_fs('ftp://foo:bar@ftp.example.org?proxy=ftp.proxy.org')
+        mock_FTPFS.assert_called_once_with('ftp.example.org', passwd='bar', port=21, user='foo', proxy='ftp.proxy.org')
+

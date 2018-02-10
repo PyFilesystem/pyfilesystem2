@@ -285,6 +285,7 @@ class FTPFS(FS):
         timeout (int, optional): Timeout for contacting server (in seconds,
             defaults to 10).
         port (int, optional): FTP port number (default 21).
+        proxy (str): An FTP proxy, or ``None`` (default) for no proxy.
 
     """
 
@@ -303,14 +304,16 @@ class FTPFS(FS):
                  passwd='',
                  acct='',
                  timeout=10,
-                 port=21):
+                 port=21,
+                 proxy=None):
         super(FTPFS, self).__init__()
-        self.host = host
-        self.user = user
+        self._host = host
+        self._user = user
         self.passwd = passwd
         self.acct = acct
         self.timeout = timeout
         self.port = port
+        self.proxy = proxy
 
         self.encoding = 'latin-1'
         self._ftp = None
@@ -327,6 +330,22 @@ class FTPFS(FS):
             else "<ftpfs '{host}:{port}'>"
         )
         return _fmt.format(host=self.host, port=self.port)
+
+    @property
+    def user(self):
+        return (
+            self._user
+            if self.proxy is None else
+            '{}@{}'.format(self._user, self._host)
+        )
+
+    @property
+    def host(self):
+        return (
+            self._host
+            if self.proxy is None else
+            self.proxy
+        )
 
     @classmethod
     def _parse_features(cls, feat_response):

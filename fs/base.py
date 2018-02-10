@@ -45,7 +45,7 @@ class FS(object):
     _meta = {}
 
     # most FS will use default walking algorithms
-    walker_class=Walker
+    walker_class = Walker
 
     def __init__(self):
         """Create a filesystem. See help(type(self)) for accurate signature.

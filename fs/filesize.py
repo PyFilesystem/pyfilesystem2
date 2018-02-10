@@ -17,7 +17,6 @@ from __future__ import unicode_literals
 __all__ = ['traditional', 'decimal', 'binary']
 
 
-
 def _to_str(size, suffixes, base):
     try:
         size = int(size)
