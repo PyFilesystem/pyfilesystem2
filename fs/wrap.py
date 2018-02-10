@@ -12,7 +12,7 @@ Here's an example that opens a filesystem then makes it *read only*::
     fs.errors.ResourceReadOnly: resource '__init__.py' is read only
 
 """
-
+from time import time
 from __future__ import print_function
 from __future__ import unicode_literals
 
@@ -67,8 +67,10 @@ class WrapCachedDir(WrapFS):
 
     wrap_name = 'cached-dir'
 
-    def __init__(self, wrap_fs):
+    def __init__(self, wrap_fs, livetime=10, speedup=False):
         super(WrapCachedDir, self).__init__(wrap_fs)
+        self.livetime = livetime
+        self.speedup = speedup
         self._cache = {}
 
     def scandir(self, path, namespaces=None, page=None):
@@ -81,7 +83,20 @@ class WrapCachedDir(WrapFS):
                 page=page
             )
             _dir = {info.name: info for info in _scan_result}
-            self._cache[cache_key] = _dir
+            self._cache[cache_key] = {'time':time(),'data':_dir}
+        else:
+            if self._cache[cache_key]['time'] + self.livetime < time():
+                _scan_result = self._wrap_fs.scandir(
+                    path,
+                    namespaces=namespaces,
+                    page=page
+                )
+                _dir = {info.name: info for info in _scan_result}
+                self._cache[cache_key] = {'time':time(),'data':_dir}
+            else:
+                if self.speedup:
+                    self._cache[cache_key]['time'] = time.time()
+
         gen_scandir = iter(self._cache[cache_key].values())
         return gen_scandir
 
@@ -97,12 +112,12 @@ class WrapCachedDir(WrapFS):
         dir_path, resource_name = split(_path)
         cache_key = (dir_path, frozenset(namespaces or ()))
 
-        if cache_key not in self._cache:
-            self.scandir(dir_path, namespaces=namespaces)
+        #if cache_key not in self._cache:
+        self.scandir(dir_path, namespaces=namespaces)
 
         _dir = self._cache[cache_key]
         try:
-            info = _dir[resource_name]
+            info = _dir['data'][resource_name]
         except KeyError:
             raise ResourceNotFound(path)
         return info
