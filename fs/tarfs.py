@@ -4,6 +4,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 import os
 import tarfile
 import six
@@ -212,10 +213,10 @@ class ReadTarFS(FS):
         else:
             self._tar = tarfile.open(file, mode='r')
 
-        self._directory = {
-            relpath(self._decode(info.name)).rstrip('/'): info
+        self._directory = OrderedDict(
+            (relpath(self._decode(info.name)).rstrip('/'), info)
             for info in self._tar
-        }
+        )
 
     def __repr__(self):
         return "ReadTarFS({!r})".format(self._file)
