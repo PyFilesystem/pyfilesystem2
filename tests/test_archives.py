@@ -1,3 +1,4 @@
+# -*- encoding: UTF-8
 from __future__ import unicode_literals
 
 from six import text_type
@@ -18,6 +19,7 @@ class ArchiveTestCases(object):
     def build_source(self, fs):
         fs.makedirs('foo/bar/baz')
         fs.makedir('tmp')
+        fs.settext('Файл', 'unicode filename')
         fs.settext('top.txt', 'Hello, World')
         fs.settext('top2.txt', 'Hello, World')
         fs.settext('foo/bar/egg', 'foofoo')
@@ -141,3 +143,7 @@ class ArchiveTestCases(object):
     def test_implied_dir(self):
         self.fs.getinfo('foo/bar')
         self.fs.getinfo('foo')
+
+    def test_listdir(self):
+        for name in self.fs.listdir('/'):
+            self.assertIsInstance(name, text_type)

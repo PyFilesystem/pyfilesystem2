@@ -1,3 +1,4 @@
+# -*- encoding: UTF-8
 from __future__ import unicode_literals
 
 import os
@@ -16,6 +17,27 @@ from fs.opener.errors import NotWriteable
 from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases
+
+
+class TestWriteReadTarFS(unittest.TestCase):
+
+    def setUp(self):
+        fh, self._temp_path = tempfile.mkstemp()
+
+    def tearDown(self):
+        os.remove(self._temp_path)
+
+    def test_unicode_paths(self):
+        # https://github.com/PyFilesystem/pyfilesystem2/issues/135
+        with tarfs.TarFS(self._temp_path, write=True) as tar_fs:
+            tar_fs.settext("Файл", "some content")
+
+        with tarfs.TarFS(self._temp_path) as tar_fs:
+            paths = list(tar_fs.walk.files())
+            for path in paths:
+                self.assertIsInstance(path, six.text_type)
+                with tar_fs.openbin(path) as f:
+                    f.read()
 
 
 class TestWriteTarFS(FSTestCases, unittest.TestCase):
