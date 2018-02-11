@@ -151,31 +151,6 @@ class TestWrap(unittest.TestCase):
         mem_fs.removedir('foo/bar/baz')
         mem_fs.touch('foo/bar/baz')
         self.assertTrue(fs.isdir('foo/bar/baz'))
-        sleep(0.5)
-        self.assertTrue(fs.isdir('foo/bar/baz'))
-        sleep(0.5)
-        self.assertTrue(fs.isdir('foo/bar/baz'))
-        sleep(3)
-        self.assertFalse(fs.isdir('foo/bar/baz'))    def test_cachedir_time(self):
-        mem_fs = open_fs('mem://')
-        mem_fs.makedirs('foo/bar/baz')
-        mem_fs.touch('egg')
-
-        fs = wrap.cache_directory(mem_fs,livetime=3)
-        self.assertEqual(
-            sorted(fs.listdir('/')),
-            ['egg', 'foo']
-        )
-        self.assertEqual(
-            sorted(fs.listdir('/')),
-            ['egg', 'foo']
-        )
-
-        #caching dir
-        self.assertTrue(fs.isdir('foo/bar/baz'))
-        mem_fs.removedir('foo/bar/baz')
-        mem_fs.touch('foo/bar/baz')
-        self.assertTrue(fs.isdir('foo/bar/baz'))
         sleep(2)
         self.assertTrue(fs.isdir('foo/bar/baz'))
         sleep(2)
