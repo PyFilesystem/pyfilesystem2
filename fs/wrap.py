@@ -16,7 +16,7 @@ Here's an example that opens a filesystem then makes it *read only*::
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import time as gettime
+from time import time as gettime
 from .wrapfs import WrapFS
 from .path import abspath, normpath, split
 from .errors import ResourceReadOnly, ResourceNotFound
@@ -85,19 +85,19 @@ class WrapCachedDir(WrapFS):
             )
             _dir = {info.name: info for info in _scan_result}
             #help(time)
-            self._cache[cache_key] = {'time':gettime.time(),'data':_dir}
+            self._cache[cache_key] = {'time':gettime(),'data':_dir}
         else:
-            if self._cache[cache_key]['time'] + self.livetime < gettime.time():
+            if self._cache[cache_key]['time'] + self.livetime < gettime():
                 _scan_result = self._wrap_fs.scandir(
                     path,
                     namespaces=namespaces,
                     page=page
                 )
                 _dir = {info.name: info for info in _scan_result}
-                self._cache[cache_key] = {'time':gettime.time(),'data':_dir}
+                self._cache[cache_key] = {'time':gettime(),'data':_dir}
             else:
                 if self.speedup:
-                    self._cache[cache_key]['time'] = gettime.time()
+                    self._cache[cache_key]['time'] = gettime()
 
         gen_scandir = iter(self._cache[cache_key].values())
         return gen_scandir
