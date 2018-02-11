@@ -38,7 +38,7 @@ def read_only(fs):
     return WrapReadOnly(fs)
 
 
-def cache_directory(fs):
+def cache_directory(fs,livetime=-1,speedup=False):
     """Make a filesystem that caches directory information.
 
     Arguments:
@@ -49,7 +49,7 @@ def cache_directory(fs):
         and other methods which read directory information.
 
     """
-    return WrapCachedDir(fs)
+    return WrapCachedDir(fs, livetime, speedup)
 
 
 class WrapCachedDir(WrapFS):
@@ -85,20 +85,20 @@ class WrapCachedDir(WrapFS):
                 page=page
             )
             _dir = {info.name: info for info in _scan_result}
-            #help(time)
             self._cache[cache_key] = {'time':gettime(),'data':_dir}
         else:
-            if self._cache[cache_key]['time'] + self.livetime < gettime():
-                _scan_result = self._wrap_fs.scandir(
-                    path,
-                    namespaces=namespaces,
-                    page=page
-                )
-                _dir = {info.name: info for info in _scan_result}
-                self._cache[cache_key] = {'time':gettime(),'data':_dir}
-            else:
-                if self.speedup:
-                    self._cache[cache_key]['time'] = gettime()
+            if self.livetime >= 0:
+                if self._cache[cache_key]['time'] + self.livetime < gettime():
+                    _scan_result = self._wrap_fs.scandir(
+                        path,
+                        namespaces=namespaces,
+                        page=page
+                    )
+                    _dir = {info.name: info for info in _scan_result}
+                    self._cache[cache_key] = {'time':gettime(),'data':_dir}
+                else:
+                    if self.speedup:
+                        self._cache[cache_key]['time'] = gettime()
 
         gen_scandir = iter(self._cache[cache_key].values())
         return gen_scandir
