@@ -15,7 +15,7 @@ Here's an example that opens a filesystem then makes it *read only*::
 
 from __future__ import print_function
 from __future__ import unicode_literals
-
+import time
 from time import time as gettime
 from .wrapfs import WrapFS
 from .path import abspath, normpath, split
