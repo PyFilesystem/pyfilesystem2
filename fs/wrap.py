@@ -12,10 +12,11 @@ Here's an example that opens a filesystem then makes it *read only*::
     fs.errors.ResourceReadOnly: resource '__init__.py' is read only
 
 """
-from time import time
+
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from time import time
 from .wrapfs import WrapFS
 from .path import abspath, normpath, split
 from .errors import ResourceReadOnly, ResourceNotFound
