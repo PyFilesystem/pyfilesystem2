@@ -15,7 +15,6 @@ import logging
 import os
 import platform
 import stat
-import sys
 
 import six
 
@@ -41,8 +40,12 @@ from .errors import NoURL
 
 log = logging.getLogger('fs.osfs')
 
-
-_WINDOWS_PLATFORM = platform.system() == 'Windows'
+ps = platform.system()
+_WINDOWS_PLATFORM = ps == 'Windows'
+_MAC_PLATFORM = ps == 'Darwin'
+_NIX_PLATFORM = ps != _WINDOWS_PLATFORM and ps != _MAC_PLATFORM
+del ps
+_NIX_PY2 = _NIX_PLATFORM and six.PY2
 
 
 @six.python_2_unicode_compatible
@@ -77,23 +80,27 @@ class OSFS(FS):
         """Create an OSFS instance.
         """
         super(OSFS, self).__init__()
-        root_path = fsdecode(fspath(root_path))
-        _root_path = os.path.expanduser(os.path.expandvars(root_path))
-        _root_path = os.path.normpath(os.path.abspath(_root_path))
-        self.root_path = _root_path
+        _root_path_native = fsencode(fspath(root_path))
+        _root_path_native = os.path.expandvars(_root_path_native)
+        _root_path_native = os.path.expanduser(_root_path_native)
+        _root_path_native = os.path.abspath(_root_path_native)
+        _root_path_native = os.path.normpath(_root_path_native)
+
+        self.root_path_native = _root_path_native
+        self.root_path = fsdecode(_root_path_native)
 
         if create:
             try:
-                if not os.path.isdir(_root_path):
-                    os.makedirs(_root_path, mode=create_mode)
+                if not os.path.isdir(_root_path_native):
+                    os.makedirs(_root_path_native, mode=create_mode)
             except OSError as error:
                 raise errors.CreateFailed(
                     'unable to create {} ({})'.format(root_path, error)
                 )
         else:
-            if not os.path.isdir(_root_path):
+            if not os.path.isdir(_root_path_native):
                 raise errors.CreateFailed(
-                    'root path does not exist'
+                    'root path does not exist or is file'
                 )
 
         _meta = self._meta = {
@@ -107,7 +114,7 @@ class OSFS(FS):
         }
 
         if _WINDOWS_PLATFORM:  # pragma: nocover
-            _meta["invalid_path_chars"] =\
+            _meta["invalid_path_chars"] = \
                 ''.join(six.unichr(n) for n in range(31)) + '\\:*?"<>|'
         else:
             _meta["invalid_path_chars"] = '\0'
@@ -115,7 +122,7 @@ class OSFS(FS):
             if 'PC_PATH_MAX' in os.pathconf_names:
                 _meta['max_sys_path_length'] = (
                     os.pathconf(
-                        fsencode(_root_path),
+                        _root_path_native,
                         os.pathconf_names['PC_PATH_MAX']
                     )
                 )
@@ -130,13 +137,31 @@ class OSFS(FS):
         return fmt.format(self.__class__.__name__.lower(),
                           self.root_path)
 
-    def _to_sys_path(self, path):
+    def _to_sys_path(self, path, as_bytes=False):
         """Convert a FS path to a path on the OS.
+        If `as_bytes` is True, return fsencoded-bytes instead of Unicode.
         """
+        root_path = self.root_path
+        _path = path
+        sep = '/'
+        os_sep = os.sep
+
+        if _NIX_PY2:
+            root_path = self.root_path_native
+            _path = fsencode(path)
+            sep = b'/'
+            os_sep = fsencode(os_sep)
+
         sys_path = os.path.join(
-            self.root_path,
-            path.lstrip('/').replace('/', os.sep)
+            root_path,
+            _path.lstrip(sep).replace(sep, os_sep)
         )
+
+        sys_path = fsdecode(sys_path)
+
+        if as_bytes:
+            return fsencode(sys_path)
+
         return sys_path
 
     @classmethod
@@ -209,25 +234,37 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def _gettarget(self, sys_path):
+        _sys_path = sys_path
+        if _NIX_PY2:
+            _sys_path = fsencode(_sys_path)
         try:
-            target = os.readlink(sys_path)
+            target = os.readlink(_sys_path)
         except OSError:
             return None
         else:
+            if _NIX_PY2 and target:
+                target = fsdecode(target)
             return target
 
     def _make_link_info(self, sys_path):
         _target = self._gettarget(sys_path)
         link = {
-            'target': _target,
+            'target': fsdecode(_target) if _target else _target,
         }
         return link
+
+    def _get_validated_syspath(self, path):
+        """Return a validated, normalized and eventually encoded string or byte
+           path.
+        """
+        _path = fsdecode(path) if path else path
+        _path = self.validatepath(_path)
+        return self._to_sys_path(_path, as_bytes=_NIX_PY2)
 
     def getinfo(self, path, namespaces=None):
         self.check()
         namespaces = namespaces or ()
-        _path = self.validatepath(path)
-        sys_path = self.getsyspath(_path)
+        sys_path = self._get_validated_syspath(path)
         _lstat = None
         with convert_os_errors('getinfo', path):
             _stat = os.stat(sys_path)
@@ -236,7 +273,7 @@ class OSFS(FS):
 
         info = {
             'basic': {
-                'name': basename(_path),
+                'name': fsdecode(basename(sys_path)),
                 'is_dir': stat.S_ISDIR(_stat.st_mode)
             }
         }
@@ -261,17 +298,17 @@ class OSFS(FS):
 
     def listdir(self, path):
         self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('listdir', path, directory=True):
-            names = os.listdir(sys_path)
+            names = [fsdecode(f) for f in os.listdir(sys_path)]
         return names
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
         mode = Permissions.get_mode(permissions)
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
+        _path = fsdecode(path) if path else path
+        _path = self.validatepath(_path)
+        sys_path = self._get_validated_syspath(_path)
         with convert_os_errors('makedir', path, directory=True):
             try:
                 os.mkdir(sys_path, mode)
@@ -288,10 +325,10 @@ class OSFS(FS):
         _mode = Mode(mode)
         _mode.validate_bin()
         self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
+        _path = fsdecode(path) if path else path
+        sys_path = self._get_validated_syspath(_path)
         with convert_os_errors('openbin', path):
-            if six.PY2 and _mode.exclusive and self.exists(path):
+            if six.PY2 and _mode.exclusive and self.exists(_path):
                 raise errors.FileExists(path)
             binary_file = io.open(
                 sys_path,
@@ -303,17 +340,16 @@ class OSFS(FS):
 
     def remove(self, path):
         self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('remove', path):
             try:
                 os.remove(sys_path)
             except OSError as error:
-                if error.errno == errno.EACCES and sys.platform == "win32":
+                if error.errno == errno.EACCES and _WINDOWS_PLATFORM:
                     # sometimes windows says this for attempts to remove a dir
                     if os.path.isdir(sys_path):  # pragma: nocover
                         raise errors.FileExpected(path)
-                if error.errno == errno.EPERM and sys.platform == "darwin":
+                if error.errno == errno.EPERM and _MAC_PLATFORM:
                     # sometimes OSX says this for attempts to remove a dir
                     if os.path.isdir(sys_path):  # pragma: nocover
                         raise errors.FileExpected(path)
@@ -321,10 +357,12 @@ class OSFS(FS):
 
     def removedir(self, path):
         self.check()
-        _path = self.validatepath(path)
+        _path = fsdecode(path) if path else path
+        _path = self.validatepath(_path)
         if _path == '/':
             raise errors.RemoveRootError()
-        sys_path = self._to_sys_path(path)
+
+        sys_path = self._to_sys_path(_path, as_bytes=_NIX_PY2)
         with convert_os_errors('removedir', path, directory=True):
             os.rmdir(sys_path)
 
@@ -333,17 +371,19 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def getsyspath(self, path):
-        sys_path = self._to_sys_path(path)
+        _path = fsdecode(path) if path else path
+        sys_path = self._to_sys_path(_path, as_bytes=False)
         return sys_path
 
     def geturl(self, path, purpose='download'):
         if purpose != 'download':
             raise NoURL(path, purpose)
+        # FIXME: segments might need to be URL/percent-encoded instead
         return "file://" + self.getsyspath(path)
 
     def gettype(self, path):
         self.check()
-        sys_path = self._to_sys_path(path)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('gettype', path):
             stat = os.stat(sys_path)
         resource_type = self._get_type_from_stat(stat)
@@ -351,8 +391,7 @@ class OSFS(FS):
 
     def islink(self, path):
         self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
+        sys_path = self._get_validated_syspath(path)
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
         with convert_os_errors('islink', path):
@@ -368,10 +407,10 @@ class OSFS(FS):
              line_buffering=False,
              **options):
         _mode = Mode(mode)
+
         validate_open_mode(mode)
         self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
+        sys_path = self._get_validated_syspath(path)
         with convert_os_errors('open', path):
             if six.PY2 and _mode.exclusive and self.exists(path):
                 raise FileExists(path)
@@ -388,8 +427,7 @@ class OSFS(FS):
 
     def setinfo(self, path, info):
         self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
+        sys_path = self._get_validated_syspath(path)
         if not os.path.exists(sys_path):
             raise errors.ResourceNotFound(path)
         if 'details' in info:
@@ -407,13 +445,14 @@ class OSFS(FS):
         def _scandir(self, path, namespaces=None):
             self.check()
             namespaces = namespaces or ()
-            _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path)
+            sys_path = self._get_validated_syspath(path)
+            sys_path_u = fsdecode(sys_path)
             with convert_os_errors('scandir', path, directory=True):
                 for dir_entry in scandir(sys_path):
+                    entry_name = fsdecode(dir_entry.name)
                     info = {
                         "basic": {
-                            "name": dir_entry.name,
+                            "name": entry_name,
                             "is_dir": dir_entry.is_dir()
                         }
                     }
@@ -434,12 +473,11 @@ class OSFS(FS):
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        info['link'] = self._make_link_info(
-                            os.path.join(sys_path, dir_entry.name)
-                        )
+                        entry_path = os.path.join(sys_path_u, entry_name)
+                        info['link'] = self._make_link_info(entry_path)
                     if 'access' in namespaces:
                         stat_result = dir_entry.stat()
-                        info['access'] =\
+                        info['access'] = \
                             self._make_access_from_stat(stat_result)
 
                     yield Info(info)
@@ -449,12 +487,15 @@ class OSFS(FS):
         def _scandir(self, path, namespaces=None):
             self.check()
             namespaces = namespaces or ()
-            _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path)
+            sys_path = self._get_validated_syspath(path)
+            sys_path_u = fsdecode(sys_path)
             with convert_os_errors('scandir', path, directory=True):
                 for entry_name in os.listdir(sys_path):
-                    entry_path = os.path.join(sys_path, entry_name)
-                    stat_result = os.stat(entry_path)
+                    entry_name = fsdecode(entry_name)
+                    entry_path = os.path.join(sys_path_u, entry_name)
+                    entry_path_b = fsdecode(entry_path)
+                    stat_result = os.stat(entry_path_b)
+
                     info = {
                         "basic": {
                             "name": entry_name,
@@ -470,23 +511,22 @@ class OSFS(FS):
                             for k in dir(stat_result) if k.startswith('st_')
                         }
                     if 'lstat' in namespaces:
-                        lstat_result = os.lstat(entry_path)
+                        lstat_result = os.lstat(entry_path_b)
                         info['lstat'] = {
                             k: getattr(lstat_result, k)
                             for k in dir(lstat_result) if k.startswith('st_')
                         }
                     if 'link' in namespaces:
-                        info['link'] = self._make_link_info(
-                            os.path.join(sys_path, entry_name)
-                        )
+                        info['link'] = self._make_link_info(entry_path)
                     if 'access' in namespaces:
-                        info['access'] =\
+                        info['access'] = \
                             self._make_access_from_stat(stat_result)
 
                     yield Info(info)
 
 
     def scandir(self, path, namespaces=None, page=None):
+        path = fsdecode(path) if path else path
         iter_info = self._scandir(path, namespaces=namespaces)
         if page is not None:
             start, end = page
