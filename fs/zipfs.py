@@ -241,6 +241,7 @@ class ReadZipFS(FS):
         'virtual': False,
     }
 
+    @errors.CreateFailed.catch_all
     def __init__(self, file, encoding='utf-8'):
         super(ReadZipFS, self).__init__()
         self._file = file

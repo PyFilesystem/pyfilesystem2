@@ -103,7 +103,7 @@ class CreateFailed(FSError):
             except cls:
                 raise
             except Exception as e:
-                six.raise_from(cls(exc=e), None)
+                raise cls(exc=e)
         return new_func
 
     def __init__(self, msg=None, exc=None):

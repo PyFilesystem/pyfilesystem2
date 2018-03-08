@@ -87,12 +87,9 @@ class OSFS(FS):
                 if not os.path.isdir(_root_path):
                     os.makedirs(_root_path, mode=create_mode)
             except OSError as error:
-                six.raise_from(
-                    errors.CreateFailed(
-                        'unable to create {} ({})'.format(root_path, error),
-                        error,
-                    ),
-                    None,
+                raise errors.CreateFailed(
+                    'unable to create {} ({})'.format(root_path, error),
+                    error,
                 )
         else:
             if not os.path.isdir(_root_path):

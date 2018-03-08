@@ -198,6 +198,7 @@ class ReadTarFS(FS):
         tarfile.LNKTYPE: ResourceType.symlink,
     }
 
+    @errors.CreateFailed.catch_all
     def __init__(self, file, encoding='utf-8'):
         super(ReadTarFS, self).__init__()
         self._file = file
