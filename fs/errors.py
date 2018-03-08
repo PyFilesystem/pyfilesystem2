@@ -11,6 +11,8 @@ which may be used as a catch-all filesystem exception.
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import functools
+
 import six
 from six import text_type
 
@@ -92,6 +94,21 @@ class CreateFailed(FSError):
 
     default_message = "unable to create filesystem"
 
+    @classmethod
+    def catch_all(cls, func):
+        @functools.wraps(func)
+        def new_func(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except cls:
+                raise
+            except Exception as e:
+                six.raise_from(cls(exc=e), None)
+        return new_func
+
+    def __init__(self, msg=None, exc=None):
+        self._msg = msg or self.default_message
+        self.exc = exc
 
 class PathError(FSError):
     """Base exception for errors to do with a path string.
