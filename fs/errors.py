@@ -92,7 +92,7 @@ class CreateFailed(FSError):
     """Filesystem could not be created.
     """
 
-    default_message = "unable to create filesystem"
+    default_message = "unable to create filesystem, {details}"
 
     @classmethod
     def catch_all(cls, func):
@@ -108,6 +108,7 @@ class CreateFailed(FSError):
 
     def __init__(self, msg=None, exc=None):
         self._msg = msg or self.default_message
+        self.details = '' if exc is None else text_type(exc)
         self.exc = exc
 
 class PathError(FSError):
