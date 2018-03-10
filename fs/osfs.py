@@ -88,13 +88,12 @@ class OSFS(FS):
                     os.makedirs(_root_path, mode=create_mode)
             except OSError as error:
                 raise errors.CreateFailed(
-                    'unable to create {} ({})'.format(root_path, error)
+                    'unable to create {} ({})'.format(root_path, error),
+                    error,
                 )
         else:
             if not os.path.isdir(_root_path):
-                raise errors.CreateFailed(
-                    'root path does not exist'
-                )
+                raise errors.CreateFailed('root path does not exist')
 
         _meta = self._meta = {
             'case_insensitive': os.path.normcase('Aa') != 'aa',
