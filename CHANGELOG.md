@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.19] - Unreleased
+
+### Fixed
+
+- encoding issue with TarFS
+- CreateFailed now wrap the original exception in `exc` attribute
+
 ## [2.0.18] - 2018-01-31
 
 ### Added
