@@ -4,6 +4,8 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+import os
 import tarfile
 import six
 
@@ -85,7 +87,11 @@ class TarFS(WrapFS):
                 encoding="utf-8",
                 temp_fs="temp://__tartemp__"):
 
-        filename = str(getattr(file, 'name', file))
+        if isinstance(file, (six.text_type, six.binary_type)):
+            file = os.path.expanduser(file)
+            filename = file
+        else:
+            filename = getattr(file, 'name', '')
 
         if write and compression is None:
             compression = None
@@ -99,8 +105,8 @@ class TarFS(WrapFS):
                               compression=compression,
                               encoding=encoding,
                               temp_fs=temp_fs)
-        # else:
-        return ReadTarFS(file, encoding=encoding)
+        else:
+            return ReadTarFS(file, encoding=encoding)
 
 
 @six.python_2_unicode_compatible
@@ -207,11 +213,30 @@ class ReadTarFS(FS):
         else:
             self._tar = tarfile.open(file, mode='r')
 
+        self._directory = OrderedDict(
+            (relpath(self._decode(info.name)).rstrip('/'), info)
+            for info in self._tar
+        )
+
     def __repr__(self):
         return "ReadTarFS({!r})".format(self._file)
 
     def __str__(self):
         return "<TarFS '{}'>".format(self._file)
+
+    def _encode(self, s):
+        return(
+            s.encode(self.encoding)
+            if six.PY2 else
+            s
+        )
+
+    def _decode(self, s):
+        return(
+            s.decode(self.encoding)
+            if six.PY2 else
+            s
+        )
 
     def getinfo(self, path, namespaces=None):
         _path = relpath(self.validatepath(path))
@@ -230,12 +255,12 @@ class ReadTarFS(FS):
 
         else:
             try:
-                member = self._tar.getmember(_path)
+                member = self._tar.getmember(self._encode(_path))
             except KeyError:
                 raise errors.ResourceNotFound(path)
 
             raw_info["basic"] = {
-                "name": basename(member.name),
+                "name": basename(self._decode(member.name)),
                 "is_dir": member.isdir(),
             }
 
@@ -269,21 +294,19 @@ class ReadTarFS(FS):
 
     def listdir(self, path):
         self.check()
-        path = relpath(path)
-        if path:
-            try:
-                member = self._tar.getmember(path)
-            except KeyError:
-                six.raise_from(errors.ResourceNotFound(path), None)
-            else:
-                if not member.isdir():
-                    six.raise_from(errors.DirectoryExpected(path), None)
-
-        return [
-            basename(member.name)
-            for member in self._tar
-            if dirname(member.path) == path
+        _path = relpath(path)
+        info = self._directory.get(_path)
+        if _path:
+            if info is None:
+                raise errors.ResourceNotFound(path)
+            if not info.isdir():
+                raise errors.DirectoryExpected(path)
+        dir_list = [
+            basename(name)
+            for name in self._directory.keys()
+            if dirname(name) == _path
         ]
+        return dir_list
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
@@ -297,7 +320,7 @@ class ReadTarFS(FS):
             raise errors.ResourceReadOnly(path)
 
         try:
-            member = self._tar.getmember(path)
+            member = self._tar.getmember(self._encode(path))
         except KeyError:
             six.raise_from(errors.ResourceNotFound(path), None)
 

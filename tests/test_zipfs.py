@@ -7,6 +7,8 @@ import tempfile
 import unittest
 import zipfile
 
+import six
+
 from fs import zipfs
 from fs.compress import write_zip
 from fs.opener import open_fs
@@ -34,6 +36,7 @@ class TestWriteReadZipFS(unittest.TestCase):
         with zipfs.ZipFS(self._temp_path) as zip_fs:
             paths = list(zip_fs.walk.files())
             for path in paths:
+                self.assertIsInstance(path, six.text_type)
                 with zip_fs.openbin(path) as f:
                     f.read()
 
