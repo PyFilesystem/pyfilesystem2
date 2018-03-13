@@ -134,3 +134,13 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
     def test_validate_path(self):
         self.fs.write_fs = None
         self.fs.validatepath('foo')
+
+    def test_listdir_duplicates(self):
+        m1 = MemoryFS()
+        m2 = MemoryFS()
+        m1.touch('foo')
+        m2.touch('foo')
+        multi_fs = MultiFS()
+        multi_fs.add_fs('m1', m1)
+        multi_fs.add_fs('m2', m2)
+        self.assertEqual(multi_fs.listdir(u'/'), ['foo'])
