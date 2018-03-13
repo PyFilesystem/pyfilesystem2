@@ -5,7 +5,7 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
 
-from collections import namedtuple
+from collections import namedtuple, OrderedDict
 from operator import itemgetter
 
 from six import text_type
@@ -203,6 +203,7 @@ class MultiFS(FS):
                 exists = True
         if not exists:
             raise errors.ResourceNotFound(path)
+        directory = list(OrderedDict.fromkeys(directory))
         return directory
 
     def makedir(self, path, permissions=None, recreate=False):
