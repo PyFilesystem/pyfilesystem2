@@ -15,7 +15,9 @@ Here's an example that opens a filesystem then makes it *read only*::
 
 from __future__ import print_function
 from __future__ import unicode_literals
+from __future__ import absolute_import
 
+from time import time as gettime
 from .wrapfs import WrapFS
 from .path import abspath, normpath, split
 from .errors import ResourceReadOnly, ResourceNotFound
@@ -36,7 +38,7 @@ def read_only(fs):
     return WrapReadOnly(fs)
 
 
-def cache_directory(fs):
+def cache_directory(fs,livetime=-1,speedup=False):
     """Make a filesystem that caches directory information.
 
     Arguments:
@@ -47,7 +49,7 @@ def cache_directory(fs):
         and other methods which read directory information.
 
     """
-    return WrapCachedDir(fs)
+    return WrapCachedDir(fs, livetime, speedup)
 
 
 class WrapCachedDir(WrapFS):
@@ -67,8 +69,10 @@ class WrapCachedDir(WrapFS):
 
     wrap_name = 'cached-dir'
 
-    def __init__(self, wrap_fs):
+    def __init__(self, wrap_fs, livetime=10, speedup=False):
         super(WrapCachedDir, self).__init__(wrap_fs)
+        self.livetime = livetime
+        self.speedup = speedup
         self._cache = {}
 
     def scandir(self, path, namespaces=None, page=None):
@@ -81,7 +85,21 @@ class WrapCachedDir(WrapFS):
                 page=page
             )
             _dir = {info.name: info for info in _scan_result}
-            self._cache[cache_key] = _dir
+            self._cache[cache_key] = {'time':gettime(),'data':_dir}
+        else:
+            if self.livetime >= 0:
+                if self._cache[cache_key]['time'] + self.livetime < gettime():
+                    _scan_result = self._wrap_fs.scandir(
+                        path,
+                        namespaces=namespaces,
+                        page=page
+                    )
+                    _dir = {info.name: info for info in _scan_result}
+                    self._cache[cache_key] = {'time':gettime(),'data':_dir}
+                else:
+                    if self.speedup:
+                        self._cache[cache_key]['time'] = gettime()
+
         gen_scandir = iter(self._cache[cache_key].values())
         return gen_scandir
 
@@ -97,12 +115,12 @@ class WrapCachedDir(WrapFS):
         dir_path, resource_name = split(_path)
         cache_key = (dir_path, frozenset(namespaces or ()))
 
-        if cache_key not in self._cache:
-            self.scandir(dir_path, namespaces=namespaces)
+        #if cache_key not in self._cache:
+        self.scandir(dir_path, namespaces=namespaces)
 
         _dir = self._cache[cache_key]
         try:
-            info = _dir[resource_name]
+            info = _dir['data'][resource_name]
         except KeyError:
             raise ResourceNotFound(path)
         return info
