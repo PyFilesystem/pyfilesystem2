@@ -15,11 +15,17 @@ from .errors import UnsupportedProtocol, EntryPointError
 from .parse import parse_fs_url
 
 
+if False:  # typing imports
+    from typing import Text, Union
+    from ..base import FS
+
+
 class Registry(object):
     """A registry for `Opener` instances.
     """
 
     def __init__(self, default_opener='osfs'):
+        # type: (Text) -> None
         """Create a registry object.
 
         Arguments:
@@ -30,7 +36,6 @@ class Registry(object):
         """
         self.default_opener = default_opener
         self._protocols = None
-
 
     def __repr__(self):
         return "<fs-registry {!r}>".format(self.protocols)
@@ -48,6 +53,7 @@ class Registry(object):
         return self._protocols
 
     def get_opener(self, protocol):
+        # type: (Text) -> Opener
         """Get the opener class associated to a given protocol.
 
         Arguments:
@@ -103,11 +109,13 @@ class Registry(object):
         return opener_instance
 
     def open(self,
-             fs_url,
-             writeable=True,
-             create=False,
-             cwd=".",
-             default_protocol='osfs'):
+             fs_url,                    # type: Text
+             writeable=True,            # type: bool
+             create=False,              # type: bool
+             cwd=".",                   # type: Text
+             default_protocol='osfs'    # type: Text
+             ):
+        # type: (...) -> Tuple[FS, Text]
         """Open a filesystem from a FS URL.
 
         Returns a tuple of a filesystem object and a path. If there is
@@ -119,7 +127,7 @@ class Registry(object):
                 writeable.
             create (bool, optional): `True` if the filesystem should be
                 created if it does not exist.
-            cwd (str, optional): The current working directory, or `None`.
+            cwd (str): The current working directory.
 
         Returns:
             (FS, str): a tuple of ``(<filesystem>, <path from url>)``
@@ -145,11 +153,12 @@ class Registry(object):
         return open_fs, open_path
 
     def open_fs(self,
-                fs_url,
-                writeable=False,
-                create=False,
-                cwd=".",
-                default_protocol='osfs'):
+                fs_url,                     # type: Text
+                writeable=False,            # type: bool
+                create=False,               # type: bool
+                cwd=".",                    # type: Text
+                default_protocol='osfs'     # type: Text
+                ):
         """Open a filesystem from a FS URL (ignoring the path component).
 
         Arguments:
@@ -158,8 +167,8 @@ class Registry(object):
                 be writeable.
             create (bool, optional): `True` if the filesystem should be
                 created if it does not exist.
-            cwd (str, optional): The current working directory (generally
-                only relevant for OS filesystems).
+            cwd (str): The current working directory (generally only
+                relevant for OS filesystems).
             default_protocol (str): The protocol to use if one is not
                 supplied in the FS URL (defaults to ``"osfs"``).
 
@@ -181,7 +190,12 @@ class Registry(object):
         return _fs
 
     @contextlib.contextmanager
-    def manage_fs(self, fs_url, create=False, writeable=False, cwd='.'):  # noqa: D300,D301
+    def manage_fs(self,
+                  fs_url,           # type: Union[FS, Text]
+                  create=False,     # type: bool
+                  writeable=False,  # type: bool
+                  cwd='.'           # type: Text
+                  ):
         """Get a context manager to open and close a filesystem.
 
         Arguments:
@@ -199,7 +213,7 @@ class Registry(object):
 
         Example:
             >>> def print_ls(list_fs):
-            ...     \"\"\"List a directory.\"\"\"
+            ...     '''List a directory.'''
             ...     with manage_fs(list_fs) as fs:
             ...         print(' '.join(fs.listdir()))
 

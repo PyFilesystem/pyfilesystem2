@@ -13,6 +13,11 @@ from .osfs import OSFS
 from ._repr import make_repr
 from appdirs import AppDirs
 
+
+if False:  # typing imports
+    from typing import ClassVar, Optional, Text
+
+
 __all__ = ['UserDataFS',
            'UserConfigFS',
            'SiteDataFS',
@@ -25,14 +30,19 @@ class _AppFS(OSFS):
     """Abstract base class for an app FS.
     """
 
-    app_dir = None
+    # FIXME(@althonos): replace by ClassVar[Optional[Text]]
+    # once https://github.com/python/mypy/pull/4718 is accepted
+    # (subclass override will raise errors until then)
+    app_dir = None  # type: Optional[Text]
 
     def __init__(self,
-                 appname,
-                 author=None,
-                 version=None,
+                 appname,          # type: Text
+                 author=None,      # type: Optional[Text]
+                 version=None,     # type: Optional[Text]
                  roaming=False,
-                 create=True):
+                 create=True
+                 ):
+        # type: (...) -> None
         self.app_dirs = AppDirs(appname, author, version, roaming)
         self.create = create
         super(_AppFS, self).__init__(

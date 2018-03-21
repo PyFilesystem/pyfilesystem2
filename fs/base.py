@@ -36,8 +36,7 @@ from .time import datetime_to_epoch
 from .walk import Walker
 
 
-# type annotations
-if False:
+if False:  # typing imports
     from datetime import datetime
     from typing import *
     from .enums import ResourceType
@@ -242,6 +241,7 @@ class FS(object):
 
     def appendbytes(self, path, data):
         # type: (Text, bytes) -> None
+        # FIXME(@althonos): accept bytearray and memoryview as well ?
         """Append bytes to the end of a file, creating it if needed.
 
         Arguments:
@@ -570,7 +570,7 @@ class FS(object):
                 )
 
     def gettext(self, path, encoding=None, errors=None, newline=''):
-        # type: (Text, Optional[Text], Optional[Text], Text) -> None
+        # type: (Text, Optional[Text], Optional[Text], Text) -> Text
         """Get the contents of a file as a string.
 
         Arguments:
@@ -1161,6 +1161,7 @@ class FS(object):
 
     def setbytes(self, path, contents):
         # type: (Text, bytes) -> None
+        # FIXME(@althonos): accept bytearray and memoryview as well ?
         """Copy binary data to a file.
 
         Arguments:

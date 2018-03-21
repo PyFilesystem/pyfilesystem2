@@ -22,14 +22,22 @@ from .errors import NoSysPath, MissingInfoNamespace
 from .walk import Walker
 
 
-def write_zip(src_fs,
-              file,
-              compression=zipfile.ZIP_DEFLATED,
-              encoding="utf-8",
-              walker=None):
+if False:  # typing imports
+    from typing import IO, Optional, Text, Type
+    from .base import FS
+
+
+def write_zip(src_fs,                            # type: FS
+              file,                              # type: IO
+              compression=zipfile.ZIP_DEFLATED,  # type: int
+              encoding="utf-8",                  # type: Text
+              walker=None                        # type: Optional[Type[Walker]]
+              ):
+    # type: (...) -> None
     """Write the contents of a filesystem to a zip file.
 
     Arguments:
+        src_fs (~fs.base.FS): The source filesystem to compress.
         file (str or io.IOBase): Destination file, may be a file name
             or an open file object.
         compression (str, optional): Compression to use (one of the constants
@@ -102,11 +110,13 @@ def write_zip(src_fs,
                     _zip.write(sys_path, zip_name)
 
 
-def write_tar(src_fs,
-              file,
-              compression=None,
-              encoding="utf-8",
-              walker=None):
+def write_tar(src_fs,            # type: FS
+              file,              # type: IO
+              compression=None,  # type: Optional[Text]
+              encoding="utf-8",  # type: Text
+              walker=None        # type: Optional[Type[Walker]]
+              ):
+    # type: (...) -> None
     """Write the contents of a filesystem to a tar file.
 
     Arguments:
