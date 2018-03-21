@@ -1019,7 +1019,7 @@ class FS(object):
              encoding=None,  # type: Optional[Text]
              errors=None,    # type: Optional[Text]
              newline='',     # type: Text
-             **options,      # type: Any
+             **options       # type: Any
              ):
         # type: (...) -> IO
         """Open a file.
