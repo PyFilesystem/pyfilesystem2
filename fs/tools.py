@@ -15,7 +15,14 @@ from .path import normpath
 from .path import recursepath
 
 
+# type annotations
+if False:
+    from typing import *
+    from .base import FS
+
+
 def remove_empty(fs, path):
+    # type: (FS, Text) -> None
     """Remove all empty parents.
 
     Arguments:
@@ -33,6 +40,7 @@ def remove_empty(fs, path):
 
 
 def copy_file_data(src_file, dst_file, chunk_size=None):
+    # type: (IO, IO, Optional[int]) -> None
     """Copy data from one file object to another.
 
     Arguments:
@@ -51,6 +59,7 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
 
 
 def get_intermediate_dirs(fs, dir_path):
+    # type: (FS, Text) -> List[Text]
     """Get a list of non-existing intermediate directories.
 
     Arguments:

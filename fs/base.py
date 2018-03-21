@@ -36,6 +36,15 @@ from .time import datetime_to_epoch
 from .walk import Walker
 
 
+# type annotations
+if False:
+    from datetime import datetime
+    from typing import *
+    from .enums import ResourceType
+    from .info import Info
+    from .permissions import Permissions
+
+
 @six.add_metaclass(abc.ABCMeta)
 class FS(object):
     """Base class for FS objects.
@@ -48,6 +57,7 @@ class FS(object):
     walker_class = Walker
 
     def __init__(self):
+        # type: (...) -> None
         """Create a filesystem. See help(type(self)) for accurate signature.
         """
         self._closed = False
@@ -55,11 +65,13 @@ class FS(object):
         super(FS, self).__init__()
 
     def __enter__(self):
+        # type: (...) -> FS
         """Allow use of filesystem as a context manager.
         """
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        # type: (...) -> None
         """Close filesystem on exit.
         """
         self.close()
@@ -77,12 +89,13 @@ class FS(object):
 
     @abc.abstractmethod
     def getinfo(self, path, namespaces=None):
+        # type: (Text, Optional[Container[Text]]) -> Info
         """Get information about a resource on a filesystem.
 
         Arguments:
             path (str): A path to a resource on the filesystem.
             namespaces (list, optional): Info namespaces to query
-                (defaults to *basic*).
+                (defaults to *[basic]*).
 
         Returns:
             ~fs.info.Info: resource information object.
@@ -93,6 +106,7 @@ class FS(object):
 
     @abc.abstractmethod
     def listdir(self, path):
+        # type: (Text) -> List[Text]
         """Get a list of the resource names in a directory.
 
         This method will return a list of the resources in a directory.
@@ -113,14 +127,15 @@ class FS(object):
 
     @abc.abstractmethod
     def makedir(self, path, permissions=None, recreate=False):
+        # type: (Text, Optional[Permissions], bool) -> FS
         """Make a directory.
 
         Arguments:
             path (str): Path to directory from root.
             permissions (~fs.permissions.Permissions, optional): a
                 `Permissions` instance, or `None` to use default.
-            recreate (bool, optional): Set to `True` to avoid raising an
-                error if the directory already exists (defaults to `False`).
+            recreate (bool): Set to `True` to avoid raising an error if
+                the directory already exists (defaults to `False`).
 
         Returns:
             ~fs.subfs.SubFS: a filesystem whose root is the new directory.
@@ -133,16 +148,17 @@ class FS(object):
 
     @abc.abstractmethod
     def openbin(self, path, mode="r", buffering=-1, **options):
+        # type: (Text, Text, int, **Any) -> BinaryIO
         """Open a binary file-like object.
 
         Arguments:
             path (str): A path on the filesystem.
-            mode (str, optional): Mode to open file (must be a valid
-                non-text mode, defaults to *r*). Since this method only
-                opens binary files, the ``b`` in the mode string is implied.s
-            buffering (int, optional): Buffering policy (-1 to use
-                default buffering, 0 to disable buffering, or any
-                positive integer to indicate a buffer size).
+            mode (str): Mode to open file (must be a valid non-text mode,
+                defaults to *r*). Since this method only opens binary files,
+                the ``b`` in the mode string is implied.
+            buffering (int): Buffering policy (-1 to use default buffering,
+                0 to disable buffering, or any positive integer to indicate
+                a buffer size).
             **options: keyword arguments for any additional information
                 required by the filesystem (if any).
 
@@ -159,6 +175,7 @@ class FS(object):
 
     @abc.abstractmethod
     def remove(self, path):
+        # type: (Text) -> None
         """Remove a file from the filesystem.
 
         Arguments:
@@ -172,6 +189,7 @@ class FS(object):
 
     @abc.abstractmethod
     def removedir(self, path):
+        # type: (Text) -> None
         """Remove a directory from the filesystem.
 
         Arguments:
@@ -192,6 +210,7 @@ class FS(object):
 
     @abc.abstractmethod
     def setinfo(self, path, info):
+        # type: (Text, dict) -> None
         """Set info on a resource.
 
         This method is the compliment to `~fs.base.FS.getinfo`
@@ -222,6 +241,7 @@ class FS(object):
     # ---------------------------------------------------------------- #
 
     def appendbytes(self, path, data):
+        # type: (Text, bytes) -> None
         """Append bytes to the end of a file, creating it if needed.
 
         Arguments:
@@ -241,21 +261,22 @@ class FS(object):
                 append_file.write(data)
 
     def appendtext(self,
-                   path,
-                   text,
-                   encoding='utf-8',
-                   errors=None,
-                   newline=''):
+                   path,                # type: Text
+                   text,                # type: Text
+                   encoding='utf-8',    # type: Text
+                   errors=None,         # type: Optional[Text]
+                   newline=''           # type: Text
+                   ):
+        # type: (...) -> None
         """Append text to the end of a file, creating it if needed.
 
         Arguments:
             path (str): Path to a file.
             text (str): Text to append.
-            encoding (str, optional): Encoding for text files
-                (defaults to ``utf-8``).
+            encoding (str): Encoding for text files (defaults to ``utf-8``).
             errors (str, optional): What to do with unicode decode errors
                 (see `codecs` module for more information).
-            newline (str, optional): Newline parameter.
+            newline (str): Newline parameter.
 
         Raises:
             TypeError: if ``text`` is not an unicode string.
@@ -274,6 +295,7 @@ class FS(object):
                 append_file.write(text)
 
     def close(self):
+        # type: () -> None
         """Close the filesystem and release any resources.
 
         It is important to call this method when you have finished
@@ -297,13 +319,14 @@ class FS(object):
         self._closed = True
 
     def copy(self, src_path, dst_path, overwrite=False):
+        # type: (Text, Text, bool) -> None
         """Copy file contents from ``src_path`` to ``dst_path``.
 
         Arguments:
             src_path (str): Path of source file.
             dst_path (str): Path to destination file.
-            overwrite (bool, Optional): If `True`, overwrite the
-                destination file if it exists (defaults to `False`).
+            overwrite (bool): If `True`, overwrite the destination file
+                if it exists (defaults to `False`).
 
         Raises:
             fs.errors.DestinationExists: If ``dst_path`` exists,
@@ -316,17 +339,18 @@ class FS(object):
             if not overwrite and self.exists(dst_path):
                 raise errors.DestinationExists(dst_path)
             with closing(self.open(src_path, 'rb')) as read_file:
-                self.setbinfile(dst_path, read_file)
+                # FIXME(@althonos): typing complains because open return IO
+                self.setbinfile(dst_path, read_file)   # type: ignore
 
     def copydir(self, src_path, dst_path, create=False):
+        # type: (Text, Text, bool) -> None
         """Copy the contents of ``src_path`` to ``dst_path``.
 
         Arguments:
             src_path (str): Path of source directory.
             dst_path (str): Path to destination directory.
-            create (bool, optional): If `True`, then ``dst_path``
-                will be created if it doesn't exist alreadys
-                (defaults to `False`).
+            create (bool): If `True`, then ``dst_path`` will be created
+                if it doesn't exist alreadys (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: If the ``dst_path``
@@ -346,6 +370,7 @@ class FS(object):
             )
 
     def create(self, path, wipe=False):
+        # type: (Text, bool) -> bool
         """Create an empty file.
 
         The default behavior is to create a new file if one doesn't
@@ -369,6 +394,7 @@ class FS(object):
             return True
 
     def desc(self, path):
+        # type: (Text) -> Text
         """Return a short descriptive text regarding a path.
 
         Arguments:
@@ -388,6 +414,7 @@ class FS(object):
             return syspath
 
     def exists(self, path):
+        # type: (Text) -> bool
         """Check if a path maps to a resource.
 
         Arguments:
@@ -405,13 +432,15 @@ class FS(object):
             return True
 
     def filterdir(self,
-                  path,
-                  files=None,
-                  dirs=None,
-                  exclude_dirs=None,
-                  exclude_files=None,
-                  namespaces=None,
-                  page=None):
+                  path,                 # type: Text
+                  files=None,           # type: Optional[Iterable[Text]]
+                  dirs=None,            # type: Optional[Iterable[Text]]
+                  exclude_dirs=None,    # type: Optional[Iterable[Text]]
+                  exclude_files=None,   # type: Optional[Iterable[Text]]
+                  namespaces=None,      # type: Optional[Container[Text]]
+                  page=None,            # type: Optional[Tuple[int, int]]
+                  ):
+        # type: (...) -> Iterator[Info]
         """Get an iterator of resource info, filtered by patterns.
 
         This method enhances `~fs.base.FS.scandir` with additional
@@ -443,21 +472,25 @@ class FS(object):
         filters = []
 
         def match_dir(patterns, info):
+            # type: (Optional[Iterable[Text]], Info) -> bool
             """Pattern match info.name.
             """
             return info.is_file or self.match(patterns, info.name)
 
         def match_file(patterns, info):
+            # type: (Optional[Iterable[Text]], Info) -> bool
             """Pattern match info.name.
             """
             return info.is_dir or self.match(patterns, info.name)
 
         def exclude_dir(patterns, info):
+            # type: (Optional[Iterable[Text]], Info) -> bool
             """Pattern match info.name.
             """
             return info.is_file or not self.match(patterns, info.name)
 
         def exclude_file(patterns, info):
+            # type: (Optional[Iterable[Text]], Info) -> bool
             """Pattern match info.name.
             """
             return info.is_dir or not self.match(patterns, info.name)
@@ -485,6 +518,7 @@ class FS(object):
         return iter_info
 
     def getbytes(self, path):
+        # type: (Text) -> bytes
         """Get the contents of a file as bytes.
 
         Arguments:
@@ -502,6 +536,7 @@ class FS(object):
         return contents
 
     def getfile(self, path, file, chunk_size=None, **options):
+        # type: (Text, IO, Optional[int], **Any) -> None
         """Copies a file from the filesystem to a file-like object.
 
         This may be more efficient that opening and copying files
@@ -535,6 +570,7 @@ class FS(object):
                 )
 
     def gettext(self, path, encoding=None, errors=None, newline=''):
+        # type: (Text, Optional[Text], Optional[Text], Text) -> None
         """Get the contents of a file as a string.
 
         Arguments:
@@ -542,7 +578,7 @@ class FS(object):
             encoding (str, optional): Encoding to use when reading contents
                 in text mode (defaults to `None`, reading in binary mode).
             errors (str, optional): Unicode errors parameter.
-            newline (str, optional): Newlines parameter.
+            newline (str): Newlines parameter.
 
         Returns:
             str: file contents.
@@ -563,6 +599,7 @@ class FS(object):
         return contents
 
     def getmeta(self, namespace="standard"):
+        # type: (Text) -> dict
         """Get meta information regarding a filesystem.
 
         Arguments:
@@ -616,6 +653,7 @@ class FS(object):
         return meta
 
     def getsize(self, path):
+        # type: (Text) -> int
         """Get the size (in bytes) of a resource.
 
         Arguments:
@@ -636,6 +674,7 @@ class FS(object):
         return size
 
     def getsyspath(self, path):
+        # type: (Text) -> Text
         """Get the *system path* of a resource.
 
         Parameters:
@@ -669,6 +708,7 @@ class FS(object):
         raise errors.NoSysPath(path=path)
 
     def gettype(self, path):
+        # type: (Text) -> ResourceType
         """Get the type of a resource.
 
         Parameters:
@@ -706,6 +746,7 @@ class FS(object):
         return resource_type
 
     def geturl(self, path, purpose='download'):
+        # type: (Text, Text) -> Text
         """Get the URL to a given resource.
 
         Parameters:
@@ -726,6 +767,7 @@ class FS(object):
         raise errors.NoURL(path, purpose)
 
     def hassyspath(self, path):
+        # type: (Text) -> bool
         """Check if a path maps to a system path.
 
         Parameters:
@@ -743,6 +785,7 @@ class FS(object):
         return has_sys_path
 
     def hasurl(self, path, purpose='download'):
+        # type: (Text, Text) -> bool
         """Check if a path has a corresponding URL.
 
         Parameters:
@@ -762,11 +805,13 @@ class FS(object):
         return has_url
 
     def isclosed(self):
+        # type: () -> bool
         """Check if the filesystem is closed.
         """
         return getattr(self, '_closed', False)
 
     def isdir(self, path):
+        # type: (Text) -> bool
         """Check if a path maps to an existing directory.
 
         Parameters:
@@ -782,6 +827,7 @@ class FS(object):
             return False
 
     def isempty(self, path):
+        # type: (Text) -> bool
         """Check if a directory is empty.
 
         A directory is considered empty when it does not contain
@@ -801,6 +847,7 @@ class FS(object):
         return next(iter(self.scandir(path)), None) is None
 
     def isfile(self, path):
+        # type: (Text) -> bool
         """Check if a path maps to an existing file.
 
         Parameters:
@@ -816,6 +863,7 @@ class FS(object):
             return False
 
     def islink(self, path):
+        # type: (Text) -> bool
         """Check if a path maps to a symlink.
 
         Parameters:
@@ -829,6 +877,7 @@ class FS(object):
         return False
 
     def lock(self):
+        # type: () -> threading.RLock
         """Get a context manager that *locks* the filesystem.
 
         Locking a filesystem gives a thread exclusive access to it.
@@ -860,6 +909,7 @@ class FS(object):
         return self._lock
 
     def movedir(self, src_path, dst_path, create=False):
+        # type: (Text, Text, bool) -> None
         """Move contents of directory ``src_path`` to ``dst_path``.
 
         Parameters:
@@ -885,6 +935,7 @@ class FS(object):
             )
 
     def makedirs(self, path, permissions=None, recreate=False):
+        # type: (Text, Optional[Permissions], bool) -> FS
         """Make a directory, and any missing intermediate directories.
 
         Arguments:
@@ -918,10 +969,8 @@ class FS(object):
                     raise
             return self.opendir(path)
 
-    def move(self,
-             src_path,
-             dst_path,
-             overwrite=False):
+    def move(self, src_path, dst_path, overwrite=False):
+        # type: (Text, Text, bool) -> None
         """Move a file from ``src_path`` to ``dst_path``.
 
         Arguments:
@@ -959,17 +1008,20 @@ class FS(object):
                     return
         with self._lock:
             with self.open(src_path, 'rb') as read_file:
-                self.setbinfile(dst_path, read_file)
+                # FIXME(@althonos): typing complains because open return IO
+                self.setbinfile(dst_path, read_file)  # type: ignore
             self.remove(src_path)
 
     def open(self,
-             path,
-             mode='r',
-             buffering=-1,
-             encoding=None,
-             errors=None,
-             newline='',
-             **options):
+             path,           # type: Text
+             mode='r',       # type: Text
+             buffering=-1,   # type: int
+             encoding=None,  # type: Optional[Text]
+             errors=None,    # type: Optional[Text]
+             newline='',     # type: Text
+             **options,      # type: Any
+             ):
+        # type: (...) -> IO
         """Open a file.
 
         Arguments:
@@ -1014,6 +1066,8 @@ class FS(object):
         return io_stream
 
     def opendir(self, path, factory=None):
+        # type: (Text, Optional[Callable[[FS, Text], FS]]) -> FS
+        # FIXME(@althonos): use generics here if possible
         """Get a filesystem object for a sub-directory.
 
         Arguments:
@@ -1041,6 +1095,7 @@ class FS(object):
         return factory(self, path)
 
     def removetree(self, dir_path):
+        # type: (Text) -> None
         """Recursively remove the contents of a directory.
 
         This method is similar to `~fs.base.removedir`, but will
@@ -1062,7 +1117,12 @@ class FS(object):
             if _dir_path != '/':
                 self.removedir(dir_path)
 
-    def scandir(self, path, namespaces=None, page=None):
+    def scandir(self,
+                path,             # type: Text
+                namespaces=None,  # type: Optional[Container[Text]]
+                page=None,        # type: Optional[Tuple[int, int]]
+                ):
+        # type: (...) -> Iterator[Info]
         """Get an iterator of resource info.
 
         Arguments:
@@ -1100,6 +1160,7 @@ class FS(object):
         return iter_info
 
     def setbytes(self, path, contents):
+        # type: (Text, bytes) -> None
         """Copy binary data to a file.
 
         Arguments:
@@ -1116,6 +1177,7 @@ class FS(object):
             write_file.write(contents)
 
     def setbinfile(self, path, file):
+        # type: (Text, BinaryIO) -> None
         """Set a file to the contents of a binary file object.
 
         This method copies bytes from an open binary file to a file on
@@ -1141,11 +1203,13 @@ class FS(object):
                 tools.copy_file_data(file, dst_file)
 
     def setfile(self,
-                path,
-                file,
-                encoding=None,
-                errors=None,
-                newline=None):
+                path,           # type: Text
+                file,           # type: IO
+                encoding=None,  # type: Optional[Text]
+                errors=None,    # type: Optional[Text]
+                newline='',     # type: Text
+                ):
+        # type: (...) -> None
         """Set a file to the contents of a file object.
 
         Arguments:
@@ -1185,6 +1249,7 @@ class FS(object):
                 tools.copy_file_data(file, dst_file)
 
     def settimes(self, path, accessed=None, modified=None):
+        # type: (Text, Optional[datetime], Optional[datetime]) -> None
         """Set the accessed and modified time on a resource.
 
         Arguments:
@@ -1196,7 +1261,7 @@ class FS(object):
                 ``accessed`` parameter.
 
         """
-        details = {}
+        details = {}  # type: dict
         raw_info = {
             "details": details
         }
@@ -1216,11 +1281,13 @@ class FS(object):
         self.setinfo(path, raw_info)
 
     def settext(self,
-                path,
-                contents,
-                encoding='utf-8',
-                errors=None,
-                newline=''):
+                path,               # type: Text
+                contents,           # type: Text
+                encoding='utf-8',   # type: Text
+                errors=None,        # type: Optional[Text]
+                newline='',         # type: Text
+                ):
+        # typing:
         """Create or replace a file with text.
 
         Arguments:
@@ -1246,6 +1313,7 @@ class FS(object):
             write_file.write(contents)
 
     def touch(self, path):
+        # type: (Text) -> None
         """Touch a file on the filesystem.
 
         Touching a file means creating a new file if ``path`` doesn't
@@ -1269,6 +1337,7 @@ class FS(object):
                 self.setinfo(path, raw_info)
 
     def validatepath(self, path):
+        # type: (Text) -> Text
         """Check if a path is valid, returning a normalized absolute
         path.
 
@@ -1328,6 +1397,7 @@ class FS(object):
     # ---------------------------------------------------------------- #
 
     def getbasic(self, path):
+        # type: (Text) -> Info
         """Get the *basic* resource info.
 
         This method is shorthand for the following::
@@ -1344,6 +1414,7 @@ class FS(object):
         return self.getinfo(path, namespaces=['basic'])
 
     def getdetails(self, path):
+        # type: (Text) -> Info
         """Get the *details* resource info.
 
         This method is shorthand for the following::
@@ -1360,6 +1431,7 @@ class FS(object):
         return self.getinfo(path, namespaces=['details'])
 
     def check(self):
+        # type: () -> None
         """Check if a filesystem may be used.
 
         Raises:
@@ -1370,6 +1442,7 @@ class FS(object):
             raise errors.FilesystemClosed()
 
     def match(self, patterns, name):
+        # type: (Iterable[Text], Text) -> bool
         """Check if a name matches any of a list of wildcards.
 
         Arguments:
@@ -1405,6 +1478,7 @@ class FS(object):
         return matcher(name)
 
     def tree(self, **kwargs):
+        # type: (**Any) -> None
         """Render a tree view of the filesystem to stdout or a file.
 
         The parameters are passed to :func:`~fs.tree.render`.
