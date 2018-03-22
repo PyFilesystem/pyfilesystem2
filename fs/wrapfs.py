@@ -14,6 +14,12 @@ from .path import abspath, normpath
 from .error_tools import unwrap_errors
 
 
+if False:  # typing imports
+    from typing import Optional, Text, Tuple
+    from .base import FS
+
+
+
 @six.python_2_unicode_compatible
 class WrapFS(FS):
     """A proxy for a filesystem object.
@@ -24,9 +30,10 @@ class WrapFS(FS):
 
     """
 
-    wrap_name = None
+    wrap_name = None    # type: Optional[Text]
 
     def __init__(self, wrap_fs):
+        # type: (FS) -> None
         self._wrap_fs = wrap_fs
         super(WrapFS, self).__init__()
 
@@ -51,6 +58,7 @@ class WrapFS(FS):
         return _str
 
     def delegate_path(self, path):
+        # type: (Text) -> Tuple[FS, Text]
         """Encode a path for proxied filesystem.
 
         Arguments:
@@ -63,6 +71,7 @@ class WrapFS(FS):
         return self._wrap_fs, path
 
     def delegate_fs(self):
+        # type: () -> FS
         """Get the proxied filesystem.
 
         This method should return a filesystem for methods not
@@ -401,4 +410,3 @@ class WrapFS(FS):
     @property
     def walk(self):
         return self._wrap_fs.walker_class.bind(self)
-

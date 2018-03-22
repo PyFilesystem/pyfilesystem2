@@ -6,6 +6,12 @@ import six
 import abc
 
 
+if False:  # typing imports
+    from typing import List, Text, Union
+    from ..base import FS
+    from .parse import ParseResult
+
+
 @six.add_metaclass(abc.ABCMeta)
 class Opener(object):
     """The base class for filesystem openers.
@@ -15,13 +21,20 @@ class Opener(object):
 
     """
 
-    protocols = []
+    protocols = []  # type: List[Text]
 
     def __repr__(self):
         return "<opener {!r}>".format(self.protocols)
 
     @abc.abstractmethod
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
+    def open_fs(self,
+                fs_url,        # type: Text
+                parse_result,  # type: ParseResult
+                writeable,     # type: bool
+                create,        # type: bool
+                cwd            # type: Text
+                ):
+        # type: (...) -> FS
         """Open a filesystem object from a FS URL.
 
         Arguments:

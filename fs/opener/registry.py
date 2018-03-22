@@ -16,7 +16,7 @@ from .parse import parse_fs_url
 
 
 if False:  # typing imports
-    from typing import Text, Union
+    from typing import Text, Tuple, Union
     from ..base import FS
 
 

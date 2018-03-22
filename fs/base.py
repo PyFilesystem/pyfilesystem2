@@ -50,7 +50,7 @@ class FS(object):
     """
 
     # This is the "standard" meta namespace.
-    _meta = {}
+    _meta = {}      # type: Dict[Text, Union[Text, int, bool, None]]
 
     # most FS will use default walking algorithms
     walker_class = Walker
@@ -88,7 +88,7 @@ class FS(object):
 
     @abc.abstractmethod
     def getinfo(self, path, namespaces=None):
-        # type: (Text, Optional[Container[Text]]) -> Info
+        # type: (Text, Optional[Collection[Text]]) -> Info
         """Get information about a resource on a filesystem.
 
         Arguments:
@@ -437,7 +437,7 @@ class FS(object):
                   dirs=None,            # type: Optional[Iterable[Text]]
                   exclude_dirs=None,    # type: Optional[Iterable[Text]]
                   exclude_files=None,   # type: Optional[Iterable[Text]]
-                  namespaces=None,      # type: Optional[Container[Text]]
+                  namespaces=None,      # type: Optional[Collection[Text]]
                   page=None,            # type: Optional[Tuple[int, int]]
                   ):
         # type: (...) -> Iterator[Info]
@@ -1119,7 +1119,7 @@ class FS(object):
 
     def scandir(self,
                 path,             # type: Text
-                namespaces=None,  # type: Optional[Container[Text]]
+                namespaces=None,  # type: Optional[Collection[Text]]
                 page=None,        # type: Optional[Tuple[int, int]]
                 ):
         # type: (...) -> Iterator[Info]

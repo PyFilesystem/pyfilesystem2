@@ -9,16 +9,22 @@ from functools import partial
 
 from .lrucache import LRUCache
 
+
+if False:  # typing imports
+    from typing import Iterable, Text, Callable
+
 _MAXCACHE = 1000
 _PATTERN_CACHE = LRUCache(_MAXCACHE)
 
 
+
 def match(pattern, name):
+    # type: (Text, Text) -> bool
     """Test whether a name matches a wildcard pattern.
 
     Arguments:
         pattern (str): A wildcard pattern, e.g. ``"*.py"``.
-        name (bool): A filename.
+        name (str): A filename.
 
     Returns:
         bool: `True` if the filename matches the pattern.
@@ -33,6 +39,7 @@ def match(pattern, name):
 
 
 def imatch(pattern, name):
+    # type: (Text, Text) -> bool
     """Test whether a name matches a wildcard pattern (case insensitive).
 
     Arguments:
@@ -53,6 +60,7 @@ def imatch(pattern, name):
 
 
 def match_any(patterns, name):
+    # type: (Iterable[Text], Text) -> bool
     """Test if a name matches any of a list of patterns.
 
     Will return `True` if ``patterns`` is an empty list.
@@ -72,6 +80,7 @@ def match_any(patterns, name):
 
 
 def imatch_any(patterns, name):
+    # type: (Iterable[Text], Text) -> bool
     """Test if a name matches any of a list of patterns (case insensitive).
 
     Will return `True` if ``patterns`` is an empty list.
@@ -91,6 +100,7 @@ def imatch_any(patterns, name):
 
 
 def get_matcher(patterns, case_sensitive):
+    # type: (Iterable[Text], bool) -> Callable[[Text], bool]
     """Get a callable that matches names against the given patterns.
 
     Arguments:
@@ -121,6 +131,7 @@ def get_matcher(patterns, case_sensitive):
 
 
 def _translate(pattern, case_sensitive=True):
+    # type: (Text, bool) -> Text
     """Translate a wildcard pattern to a regular expression.
 
     There is no way to quote meta-characters.
