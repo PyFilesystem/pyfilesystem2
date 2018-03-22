@@ -14,10 +14,16 @@ See Also:
 from __future__ import division
 from __future__ import unicode_literals
 
+
+if False:  # typing imports
+    from typing import Iterable, SupportsInt, Text
+
+
 __all__ = ['traditional', 'decimal', 'binary']
 
 
 def _to_str(size, suffixes, base):
+    # type: (SupportsInt, Iterable[Text], int) -> Text
     try:
         size = int(size)
     except ValueError:
@@ -37,6 +43,7 @@ def _to_str(size, suffixes, base):
 
 
 def traditional(size):
+    # type: (SupportsInt) -> Text
     """Convert a filesize in to a string (powers of 1024, JDEC prefixes).
 
     In this convention, ``1024 B = 1 KB``.
@@ -66,6 +73,7 @@ def traditional(size):
 
 
 def binary(size):
+    # type: (SupportsInt) -> Text
     """Convert a filesize in to a string (powers of 1024, IEC prefixes).
 
     In this convention, ``1024 B = 1 KiB``.
@@ -95,6 +103,7 @@ def binary(size):
 
 
 def decimal(size):
+    # type: (SupportsInt) -> Text
     """Convert a filesize in to a string (powers of 1000, SI prefixes).
 
     In this convention, ``1000 B = 1 kB``.
