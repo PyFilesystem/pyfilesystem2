@@ -565,7 +565,7 @@ def relativefrom(base, path):
             break
         common += 1
 
-    return '/'.join(['..'] * (len(base) - common) + path_parts[common:])
+    return '/'.join(['..'] * (len(base_parts) - common) + path_parts[common:])
 
 
 _WILD_CHARS = frozenset('*?[]!{}')
