@@ -25,6 +25,9 @@ Step = namedtuple('Step', 'path, dirs, files')
 """
 
 
+# TODO(@althonos): It could be a good idea to create an Abstract Base Class
+#                  BaseWalker (with methods walk, files, dirs and info) ?
+
 class Walker(object):
     """A walker object recursively lists directories in a filesystem.
 

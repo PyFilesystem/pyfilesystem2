@@ -11,10 +11,10 @@ from .lrucache import LRUCache
 
 
 if False:  # typing imports
-    from typing import Iterable, Text, Callable
+    from typing import *
 
 _MAXCACHE = 1000
-_PATTERN_CACHE = LRUCache(_MAXCACHE)
+_PATTERN_CACHE = LRUCache(_MAXCACHE)  # type: MutableMapping[Tuple[Text, bool], Pattern]
 
 
 

@@ -7,6 +7,10 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 
 
+if False:  # typing imports
+    from typing import *
+
+
 class LRUCache(OrderedDict):
     """A dictionary-like container that stores a given maximum items.
 
@@ -16,10 +20,12 @@ class LRUCache(OrderedDict):
     """
 
     def __init__(self, cache_size):
+        # type: (int) -> None
         self.cache_size = cache_size
         super(LRUCache, self).__init__()
 
     def __setitem__(self, key, value):
+        # type: (object, object) -> None
         """Store a new views, potentially discarding an old value.
         """
         if key not in self:
@@ -28,10 +34,11 @@ class LRUCache(OrderedDict):
         OrderedDict.__setitem__(self, key, value)
 
     def __getitem__(self, key):
+        # type: (object) -> object
         """Get the item, but also makes it most recent.
         """
         _super = super(LRUCache, self)
-        value = _super.__getitem__(key)
-        _super.__delitem__(key)
-        _super.__setitem__(key, value)
+        value = _super.__getitem__(key)     # type: ignore
+        _super.__delitem__(key)             # type: ignore
+        _super.__setitem__(key, value)      # type: ignore
         return value

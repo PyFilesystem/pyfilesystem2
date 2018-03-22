@@ -1443,7 +1443,7 @@ class FS(object):
             raise errors.FilesystemClosed()
 
     def match(self, patterns, name):
-        # type: (Iterable[Text], Text) -> bool
+        # type: (Optional[Iterable[Text]], Text) -> bool
         """Check if a name matches any of a list of wildcards.
 
         Arguments:
