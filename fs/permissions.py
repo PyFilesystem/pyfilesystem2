@@ -7,6 +7,10 @@ from __future__ import unicode_literals
 import six
 
 
+if False:  # typing imports
+    from typing import *
+
+
 def make_mode(init):
     """Make a mode integer from an initial value.
     """
@@ -80,14 +84,16 @@ class Permissions(object):
     _LINUX_PERMS_NAMES = [_name for _name, _mask in _LINUX_PERMS]
 
     def __init__(self,
-                 names=None,
-                 mode=None,
-                 user=None,
-                 group=None,
-                 other=None,
-                 sticky=None,
-                 setuid=None,
-                 setguid=None):
+                 names=None,    # type: Optional[Iterable[Text]]
+                 mode=None,     # type: Optional[int]
+                 user=None,     # type: Optional[Text]
+                 group=None,    # type: Optional[Text]
+                 other=None,    # type: Optional[Text]
+                 sticky=None,   # type: Optional[bool]
+                 setuid=None,   # type: Optional[bool]
+                 setguid=None   # type: Optional[bool]
+                 ):
+        # type: (...) -> None
         if names is not None:
             self._perms = set(names)
         elif mode is not None:
@@ -167,6 +173,7 @@ class Permissions(object):
 
     @classmethod
     def parse(cls, ls):
+        # type: (Text) -> Permissions
         """Parse permissions in Linux notation.
         """
         user = ls[:3]
@@ -176,12 +183,14 @@ class Permissions(object):
 
     @classmethod
     def load(cls, permissions):
+        # type: (List[Text]) -> Permissions
         """Load a serialized permissions object.
         """
         return cls(names=permissions)
 
     @classmethod
     def create(cls, init=None):
+        # type: (Union[int, Iterable[Text], None]) -> Permissions
         """Create a permissions object from an initial value.
 
         Arguments:
@@ -212,21 +221,25 @@ class Permissions(object):
 
     @classmethod
     def get_mode(cls, init):
+        # type: (Union[int, Iterable[Text], None]) -> int
         """Convert an initial value to a mode integer.
         """
         return cls.create(init).mode
 
     def copy(self):
+        # type: () -> Permissions
         """Make a copy of this permissions object.
         """
         return Permissions(names=list(self._perms))
 
     def dump(self):
+        # type: () -> List[Text]
         """Get a list suitable for serialization.
         """
         return sorted(self._perms)
 
     def as_str(self):
+        # type: () -> Text
         """Get a Linux-style string representation of permissions.
         """
         perms = [
@@ -281,6 +294,7 @@ class Permissions(object):
     setguid = _PermProperty('setguid')
 
     def add(self, *permissions):
+        # type: (*Text) -> None
         """Add permission(s).
 
         Arguments:
@@ -291,6 +305,7 @@ class Permissions(object):
         self._perms.update(permissions)
 
     def remove(self, *permissions):
+        # type: (*Text) -> None
         """Remove permission(s).
 
         Arguments:
@@ -301,6 +316,7 @@ class Permissions(object):
         self._perms.difference_update(permissions)
 
     def check(self, *permissions):
+        # type: (*Text) -> bool
         """Check if one or more permissions are enabled.
 
         Arguments:
