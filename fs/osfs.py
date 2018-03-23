@@ -23,7 +23,7 @@ try:
     from os import scandir
 except ImportError:
     try:
-        from scandir import scandir
+        from scandir import scandir    # type: ignore
     except ImportError:  # pragma: nocover
         scandir = None
 
@@ -38,6 +38,11 @@ from .permissions import Permissions
 from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
 from .errors import NoURL
+
+
+if False:  # typing imports
+    from typing import *
+
 
 log = logging.getLogger('fs.osfs')
 
@@ -74,6 +79,7 @@ class OSFS(FS):
                  root_path,
                  create=False,
                  create_mode=0o777):
+        # type: (Text, bool, int) -> None
         """Create an OSFS instance.
         """
         super(OSFS, self).__init__()
@@ -130,6 +136,7 @@ class OSFS(FS):
                           self.root_path)
 
     def _to_sys_path(self, path):
+        # type: (Text) -> Text
         """Convert a FS path to a path on the OS.
         """
         sys_path = os.path.join(
@@ -140,6 +147,7 @@ class OSFS(FS):
 
     @classmethod
     def _make_details_from_stat(cls, stat_result):
+        # type: (os.stat_result) -> Dict[Text, object]
         """Make a *details* info dict from an `os.stat_result` object.
         """
         details = {
@@ -163,24 +171,25 @@ class OSFS(FS):
 
     @classmethod
     def _make_access_from_stat(cls, stat_result):
+        # type: (os.stat_result) -> Dict[Text, object]
         """Make an *access* info dict from an `os.stat_result` object.
         """
-        access = {}
+        access = {}   # type: Dict[Text, object]
         access['permissions'] = Permissions(
             mode=stat_result.st_mode
         ).dump()
-        access['gid'] = stat_result.st_gid
-        access['uid'] = stat_result.st_uid
+        access['gid'] = gid = stat_result.st_gid
+        access['uid'] = uid = stat_result.st_uid
         if not _WINDOWS_PLATFORM:
             import grp
             import pwd
             try:
-                access['group'] = grp.getgrgid(access['gid']).gr_name
+                access['group'] = grp.getgrgid(gid).gr_name
             except KeyError:  # pragma: nocover
                 pass
 
             try:
-                access['user'] = pwd.getpwuid(access['uid']).pw_name
+                access['user'] = pwd.getpwuid(uid).pw_name
             except KeyError:  # pragma: nocover
                 pass
         return access
@@ -197,6 +206,7 @@ class OSFS(FS):
 
     @classmethod
     def _get_type_from_stat(cls, _stat):
+        # type: (os.stat_result) -> ResourceType
         """Get the resource type from an `os.stat_result` object.
         """
         st_mode = _stat.st_mode
@@ -208,6 +218,7 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def _gettarget(self, sys_path):
+        # type: (Text) -> Optional[Text]
         try:
             target = os.readlink(sys_path)
         except OSError:
@@ -216,6 +227,7 @@ class OSFS(FS):
             return target
 
     def _make_link_info(self, sys_path):
+        # type: (Text) -> Dict[Text, Optional[Text]]
         _target = self._gettarget(sys_path)
         link = {
             'target': _target,
@@ -404,6 +416,7 @@ class OSFS(FS):
 
     if scandir:
         def _scandir(self, path, namespaces=None):
+            # type: (Text, Optional[Collection[Text]]) -> Iterator[Info]
             self.check()
             namespaces = namespaces or ()
             _path = self.validatepath(path)
@@ -446,6 +459,7 @@ class OSFS(FS):
     else:
 
         def _scandir(self, path, namespaces=None):
+            # type: (Text, Optional[Collection[Text]]) -> Iterator[Info]
             self.check()
             namespaces = namespaces or ()
             _path = self.validatepath(path)
@@ -459,7 +473,7 @@ class OSFS(FS):
                             "name": entry_name,
                             "is_dir": stat.S_ISDIR(stat_result.st_mode),
                         }
-                    }
+                    }  # type: Dict[Text, Dict[Text, Any]]
                     if 'details' in namespaces:
                         info['details'] = \
                             self._make_details_from_stat(stat_result)
@@ -477,7 +491,7 @@ class OSFS(FS):
                     if 'link' in namespaces:
                         info['link'] = self._make_link_info(
                             os.path.join(sys_path, entry_name)
-                        )
+                        )   # type: ignore
                     if 'access' in namespaces:
                         info['access'] =\
                             self._make_access_from_stat(stat_result)
@@ -485,7 +499,12 @@ class OSFS(FS):
                     yield Info(info)
 
 
-    def scandir(self, path, namespaces=None, page=None):
+    def scandir(self,
+                path,               # type: Text
+                namespaces=None,    # type: Optional[Collection[Text]]
+                page=None           # type: Optional[Tuple[int, int]]
+                ):
+        # type: (...) -> Iterator[Info]
         iter_info = self._scandir(path, namespaces=namespaces)
         if page is not None:
             start, end = page

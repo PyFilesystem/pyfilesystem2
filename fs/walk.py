@@ -20,6 +20,11 @@ from .path import join
 from .path import normpath
 
 
+if False:  # typing imports
+    from typing import *
+    from .info import Info
+
+
 Step = namedtuple('Step', 'path, dirs, files')
 """type: a *step* in a directory walk.
 """
@@ -267,12 +272,12 @@ class Walker(object):
 
         """
         _path = abspath(normpath(path))
-        dir_info = defaultdict(list)
+        dir_info = defaultdict(list)  # type: MutableMapping[Text, List[Info]]
         _walk = self._iter_walk(fs, _path, namespaces=namespaces)
         for dir_path, info in _walk:
             if info is None:
-                dirs = []
-                files = []
+                dirs = []       # type: List[Info]
+                files = []      # type: List[Info]
                 for _info in dir_info[dir_path]:
                     (dirs if _info.is_dir else files).append(_info)
                 yield Step(dir_path, dirs, files)
@@ -358,11 +363,12 @@ class Walker(object):
         # No recursion!
 
         def scan(path):
+            # type: (Text) -> Iterator[Info]
             """Perform scan."""
             return self._scan(fs, path, namespaces=namespaces)
 
+        stack = [(path, scan(path), None)]  # type: List[Tuple[Text, Iterator[Info], Optional[Tuple[Text, Info]]]]
         depth = self._calculate_depth(path)
-        stack = [(path, scan(path), None)]
         push = stack.append
 
         while stack:

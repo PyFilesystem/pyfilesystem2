@@ -18,14 +18,14 @@ if False:  # typing imports
     from .base import FS
     from .walk import Walker
 
-    OnCopy = Callable[[FS, Text, FS, Text], None]
+    _OnCopy = Callable[[FS, Text, FS, Text], None]
 
 
 
 def copy_fs(src_fs,       # type: Union[FS, Text]
             dst_fs,       # type: Union[FS, Text]
             walker=None,  # type: Optional[Walker]
-            on_copy=None  # type: Optional[OnCopy]
+            on_copy=None  # type: Optional[_OnCopy]
             ):
     # type: (...) -> None
     """Copy the contents of one filesystem to another.
@@ -48,7 +48,7 @@ def copy_fs(src_fs,       # type: Union[FS, Text]
 def copy_fs_if_newer(src_fs,        # type: Union[FS, Text]
                      dst_fs,        # type: Union[FS, Text]
                      walker=None,   # type: Optional[Walker]
-                     on_copy=None   # type: Optional[OnCopy]
+                     on_copy=None   # type: Optional[_OnCopy]
                      ):
     # type: (...) -> None
     """Copy the contents of one filesystem to another, checking times.
@@ -240,7 +240,7 @@ def copy_dir(src_fs,        # type: Union[FS, Text]
              dst_fs,        # type: Union[FS, Text]
              dst_path,      # type: Text
              walker=None,   # type: Optional[Walker]
-             on_copy=None   # type: Optional[OnCopy]
+             on_copy=None   # type: Optional[_OnCopy]
              ):
     # type: (...) -> None
     """Copy a directory from one filesystem to another.
@@ -293,7 +293,7 @@ def copy_dir_if_newer(src_fs,       # type: Union[FS, Text]
                       dst_fs,       # type: Union[FS, Text]
                       dst_path,     # type: Text
                       walker=None,  # type: Optional[Walker]
-                      on_copy=None  # type: Optional[OnCopy]
+                      on_copy=None  # type: Optional[_OnCopy]
                       ):
     # type: (...) -> None
     """Copy a directory from one filesystem to another, checking times.

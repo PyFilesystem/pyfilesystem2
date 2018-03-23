@@ -14,6 +14,10 @@ from . import errors
 from six import reraise
 
 
+if False:  # typing imports
+    from typing import Text
+
+
 _WINDOWS_PLATFORM = platform.system() == 'Windows'
 
 
@@ -54,6 +58,7 @@ class _ConvertOSErrors(object):
         FILE_ERRORS[13] = errors.FileExpected
 
     def __init__(self, opname, path, directory=False):
+        # type: (Text, Text, bool) -> None
         self._opname = opname
         self._path = path
         self._directory = directory
