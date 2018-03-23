@@ -3,7 +3,13 @@
 
 from __future__ import unicode_literals
 
+
+if False:
+    from typing import Text, Tuple
+
+
 def make_repr(class_name, *args, **kwargs):
+    # type: (Text, *object, **Tuple[object, object]) -> Text
     """Generate a repr string.
 
     Positional arguments should be the positional arguments used to

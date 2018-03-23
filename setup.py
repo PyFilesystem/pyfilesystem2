@@ -37,7 +37,8 @@ setup(
     install_requires=REQUIREMENTS,
     extras_require={
         "scandir :python_version < '3.5'": ['scandir~=1.5'],
-        ":python_version < '3.4'": ['enum34~=1.1.6']
+        ":python_version < '3.4'": ['enum34~=1.1.6'],
+        ":python_version < '3.5'": ['typing~=3.6'],
     },
     entry_points={'fs.opener': [
         'ftp  = fs.opener.ftpfs:FTPOpener',

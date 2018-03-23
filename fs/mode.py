@@ -8,13 +8,21 @@ Mode strings are used in in `~fs.base.FS.open` and
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+from typing import Container, FrozenSet, Set, Text, Union
+
 import six
-from typing import Container, Set, Text
+
+
+__all__ = ["Mode",
+           "check_readable",
+           "check_writable",
+           "validate_openbin_mode"]
 
 
 # https://docs.python.org/3/library/functions.html#open
 @six.python_2_unicode_compatible
-class Mode(Container[Text]):
+class Mode(typing.Container[Text]):
     """An abstraction for I/O modes.
 
     A mode object provides properties that can be used to interrogate the
@@ -206,7 +214,7 @@ def check_writable(mode):
 
 
 def validate_open_mode(mode):
-    # type: (Text) -> bool
+    # type: (Text) -> None
     """Check ``mode`` parameter of `~fs.base.FS.open` is valid.
 
     Arguments:
@@ -220,7 +228,7 @@ def validate_open_mode(mode):
 
 
 def validate_openbin_mode(mode, _valid_chars=frozenset('rwxab+')):
-    # type: (Text) -> bool
+    # type: (Text, Union[Set[Text], FrozenSet[Text]]) -> None
     """Check ``mode`` parameter of `~fs.base.FS.openbin` is valid.
 
     Arguments:
