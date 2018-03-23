@@ -7,15 +7,17 @@ import contextlib
 import io
 import os
 import time
+import typing
 
 from collections import OrderedDict
 from threading import RLock
+from typing import Optional, Text
 
 import six
 
 from . import errors
 from .base import FS
-from .enums import ResourceType
+from .enums import ResourceType, Seek
 from .info import Info
 from .path import iteratepath
 from .path import normpath
@@ -23,16 +25,20 @@ from .path import split
 from .mode import Mode
 
 
+
 @six.python_2_unicode_compatible
-class _MemoryFile(io.IOBase):
+class _MemoryFile(io.RawIOBase):
 
     def __init__(self, path, memory_fs, mode, dir_entry):
+        # type: (Text, MemoryFS, Text, _DirEntry) -> None
         super(_MemoryFile, self).__init__()
         self._path = path
         self._memory_fs = memory_fs
         self._mode = Mode(mode)
         self._dir_entry = dir_entry
-        self._bytes_io = dir_entry.bytes_file
+
+        # We are opening a file - dir_entry.bytes_file is not None
+        self._bytes_io = typing.cast(io.BytesIO, dir_entry.bytes_file)
 
         self.accessed_time = time.time()
         self.modified_time = time.time()
@@ -59,41 +65,49 @@ class _MemoryFile(io.IOBase):
             self.pos = self._bytes_io.tell()
 
     def on_modify(self):  # noqa: D401
+        # type: () -> None
         """Called when file data is modified.
         """
         self._dir_entry.modified_time = self.modified_time = time.time()
 
     def on_access(self):  # noqa: D401
+        # type: () -> None
         """Called when file is accessed.
         """
         self._dir_entry.accessed_time = self.accessed_time = time.time()
 
     def flush(self):
+        # type: () -> None
         pass
 
     def __iter__(self):
+        # type: () -> typing.Iterator[bytes]
         self._bytes_io.seek(self.pos)
         for line in self._bytes_io:
             yield line
 
     def next(self):
+        # type: () -> bytes
         with self._seek_lock():
             return next(self._bytes_io)
 
     __next__ = next
 
-    def readline(self, *args, **kwargs):
+    def readline(self, size=-1):
+        # type: (int) -> bytes
         with self._seek_lock():
             self.on_access()
-            return self._bytes_io.readline(*args, **kwargs)
+            return self._bytes_io.readline(size)
 
     def close(self):
+        # type: () -> None
         if not self.closed:
             with self._dir_entry.lock:
                 self._dir_entry.remove_open_file(self)
                 super(_MemoryFile, self).close()
 
-    def read(self, size=None):
+    def read(self, size=-1):
+        # type: (Optional[int]) -> bytes
         if not self._mode.reading:
             raise IOError('File not open for reading')
         if size is None:
@@ -103,24 +117,30 @@ class _MemoryFile(io.IOBase):
             return self._bytes_io.read(size)
 
     def readable(self):
+        # type: () -> bool
         return self._mode.reading
 
     def readlines(self, hint=-1):
+        # type: (int) -> typing.List[bytes]
         with self._seek_lock():
             return self._bytes_io.readlines(hint)
 
     def seekable(self):
+        # type: () -> bool
         return True
 
-    def seek(self, *args, **kwargs):
+    def seek(self, pos, whence=Seek.set):
+        # type: (int, typing.SupportsInt) -> int
         with self._seek_lock():
             self.on_access()
-            return self._bytes_io.seek(*args, **kwargs)
+            return self._bytes_io.seek(pos, int(whence))
 
     def tell(self):
+        # type: () -> int
         return self.pos
 
     def truncate(self, size=None):
+        # type: (Optional[int]) -> int
         with self._seek_lock():
             self.on_modify()
             new_size = self._bytes_io.truncate(size)
@@ -131,16 +151,21 @@ class _MemoryFile(io.IOBase):
             return size or new_size
 
     def writable(self):
+        # type: () -> bool
         return self._mode.writing
 
     def write(self, data):
+        # type: (bytes) -> int
         if not self._mode.writing:
             raise IOError('File not open for writing')
         with self._seek_lock():
             self.on_modify()
             return self._bytes_io.write(data)
 
-    def writelines(self, sequence):
+    def writelines(self, sequence):  # type: ignore
+        # type: (typing.List[bytes]) -> None
+        # FIXME(@althonos): For some reason the stub for IOBase.writelines
+        #                   is List[Any] ?!
         with self._seek_lock():
             self.on_modify()
             self._bytes_io.writelines(sequence)
@@ -149,11 +174,12 @@ class _MemoryFile(io.IOBase):
 class _DirEntry(object):
 
     def __init__(self, resource_type, name):
+        # type: (ResourceType, Text) -> None
         self.resource_type = resource_type
         self.name = name
-        self._dir = OrderedDict()
-        self._open_files = []
-        self._bytes_file = None
+        self._dir = OrderedDict()  # type: typing.MutableMapping[Text, _DirEntry]
+        self._open_files = []      # type: typing.MutableSequence[_MemoryFile]
+        self._bytes_file = None    # type: Optional[io.BytesIO]
         self.lock = RLock()
 
         current_time = time.time()
@@ -166,44 +192,71 @@ class _DirEntry(object):
 
     @property
     def bytes_file(self):
+        # type: () -> Optional[io.BytesIO]
         return self._bytes_file
 
     @property
     def is_dir(self):
+        # type: () -> bool
         return self.resource_type == ResourceType.directory
 
     @property
     def size(self):
+        # type: () -> int
         with self.lock:
             if self.is_dir:
                 return 0
             else:
-                self._bytes_file.seek(0, os.SEEK_END)
-                return self._bytes_file.tell()
+                _bytes_file = typing.cast(io.BytesIO, self._bytes_file)
+                _bytes_file.seek(0, os.SEEK_END)
+                return _bytes_file.tell()
+
+    @typing.overload
+    def get_entry(self, name, default):
+        # type: (Text, _DirEntry) -> _DirEntry
+        pass
+
+    @typing.overload
+    def get_entry(self, name):
+        # type: (Text) -> Optional[_DirEntry]
+        pass
+
+    @typing.overload
+    def get_entry(self, name, default):
+        # type: (Text, None) -> Optional[_DirEntry]
+        pass
 
     def get_entry(self, name, default=None):
+        # type: (Text, Optional[_DirEntry]) -> Optional[_DirEntry]
         assert self.is_dir, 'must be a directory'
         return self._dir.get(name, default)
 
     def set_entry(self, name, dir_entry):
+        # type: (Text, _DirEntry) -> None
         self._dir[name] = dir_entry
 
     def remove_entry(self, name):
+        # type: (Text) -> None
         del self._dir[name]
 
     def __contains__(self, name):
+        # type: (object) -> bool
         return name in self._dir
 
     def __len__(self):
+        # type: () -> int
         return len(self._dir)
 
     def list(self):
+        # type: () -> typing.List[Text]
         return list(self._dir.keys())
 
     def add_open_file(self, memory_file):
+        # type: (_MemoryFile) -> None
         self._open_files.append(memory_file)
 
     def remove_open_file(self, memory_file):
+        # type: (_MemoryFile) -> None
         self._open_files.remove(memory_file)
 
 
