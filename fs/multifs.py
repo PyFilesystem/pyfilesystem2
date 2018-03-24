@@ -5,16 +5,26 @@ from __future__ import absolute_import
 from __future__ import unicode_literals
 from __future__ import print_function
 
+import typing
 from collections import namedtuple, OrderedDict
 from operator import itemgetter
 
 from six import text_type
 
+from . import errors
 from .base import FS
 from .mode import check_writable
-from . import errors
 from .opener import open_fs
 from .path import abspath, normpath
+
+if typing.TYPE_CHECKING:
+    from typing import (
+        Any, BinaryIO, Collection, Iterator, MutableMapping,
+        List, MutableSet, Optional, Text, Tuple)
+    from .enums import ResourceType
+    from .info import Info, RawInfo
+    from .permissions import Permissions
+
 
 
 _PrioritizedFS = namedtuple(
@@ -42,27 +52,30 @@ class MultiFS(FS):
     }
 
     def __init__(self, auto_close=True):
+        # type: (bool) -> None
         super(MultiFS, self).__init__()
 
         self._auto_close = auto_close
-        self.write_fs = None
-
-        self._write_fs_name = None
+        self.write_fs = None            # type: Optional[FS]
+        self._write_fs_name = None      # type: Optional[Text]
         self._sort_index = 0
-        self._filesystems = {}
-        self._fs_sequence = None
+        self._filesystems = {}     # type: MutableMapping[Text, _PrioritizedFS]
+        self._fs_sequence = None   # type: Optional[List[Tuple[Text, FS]]]
         self._closed = False
 
     def __repr__(self):
+        # type: () -> Text
         if self._auto_close:
             return "MultiFS()"
         else:
             return "MultiFS(auto_close=False)"
 
     def __str__(self):
+        # type: () -> Text
         return "<multifs>"
 
     def add_fs(self, name, fs, write=False, priority=0):
+        # type: (Text, FS, bool, int) -> None
         """Add a filesystem to the MultiFS.
 
         Arguments:
@@ -99,6 +112,7 @@ class MultiFS(FS):
             self._write_fs_name = name
 
     def get_fs(self, name):
+        # type: (Text) -> FS
         """Get a filesystem from its name.
 
         Arguments:
@@ -114,11 +128,13 @@ class MultiFS(FS):
         return self._filesystems[name].fs
 
     def _resort(self):
+        # type: () -> None
         """Force `iterate_fs` to re-sort on next reference.
         """
         self._fs_sequence = None
 
     def iterate_fs(self):
+        # type: () -> Iterator[Tuple[Text, FS]]
         """Get iterator that returns (name, fs) in priority order.
         """
         if self._fs_sequence is None:
@@ -134,6 +150,7 @@ class MultiFS(FS):
         return iter(self._fs_sequence)
 
     def _delegate(self, path):
+        # type: (Text) -> Optional[FS]
         """Get a filesystem which has a given path.
         """
         for _name, fs in self.iterate_fs():
@@ -142,6 +159,7 @@ class MultiFS(FS):
         return None
 
     def _delegate_required(self, path):
+        # type: (Text) -> FS
         """Check that there is a filesystem with the given ``path``.
         """
         fs = self._delegate(path)
@@ -150,12 +168,14 @@ class MultiFS(FS):
         return fs
 
     def _require_writable(self, path):
+        # type: (Text) -> None
         """Check that ``path`` is writeable.
         """
         if self.write_fs is None:
             raise errors.ResourceReadOnly(path)
 
     def which(self, path, mode="r"):
+        # type: (Text, Text) -> Tuple[Optional[Text], Optional[FS]]
         """Get a tuple of (name, fs) that the given path would map to.
 
         Arguments:
@@ -171,6 +191,7 @@ class MultiFS(FS):
         return None, None
 
     def close(self):
+        # type: () -> None
         self._closed = True
         if self._auto_close:
             try:
@@ -181,6 +202,7 @@ class MultiFS(FS):
                 self._resort()
 
     def getinfo(self, path, namespaces=None):
+        # type: (Text, Optional[Collection[Text]]) -> Info
         self.check()
         namespaces = namespaces or ()
         fs = self._delegate(path)
@@ -191,6 +213,7 @@ class MultiFS(FS):
         return info
 
     def listdir(self, path):
+        # type: (Text) -> List[Text]
         self.check()
         directory = []
         exists = False
@@ -207,12 +230,14 @@ class MultiFS(FS):
         return directory
 
     def makedir(self, path, permissions=None, recreate=False):
+        # type: (Text, Optional[Permissions], bool) -> FS
         self.check()
         self._require_writable(path)
         return self.write_fs.makedir(
             path, permissions=permissions, recreate=recreate)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
+        # type: (Text, Text, int, **Any) -> BinaryIO
         self.check()
         if check_writable(mode):
             self._require_writable(path)
@@ -227,18 +252,25 @@ class MultiFS(FS):
         )
 
     def remove(self, path):
+        # type: (Text) -> None
         self.check()
         fs = self._delegate_required(path)
         return fs.remove(path)
 
     def removedir(self, path):
+        # type: (Text) -> None
         self.check()
         fs = self._delegate_required(path)
         return fs.removedir(path)
 
-    def scandir(self, path, namespaces=None, page=None):
+    def scandir(self,
+                path,               # type: Text
+                namespaces=None,    # type: Optional[Collection[Text]]
+                page=None           # type: Optional[Tuple[int, int]]
+                ):
+        # type: (...) -> Iterator[Info]
         self.check()
-        seen = set()
+        seen = set()    # type: MutableSet[Text]
         exists = False
         for _name, fs in self.iterate_fs():
             try:
@@ -254,6 +286,7 @@ class MultiFS(FS):
             raise errors.ResourceNotFound(path)
 
     def getbytes(self, path):
+        # type: (Text) -> bytes
         self.check()
         fs = self._delegate(path)
         if fs is None:
@@ -261,10 +294,12 @@ class MultiFS(FS):
         return fs.getbytes(path)
 
     def getfile(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         fs = self._delegate_required(path)
         return fs.getfile(path, file, chunk_size=chunk_size, **options)
 
     def gettext(self, path, encoding=None, errors=None, newline=''):
+        # type: (Text, Optional[Text], Optional[Text], Text) -> Text
         self.check()
         fs = self._delegate_required(path)
         return fs.gettext(
@@ -275,51 +310,61 @@ class MultiFS(FS):
         )
 
     def getsize(self, path):
+        # type: (Text) -> int
         self.check()
         fs = self._delegate_required(path)
         return fs.getsize(path)
 
     def getsyspath(self, path):
+        # type: (Text) -> Text
         self.check()
         fs = self._delegate_required(path)
         return fs.getsyspath(path)
 
     def gettype(self, path):
+        # type: (Text) -> ResourceType
         self.check()
         fs = self._delegate_required(path)
         return fs.gettype(path)
 
     def geturl(self, path, purpose='download'):
+        # type: (Text, Text) -> Text
         self.check()
         fs = self._delegate_required(path)
         return fs.geturl(path, purpose=purpose)
 
     def hassyspath(self, path):
+        # type: (Text) -> bool
         self.check()
         fs = self._delegate(path)
         return fs is not None and fs.hassyspath(path)
 
     def hasurl(self, path, purpose='download'):
+        # type: (Text, Text) -> bool
         self.check()
         fs = self._delegate(path)
         return fs is not None and fs.hasurl(path, purpose=purpose)
 
     def isdir(self, path):
+        # type: (Text) -> bool
         self.check()
         fs = self._delegate(path)
         return fs and fs.isdir(path)
 
     def isfile(self, path):
+        # type: (Text) -> bool
         self.check()
         fs = self._delegate(path)
         return fs and fs.isfile(path)
 
     def setinfo(self, path, info):
+        # type:(Text, RawInfo) -> None
         self.check()
         self._require_writable(path)
         return self.write_fs.setinfo(path, info)
 
     def validatepath(self, path):
+        # type: (Text) -> Text
         self.check()
         if self.write_fs is not None:
             self.write_fs.validatepath(path)
@@ -329,6 +374,7 @@ class MultiFS(FS):
         return path
 
     def makedirs(self, path, permissions=None, recreate=False):
+        # type: (Text, Optional[Permissions], bool) -> FS
         self.check()
         self._require_writable(path)
         return self.write_fs.makedirs(
@@ -338,13 +384,14 @@ class MultiFS(FS):
         )
 
     def open(self,
-             path,
-             mode='r',
-             buffering=-1,
-             encoding=None,
-             errors=None,
-             newline='',
-             **kwargs):
+             path,             # type: Text
+             mode='r',         # type: Text
+             buffering=-1,     # type: int
+             encoding=None,    # type: Optional[Text]
+             errors=None,      # type: Optional[Text]
+             newline='',       # type: Text
+             **kwargs          # type: Any
+             ):
         self.check()
         if check_writable(mode):
             self._require_writable(path)
@@ -362,19 +409,22 @@ class MultiFS(FS):
         )
 
     def setbinfile(self, path, file):
+        # type: (Text, BinaryIO) -> None
         self._require_writable(path)
         self.write_fs.setbinfile(path, file)
 
     def setbytes(self, path, contents):
+        # type: (Text, bytes) -> None
         self._require_writable(path)
         return self.write_fs.setbytes(path, contents)
 
     def settext(self,
-                path,
-                contents,
-                encoding='utf-8',
-                errors=None,
-                newline=''):
+                path,               # type: Text
+                contents,           # type: Text
+                encoding='utf-8',   # type: Text
+                errors=None,        # type: Optional[Text]
+                newline=''          # type: Text
+                ):
         self._require_writable(path)
         return self.write_fs.settext(
             path,
