@@ -547,7 +547,7 @@ class FS(object):
         return contents
 
     def getfile(self, path, file, chunk_size=None, **options):
-        # type: (Text, IO, Optional[int], **Any) -> None
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         """Copies a file from the filesystem to a file-like object.
 
         This may be more efficient that opening and copying files
