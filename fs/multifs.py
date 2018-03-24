@@ -167,12 +167,13 @@ class MultiFS(FS):
             raise errors.ResourceNotFound(path)
         return fs
 
-    def _require_writable(self, path):
-        # type: (Text) -> None
+    def _writable_required(self, path):
+        # type: (Text) -> FS
         """Check that ``path`` is writeable.
         """
         if self.write_fs is None:
             raise errors.ResourceReadOnly(path)
+        return self.write_fs
 
     def which(self, path, mode="r"):
         # type: (Text, Text) -> Tuple[Optional[Text], Optional[FS]]
@@ -232,16 +233,15 @@ class MultiFS(FS):
     def makedir(self, path, permissions=None, recreate=False):
         # type: (Text, Optional[Permissions], bool) -> FS
         self.check()
-        self._require_writable(path)
-        return self.write_fs.makedir(
+        write_fs = self._writable_required(path)
+        return write_fs.makedir(
             path, permissions=permissions, recreate=recreate)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
         # type: (Text, Text, int, **Any) -> BinaryIO
         self.check()
         if check_writable(mode):
-            self._require_writable(path)
-            _fs = self.write_fs
+            _fs = self._writable_required(path)
         else:
             _fs = self._delegate_required(path)
         return _fs.openbin(
@@ -349,19 +349,19 @@ class MultiFS(FS):
         # type: (Text) -> bool
         self.check()
         fs = self._delegate(path)
-        return fs and fs.isdir(path)
+        return fs is not None and fs.isdir(path)
 
     def isfile(self, path):
         # type: (Text) -> bool
         self.check()
         fs = self._delegate(path)
-        return fs and fs.isfile(path)
+        return fs is not None and fs.isfile(path)
 
     def setinfo(self, path, info):
         # type:(Text, RawInfo) -> None
         self.check()
-        self._require_writable(path)
-        return self.write_fs.setinfo(path, info)
+        write_fs = self._writable_required(path)
+        return write_fs.setinfo(path, info)
 
     def validatepath(self, path):
         # type: (Text) -> Text
@@ -376,8 +376,8 @@ class MultiFS(FS):
     def makedirs(self, path, permissions=None, recreate=False):
         # type: (Text, Optional[Permissions], bool) -> FS
         self.check()
-        self._require_writable(path)
-        return self.write_fs.makedirs(
+        write_fs = self._writable_required(path)
+        return write_fs.makedirs(
             path,
             permissions=permissions,
             recreate=recreate
@@ -394,8 +394,7 @@ class MultiFS(FS):
              ):
         self.check()
         if check_writable(mode):
-            self._require_writable(path)
-            _fs = self.write_fs
+            _fs = self._writable_required(path)
         else:
             _fs = self._delegate_required(path)
         return _fs.open(
@@ -410,13 +409,11 @@ class MultiFS(FS):
 
     def setbinfile(self, path, file):
         # type: (Text, BinaryIO) -> None
-        self._require_writable(path)
-        self.write_fs.setbinfile(path, file)
+        self._writable_required(path).setbinfile(path, file)
 
     def setbytes(self, path, contents):
         # type: (Text, bytes) -> None
-        self._require_writable(path)
-        return self.write_fs.setbytes(path, contents)
+        self._writable_required(path).setbytes(path, contents)
 
     def settext(self,
                 path,               # type: Text
@@ -425,8 +422,8 @@ class MultiFS(FS):
                 errors=None,        # type: Optional[Text]
                 newline=''          # type: Text
                 ):
-        self._require_writable(path)
-        return self.write_fs.settext(
+        write_fs = self._writable_required(path)
+        return write_fs.settext(
             path,
             contents,
             encoding=encoding,
