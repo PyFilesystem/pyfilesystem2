@@ -5,13 +5,19 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+
 from copy import deepcopy
+from typing import Mapping, Text
 
 from .path import join
 from .enums import ResourceType
 from .errors import MissingInfoNamespace
 from .permissions import Permissions
 from .time import epoch_to_datetime
+
+
+_RawInfo = Mapping[Text, Mapping[Text, object]]
 
 
 class Info(object):
