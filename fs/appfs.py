@@ -30,10 +30,10 @@ class _AppFS(OSFS):
     """Abstract base class for an app FS.
     """
 
-    # FIXME(@althonos): replace by ClassVar[Optional[Text]]
-    # once https://github.com/python/mypy/pull/4718 is accepted
+    # FIXME(@althonos): replace by ClassVar[Text] once
+    # https://github.com/python/mypy/pull/4718 is accepted
     # (subclass override will raise errors until then)
-    app_dir = None  # type: Optional[Text]
+    app_dir = None  # type: Text
 
     def __init__(self,
                  appname,          # type: Text
