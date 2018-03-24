@@ -8,17 +8,14 @@ import errno
 import platform
 import sys
 import typing
-
 from contextlib import contextmanager
-from typing import Text
-
-from . import errors
 
 from six import reraise
 
+from . import errors
 
-if False:  # typing imports
-    from typing import Text
+if typing.TYPE_CHECKING:  # typing imports
+    from typing import Iterator, Text
 
 
 _WINDOWS_PLATFORM = platform.system() == 'Windows'
@@ -96,6 +93,7 @@ convert_os_errors = _ConvertOSErrors
 
 @contextmanager
 def unwrap_errors(path_replace):
+    # type: (Text) -> Iterator[None]
     """Get a context to map OS errors to their `fs.errors` counterpart.
 
     The context will re-write the paths in resource exceptions to be

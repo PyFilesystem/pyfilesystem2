@@ -4,6 +4,8 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+
 from .walk import Walker
 from .opener import manage_fs
 from .path import abspath
@@ -12,14 +14,11 @@ from .path import frombase
 from .path import normpath
 from .errors import FSError
 
-
 if False:  # typing imports
     from typing import *
     from .base import FS
     from .walk import Walker
-
     _OnCopy = Callable[[FS, Text, FS, Text], None]
-
 
 
 def copy_fs(src_fs,       # type: Union[FS, Text]

@@ -8,10 +8,8 @@ import io
 import os
 import time
 import typing
-
 from collections import OrderedDict
 from threading import RLock
-from typing import Dict, Optional, Text, Union
 
 import six
 
@@ -24,9 +22,11 @@ from .path import iteratepath
 from .path import normpath
 from .path import split
 
-
-if False:  # typing imports
-    from .info import _RawInfo
+if typing.TYPE_CHECKING:
+    from typing import (
+        Any, BinaryIO, Collection, Dict, Iterator, List,
+        Optional, SupportsInt, Union, Text)
+    from .info import RawInfo
     from .permissions import Permissions
 
 
@@ -58,11 +58,13 @@ class _MemoryFile(io.RawIOBase):
                 self.pos = self._bytes_io.tell()
 
     def __str__(self):
+        # type: () -> str
         _template = "<memoryfile '{path}' '{mode}'>"
         return _template.format(path=self._path, mode=self._mode)
 
     @contextlib.contextmanager
     def _seek_lock(self):
+        # type: () -> Iterator[None]
         with self._dir_entry.lock:
             self._bytes_io.seek(self.pos)
             yield
@@ -125,7 +127,7 @@ class _MemoryFile(io.RawIOBase):
         return self._mode.reading
 
     def readlines(self, hint=-1):
-        # type: (int) -> typing.List[bytes]
+        # type: (int) -> List[bytes]
         with self._seek_lock():
             return self._bytes_io.readlines(hint)
 
@@ -134,7 +136,7 @@ class _MemoryFile(io.RawIOBase):
         return True
 
     def seek(self, pos, whence=Seek.set):
-        # type: (int, typing.SupportsInt) -> int
+        # type: (int, SupportsInt) -> int
         # NOTE(@althonos): allows passing both Seek.set and os.SEEK_SET
         with self._seek_lock():
             self.on_access()
@@ -168,9 +170,9 @@ class _MemoryFile(io.RawIOBase):
             return self._bytes_io.write(data)
 
     def writelines(self, sequence):  # type: ignore
-        # type: (typing.List[bytes]) -> None
+        # type: (List[bytes]) -> None
         # FIXME(@althonos): For some reason the stub for IOBase.writelines
-        #                   is List[Any] ?!
+        #      is List[Any] ?! It should probably be Iterable[ByteString]
         with self._seek_lock():
             self.on_modify()
             self._bytes_io.writelines(sequence)
@@ -253,7 +255,7 @@ class _DirEntry(object):
         return len(self._dir)
 
     def list(self):
-        # type: () -> typing.List[Text]
+        # type: () -> List[Text]
         return list(self._dir.keys())
 
     def add_open_file(self, memory_file):
@@ -328,7 +330,7 @@ class MemoryFS(FS):
             return current_entry
 
     def getinfo(self, path, namespaces=None):
-        # type: (Text, Optional[typing.Collection[Text]]) -> Info
+        # type: (Text, Optional[Collection[Text]]) -> Info
         namespaces = namespaces or ()
         _path = self.validatepath(path)
         dir_entry = self._get_dir_entry(_path)
@@ -352,7 +354,7 @@ class MemoryFS(FS):
         return Info(info)
 
     def listdir(self, path):
-        # type: (Text) -> typing.List[Text]
+        # type: (Text) -> List[Text]
         self.check()
         _path = self.validatepath(path)
         with self._lock:
@@ -392,7 +394,7 @@ class MemoryFS(FS):
             return self.opendir(path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
-        # type: (Text, Text, int, **typing.Any) -> typing.BinaryIO
+        # type: (Text, Text, int, **Any) -> BinaryIO
         _mode = Mode(mode)
         _mode.validate_bin()
         _path = self.validatepath(path)
@@ -485,7 +487,7 @@ class MemoryFS(FS):
             parent_dir_entry.remove_entry(file_name)
 
     def setinfo(self, path, info):
-        # type: (Text, _RawInfo) -> None
+        # type: (Text, RawInfo) -> None
         _path = self.validatepath(path)
         with self._lock:
             dir_path, file_name = split(_path)
@@ -497,7 +499,7 @@ class MemoryFS(FS):
             resource_entry = typing.cast(
                 _DirEntry, parent_dir_entry.get_entry(file_name))
 
-            if 'details' in info: 
+            if 'details' in info:
                 details = info['details']
                 if 'accessed' in details:
                     resource_entry.accessed_time = details['accessed'] # type: ignore

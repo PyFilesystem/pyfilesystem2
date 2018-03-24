@@ -9,13 +9,14 @@ subclasses of `~fs.osfs.OSFS`.
 
 # see http://technet.microsoft.com/en-us/library/cc766489(WS.10).aspx
 
+import typing
+
 from .osfs import OSFS
 from ._repr import make_repr
 from appdirs import AppDirs
 
-
-if False:  # typing imports
-    from typing import ClassVar, Optional, Text
+if typing.TYPE_CHECKING:
+    from typing import Optional, Text
 
 
 __all__ = ['UserDataFS',
@@ -51,7 +52,7 @@ class _AppFS(OSFS):
         )
 
     def __repr__(self):
-        return make_repr(
+        return make_repr(       # type: ignore
             self.__class__.__name__,
             self.app_dirs.appname,
             author=(self.app_dirs.appauthor, None),
@@ -65,6 +66,7 @@ class _AppFS(OSFS):
             self.__class__.__name__.lower(),
             self.app_dirs.appname
         )
+
 
 class UserDataFS(_AppFS):
     """A filesystem for per-user application data.

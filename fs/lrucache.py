@@ -4,11 +4,8 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
+import typing
 from collections import OrderedDict
-
-
-if False:  # typing imports
-    from typing import *
 
 
 class LRUCache(OrderedDict):
@@ -37,8 +34,8 @@ class LRUCache(OrderedDict):
         # type: (object) -> object
         """Get the item, but also makes it most recent.
         """
-        _super = super(LRUCache, self)
-        value = _super.__getitem__(key)     # type: ignore
-        _super.__delitem__(key)             # type: ignore
-        _super.__setitem__(key, value)      # type: ignore
+        _super = typing.cast(OrderedDict, super(LRUCache, self))
+        value = _super.__getitem__(key)
+        _super.__delitem__(key)
+        _super.__setitem__(key, value)
         return value

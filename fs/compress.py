@@ -8,10 +8,11 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from datetime import datetime
 import time
-import zipfile
 import tarfile
+import typing
+import zipfile
+from datetime import datetime
 
 import six
 
@@ -21,8 +22,7 @@ from .time import datetime_to_epoch
 from .errors import NoSysPath, MissingInfoNamespace
 from .walk import Walker
 
-
-if False:  # typing imports
+if typing.TYPE_CHECKING:
     from typing import IO, Optional, Text, Type
     from .base import FS
 
@@ -31,7 +31,7 @@ def write_zip(src_fs,                            # type: FS
               file,                              # type: IO
               compression=zipfile.ZIP_DEFLATED,  # type: int
               encoding="utf-8",                  # type: Text
-              walker=None                        # type: Optional[Type[Walker]]
+              walker=None                        # type: Optional[Walker]
               ):
     # type: (...) -> None
     """Write the contents of a filesystem to a zip file.
@@ -114,7 +114,7 @@ def write_tar(src_fs,            # type: FS
               file,              # type: IO
               compression=None,  # type: Optional[Text]
               encoding="utf-8",  # type: Text
-              walker=None        # type: Optional[Type[Walker]]
+              walker=None        # type: Optional[Walker]
               ):
     # type: (...) -> None
     """Write the contents of a filesystem to a tar file.

@@ -4,14 +4,14 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from collections import OrderedDict
 import calendar
+import ftplib
 import io
 import itertools
 import socket
 import threading
 import typing
-
+from collections import OrderedDict
 from contextlib import contextmanager
 from ftplib import FTP
 from ftplib import error_perm
@@ -25,7 +25,7 @@ from .base import FS
 from .constants import DEFAULT_CHUNK_SIZE
 from .enums import ResourceType
 from .enums import Seek
-from .info import Info, _RawInfo
+from .info import Info
 from .iotools import line_iterator
 from .mode import Mode
 from .path import abspath
@@ -35,12 +35,10 @@ from .path import normpath
 from .path import split
 from . import _ftp_parse as ftp_parse
 
-
 if typing.TYPE_CHECKING:
     import ftplib
-    import typing
     from typing import ByteString, Iterator, Dict, Optional, Text, Union
-    from .info import _RawInfo
+    from .info import RawInfo
     from .permissions import Permissions
 
 
@@ -539,7 +537,7 @@ class FTPFS(FS):
 
     @classmethod
     def _parse_mlsx(cls, lines):
-        # type: (typing.Iterable[Text]) -> Iterator[_RawInfo]
+        # type: (typing.Iterable[Text]) -> Iterator[RawInfo]
         for line in lines:
             name, facts = cls._parse_facts(line.strip())
             if name is None:
@@ -755,7 +753,7 @@ class FTPFS(FS):
         self.setbinfile(path, io.BytesIO(contents))
 
     def setinfo(self, path, info):
-        # type: (Text, _RawInfo) -> None
+        # type: (Text, RawInfo) -> None
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
 

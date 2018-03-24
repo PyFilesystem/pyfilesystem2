@@ -14,8 +14,9 @@ See Also:
 from __future__ import division
 from __future__ import unicode_literals
 
+import typing
 
-if False:  # typing imports
+if typing.TYPE_CHECKING:
     from typing import Iterable, SupportsInt, Text
 
 

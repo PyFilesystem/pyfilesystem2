@@ -14,6 +14,7 @@ import abc
 import os
 import threading
 import time
+import typing
 from functools import partial
 
 from contextlib import closing
@@ -36,12 +37,13 @@ from .time import datetime_to_epoch
 from .walk import Walker
 
 
-if False:  # typing imports
+if typing.TYPE_CHECKING:
     from datetime import datetime
-    from typing import *   # FIXME
+    from typing import (
+        Any, BinaryIO, Callable, Collection, Dict, IO, Iterable,
+        Iterator, List, Optional, Text, Tuple, Union)
     from .enums import ResourceType
-    from .info import Info
-    from .info import _RawInfo
+    from .info import Info, RawInfo
     from .permissions import Permissions
 
 
@@ -88,8 +90,11 @@ class FS(object):
     # ---------------------------------------------------------------- #
 
     @abc.abstractmethod
-    def getinfo(self, path, namespaces=None):
-        # type: (Text, Optional[Collection[Text]]) -> Info
+    def getinfo(self,
+                path,            # type: Text
+                namespaces=None  # type: Optional[Collection[Text]]
+                ):
+        # type: (...) -> Info
         """Get information about a resource on a filesystem.
 
         Arguments:
@@ -147,8 +152,13 @@ class FS(object):
         """
 
     @abc.abstractmethod
-    def openbin(self, path, mode="r", buffering=-1, **options):
-        # type: (Text, Text, int, **Any) -> BinaryIO
+    def openbin(self,
+                path,           # type: Text
+                mode="r",       # type: Text
+                buffering=-1,   # type: int
+                **options       # type: Any
+                ):
+        # type: (...) -> BinaryIO
         """Open a binary file-like object.
 
         Arguments:
@@ -210,7 +220,7 @@ class FS(object):
 
     @abc.abstractmethod
     def setinfo(self, path, info):
-        # type: (Text, _RawInfo) -> None
+        # type: (Text, RawInfo) -> None
         """Set info on a resource.
 
         This method is the compliment to `~fs.base.FS.getinfo`

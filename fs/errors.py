@@ -111,6 +111,7 @@ class CreateFailed(FSError):
         self.details = '' if exc is None else text_type(exc)
         self.exc = exc
 
+
 class PathError(FSError):
     """Base exception for errors to do with a path string.
     """
