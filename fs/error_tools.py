@@ -21,7 +21,7 @@ if typing.TYPE_CHECKING:  # typing imports
 _WINDOWS_PLATFORM = platform.system() == 'Windows'
 
 
-class _ConvertOSErrors(typing.ContextManager):
+class _ConvertOSErrors(object):
     """Context manager to convert OSErrors in to FS Errors.
     """
 
