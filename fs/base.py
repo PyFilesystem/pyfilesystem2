@@ -38,9 +38,10 @@ from .walk import Walker
 
 if False:  # typing imports
     from datetime import datetime
-    from typing import *
+    from typing import *   # FIXME
     from .enums import ResourceType
     from .info import Info
+    from .info import _RawInfo
     from .permissions import Permissions
 
 
@@ -209,7 +210,7 @@ class FS(object):
 
     @abc.abstractmethod
     def setinfo(self, path, info):
-        # type: (Text, dict) -> None
+        # type: (Text, _RawInfo) -> None
         """Set info on a resource.
 
         This method is the compliment to `~fs.base.FS.getinfo`
