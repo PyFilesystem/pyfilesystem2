@@ -7,6 +7,8 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import contextlib
+import typing
+
 import six
 import pkg_resources
 
@@ -14,8 +16,7 @@ from .base import Opener
 from .errors import UnsupportedProtocol, EntryPointError
 from .parse import parse_fs_url
 
-
-if False:  # typing imports
+if typing.TYPE_CHECKING:
     from typing import Text, Tuple, Union
     from ..base import FS
 
