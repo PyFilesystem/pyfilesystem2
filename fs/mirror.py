@@ -19,14 +19,21 @@ the expense of potentially copying extra files.
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
 
 from .copy import copy_file_internal
 from .errors import ResourceNotFound
 from .walk import Walker
 from .opener import manage_fs
 
+if typing.TYPE_CHECKING:
+    from typing import Optional, Text, Union
+    from .base import FS
+    from .info import Info
+
 
 def _compare(info1, info2):
+    # type: (Info, Info) -> bool
     """Compare two `Info` objects to see if they should be copied.
 
     Returns:
@@ -42,7 +49,12 @@ def _compare(info1, info2):
     return date1 is None or date2 is None or date1 > date2
 
 
-def mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
+def mirror(src_fs,              # type: Union[FS, Text]
+           dst_fs,              # type: Union[FS, Text]
+           walker=None,         # type: Optional[Walker]
+           copy_if_newer=True   # type: bool
+           ):
+    # type: (...) -> None
     """Mirror files / directories from one filesystem to another.
 
     Mirroring a filesystem will create an exact copy of ``src_fs`` on
@@ -68,6 +80,7 @@ def mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
 
 
 def _mirror(src_fs, dst_fs, walker=None, copy_if_newer=True):
+    # type: (FS, FS, Optional[Walker], bool) -> None
     walker = walker or Walker()
     walk = walker.walk(src_fs, namespaces=['details'])
     for path, dirs, files in walk:
