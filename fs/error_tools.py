@@ -5,9 +5,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import errno
-from contextlib import contextmanager
-import sys
 import platform
+import sys
+import typing
+
+from contextlib import contextmanager
+from typing import Text
 
 from . import errors
 
@@ -21,7 +24,7 @@ if False:  # typing imports
 _WINDOWS_PLATFORM = platform.system() == 'Windows'
 
 
-class _ConvertOSErrors(object):
+class _ConvertOSErrors(typing.ContextManager):
     """Context manager to convert OSErrors in to FS Errors.
     """
 
