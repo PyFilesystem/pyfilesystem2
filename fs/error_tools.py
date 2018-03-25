@@ -4,6 +4,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import collections
 import errno
 import platform
 import sys
@@ -15,7 +16,7 @@ from six import reraise
 from . import errors
 
 if typing.TYPE_CHECKING:  # typing imports
-    from typing import Iterator, Text
+    from typing import Iterator, Mapping, Text, Union
 
 
 _WINDOWS_PLATFORM = platform.system() == 'Windows'
@@ -93,7 +94,7 @@ convert_os_errors = _ConvertOSErrors
 
 @contextmanager
 def unwrap_errors(path_replace):
-    # type: (Text) -> Iterator[None]
+    # type: (Union[Text, Mapping[Text, Text]]) -> Iterator[None]
     """Get a context to map OS errors to their `fs.errors` counterpart.
 
     The context will re-write the paths in resource exceptions to be
@@ -108,7 +109,7 @@ def unwrap_errors(path_replace):
         yield
     except errors.ResourceError as e:
         if hasattr(e, 'path'):
-            if isinstance(path_replace, dict):
+            if isinstance(path_replace, collections.Mapping):
                 e.path = path_replace.get(e.path, e.path)
             else:
                 e.path = path_replace
