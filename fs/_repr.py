@@ -10,7 +10,7 @@ if typing.TYPE_CHECKING:
 
 
 def make_repr(class_name, *args, **kwargs):
-    # type: (Text, *object, **Tuple[Text, Text]) -> Text
+    # type: (Text, *object, **Tuple[object, object]) -> Text
     """Generate a repr string.
 
     Positional arguments should be the positional arguments used to
