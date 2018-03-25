@@ -23,12 +23,13 @@ from .errors import NoSysPath, MissingInfoNamespace
 from .walk import Walker
 
 if typing.TYPE_CHECKING:
-    from typing import IO, Optional, Text, Type
+    from typing import BinaryIO, Optional, Text, Tuple, Type, Union
     from .base import FS
+    ZipTime = Tuple[int, int, int, int, int, int]
 
 
 def write_zip(src_fs,                            # type: FS
-              file,                              # type: IO
+              file,                              # type: Union[Text, BinaryIO]
               compression=zipfile.ZIP_DEFLATED,  # type: int
               encoding="utf-8",                  # type: Text
               walker=None                        # type: Optional[Walker]
@@ -74,7 +75,7 @@ def write_zip(src_fs,                            # type: FS
                 # zip time directory from the stat structure
                 st_mtime = info.get('stat', 'st_mtime', None)
                 _mtime = time.localtime(st_mtime)
-                zip_time = _mtime[0:6]
+                zip_time = _mtime[0:6]  # type: ZipTime
             else:
                 # Otherwise, use the modified time from details
                 # namespace.
@@ -83,7 +84,10 @@ def write_zip(src_fs,                            # type: FS
                     mt.year, mt.month, mt.day,
                     mt.hour, mt.minute, mt.second
                 )
-            zip_info = zipfile.ZipInfo(zip_name, zip_time)
+
+            # NOTE(@althonos): typeshed's `zipfile.py` on declares
+            #     ZipInfo.__init__ for Python < 3 ?!
+            zip_info = zipfile.ZipInfo(zip_name, zip_time)  # type: ignore
 
             try:
                 zip_info.external_attr = info.permissions.mode << 16
@@ -111,7 +115,7 @@ def write_zip(src_fs,                            # type: FS
 
 
 def write_tar(src_fs,            # type: FS
-              file,              # type: IO
+              file,              # type: Union[Text, BinaryIO]
               compression=None,  # type: Optional[Text]
               encoding="utf-8",  # type: Text
               walker=None        # type: Optional[Walker]
@@ -150,10 +154,10 @@ def write_tar(src_fs,            # type: FS
     ]
 
     mode = 'w:{}'.format(compression or '')
-    if hasattr(file, 'write'):
-        _tar = tarfile.open(fileobj=file, mode=mode)
-    else:
+    if isinstance(file, (six.text_type, six.binary_type)):
         _tar = tarfile.open(file, mode=mode)
+    else:
+        _tar = tarfile.open(fileobj=file, mode=mode)
 
     current_time = time.time()
     walker = walker or Walker()

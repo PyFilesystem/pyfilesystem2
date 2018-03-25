@@ -4,12 +4,11 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
 import zipfile
-
 from datetime import datetime
 
 import six
-from six import PY2
 
 from . import errors
 from .base import FS
@@ -24,26 +23,36 @@ from .path import dirname, normpath, relpath
 from .time import datetime_to_epoch
 from .wrapfs import WrapFS
 
+if typing.TYPE_CHECKING:
+    from typing import (
+        Any, BinaryIO, Collection, Dict, List, Optional,
+        SupportsInt, Text, Tuple, Union)
+    from .info import RawInfo
+
 
 class _ZipExtFile(RawWrapper):
 
     def __init__(self, fs, name):
+        # type: (ReadZipFS, Text) -> None
         self._zip = _zip = fs._zip
         self._end = _zip.getinfo(name).file_size
         self._pos = 0
         super(_ZipExtFile, self).__init__(_zip.open(name), 'r', name)
 
     def read(self, size=-1):
+        # type: (int) -> bytes
         buf = self._f.read(-1 if size is None else size)
         self._pos += len(buf)
         return buf
 
     def read1(self, size=-1):
+        # type: (int) -> bytes
         buf = self._f.read1(-1 if size is None else size)
         self._pos += len(buf)
         return buf
 
     def seek(self, offset, whence=Seek.set):
+        # type: (int, SupportsInt) -> int
         """Change stream position.
 
         Change the stream position to the given byte offset. The
@@ -72,19 +81,20 @@ class _ZipExtFile(RawWrapper):
                 * read and discard data to advance in the file
 
         """
-        if whence == Seek.current:
+        _whence = int(whence)
+        if _whence == Seek.current:
             offset += self._pos
-        if whence == Seek.current or whence == Seek.set:
+        if _whence == Seek.current or _whence == Seek.set:
             if offset < 0:
                 raise ValueError("Negative seek position {}".format(offset))
-        elif whence == Seek.end:
+        elif _whence == Seek.end:
             if offset > 0:
                 raise ValueError("Positive seek position {}".format(offset))
             offset += self._end
         else:
             raise ValueError(
                 "Invalid whence ({}, should be {}, {} or {})".format(
-                    whence, Seek.set, Seek.current, Seek.end
+                    _whence, Seek.set, Seek.current, Seek.end
                 )
             )
 
@@ -95,6 +105,7 @@ class _ZipExtFile(RawWrapper):
         return self._pos
 
     def tell(self):
+        # type: () -> int
         return self._pos
 
 
@@ -141,11 +152,13 @@ class ZipFS(WrapFS):
     """
 
     def __new__(cls,
-                file,
-                write=False,
-                compression=zipfile.ZIP_DEFLATED,
-                encoding="utf-8",
-                temp_fs="temp://__ziptemp__"):
+                file,                              # type: Union[Text, BinaryIO]
+                write=False,                       # type: bool
+                compression=zipfile.ZIP_DEFLATED,  # type: int
+                encoding="utf-8",                  # type: Text
+                temp_fs="temp://__ziptemp__"       # type: Text
+                ):
+        # type: (...) -> FS
         # This magic returns a different class instance based on the
         # value of the ``write`` parameter.
         if write:
@@ -156,6 +169,17 @@ class ZipFS(WrapFS):
         else:
             return ReadZipFS(file, encoding=encoding)
 
+    if typing.TYPE_CHECKING:
+        def __init__(self,
+                     file,                              # type: Union[Text, BinaryIO]
+                     write=False,                       # type: bool
+                     compression=zipfile.ZIP_DEFLATED,  # type: int
+                     encoding="utf-8",                  # type: Text
+                     temp_fs="temp://__ziptemp__"       # type: Text
+                     ):
+            # type: (...) -> None
+            pass
+
 
 @six.python_2_unicode_compatible
 class WriteZipFS(WrapFS):
@@ -163,10 +187,12 @@ class WriteZipFS(WrapFS):
     """
 
     def __init__(self,
-                 file,
-                 compression=zipfile.ZIP_DEFLATED,
-                 encoding="utf-8",
-                 temp_fs="temp://__ziptemp__"):
+                 file,                               # type: Union[Text, BinaryIO]
+                 compression=zipfile.ZIP_DEFLATED,   # type: int
+                 encoding="utf-8",                   # type: Text
+                 temp_fs="temp://__ziptemp__"        # type: Text
+                 ):
+        # type: (...) -> None
         self._file = file
         self.compression = compression
         self.encoding = encoding
@@ -176,6 +202,7 @@ class WriteZipFS(WrapFS):
         super(WriteZipFS, self).__init__(self._temp_fs)
 
     def __repr__(self):
+        # type: () -> Text
         t = "WriteZipFS({!r}, compression={!r}, encoding={!r}, temp_fs={!r})"
         return t.format(
             self._file,
@@ -185,15 +212,19 @@ class WriteZipFS(WrapFS):
         )
 
     def __str__(self):
+        # type: () -> Text
         return "<zipfs-write '{}'>".format(self._file)
 
     def delegate_path(self, path):
+        # type: (Text) -> Tuple[FS, Text]
         return self._temp_fs, path
 
     def delegate_fs(self):
+        # type: () -> FS
         return self._temp_fs
 
     def close(self):
+        # type: () -> None
         if not self.isclosed():
             try:
                 self.write_zip()
@@ -201,7 +232,12 @@ class WriteZipFS(WrapFS):
                 self._temp_fs.close()
         super(WriteZipFS, self).close()
 
-    def write_zip(self, file=None, compression=None, encoding=None):
+    def write_zip(self,
+                  file=None,         # type: Union[Text, BinaryIO, None]
+                  compression=None,  # type: Optional[int]
+                  encoding=None      # type: Optional[Text]
+                  ):
+        # type: (...) -> None
         """Write zip to a file.
 
         Arguments:
@@ -243,33 +279,38 @@ class ReadZipFS(FS):
 
     @errors.CreateFailed.catch_all
     def __init__(self, file, encoding='utf-8'):
+        # type: (Union[BinaryIO, Text], Text) -> None
         super(ReadZipFS, self).__init__()
         self._file = file
         self.encoding = encoding
         self._zip = zipfile.ZipFile(file, 'r')
-        self._directory_fs = None
+        self._directory_fs = None   # type: Optional[MemoryFS]
 
     def __repr__(self):
+        # type: () -> Text
         return "ReadZipFS({!r})".format(self._file)
 
     def __str__(self):
+        # type: () -> Text
         return "<zipfs '{}'>".format(self._file)
 
     def _path_to_zip_name(self, path):
+        # type: (Text) -> str
         """Convert a path to a zip file name.
         """
         if self._directory.isdir(path):
             _path = relpath(normpath(path)) + '/'
         else:
             _path = relpath(normpath(path))
-        return (
+        return (                                # type: ignore
             _path.encode(self.encoding)
-            if PY2 else
+            if six.PY2 else
             _path
         )
 
     @property
     def _directory(self):
+        # type: () -> MemoryFS
         """`MemoryFS`: a filesystem with the same folder hierarchy as the zip.
         """
         self.check()
@@ -289,9 +330,10 @@ class ReadZipFS(FS):
             return self._directory_fs
 
     def getinfo(self, path, namespaces=None):
+        # type: (Text, Optional[Collection[Text]]) -> Info
         _path = self.validatepath(path)
         namespaces = namespaces or ()
-        raw_info = {}
+        raw_info = {}  # type: Dict[Text, Dict[Text, object]]
 
         if _path == '/':
             raw_info["basic"] = {
@@ -333,7 +375,7 @@ class ReadZipFS(FS):
                     if "zip" in namespaces:
                         raw_info["zip"] = {
                             k: getattr(zip_info, k)
-                            for k in zip_info.__slots__
+                            for k in zip_info.__slots__  # type: ignore
                             if not k.startswith('_')
                         }
                     if "access" in namespaces:
@@ -349,18 +391,22 @@ class ReadZipFS(FS):
         return Info(raw_info)
 
     def setinfo(self, path, info):
+        # type: (Text, RawInfo) -> None
         self.check()
         raise errors.ResourceReadOnly(path)
 
     def listdir(self, path):
+        # type: (Text) -> List[Text]
         self.check()
         return self._directory.listdir(path)
 
     def makedir(self, path, permissions=None, recreate=False):
+        # type: (Text, Optional[Permissions], bool) -> FS
         self.check()
         raise errors.ResourceReadOnly(path)
 
     def openbin(self, path, mode="r", buffering=-1, **kwargs):
+        # type: (Text, Text, int, **Any) -> BinaryIO
         self.check()
         if 'w' in mode or '+' in mode or 'a' in mode:
             raise errors.ResourceReadOnly(path)
@@ -371,21 +417,25 @@ class ReadZipFS(FS):
             raise errors.FileExpected(path)
 
         zip_name = self._path_to_zip_name(path)
-        return _ZipExtFile(self, zip_name)
+        return _ZipExtFile(self, zip_name)         # type: ignore
 
     def remove(self, path):
+        # type: (Text) -> None
         self.check()
         raise errors.ResourceReadOnly(path)
 
     def removedir(self, path):
+        # type: (Text) -> None
         self.check()
         raise errors.ResourceReadOnly(path)
 
     def close(self):
+        # type: () -> None
         super(ReadZipFS, self).close()
         self._zip.close()
 
     def getbytes(self, path):
+        # type: (Text) -> bytes
         self.check()
         if not self._directory.isfile(path):
             raise errors.ResourceNotFound(path)
