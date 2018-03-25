@@ -39,12 +39,14 @@ from .walk import Walker
 
 if typing.TYPE_CHECKING:
     from datetime import datetime
+    from threading import RLock
     from typing import (
         Any, BinaryIO, Callable, Collection, Dict, IO, Iterable,
-        Iterator, List, Optional, Text, Tuple, Union)
+        Iterator, List, Mapping, Optional, Text, Tuple, Union)
     from .enums import ResourceType
     from .info import Info, RawInfo
     from .permissions import Permissions
+    OpendirFactory = Callable[[FS, Text], FS]
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -580,8 +582,13 @@ class FS(object):
                     chunk_size=chunk_size
                 )
 
-    def gettext(self, path, encoding=None, errors=None, newline=''):
-        # type: (Text, Optional[Text], Optional[Text], Text) -> Text
+    def gettext(self,
+                path,           # type: Text
+                encoding=None,  # type: Optional[Text]
+                errors=None,    # type: Optional[Text]
+                newline=''      # type: Text
+                ):
+        # type: (...) -> Text
         """Get the contents of a file as a string.
 
         Arguments:
@@ -610,7 +617,7 @@ class FS(object):
         return contents
 
     def getmeta(self, namespace="standard"):
-        # type: (Text) -> dict
+        # type: (Text) -> Mapping[Text, object]
         """Get meta information regarding a filesystem.
 
         Arguments:
@@ -888,7 +895,7 @@ class FS(object):
         return False
 
     def lock(self):
-        # type: () -> threading.RLock
+        # type: () -> RLock
         """Get a context manager that *locks* the filesystem.
 
         Locking a filesystem gives a thread exclusive access to it.
@@ -945,8 +952,12 @@ class FS(object):
                 dst_path
             )
 
-    def makedirs(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+    def makedirs(self,
+                 path,              # type: Text
+                 permissions=None,  # type: Optional[Permissions]
+                 recreate=False     # type: bool
+                 ):
+        # type: (...) -> FS
         """Make a directory, and any missing intermediate directories.
 
         Arguments:
@@ -1076,8 +1087,11 @@ class FS(object):
         )
         return io_stream
 
-    def opendir(self, path, factory=None):
-        # type: (Text, Optional[Callable[[FS, Text], FS]]) -> FS
+    def opendir(self,
+                path,           # type: Text
+                factory=None    # type: Optional[OpendirFactory]
+                ):
+        # type: (...) -> FS
         # FIXME(@althonos): use generics here if possible
         """Get a filesystem object for a sub-directory.
 
