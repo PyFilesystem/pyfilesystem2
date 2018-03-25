@@ -5,6 +5,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import io
+import typing
 
 from . import errors
 from .errors import DirectoryNotEmpty
@@ -14,11 +15,8 @@ from .path import dirname
 from .path import normpath
 from .path import recursepath
 
-
-# type annotations
-if False:
-    from io import RawIOBase, IOBase
-    from typing import *
+if typing.TYPE_CHECKING:
+    from typing import IO, List, Optional, Text
     from .base import FS
 
 
@@ -41,6 +39,7 @@ def remove_empty(fs, path):
 
 
 def copy_file_data(src_file, dst_file, chunk_size=None):
+    # type: (IO, IO, Optional[int]) -> None
     """Copy data from one file object to another.
 
     Arguments:
@@ -50,11 +49,11 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
             a time (or `None` to use sensible default).
 
     """
-    chunk_size = chunk_size or io.DEFAULT_BUFFER_SIZE
+    _chunk_size = chunk_size or io.DEFAULT_BUFFER_SIZE
     read = src_file.read
     write = dst_file.write
     # The 'or None' is so that it works with binary and text files
-    for chunk in iter(lambda: read(chunk_size) or None, None):
+    for chunk in iter(lambda: read(_chunk_size) or None, None):
         write(chunk)
 
 

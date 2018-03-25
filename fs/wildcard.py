@@ -5,17 +5,19 @@
 from __future__ import unicode_literals
 
 import re
+import typing
 from functools import partial
 
 from .lrucache import LRUCache
 
+if typing.TYPE_CHECKING:  # typing imports
+    from typing import (
+        Callable, Iterable, MutableMapping, Text,
+        Tuple, Pattern)
 
-if False:  # typing imports
-    from typing import *
 
 _MAXCACHE = 1000
 _PATTERN_CACHE = LRUCache(_MAXCACHE)  # type: MutableMapping[Tuple[Text, bool], Pattern]
-
 
 
 def match(pattern, name):

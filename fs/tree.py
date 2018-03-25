@@ -8,19 +8,27 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import sys
+import typing
 
 from fs.path import abspath, join, normpath
 
+if typing.TYPE_CHECKING:
+    from typing import List, Optional, Text, TextIO, Tuple
+    from .base import FS
+    from .info import Info
+
 
 def render(fs,
-           path='/',
-           file=None,
-           encoding=None,
-           max_levels=5,
-           with_color=None,
-           dirs_first=True,
-           exclude=None,
-           filter=None):
+           path='/',            # type: Text
+           file=None,           # type: Optional[TextIO]
+           encoding=None,       # type: Optional[Text]
+           max_levels=5,        # type: int
+           with_color=None,     # type: Optional[bool]
+           dirs_first=True,     # type: bool
+           exclude=None,        # type: Optional[List[Text]]
+           filter=None          # type: Optional[List[Text]]
+           ):
+    # type: (...) -> Tuple[int, int]
     """Render a directory structure in to a pretty tree.
 
     Arguments:
@@ -69,11 +77,16 @@ def render(fs,
     line_indent = char_vertline + ' ' * 3
 
     def write(line):
+        # type: (Text) -> None
         """Write a line to the output.
         """
         print(line, file=file)
 
+    # FIXME(@althonos): define functions using `with_color` and
+    #      avoid checking `with_color` at every function call !
+
     def format_prefix(prefix):
+        # type: (Text) -> Text
         """Format the prefix lines.
         """
         if not with_color:
@@ -81,6 +94,7 @@ def render(fs,
         return '\x1b[32m%s\x1b[0m' % prefix
 
     def format_dirname(dirname):
+        # type: (Text) -> Text
         """Format a directory name.
         """
         if not with_color:
@@ -88,6 +102,7 @@ def render(fs,
         return '\x1b[1;34m%s\x1b[0m' % dirname
 
     def format_error(msg):
+        # type: (Text) -> Text
         """Format an error.
         """
         if not with_color:
@@ -95,6 +110,7 @@ def render(fs,
         return '\x1b[31m%s\x1b[0m' % msg
 
     def format_filename(fname):
+        # type: (Text) -> Text
         """Format a filename.
         """
         if not with_color:
@@ -104,11 +120,13 @@ def render(fs,
         return fname
 
     def sort_key_dirs_first(info):
+        # type: (Info) -> Tuple[bool, Text]
         """Get the info sort function with directories first.
         """
         return (not info.is_dir, info.name.lower())
 
     def sort_key(info):
+        # type: (Info) -> Text
         """Get the default info sort function using resource name.
         """
         return info.name.lower()
@@ -116,6 +134,7 @@ def render(fs,
     counts = {"dirs": 0, "files": 0}
 
     def format_directory(path, levels):
+        # type: (Text, List[bool]) -> None
         """Recursive directory function.
         """
         try:
