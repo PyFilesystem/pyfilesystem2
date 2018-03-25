@@ -16,16 +16,17 @@ Here's an example that opens a filesystem then makes it *read only*::
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+
 from .wrapfs import WrapFS
 from .path import abspath, normpath, split
 from .errors import ResourceReadOnly, ResourceNotFound
 from .info import Info
 from .mode import check_writable
 
-
-if False:  # typing imports
+if typing.TYPE_CHECKING:
     from datetime import datetime
-    from typing import *
+    from typing import Dict, Text, Tuple
     from .base import FS
     from .info import Info
     from .permissions import Permissions
