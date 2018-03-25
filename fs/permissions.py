@@ -4,11 +4,13 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+from typing import Container, Iterable, Text
+
 import six
 
-
-if False:  # typing imports
-    from typing import *
+if typing.TYPE_CHECKING:
+    from typing import Iterator, List, Optional, Tuple, Union
 
 
 def make_mode(init):
@@ -20,7 +22,9 @@ def make_mode(init):
 class _PermProperty(object):
     """Creates simple properties to get/set permissions.
     """
+
     def __init__(self, name):
+        # type: (Text) -> None
         self._name = name
         self.__doc__ = "Boolean for '{}' permission.".format(name)
 
@@ -35,7 +39,7 @@ class _PermProperty(object):
 
 
 @six.python_2_unicode_compatible
-class Permissions(object):
+class Permissions(Container[Text], Iterable[Text]):
     """An abstraction for file system permissions.
 
     Permissions objects store information regarding the permissions
@@ -80,8 +84,8 @@ class Permissions(object):
         ('o_r', 4),
         ('o_w', 2),
         ('o_x', 1)
-    ]
-    _LINUX_PERMS_NAMES = [_name for _name, _mask in _LINUX_PERMS]
+    ]  # type: List[Tuple[Text, int]]
+    _LINUX_PERMS_NAMES = [_name for _name, _mask in _LINUX_PERMS]  # type: List[Text]
 
     def __init__(self,
                  names=None,    # type: Optional[Iterable[Text]]
@@ -116,6 +120,7 @@ class Permissions(object):
             self._perms.add('setguid')
 
     def __repr__(self):
+        # type: () -> Text
         if not self._perms.issubset(self._LINUX_PERMS_NAMES):
             _perms_str = ", ".join(
                 "'{}'".format(p) for p in sorted(self._perms)
@@ -153,22 +158,27 @@ class Permissions(object):
         return "Permissions({})".format(', '.join(args))
 
     def __str__(self):
+        # type: () -> Text
         return self.as_str()
 
     def __iter__(self):
+        # type: () -> Iterator[Text]
         return iter(self._perms)
 
     def __contains__(self, permission):
+        # type: (object) -> bool
         return permission in self._perms
 
     def __eq__(self, other):
+        # type: (object) -> bool
         if isinstance(other, Permissions):
-            names = other.dump()
+            names = other.dump()            # type: object
         else:
             names = other
         return self.dump() == names
 
     def __ne__(self, other):
+        # type: (object) -> bool
         return not self.__eq__(other)
 
     @classmethod
@@ -261,6 +271,7 @@ class Permissions(object):
 
     @property
     def mode(self):
+        # type: () -> int
         """`int`: mode integer.
         """
         mode = 0
@@ -271,6 +282,7 @@ class Permissions(object):
 
     @mode.setter
     def mode(self, mode):
+        # type: (int) -> None
         self._perms = {
             name
             for name, mask in self._LINUX_PERMS

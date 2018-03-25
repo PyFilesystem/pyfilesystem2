@@ -12,12 +12,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import re
+import typing
 
 from .errors import IllegalBackReference
 
-if False:  # typing imports
-    from typing import *
-
+if typing.TYPE_CHECKING:
+    from typing import List, Text, Tuple
 
 
 __all__ = [
