@@ -40,8 +40,8 @@ class _AppFS(OSFS):
                  appname,          # type: Text
                  author=None,      # type: Optional[Text]
                  version=None,     # type: Optional[Text]
-                 roaming=False,
-                 create=True
+                 roaming=False,    # type: bool
+                 create=True       # type: bool
                  ):
         # type: (...) -> None
         self.app_dirs = AppDirs(appname, author, version, roaming)
@@ -52,7 +52,8 @@ class _AppFS(OSFS):
         )
 
     def __repr__(self):
-        return make_repr(       # type: ignore
+        # type: () -> Text
+        return make_repr(
             self.__class__.__name__,
             self.app_dirs.appname,
             author=(self.app_dirs.appauthor, None),
@@ -62,6 +63,7 @@ class _AppFS(OSFS):
         )
 
     def __str__(self):
+        # type: () -> Text
         return "<{} '{}'>".format(
             self.__class__.__name__.lower(),
             self.app_dirs.appname

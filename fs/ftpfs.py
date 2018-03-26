@@ -40,6 +40,8 @@ if typing.TYPE_CHECKING:
     from typing import ByteString, Iterator, Dict, Optional, Text, Union
     from .info import RawInfo
     from .permissions import Permissions
+    from .subfs import SubFS
+    F = typing.TypeVar('F', bound='FTPFS')
 
 
 __all__ = ['FTPFS']
@@ -619,8 +621,12 @@ class FTPFS(FS):
             ]
         return dir_list
 
-    def makedir(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+    def makedir(self,               # type: F
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[F]
         _path = self.validatepath(path)
 
         with ftp_errors(self, path=path):

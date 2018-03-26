@@ -28,6 +28,8 @@ if typing.TYPE_CHECKING:
         Any, BinaryIO, Collection, Dict, List, Optional,
         SupportsInt, Text, Tuple, Union)
     from .info import RawInfo
+    from .subfs import SubFS
+    R = typing.TypeVar("R", bound="ReadZipFS")
 
 
 class _ZipExtFile(RawWrapper):
@@ -400,8 +402,12 @@ class ReadZipFS(FS):
         self.check()
         return self._directory.listdir(path)
 
-    def makedir(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+    def makedir(self,               # type: R
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[R]
         self.check()
         raise errors.ResourceReadOnly(path)
 

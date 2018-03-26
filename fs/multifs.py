@@ -24,7 +24,8 @@ if typing.TYPE_CHECKING:
     from .enums import ResourceType
     from .info import Info, RawInfo
     from .permissions import Permissions
-
+    from .subfs import SubFS
+    M = typing.TypeVar('M', bound='MultiFS')
 
 
 _PrioritizedFS = namedtuple(
@@ -230,8 +231,13 @@ class MultiFS(FS):
         directory = list(OrderedDict.fromkeys(directory))
         return directory
 
-    def makedir(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+    @typing.no_type_check
+    def makedir(self,               # type: M
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[FS]
         self.check()
         write_fs = self._writable_required(path)
         return write_fs.makedir(
@@ -373,8 +379,13 @@ class MultiFS(FS):
         path = abspath(normpath(path))
         return path
 
-    def makedirs(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+    @typing.no_type_check
+    def makedirs(self,              # type: M
+                 path,              # type: Text
+                 permissions=None,  # type: Optional[Permissions]
+                 recreate=False     # type: bool
+                 ):
+        # type: (...) -> SubFS[FS]
         self.check()
         write_fs = self._writable_required(path)
         return write_fs.makedirs(

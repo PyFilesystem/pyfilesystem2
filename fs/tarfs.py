@@ -368,6 +368,7 @@ class ReadTarFS(FS):
 
     def listdir(self, path):
         # type: (Text) -> List[Text]
+<<<<<<< HEAD
         _path = relpath(self.validatepath(path))
 
         if not self.gettype(path) is ResourceType.directory:
@@ -376,6 +377,22 @@ class ReadTarFS(FS):
         children = (frombase(_path, n) for n in self._directory if isbase(_path, n))
         content = (parts(child)[1] for child in children if relpath(child))
         return list(OrderedDict.fromkeys(content))
+=======
+        self.check()
+        _path = relpath(path)
+        info = self._directory.get(_path)
+        if _path:
+            if info is None:
+                raise errors.ResourceNotFound(path)
+            if not info.isdir():
+                raise errors.DirectoryExpected(path)
+        dir_list = [
+            basename(name)
+            for name in self._directory.keys()
+            if dirname(name) == _path
+        ]
+        return dir_list
+>>>>>>> Fix `makedir`, `makedirs` and `opendir` signatures where applicable
 
     def makedir(self,               # type: T
                 path,               # type: Text

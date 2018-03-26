@@ -28,6 +28,8 @@ if typing.TYPE_CHECKING:
         Optional, SupportsInt, Union, Text)
     from .info import RawInfo
     from .permissions import Permissions
+    from .subfs import SubFS
+    M = typing.TypeVar('M', bound='MemoryFS')
 
 
 @six.python_2_unicode_compatible
@@ -365,8 +367,12 @@ class MemoryFS(FS):
                 raise errors.DirectoryExpected(path)
             return dir_entry.list()
 
-    def makedir(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+    def makedir(self,               # type: M
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[M]
         _path = self.validatepath(path)
         with self._lock:
             if _path == '/':
