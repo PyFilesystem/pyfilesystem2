@@ -41,10 +41,10 @@ def write_zip(src_fs,                            # type: FS
         src_fs (~fs.base.FS): The source filesystem to compress.
         file (str or io.IOBase): Destination file, may be a file name
             or an open file object.
-        compression (str, optional): Compression to use (one of the constants
+        compression (int): Compression to use (one of the constants
             defined in the `zipfile` module in the stdlib). Defaults
             to `zipfile.ZIP_DEFLATED`.
-        encoding (str, optional):
+        encoding (str):
              The encoding to use for filenames. The default is ``"utf-8"``,
              use ``"CP437"`` if compatibility with WinZip is desired.
         walker (~fs.walk.Walker, optional): A `Walker` instance, or `None`
@@ -124,15 +124,15 @@ def write_tar(src_fs,            # type: FS
     """Write the contents of a filesystem to a tar file.
 
     Arguments:
-        file (str or io.IOBase): Destination file, may be a file name or
-            an open file object.
+        file (str or io.IOBase): Destination file, may be a file
+            name or an open file object.
         compression (str, optional): Compression to use, or `None`
             for a plain Tar archive without compression.
-        encoding(str, optional): The encoding to use for filenames. The
+        encoding(str): The encoding to use for filenames. The
             default is ``"utf-8"``.
-        walker (~fs.walk.Walker, optional): A `Walker` instance, or `None`
-            to use default walker. You can use this to specify which files
-            you want to compress.
+        walker (~fs.walk.Walker, optional): A `Walker` instance, or
+            `None` to use default walker. You can use this to specify
+            which files you want to compress.
 
     """
     type_map = {

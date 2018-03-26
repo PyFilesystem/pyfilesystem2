@@ -37,7 +37,7 @@ class MountFS(FS):
     """A virtual filesystem that maps directories on to other file-systems.
 
     Arguments:
-        auto_close (bool, optional): If `True` (the default), the child
+        auto_close (bool): If `True` (the default), the child
             filesystems will be closed when `MountFS` is closed.
 
     """

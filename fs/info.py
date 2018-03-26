@@ -33,7 +33,7 @@ class Info(object):
 
     Arguments:
         raw_info (dict): A dict containing resource info.
-        to_datetime (callable, optional): A callable that converts an
+        to_datetime (callable): A callable that converts an
             epoch time to a datetime object. The default uses
             :func:`~fs.time.epoch_to_datetime`.
 

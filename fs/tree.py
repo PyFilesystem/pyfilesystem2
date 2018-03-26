@@ -37,16 +37,16 @@ def render(fs,
             from (defaults to root folder, i.e. ``'/'``).
         file (io.IOBase): An open file-like object to render the
             tree, or `None` for stdout.
-        encoding (str or None): Unicode encoding, or `None` to
+        encoding (str, optional): Unicode encoding, or `None` to
             auto-detect.
-        max_levels (int or None): Maximum number of levels to
+        max_levels (int, optional): Maximum number of levels to
             display, or `None` for no maximum.
-        with_color (bool or None): Enable terminal color output,
+        with_color (bool, optional): Enable terminal color output,
             or `None` to auto-detect terminal.
         dirs_first (bool): Show directories first.
-        exclude (list or None): Option list of directory patterns
+        exclude (list, optional): Option list of directory patterns
             to exclude from the tree render.
-        filter (list or None): Optional list of files patterns to
+        filter (list, optional): Optional list of files patterns to
             match in the tree render.
 
     Returns:

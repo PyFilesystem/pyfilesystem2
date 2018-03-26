@@ -83,12 +83,11 @@ class MultiFS(FS):
             name (str): A unique name to refer to the filesystem being
                 added.
             fs (FS or str): The filesystem (instance or URL) to add.
-            write (bool, optional): If this value is True,
-                then the ``fs`` will be used as the writeable FS (defaults
-                to False).
-            priority (int, optional): An integer that denotes the priority
-                of the filesystem being added. Filesystems will be searched
-                in descending priority order and then by the reverse order
+            write (bool): If this value is True, then the ``fs`` will
+                be used as the writeable FS (defaults to False).
+            priority (int): An integer that denotes the priority of the
+                filesystem being added. Filesystems will be searched in
+                descending priority order and then by the reverse order
                 they were added. So by default, the most recently added
                 filesystem will be looked at first.
 

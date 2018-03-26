@@ -62,11 +62,11 @@ class OSFS(FS):
     Arguments:
         root_path (str or ~os.PathLike): An OS path or path-like object to
             the location on your HD you wish to manage.
-        create (bool, optional): Set to `True` to create the root directory
-            if it does not already exist, otherwise the directory should exist
-            prior to creating the ``OSFS`` instance (default `False`).
-        create_mode (int, optional): The permissions that will be used to
-            create the directory if ``create`` is `True` and the path doesn't
+        create (bool): Set to `True` to create the root directory if it
+            does not already exist, otherwise the directory should exist
+            prior to creating the ``OSFS`` instance (defaults to `False`).
+        create_mode (int): The permissions that will be used to create
+            the directory if ``create`` is `True` and the path doesn't
             exist, defaults to ``0o777``.
 
     Raises:

@@ -32,12 +32,12 @@ class TempFS(OSFS):
     Arguments:
         identifier (str): A string to distinguish the directory within
             the OS temp location, used as part of the directory name.
-        temp_dir (str, optional): An OS path to your temp directory (leave
-            as `None` to auto-detect)
-        auto_clean (bool, optional): If `True` (the default), the directory
+        temp_dir (str, optional): An OS path to your temp directory
+            (leave as `None` to auto-detect)
+        auto_clean (bool): If `True` (the default), the directory
             contents will be wiped on close.
-        ignore_clean_errors (bool, optional): If `True` (the default), any
-            errors in the clean process will be suppressed. If `False`, they
+        ignore_clean_errors (bool): If `True` (the default), any errors
+            in the clean process will be suppressed. If `False`, they
             will be raised.
 
     """

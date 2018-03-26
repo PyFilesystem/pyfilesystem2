@@ -140,8 +140,8 @@ def _translate(pattern, case_sensitive=True):
 
     Arguments:
         pattern (str): A wildcard pattern.
-        case_sensitive (bool, optional): Set to `False` to use a
-            case insensitive regex (default `True`).
+        case_sensitive (bool): Set to `False` to use a case
+            insensitive regex (default `True`).
 
     Returns:
         str: A regex equivalent to the given pattern.

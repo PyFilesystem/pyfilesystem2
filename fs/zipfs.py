@@ -144,12 +144,12 @@ class ZipFS(WrapFS):
 
     Arguments:
         file (str or io.IOBase): An OS filename, or an open file object.
-        write (bool, optional): Set to `True` to write a new zip file, or
-            `False` (default) to read an existing zip file.
-        compression (str, optional): Compression to use (one of the constants
+        write (bool): Set to `True` to write a new zip file, or `False`
+            (default) to read an existing zip file.
+        compression (int): Compression to use (one of the constants
             defined in the `zipfile` module in the stdlib).
-        temp_fs (str, optional): An FS URL for the temporary
-            filesystem used to store data prior to zipping.
+        temp_fs (str): An FS URL for the temporary filesystem used to
+            store data prior to zipping.
 
     """
 
@@ -245,7 +245,7 @@ class WriteZipFS(WrapFS):
         Arguments:
             file (str or io.IOBase, optional): Destination file, may be
                 a file name or an open file handle.
-            compression (str, optional): Compression to use (one of the
+            compression (int, optional): Compression to use (one of the
                 constants defined in the `zipfile` module in the stdlib).
             encoding (str, optional): The character encoding to use
                 (default uses the encoding defined in

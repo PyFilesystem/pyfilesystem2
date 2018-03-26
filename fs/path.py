@@ -122,7 +122,7 @@ def recursepath(path, reverse=False):
 
     Arguments:
         path (str): A PyFilesystem path
-        reverse (bool, optional): Reverses the order of the paths
+        reverse (bool): Reverses the order of the paths
             (default `False`).
 
     Returns:

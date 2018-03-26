@@ -402,7 +402,7 @@ class FS(object):
 
         Arguments:
             path (str): Path to a new file in the filesystem.
-            wipe (bool, optional): If `True`, truncate any existing
+            wipe (bool): If `True`, truncate any existing
                 file to 0 bytes (defaults to `False`).
 
         Returns:
@@ -475,10 +475,10 @@ class FS(object):
                 to filter file names, e.g. ``['*.py']``.
             dirs (list, optional): A list of UNIX shell-style patterns
                 to filter directory names.
-            exclude_dirs (list, optional): An optional list of patterns
-                used to exclude directories.
-            exclude_files (list, optional): An optional list of patterns
-                used to exclude files.
+            exclude_dirs (list, optional): A list of patterns used
+                to exclude directories.
+            exclude_files (list, optional): A list of patterns used
+                to exclude files.
             namespaces (list, optional): A list of namespaces to include
                 in the resource information, e.g. ``['basic', 'access']``.
             page (tuple, optional): May be a tuple of ``(<start>, <end>)``
@@ -631,8 +631,8 @@ class FS(object):
         """Get meta information regarding a filesystem.
 
         Arguments:
-            namespace (str, optional): The meta namespace
-                (defaults to ``"standard"``).
+            namespace (str): The meta namespace (defaults
+                to ``"standard"``).
 
         Returns:
             dict: the meta information.
@@ -779,11 +779,11 @@ class FS(object):
 
         Parameters:
             path (str): A path on the filesystem
-            purpose (str, optional): A short string that indicates which
-                URL to retrieve for the given path (if there is more
-                than one). The default is ``'download'``, which should
-                return a URL that serves the file. Other filesystems may
-                support other values for ``purpose``.
+            purpose (str): A short string that indicates which URL
+                to retrieve for the given path (if there is more than
+                one). The default is ``'download'``, which should return
+                a URL that serves the file. Other filesystems may support
+                other values for ``purpose``.
 
         Returns:
             str: a URL.
@@ -818,7 +818,7 @@ class FS(object):
 
         Parameters:
             path (str): A path on the filesystem.
-            purpose (str, optional): A purpose parameter, as given in
+            purpose (str): A purpose parameter, as given in
                 `~fs.base.FS.geturl`.
 
         Returns:
@@ -943,9 +943,8 @@ class FS(object):
         Parameters:
             src_path (str): Path of source directory on the filesystem.
             dst_path (str): Path to destination directory.
-            create (bool, optional): If `True`, then ``dst_path`` will
-                be created if it doesn't exist already (defaults
-                to `False`).
+            create (bool): If `True`, then ``dst_path`` will be created
+                if it doesn't exist already (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: if ``dst_path`` does not exist,
@@ -974,9 +973,9 @@ class FS(object):
             path (str): Path to directory from root.
             permissions (~fs.permissions.Permissions, optional): Initial
                 permissions, or `None` to use defaults.
-            recreate (bool, optional):  If `False` (the default),
-                attempting to create an existing directory will raise an
-                error. Set to `True` to ignore existing directories.
+            recreate (bool):  If `False` (the default), attempting to
+                create an existing directory will raise an error. Set
+                to `True` to ignore existing directories.
 
         Returns:
             ~fs.subfs.SubFS: A sub-directory filesystem.
@@ -1009,8 +1008,8 @@ class FS(object):
             src_path (str): A path on the filesystem to move.
             dst_path (str): A path on the filesystem where the source
                 file will be written to.
-            overwrite (bool, optional): If `True`, destination path
-                will be overwritten if it exists.
+            overwrite (bool): If `True`, destination path will be
+                overwritten if it exists.
 
         Raises:
             fs.errors.FileExpected: If ``src_path`` maps to a
@@ -1058,17 +1057,17 @@ class FS(object):
 
         Arguments:
             path (str): A path to a file on the filesystem.
-            mode (str, optional): Mode to open the file object with
+            mode (str): Mode to open the file object with
                 (defaults to *r*).
-            buffering (int, optional): Buffering policy (-1 to use
+            buffering (int): Buffering policy (-1 to use
                 default buffering, 0 to disable buffering, 1 to select
                 line buffering, of any positive integer to indicate
                 a buffer size).
-            encoding (str, optional): Encoding for text files
-                (defaults to ``utf-8``)
+            encoding (str): Encoding for text files (defaults to
+                ``utf-8``)
             errors (str, optional): What to do with unicode decode errors
                 (see `codecs` module for more information).
-            newline (str, optional): Newline parameter.
+            newline (str): Newline parameter.
             **options: keyword arguments for any additional information
                 required by the filesystem (if any).
 
@@ -1255,8 +1254,7 @@ class FS(object):
                 defaults to `None` for binary.
             errors (str, optional): How encoding errors should be treated
                 (same as `io.open`).
-            newline (str, optional): Newline parameter (same
-                as `io.open`).
+            newline (str): Newline parameter (same as `io.open`).
 
         This method will read the contents of a supplied file object,
         and write to a file on the filesystem. If the destination
@@ -1332,8 +1330,7 @@ class FS(object):
                 (defaults to ``'ut-8'``).
             errors (str, optional): How encoding errors should be treated
                 (same as `io.open`).
-            newline (str, optional): Newline parameter (same
-                as `io.open`).
+            newline (str): Newline parameter (same as `io.open`).
 
         Raises:
             TypeError: if ``contents`` is not a unicode string.

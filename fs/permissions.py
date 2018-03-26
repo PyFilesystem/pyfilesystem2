@@ -204,8 +204,8 @@ class Permissions(Container[Text], Iterable[Text]):
         """Create a permissions object from an initial value.
 
         Arguments:
-            init (int or list or None): May be None to use 0o777 permissions,
-                a mode integer, or a list of permission names.
+            init (int or list, optional): May be None to use `0o777`
+                permissions, a mode integer, or a list of permission names.
 
         Returns:
             int: mode integer that may be used for instance by `os.makedir`.

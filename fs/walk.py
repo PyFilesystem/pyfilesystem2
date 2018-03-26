@@ -37,20 +37,21 @@ class Walker(object):
     """A walker object recursively lists directories in a filesystem.
 
     Arguments:
-        ignore_errors (bool, optional): If `True`, any errors reading
-            a directory will be ignored, otherwise exceptions will be
-            raised.
+        ignore_errors (bool): If `True`, any errors reading a
+            directory will be ignored, otherwise exceptions will
+            be raised.
         on_error (callable, optional): If ``ignore_errors`` is `False`,
             then this callable will be invoked for a path and the exception
             object. It should return `True` to ignore the error, or `False`
             to re-raise it.
-        search (str, optional): If ``'breadth'`` then the directory will be
+        search (str): If ``'breadth'`` then the directory will be
             walked *top down*. Set to ``'depth'`` to walk *bottom up*.
-        filter (list, optional): If supplied, this parameter should be a
-            list of filename patterns, e.g. ``['*.py']``. Files will only
-            be returned if the final component matches one of the patterns.
-        exclude_dirs (list, optional): A list of patterns that will be used
-            to filter out directories from the walk. e.g.
+        filter (list, optional): If supplied, this parameter should be
+            a list of filename patterns, e.g. ``['*.py']``. Files will
+            only be returned if the final component matches one of the
+            patterns.
+        exclude_dirs (list, optional): A list of patterns that will be
+            used to filter out directories from the walk. e.g.
             ``['*.svn', '*.git']``.
         max_depth (int, optional): Maximum directory depth to walk.
 
@@ -248,7 +249,7 @@ class Walker(object):
 
         Arguments:
             fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
+            path (str): A path to a directory on the filesystem.
             namespaces (list, optional): A list of additional namespaces
                 to add to the `Info` objects.
 
@@ -290,7 +291,7 @@ class Walker(object):
 
         Arguments:
             fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
+            path (str): A path to a directory on the filesystem.
 
         Yields:
             str: absolute path to files on the filesystem found
@@ -306,7 +307,7 @@ class Walker(object):
 
         Arguments:
             fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
+            path (str): A path to a directory on the filesystem.
 
         Yields:
             str: absolute path to directories on the filesystem found
@@ -322,7 +323,7 @@ class Walker(object):
 
         Arguments:
             fs (FS): A filesystem instance.
-            path (str, optional): A path to a directory on the filesystem.
+            path (str): A path to a directory on the filesystem.
             namespaces (list, optional): A list of additional namespaces
                 to add to the `Info` objects.
 
@@ -397,7 +398,7 @@ class BoundWalker(object):
 
     Arguments:
         fs (FS): A filesystem instance.
-        walker_class (type, optional): A `~fs.walk.WalkerBase`
+        walker_class (type): A `~fs.walk.WalkerBase`
             sub-class. The default uses `~fs.walk.Walker`.
 
     You will typically not need to create instances of this class
@@ -435,7 +436,7 @@ class BoundWalker(object):
         """Walk the directory structure of a filesystem.
 
         Arguments:
-            path (str, optional):
+            path (str):
             namespaces (list, optional): A list of namespaces to include
                 in the resource information, e.g. ``['basic', 'access']``
                 (defaults to ``['basic']``).
@@ -552,7 +553,7 @@ class BoundWalker(object):
         """Walk a filesystem, yielding path and `Info` of resources.
 
         Arguments:
-            path (str, optional):
+            path (str): A path to a directory.
             namespaces (list, optional): A list of namespaces to include
                 in the resource information, e.g. ``['basic', 'access']``
                 (defaults to ``['basic']``).
