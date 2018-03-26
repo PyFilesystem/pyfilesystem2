@@ -16,6 +16,7 @@ import os
 import platform
 import stat
 import sys
+import typing
 
 import six
 
@@ -39,9 +40,13 @@ from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
 from .errors import NoURL
 
-
-if False:  # typing imports
-    from typing import *
+if typing.TYPE_CHECKING:
+    from typing import (
+        Any, BinaryIO, Collection, Dict, Iterator, IO,
+        List, Optional, SupportsInt, Text, Tuple)
+    from .info import RawInfo
+    from .subfs import SubFS
+    F = typing.TypeVar('F', bound='OSFS')
 
 
 log = logging.getLogger('fs.osfs')
@@ -76,10 +81,11 @@ class OSFS(FS):
     """
 
     def __init__(self,
-                 root_path,
-                 create=False,
-                 create_mode=0o777):
-        # type: (Text, bool, int) -> None
+                 root_path,             # type: Text
+                 create=False,          # type: bool
+                 create_mode=0o777      # type: SupportsInt
+                 ):
+        # type: (...) -> None
         """Create an OSFS instance.
         """
         super(OSFS, self).__init__()
@@ -91,7 +97,7 @@ class OSFS(FS):
         if create:
             try:
                 if not os.path.isdir(_root_path):
-                    os.makedirs(_root_path, mode=create_mode)
+                    os.makedirs(_root_path, mode=int(create_mode))
             except OSError as error:
                 raise errors.CreateFailed(
                     'unable to create {} ({})'.format(root_path, error),
@@ -227,14 +233,12 @@ class OSFS(FS):
             return target
 
     def _make_link_info(self, sys_path):
-        # type: (Text) -> Dict[Text, Optional[Text]]
+        # type: (Text) -> Dict[Text, object]
         _target = self._gettarget(sys_path)
-        link = {
-            'target': _target,
-        }
-        return link
+        return {'target': _target}  # type: ignore
 
     def getinfo(self, path, namespaces=None):
+        # type: (Text, Optional[Collection[Text]]) -> Info
         self.check()
         namespaces = namespaces or ()
         _path = self.validatepath(path)
@@ -271,6 +275,7 @@ class OSFS(FS):
         return Info(info)
 
     def listdir(self, path):
+        # type: (Text) -> List[Text]
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
@@ -278,7 +283,12 @@ class OSFS(FS):
             names = os.listdir(sys_path)
         return names
 
-    def makedir(self, path, permissions=None, recreate=False):
+    def makedir(self,               # type: F
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[F]
         self.check()
         mode = Permissions.get_mode(permissions)
         _path = self.validatepath(path)
@@ -296,6 +306,7 @@ class OSFS(FS):
             return self.opendir(_path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
+        # type: (Text, Text, int, **Any) -> BinaryIO
         _mode = Mode(mode)
         _mode.validate_bin()
         self.check()
@@ -310,9 +321,10 @@ class OSFS(FS):
                 buffering=buffering,
                 **options
             )
-        return binary_file
+        return binary_file  # type: ignore
 
     def remove(self, path):
+        # type: (Text) -> None
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
@@ -331,6 +343,7 @@ class OSFS(FS):
                 raise
 
     def removedir(self, path):
+        # type: (Text) -> None
         self.check()
         _path = self.validatepath(path)
         if _path == '/':
@@ -344,15 +357,18 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def getsyspath(self, path):
+        # type: (Text) -> Text
         sys_path = self._to_sys_path(path)
         return sys_path
 
     def geturl(self, path, purpose='download'):
+        # type: (Text, Text) -> Text
         if purpose != 'download':
             raise NoURL(path, purpose)
         return "file://" + self.getsyspath(path)
 
     def gettype(self, path):
+        # type: (Text) -> ResourceType
         self.check()
         sys_path = self._to_sys_path(path)
         with convert_os_errors('gettype', path):
@@ -361,6 +377,7 @@ class OSFS(FS):
         return resource_type
 
     def islink(self, path):
+        # type: (Text) -> bool
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
@@ -370,14 +387,16 @@ class OSFS(FS):
             return os.path.islink(sys_path)
 
     def open(self,
-             path,
-             mode="r",
-             buffering=-1,
-             encoding=None,
-             errors=None,
-             newline='',
-             line_buffering=False,
-             **options):
+             path,                  # type: Text
+             mode="r",              # type: Text
+             buffering=-1,          # type: int
+             encoding=None,         # type: Optional[Text]
+             errors=None,           # type: Optional[Text]
+             newline='',            # type: Text
+             line_buffering=False,  # type: bool
+             **options              # type: Any
+             ):
+        # type: (...) -> IO
         _mode = Mode(mode)
         validate_open_mode(mode)
         self.check()
@@ -398,6 +417,7 @@ class OSFS(FS):
             )
 
     def setinfo(self, path, info):
+        # type: (Text, RawInfo) -> None
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
@@ -406,10 +426,10 @@ class OSFS(FS):
         if 'details' in info:
             details = info['details']
             if 'accessed' in details or 'modified' in details:
-                accessed = details.get("accessed")
-                modified = details.get("modified", accessed)
-                accessed = int(modified if accessed is None else accessed)
-                modified = int(modified)
+                _accessed = typing.cast(int, details.get("accessed"))
+                _modified = typing.cast(int, details.get("modified", _accessed))
+                accessed = int(_modified if _accessed is None else _accessed)
+                modified = int(_modified)
                 if accessed is not None or modified is not None:
                     with convert_os_errors('setinfo', path):
                         os.utime(sys_path, (accessed, modified))
