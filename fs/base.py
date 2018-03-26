@@ -52,7 +52,7 @@ __all__ = ["FS"]
 
 
 # typing.TypeVar: the type variable of a filesystem subclass
-_FS = typing.TypeVar('_FS', bound=FS)
+_FS = typing.TypeVar('_FS', bound='FS')
 
 
 @six.add_metaclass(abc.ABCMeta)
