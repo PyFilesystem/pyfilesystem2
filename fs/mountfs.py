@@ -22,10 +22,11 @@ if typing.TYPE_CHECKING:
     from typing import (
         Any, BinaryIO, Collection, Iterator, IO, List,
         MutableSequence, Optional, Text, Tuple, Union)
+    from .enums import ResourceType
     from .info import Info, RawInfo
     from .permissions import Permissions
-    from .enums import ResourceType
-
+    from .subfs import SubFS
+    M = typing.TypeVar('M', bound='MountFS')
 
 class MountError(Exception):
     """Thrown when mounts conflict.
@@ -148,8 +149,12 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.listdir(_path)
 
+    # NOTE(@althonos): here, the returned FS does not always wrap
+    #     filesystems of the same type, so we cannot assume anything
+    #     about the type of the filesystem wrapped in the SubFS.
+    @typing.no_type_check
     def makedir(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+        # type: (M, Text, Optional[Permissions], bool) -> SubFS[FS]
         self.check()
         fs, _path = self._delegate(path)
         return fs.makedir(
