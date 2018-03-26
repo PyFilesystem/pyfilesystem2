@@ -309,13 +309,14 @@ class FTPFS(FS):
 
     Arguments:
         host (str): A FTP host, e.g. ``'ftp.mirror.nl'``.
-        user (str, optional): A username (default is ``'anonymous'``).
-        passwd (str, optional): Password for the server, or `None` for anon.
-        acct (str, optional): FTP account.
-        timeout (int, optional): Timeout for contacting server (in seconds,
+        user (str): A username (default is ``'anonymous'``).
+        passwd (str): Password for the server, or `None` for anon.
+        acct (str): FTP account.
+        timeout (int): Timeout for contacting server (in seconds,
             defaults to 10).
-        port (int, optional): FTP port number (default 21).
-        proxy (str): An FTP proxy, or ``None`` (default) for no proxy.
+        port (int): FTP port number (default 21).
+        proxy (str, optional): An FTP proxy, or ``None`` (default)
+            for no proxy.
 
     """
 
@@ -488,7 +489,7 @@ class FTPFS(FS):
         return 'MLST' in self.features
 
     def create(self, path, wipe=False):
-        # type: (Text, bool) -> None
+        # type: (Text, bool) -> bool
         _path = self.validatepath(path)
         with ftp_errors(self, path):
             if wipe or not self.isfile(path):
@@ -497,6 +498,8 @@ class FTPFS(FS):
                     str("STOR ") + _encode(_path, self.ftp.encoding),
                     empty_file
                 )
+                return True
+        return False
 
     @classmethod
     def _parse_ftp_time(cls, time_text):
