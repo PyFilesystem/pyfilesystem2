@@ -45,7 +45,7 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
     Arguments:
         src_file (io.IOBase): File open for reading.
         dst_file (io.IOBase): File open for writing.
-        chunk_size (int, optional): Number of bytes to copy at
+        chunk_size (int): Number of bytes to copy at
             a time (or `None` to use sensible default).
 
     """

@@ -12,9 +12,14 @@ from __future__ import unicode_literals
 from __future__ import print_function
 
 import functools
+import typing
 
 import six
 from six import text_type
+
+if typing.TYPE_CHECKING:
+    from typing import Callable, Optional, Text
+
 
 __all__ = [
     'CreateFailed',
@@ -53,6 +58,7 @@ class MissingInfoNamespace(AttributeError):
     """
 
     def __init__(self, namespace):
+        # type: (Text) -> None
         msg = "namespace '{}' is required for this attribute"
         super(MissingInfoNamespace, self).__init__(
             msg.format(namespace)
@@ -67,16 +73,19 @@ class FSError(Exception):
     default_message = "Unspecified error"
 
     def __init__(self, msg=None):
+        # type: (Optional[Text]) -> None
         self._msg = msg or self.default_message
         super(FSError, self).__init__()
 
     def __str__(self):
+        # type: () -> Text
         """Return the error message.
         """
         msg = self._msg.format(**self.__dict__)
         return msg
 
     def __repr__(self):
+        # type: () -> Text
         msg = self._msg.format(**self.__dict__)
         return "{}({!r})".format(self.__class__.__name__, msg)
 
@@ -94,8 +103,15 @@ class CreateFailed(FSError):
 
     default_message = "unable to create filesystem, {details}"
 
+    def __init__(self, msg=None, exc=None):
+        # type: (Optional[Text], Optional[Exception]) -> None
+        self._msg = msg or self.default_message
+        self.details = '' if exc is None else text_type(exc)
+        self.exc = exc
+
     @classmethod
     def catch_all(cls, func):
+        # type: (Callable) -> Callable
         @functools.wraps(func)
         def new_func(*args, **kwargs):
             try:
@@ -106,12 +122,6 @@ class CreateFailed(FSError):
                 raise cls(exc=e)
         return new_func
 
-    def __init__(self, msg=None, exc=None):
-        self._msg = msg or self.default_message
-        self.details = '' if exc is None else text_type(exc)
-        self.exc = exc
-
-
 class PathError(FSError):
     """Base exception for errors to do with a path string.
     """
@@ -119,6 +129,7 @@ class PathError(FSError):
     default_message = "path '{path}' is invalid"
 
     def __init__(self, path, msg=None):
+        # type: (Text, Optional[Text]) -> None
         self.path = path
         super(PathError, self).__init__(msg=msg)
 
@@ -137,6 +148,7 @@ class NoURL(PathError):
     default_message = "path '{path}' has no '{purpose}' URL"
 
     def __init__(self, path, purpose, msg=None):
+        # type: (Text, Text, Optional[Text]) -> None
         self.purpose = purpose
         super(NoURL, self).__init__(path, msg=msg)
 
@@ -161,7 +173,12 @@ class OperationFailed(FSError):
 
     default_message = "operation failed, {details}"
 
-    def __init__(self, path=None, exc=None, msg=None):
+    def __init__(self,
+                 path=None,     # type: Optional[Text]
+                 exc=None,      # type: Optional[Text]
+                 msg=None       # type: Optional[Text]
+                 ):
+        # type: (...) -> None
         self.path = path
         self.exc = exc
         self.details = '' if exc is None else text_type(exc)
@@ -218,6 +235,7 @@ class ResourceError(FSError):
     default_message = "failed on path {path}"
 
     def __init__(self, path, exc=None, msg=None):
+        # type: (Text, Optional[Exception], Optional[Text]) -> None
         self.path = path
         self.exc = exc
         super(ResourceError, self).__init__(msg=msg)
@@ -307,6 +325,7 @@ class IllegalBackReference(ValueError):
     """
 
     def __init__(self, path):
+        # type: (Text) -> None
         _msg = \
             "path '{path}' contains back-references outside of filesystem"
         _msg = _msg.format(path=path)

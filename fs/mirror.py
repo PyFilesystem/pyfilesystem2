@@ -65,7 +65,7 @@ def mirror(src_fs,              # type: Union[FS, Text]
         src_fs (FS or str): Source filesystem (URL or instance).
         dst_fs (FS or str): Destination filesystem (URL or instance).
         walker (~fs.walk.Walker, optional): An optional walker instance.
-        copy_if_newer (bool, optional): Only copy newer files (the default).
+        copy_if_newer (bool): Only copy newer files (the default).
 
     """
     with manage_fs(src_fs, writeable=False) as _src_fs:
