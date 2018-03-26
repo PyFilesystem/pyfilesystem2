@@ -17,7 +17,7 @@ if typing.TYPE_CHECKING:  # typing imports
 
 
 _MAXCACHE = 1000
-_PATTERN_CACHE = LRUCache(_MAXCACHE)  # type: MutableMapping[Tuple[Text, bool], Pattern]
+_PATTERN_CACHE = LRUCache(_MAXCACHE)  # type: LRUCache[Tuple[Text, bool], Pattern]
 
 
 def match(pattern, name):

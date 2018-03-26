@@ -8,7 +8,11 @@ import typing
 from collections import OrderedDict
 
 
-class LRUCache(OrderedDict):
+_K = typing.TypeVar('_K')
+_V = typing.TypeVar('_V')
+
+
+class LRUCache(OrderedDict[_K, _V], typing.Generic[_K, _V]):
     """A dictionary-like container that stores a given maximum items.
 
     If an additional item is added when the LRUCache is full, the least
@@ -22,7 +26,7 @@ class LRUCache(OrderedDict):
         super(LRUCache, self).__init__()
 
     def __setitem__(self, key, value):
-        # type: (object, object) -> None
+        # type: (_K, _V) -> None
         """Store a new views, potentially discarding an old value.
         """
         if key not in self:
@@ -31,7 +35,7 @@ class LRUCache(OrderedDict):
         OrderedDict.__setitem__(self, key, value)
 
     def __getitem__(self, key):
-        # type: (object) -> object
+        # type: (_K) -> _V
         """Get the item, but also makes it most recent.
         """
         _super = typing.cast(OrderedDict, super(LRUCache, self))
