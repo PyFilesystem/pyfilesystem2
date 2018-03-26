@@ -232,8 +232,12 @@ class WrapReadOnly(WrapFS[_FS], typing.Generic[_FS]):
         self.check()
         raise ResourceReadOnly(path)
 
-    def makedirs(self, path, recreate=False, mode=0o777):
-        # type: (W, Text, bool, int) -> SubFS[W]
+    def makedirs(self,                  # type: W
+                 path,                  # type: Text
+                 permissions=None,      # type: Optional[Permissions]
+                 recreate=False         # type: bool
+                 ):
+        # type: (...) -> SubFS[W]
         self.check()
         raise ResourceReadOnly(path)
 
