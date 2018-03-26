@@ -56,7 +56,7 @@ class Info(object):
 
     def __eq__(self, other):
         # type: (object) -> bool
-        return self.raw == other.raw
+        return self.raw == getattr(other, 'raw', None)
 
     @typing.overload
     def _make_datetime(self, t):
