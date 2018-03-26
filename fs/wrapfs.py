@@ -20,16 +20,16 @@ if typing.TYPE_CHECKING:
     from datetime import datetime
     from threading import RLock
     from typing import (
-        Any, BinaryIO, Callable, Collection, Dict,
+        Any, AnyStr, BinaryIO, Callable, Collection, Dict,
         Iterator, Iterable, IO, List, Mapping, Optional,
-        Text, TextIO, Tuple)
+        Text, TextIO, Tuple, Union)
     from .enums import ResourceType
     from .info import RawInfo
     from .permissions import Permissions
     from .subfs import SubFS
     from .walk import BoundWalker
 
-    W = typing.TypeVar('W', bound='WrapFS')
+    W = typing.TypeVar('W', bound='WrapFS[FS]')
 
 
 @six.python_2_unicode_compatible
@@ -50,19 +50,21 @@ class WrapFS(FS, typing.Generic[_FS]):
         super(WrapFS, self).__init__()
 
     def __repr__(self):
+        # type: () -> Text
         return "{}({!r})".format(
             self.__class__.__name__,
             self._wrap_fs
         )
 
     def __str__(self):
+        # type: () -> Text
         wraps = []
-        _fs = self
+        _fs = self   # type: Union[FS, WrapFS[FS]]
         while hasattr(_fs, '_wrap_fs'):
             wrap_name = getattr(_fs, 'wrap_name', None)
             if wrap_name is not None:
                 wraps.append(wrap_name)
-            _fs = _fs._wrap_fs
+            _fs = _fs._wrap_fs  # type: ignore
         if wraps:
             _str = "{}({})".format(_fs, ', '.join(wraps[::-1]))
         else:
@@ -106,6 +108,7 @@ class WrapFS(FS, typing.Generic[_FS]):
                    errors=None,             # type: Optional[Text]
                    newline=''               # type: Text
                    ):
+        # type: (...) -> None
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
@@ -145,7 +148,7 @@ class WrapFS(FS, typing.Generic[_FS]):
                 permissions=None,   # type: Optional[Permissions]
                 recreate=False      # type: bool
                 ):
-        # type: (...) -> SubFS[W]
+        # type: (...) -> SubFS[FS]
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
@@ -410,8 +413,9 @@ class WrapFS(FS, typing.Generic[_FS]):
              errors=None,               # type: Optional[Text]
              newline='',                # type: Text
              line_buffering=False,      # type: bool
-             **options):
-        # type: (...) -> IO
+             **options                  # type: Any
+             ):
+        # type: (...) -> IO[AnyStr]
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
@@ -457,7 +461,7 @@ class WrapFS(FS, typing.Generic[_FS]):
 
     def setfile(self,
                 path,           # type: Text
-                file,           # type: IO
+                file,           # type: IO[AnyStr]
                 encoding=None,  # type: Optional[Text]
                 errors=None,    # type: Optional[Text]
                 newline=''      # type: Text

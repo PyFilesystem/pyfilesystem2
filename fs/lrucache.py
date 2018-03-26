@@ -38,7 +38,7 @@ class LRUCache(OrderedDict[_K, _V], typing.Generic[_K, _V]):
         # type: (_K) -> _V
         """Get the item, but also makes it most recent.
         """
-        _super = typing.cast(OrderedDict, super(LRUCache, self))
+        _super = typing.cast(OrderedDict[_K, _V], super(LRUCache, self))
         value = _super.__getitem__(key)
         _super.__delitem__(key)
         _super.__setitem__(key, value)

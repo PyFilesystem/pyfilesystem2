@@ -235,7 +235,7 @@ class OSFS(FS):
     def _make_link_info(self, sys_path):
         # type: (Text) -> Dict[Text, object]
         _target = self._gettarget(sys_path)
-        return {'target': _target}  # type: ignore
+        return {'target': _target}
 
     def getinfo(self, path, namespaces=None):
         # type: (Text, Optional[Collection[Text]]) -> Info
@@ -511,7 +511,7 @@ class OSFS(FS):
                     if 'link' in namespaces:
                         info['link'] = self._make_link_info(
                             os.path.join(sys_path, entry_name)
-                        )   # type: ignore
+                        )
                     if 'access' in namespaces:
                         info['access'] =\
                             self._make_access_from_stat(stat_result)

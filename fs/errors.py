@@ -175,7 +175,7 @@ class OperationFailed(FSError):
 
     def __init__(self,
                  path=None,     # type: Optional[Text]
-                 exc=None,      # type: Optional[Text]
+                 exc=None,      # type: Optional[Exception]
                  msg=None       # type: Optional[Text]
                  ):
         # type: (...) -> None

@@ -104,13 +104,17 @@ def _parse_ftp_error(error):
 
 if PY2:
     def _encode(st, encoding):
+        # type: (Union[Text, bytes], Text) -> str
         return st.encode(encoding) if isinstance(st, text_type) else st
     def _decode(st, encoding):
+        # type: (Union[Text, bytes], Text) -> Text
         return st.decode(encoding, 'replace') if isinstance(st, bytes) else st
 else:
     def _encode(st, _):
+        # type: (str, str) -> str
         return st
     def _decode(st, _):
+        # type: (str, str) -> str
         return st
 
 
@@ -419,7 +423,7 @@ class FTPFS(FS):
                     else 'latin-1'
                 )
                 if not PY2:
-                    _ftp.file = _ftp.sock.makefile(    # type: ignore
+                    _ftp.file = _ftp.sock.makefile(  # type: ignore
                         'r',
                         encoding=self.encoding
                     )

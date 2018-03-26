@@ -19,7 +19,7 @@ from .iotools import RawWrapper
 from .permissions import Permissions
 from .memoryfs import MemoryFS
 from .opener import open_fs
-from .path import dirname, normpath, relpath
+from .path import dirname, forcedir, normpath, relpath
 from .time import datetime_to_epoch
 from .wrapfs import WrapFS
 
@@ -300,15 +300,12 @@ class ReadZipFS(FS):
         # type: (Text) -> str
         """Convert a path to a zip file name.
         """
+        path = relpath(normpath(path))
         if self._directory.isdir(path):
-            _path = relpath(normpath(path)) + '/'
-        else:
-            _path = relpath(normpath(path))
-        return (                                # type: ignore
-            _path.encode(self.encoding)
-            if six.PY2 else
-            _path
-        )
+            path = forcedir(path)
+        if six.PY2:
+            return path.encode(self.encoding)
+        return path
 
     @property
     def _directory(self):

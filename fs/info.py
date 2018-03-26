@@ -180,21 +180,21 @@ class Info(object):
         # type: () -> Text
         """`str`: the resource name.
         """
-        return self.get('basic', 'name')        # type: ignore
+        return self.get('basic', 'name')
 
     @property
     def is_dir(self):
         # type: () -> bool
         """`bool`: `True` if the resource references a directory.
         """
-        return self.get('basic', 'is_dir')     # type: ignore
+        return self.get('basic', 'is_dir') 
 
     @property
     def is_file(self):
         # type: () -> bool
         """`bool`: `True` if the resource references a file.
         """
-        return not self.get('basic', 'is_dir')    # type: ignore
+        return not self.get('basic', 'is_dir')
 
     @property
     def is_link(self):

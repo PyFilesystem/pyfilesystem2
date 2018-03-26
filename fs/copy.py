@@ -265,7 +265,7 @@ def copy_dir(src_fs,        # type: Union[FS, Text]
         with manage_fs(dst_fs, create=True) as _dst_fs:
             with _src_fs.lock(), _dst_fs.lock():
                 _dst_fs.makedir(_dst_path, recreate=True)
-                for dir_path, dirs, files in walker.walk(src_fs, _src_path):
+                for dir_path, dirs, files in walker.walk(_src_fs, _src_path):
                     copy_path = combine(
                         _dst_path,
                         frombase(_src_path, dir_path)
@@ -326,7 +326,7 @@ def copy_dir_if_newer(src_fs,       # type: Union[FS, Text]
                 namespace = ('details', 'modified')
                 dst_state = {
                     path: info
-                    for path, info in walker.info(dst_fs, _dst_path, namespace)
+                    for path, info in walker.info(_dst_fs, _dst_path, namespace)
                     if info.is_file
                 }
                 src_state = [
@@ -344,11 +344,12 @@ def copy_dir_if_newer(src_fs,       # type: Union[FS, Text]
                         # dst file is present, try to figure out if copy
                         # is necessary
                         src_modified = copy_info.modified
+                        dst_modified = dst_state[dir_path].modified
                         do_copy = (
                             dir_path not in dst_state or
                             src_modified is None or
-                            dst_state[dir_path].modified is None or
-                            src_modified > dst_state[dir_path].modified
+                            dst_modified is None or
+                            src_modified > dst_modified
                         )
                         if do_copy:
                             copy_file_internal(_src_fs, dir_path, _dst_fs, copy_path)
