@@ -36,7 +36,6 @@ from .path import normpath
 from .time import datetime_to_epoch
 from .walk import Walker
 
-
 if typing.TYPE_CHECKING:
     from datetime import datetime
     from threading import RLock
@@ -45,8 +44,15 @@ if typing.TYPE_CHECKING:
         Iterator, List, Mapping, Optional, Text, Tuple, Union)
     from .enums import ResourceType
     from .info import Info, RawInfo
+    from .subfs import SubFS
     from .permissions import Permissions
-    OpendirFactory = Callable[[FS, Text], FS]
+
+
+__all__ = ["FS"]
+
+
+# typing.TypeVar: the type variable of a filesystem subclass
+_FS = typing.TypeVar('_FS', bound=FS)
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -133,8 +139,12 @@ class FS(object):
         """
 
     @abc.abstractmethod
-    def makedir(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+    def makedir(self,               # type: _FS
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[_FS]
         """Make a directory.
 
         Arguments:
@@ -952,12 +962,12 @@ class FS(object):
                 dst_path
             )
 
-    def makedirs(self,
+    def makedirs(self,              # type: _FS
                  path,              # type: Text
                  permissions=None,  # type: Optional[Permissions]
                  recreate=False     # type: bool
                  ):
-        # type: (...) -> FS
+        # type: (...) -> SubFS[_FS]
         """Make a directory, and any missing intermediate directories.
 
         Arguments:
@@ -1087,11 +1097,11 @@ class FS(object):
         )
         return io_stream
 
-    def opendir(self,
-                path,           # type: Text
-                factory=None    # type: Optional[OpendirFactory]
+    def opendir(self,         # type: _FS
+                path,         # type: Text
+                factory=None  # type: Optional[Callable[[_FS, Text], SubFS[_FS]]]
                 ):
-        # type: (...) -> FS
+        # type: (...) -> SubFS[_FS]
         # FIXME(@althonos): use generics here if possible
         """Get a filesystem object for a sub-directory.
 
@@ -1111,13 +1121,13 @@ class FS(object):
 
         """
         from .subfs import SubFS
-        factory = factory or SubFS
+        _factory = factory or SubFS
 
         if not self.getbasic(path).is_dir:
             raise errors.DirectoryExpected(
                 path=path
             )
-        return factory(self, path)
+        return _factory(self, path)
 
     def removetree(self, dir_path):
         # type: (Text) -> None
@@ -1397,13 +1407,15 @@ class FS(object):
 
         meta = self.getmeta()
 
-        invalid_chars = meta.get('invalid_path_chars')
+        invalid_chars = typing.cast(
+            six.text_type, meta.get('invalid_path_chars'))
         if invalid_chars:
             if set(path).intersection(invalid_chars):
                 raise errors.InvalidCharsInPath(path)
 
-        max_sys_path_length = meta.get('max_sys_path_length')
-        if max_sys_path_length is not None:
+        max_sys_path_length = typing.cast(
+            int, meta.get('max_sys_path_length', -1))
+        if max_sys_path_length != -1:
             try:
                 sys_path = self.getsyspath(path)
             except errors.NoSysPath:  # pragma: no cover
@@ -1499,7 +1511,8 @@ class FS(object):
             return True
         if isinstance(patterns, six.text_type):
             raise TypeError('patterns must be a list or sequence')
-        case_sensitive = self.getmeta().get('case_sensitive', True)
+        case_sensitive = typing.cast(
+            bool, self.getmeta().get('case_sensitive', True))
         matcher = wildcard.get_matcher(patterns, case_sensitive)
         return matcher(name)
 

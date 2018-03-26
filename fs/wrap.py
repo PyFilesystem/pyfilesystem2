@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import typing
 
+from .base import _FS
 from .wrapfs import WrapFS
 from .path import abspath, normpath, split
 from .errors import ResourceReadOnly, ResourceNotFound
@@ -26,14 +27,18 @@ from .mode import check_writable
 
 if typing.TYPE_CHECKING:
     from datetime import datetime
-    from typing import Dict, Text, Tuple
+    from typing import (
+        Any, BinaryIO, Collection, Dict, Iterator, IO,
+        Optional, Text, Tuple)
     from .base import FS
-    from .info import Info
+    from .info import Info, RawInfo
+    from .subfs import SubFS
     from .permissions import Permissions
+    W = typing.TypeVar("W", bound='WrapFS')
 
 
 def read_only(fs):
-    # type: (FS) -> WrapReadOnly
+    # type: (_FS) -> WrapReadOnly[_FS]
     """Make a read-only filesystem.
 
     Arguments:
@@ -47,7 +52,7 @@ def read_only(fs):
 
 
 def cache_directory(fs):
-    # type: (FS) -> WrapCachedDir
+    # type: (_FS) -> WrapCachedDir[_FS]
     """Make a filesystem that caches directory information.
 
     Arguments:
@@ -61,7 +66,7 @@ def cache_directory(fs):
     return WrapCachedDir(fs)
 
 
-class WrapCachedDir(WrapFS):
+class WrapCachedDir(WrapFS[_FS], typing.Generic[_FS]):
     """Caches filesystem directory information.
 
     This filesystem caches directory information retrieved from a
@@ -79,7 +84,7 @@ class WrapCachedDir(WrapFS):
     wrap_name = 'cached-dir'
 
     def __init__(self, wrap_fs):
-        # type: (FS) -> None
+        # type: (_FS) -> None
         super(WrapCachedDir, self).__init__(wrap_fs)
         self._cache = {}  # type: Dict[Tuple[Text, frozenset], Dict[Text, Info]]
 
@@ -136,7 +141,7 @@ class WrapCachedDir(WrapFS):
         return not self.getinfo(path).is_dir
 
 
-class WrapReadOnly(WrapFS):
+class WrapReadOnly(WrapFS[_FS], typing.Generic[_FS]):
     """Makes a Filesystem read-only.
 
     Any call that would would write data or modify the filesystem in any way
@@ -161,8 +166,12 @@ class WrapReadOnly(WrapFS):
         self.check()
         raise ResourceReadOnly(path)
 
-    def makedir(self, path, permissions=None, recreate=False):
-        # type: (Text, Optional[Permissions], bool) -> FS
+    def makedir(self,               # type: W
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[W]
         self.check()
         raise ResourceReadOnly(path)
 
@@ -194,7 +203,7 @@ class WrapReadOnly(WrapFS):
         raise ResourceReadOnly(path)
 
     def setinfo(self, path, info):
-        # type: (Text, dict) -> None
+        # type: (Text, RawInfo) -> None
         self.check()
         raise ResourceReadOnly(path)
 
@@ -224,7 +233,7 @@ class WrapReadOnly(WrapFS):
         raise ResourceReadOnly(path)
 
     def makedirs(self, path, recreate=False, mode=0o777):
-        # type: (Text, bool, int) -> None
+        # type: (W, Text, bool, int) -> SubFS[W]
         self.check()
         raise ResourceReadOnly(path)
 
