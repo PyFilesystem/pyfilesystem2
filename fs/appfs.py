@@ -45,7 +45,7 @@ class _AppFS(OSFS):
                  ):
         # type: (...) -> None
         self.app_dirs = AppDirs(appname, author, version, roaming)
-        self.create = create
+        self._create = create
         super(_AppFS, self).__init__(
             getattr(self.app_dirs, self.app_dir),
             create=create
@@ -59,7 +59,7 @@ class _AppFS(OSFS):
             author=(self.app_dirs.appauthor, None),
             version=(self.app_dirs.version, None),
             roaming=(self.app_dirs.roaming, False),
-            create=(self.create, True)
+            create=(self._create, True)
         )
 
     def __str__(self):
