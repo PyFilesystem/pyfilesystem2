@@ -2,15 +2,15 @@
 """`Opener` abstract base class.
 """
 
-import six
 import abc
+import typing
 
+import six
 
-if False:  # typing imports
+if typing.TYPE_CHECKING:
     from typing import List, Text, Union
     from ..base import FS
     from .parse import ParseResult
-
 
 @six.add_metaclass(abc.ABCMeta)
 class Opener(object):
@@ -24,6 +24,7 @@ class Opener(object):
     protocols = []  # type: List[Text]
 
     def __repr__(self):
+        # type: () -> Text
         return "<opener {!r}>".format(self.protocols)
 
     @abc.abstractmethod

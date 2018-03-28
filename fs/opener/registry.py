@@ -17,7 +17,7 @@ from .errors import UnsupportedProtocol, EntryPointError
 from .parse import parse_fs_url
 
 if typing.TYPE_CHECKING:
-    from typing import Text, Tuple, Union
+    from typing import Iterator, List, Text, Tuple, Union
     from ..base import FS
 
 
@@ -36,13 +36,15 @@ class Registry(object):
 
         """
         self.default_opener = default_opener
-        self._protocols = None
+        self._protocols = None  # type: Union[None, List[Text]]
 
     def __repr__(self):
+        # type: () -> Text
         return "<fs-registry {!r}>".format(self.protocols)
 
     @property
     def protocols(self):
+        # type: () -> List[Text]
         """`list`: the list of supported protocols.
         """
         if self._protocols is None:
@@ -160,6 +162,7 @@ class Registry(object):
                 cwd=".",                    # type: Text
                 default_protocol='osfs'     # type: Text
                 ):
+        # type: (...) -> FS
         """Open a filesystem from a FS URL (ignoring the path component).
 
         Arguments:
@@ -197,6 +200,7 @@ class Registry(object):
                   writeable=False,  # type: bool
                   cwd='.'           # type: Text
                   ):
+        # type: (...) -> Iterator[FS]
         """Get a context manager to open and close a filesystem.
 
         Arguments:
