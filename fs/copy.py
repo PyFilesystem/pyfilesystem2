@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
     from typing import Callable, Optional, Text, Union
     from .base import FS
     from .walk import Walker
-    _OnCopy = Callable[[FS, Text, FS, Text], None]
+    _OnCopy = Callable[[FS, Text, FS, Text], object]
 
 
 def copy_fs(src_fs,       # type: Union[FS, Text]
