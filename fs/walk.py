@@ -444,7 +444,7 @@ class Walker(object):
                     yield dir_path, info
 
 
-class BoundWalker(object, typing.Generic[_F]):
+class BoundWalker(typing.Generic[_F]):
     """A class that binds a `Walker` instance to a `FS` instance.
 
     Arguments:

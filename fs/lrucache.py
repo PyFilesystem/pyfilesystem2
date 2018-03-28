@@ -12,7 +12,7 @@ _K = typing.TypeVar('_K')
 _V = typing.TypeVar('_V')
 
 
-class LRUCache(OrderedDict[_K, _V], typing.Generic[_K, _V]):
+class LRUCache(OrderedDict, typing.Generic[_K, _V]):
     """A dictionary-like container that stores a given maximum items.
 
     If an additional item is added when the LRUCache is full, the least
@@ -38,7 +38,7 @@ class LRUCache(OrderedDict[_K, _V], typing.Generic[_K, _V]):
         # type: (_K) -> _V
         """Get the item, but also makes it most recent.
         """
-        _super = typing.cast(OrderedDict[_K, _V], super(LRUCache, self))
+        _super = typing.cast(OrderedDict, super(LRUCache, self))
         value = _super.__getitem__(key)
         _super.__delitem__(key)
         _super.__setitem__(key, value)

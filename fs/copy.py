@@ -343,14 +343,18 @@ def copy_dir_if_newer(src_fs,       # type: Union[FS, Text]
                     elif copy_info.is_file:
                         # dst file is present, try to figure out if copy
                         # is necessary
-                        src_modified = copy_info.modified
-                        dst_modified = dst_state[dir_path].modified
-                        do_copy = (
-                            dir_path not in dst_state or
-                            src_modified is None or
-                            dst_modified is None or
-                            src_modified > dst_modified
-                        )
+                        try:
+                            src_modified = copy_info.modified
+                            dst_modified = dst_state[dir_path].modified
+                        except KeyError:
+                            do_copy = True
+                        else:
+                            do_copy = (
+                                src_modified is None or
+                                dst_modified is None or
+                                src_modified > dst_modified
+                            )
+
                         if do_copy:
                             copy_file_internal(_src_fs, dir_path, _dst_fs, copy_path)
                             on_copy(_src_fs, dir_path, _dst_fs, copy_path)
