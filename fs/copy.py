@@ -14,8 +14,8 @@ from .path import frombase
 from .path import normpath
 from .errors import FSError
 
-if False:  # typing imports
-    from typing import *
+if typing.TYPE_CHECKING:
+    from typing import Callable, Optional, Text, Union
     from .base import FS
     from .walk import Walker
     _OnCopy = Callable[[FS, Text, FS, Text], None]
