@@ -37,7 +37,11 @@ from . import _ftp_parse as ftp_parse
 
 if typing.TYPE_CHECKING:
     import ftplib
-    from typing import ByteString, Iterator, Dict, Optional, Text, Union
+    from typing import (
+        Any, BinaryIO, ByteString, ContextManager,
+        Iterable, Iterator, Collection, Container,
+        Dict, List, Optional, SupportsInt, Text,
+        Tuple, Union)
     from .info import RawInfo
     from .permissions import Permissions
     from .subfs import SubFS
@@ -94,7 +98,7 @@ def manage_ftp(ftp):
 
 
 def _parse_ftp_error(error):
-    # type: (ftplib.Error) -> typing.Tuple[Union[int, Text], Text]
+    # type: (ftplib.Error) -> Tuple[Union[int, Text], Text]
     """Extract code and message from ftp error."""
     code, _, message = text_type(error).partition(' ')
     if code.isdigit():
@@ -223,13 +227,13 @@ class FTPFile(io.RawIOBase):
 
     def readline(self, size=-1):
         # type: (int) -> bytes
-        return next(line_iterator(self, size))
+        return next(line_iterator(self, size))    # type: ignore
 
     def readlines(self, hint=-1):
-        # type: (int) -> typing.List[bytes]
+        # type: (int) -> List[bytes]
         lines = []
         size = 0
-        for line in line_iterator(self):
+        for line in line_iterator(self):          # type: ignore
             lines.append(line)
             size += len(line)
             if hint != -1 and size > hint:
@@ -260,7 +264,7 @@ class FTPFile(io.RawIOBase):
         return data_pos
 
     def writelines(self, lines):
-        # type: (typing.Iterable[bytes]) -> None
+        # type: (Iterable[bytes]) -> None
         self.write(b''.join(lines))
 
     def truncate(self, size=None):
@@ -282,7 +286,7 @@ class FTPFile(io.RawIOBase):
         return True
 
     def seek(self, pos, whence=Seek.set):
-        # type: (int, typing.SupportsInt) -> int
+        # type: (int, SupportsInt) -> int
         _whence = int(whence)
         if _whence not in (Seek.set, Seek.current, Seek.end):
             raise ValueError('invalid value for whence')
@@ -432,7 +436,7 @@ class FTPFS(FS):
         return _ftp
 
     def _manage_ftp(self):
-        # type: () -> typing.ContextManager[FTP]
+        # type: () -> ContextManager[FTP]
         ftp = self._open_ftp()
         return manage_ftp(ftp)
 
@@ -471,7 +475,7 @@ class FTPFS(FS):
     def _read_dir(self, path):
         # type: (Text) -> Dict[Text, Info]
         _path = abspath(normpath(path))
-        lines = []  # type: typing.List[typing.Union[ByteString, Text]]
+        lines = []  # type: List[Union[ByteString, Text]]
         with ftp_errors(self, path=path):
             self.ftp.retrlines(
                 str('LIST ') + _encode(_path, self.ftp.encoding),
@@ -531,7 +535,7 @@ class FTPFS(FS):
 
     @classmethod
     def _parse_facts(cls, line):
-        # type: (Text) -> typing.Tuple[Optional[Text], Dict[Text, Text]]
+        # type: (Text) -> Tuple[Optional[Text], Dict[Text, Text]]
         name = None
         facts = {}
         for fact in line.split(';'):
@@ -546,7 +550,7 @@ class FTPFS(FS):
 
     @classmethod
     def _parse_mlsx(cls, lines):
-        # type: (typing.Iterable[Text]) -> Iterator[RawInfo]
+        # type: (Iterable[Text]) -> Iterator[RawInfo]
         for line in lines:
             name, facts = cls._parse_facts(line.strip())
             if name is None:
@@ -574,7 +578,7 @@ class FTPFS(FS):
             yield raw_info
 
     def getinfo(self, path, namespaces=None):
-        # type: (Text, Optional[typing.Container[Text]]) -> Info
+        # type: (Text, Optional[Container[Text]]) -> Info
         _path = self.validatepath(path)
         namespaces = namespaces or ()
 
@@ -619,7 +623,7 @@ class FTPFS(FS):
         return _meta
 
     def listdir(self, path):
-        # type: (Text) -> typing.List[Text]
+        # type: (Text) -> List[Text]
         _path = self.validatepath(path)
         with self._lock:
             dir_list = [
@@ -658,7 +662,7 @@ class FTPFS(FS):
         return self.opendir(path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
-        # type: (Text, Text, int, **typing.Any) -> typing.BinaryIO
+        # type: (Text, Text, int, **Any) -> BinaryIO
         _mode = Mode(mode)
         _mode.validate_bin()
         _path = self.validatepath(path)
@@ -709,9 +713,9 @@ class FTPFS(FS):
 
     def _scandir(self,
                  path,            # type: Text
-                 namespaces=None  # type: Optional[typing.Container[Text]]
+                 namespaces=None  # type: Optional[Container[Text]]
                  ):
-        # type: (...) -> typing.Iterator[Info]
+        # type: (...) -> Iterator[Info]
         _path = self.validatepath(path)
         with self._lock:
             if self.supports_mlst:
@@ -736,10 +740,10 @@ class FTPFS(FS):
 
     def scandir(self,
                 path,               # type: Text
-                namespaces=None,    # type: Optional[typing.Container[Text]]
-                page=None           # type: Optional[typing.Tuple[int, int]]
+                namespaces=None,    # type: Optional[Container[Text]]
+                page=None           # type: Optional[Tuple[int, int]]
                 ):
-        # type: (...) -> typing.Iterator[Info]
+        # type: (...) -> Iterator[Info]
         if not self.supports_mlst and not self.getinfo(path).is_dir:
             raise errors.DirectoryExpected(path)
         iter_info = self._scandir(path, namespaces=namespaces)
@@ -749,7 +753,7 @@ class FTPFS(FS):
         return iter_info
 
     def setbinfile(self, path, file):
-        # type: (Text, typing.BinaryIO) -> None
+        # type: (Text, BinaryIO) -> None
         _path = self.validatepath(path)
         with self._lock:
             with self._manage_ftp() as ftp:
@@ -760,7 +764,7 @@ class FTPFS(FS):
                     )
 
     def setbytes(self, path, contents):
-        # type: (Text, typing.ByteString) -> None
+        # type: (Text, ByteString) -> None
         if not isinstance(contents, bytes):
             raise TypeError('contents must be bytes')
         self.setbinfile(path, io.BytesIO(contents))
