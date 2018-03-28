@@ -27,4 +27,4 @@ docs:
 
 .PHONY: typecheck
 typecheck:
-	mypy -p fs --ignore-missing-imports
+	mypy -p fs --config setup.cfg
