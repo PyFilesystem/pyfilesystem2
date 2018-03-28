@@ -16,7 +16,9 @@ from six import reraise
 from . import errors
 
 if typing.TYPE_CHECKING:  # typing imports
-    from typing import Iterator, Mapping, Text, Union
+    from types import TracebackType
+    from typing import (
+        Iterator, Optional, Mapping, Text, Type, Union)
 
 
 _WINDOWS_PLATFORM = platform.system() == 'Windows'
@@ -65,9 +67,15 @@ class _ConvertOSErrors(object):
         self._directory = directory
 
     def __enter__(self):
+        # type: () -> _ConvertOSErrors
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self,
+                 exc_type,      # type: Optional[Type[BaseException]]
+                 exc_value,     # type: Optional[BaseException]
+                 traceback      # type: Optional[TracebackType]
+                 ):
+        # type: (...) -> None
         os_errors = (
             self.DIR_ERRORS
             if self._directory

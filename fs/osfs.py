@@ -132,11 +132,13 @@ class OSFS(FS):
                 )
 
     def __repr__(self):
+        # type: () -> str
         _fmt = "{}({!r})"
         return _fmt.format(self.__class__.__name__,
                            self.root_path)
 
     def __str__(self):
+        # type: () -> str
         fmt = "<{} '{}'>"
         return fmt.format(self.__class__.__name__.lower(),
                           self.root_path)

@@ -163,6 +163,7 @@ class WrapReadOnly(WrapFS[_FS], typing.Generic[_FS]):
                    errors=None,         # type: Optional[Text]
                    newline=''           # type: Text
                    ):
+        # type: (...) -> None
         self.check()
         raise ResourceReadOnly(path)
 
@@ -214,6 +215,7 @@ class WrapReadOnly(WrapFS[_FS], typing.Generic[_FS]):
                 errors=None,        # type: Optional[Text]
                 newline=''          # type: Text
                 ):
+        # type: (...) -> None
         self.check()
         raise ResourceReadOnly(path)
 
@@ -251,7 +253,7 @@ class WrapReadOnly(WrapFS[_FS], typing.Generic[_FS]):
              line_buffering=False,     # type: bool
              **options                 # type: Any
              ):
-        # type(...) -> IO
+        # type: (...) -> IO
         self.check()
         if check_writable(mode):
             raise ResourceReadOnly(path)

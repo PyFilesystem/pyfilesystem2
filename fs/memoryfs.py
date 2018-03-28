@@ -313,8 +313,9 @@ class MemoryFS(FS):
         # type: () -> str
         return "<memfs>"
 
-    def _make_dir_entry(self, *args, **kwargs):
-        return _DirEntry(*args, **kwargs)
+    def _make_dir_entry(self, resource_type, name):
+        # type: (ResourceType, Text) -> _DirEntry
+        return _DirEntry(resource_type, name)
 
     def _get_dir_entry(self, dir_path):
         # type: (Text) -> Optional[_DirEntry]

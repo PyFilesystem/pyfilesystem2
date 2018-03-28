@@ -487,7 +487,7 @@ class FTPFS(FS):
 
     @property
     def supports_mlst(self):
-        # typing: () -> bool
+        # type: () -> bool
         """bool: whether the server supports MLST feature.
         """
         return 'MLST' in self.features

@@ -18,7 +18,7 @@ if typing.TYPE_CHECKING:
     from .info import Info
 
 
-def render(fs,
+def render(fs,                  # type: FS
            path='/',            # type: Text
            file=None,           # type: Optional[TextIO]
            encoding=None,       # type: Optional[Text]

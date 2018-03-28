@@ -40,12 +40,15 @@ if typing.TYPE_CHECKING:
     from datetime import datetime
     from threading import RLock
     from typing import (
-        Any, BinaryIO, Callable, Collection, Dict, IO, Iterable,
-        Iterator, List, Mapping, Optional, Text, Tuple, Union)
+        Any, BinaryIO, Callable, Collection, Dict, IO,
+        Iterable, Iterator, List, Mapping, Optional, Text,
+        Tuple, Type, Union)
+    from types import TracebackType
     from .enums import ResourceType
     from .info import Info, RawInfo
     from .subfs import SubFS
     from .permissions import Permissions
+    from .walk import BoundWalker
 
 
 __all__ = ["FS"]
@@ -80,7 +83,11 @@ class FS(object):
         """
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self,
+                 exc_type,      # type: Optional[Type[BaseException]]
+                 exc_value,     # type: Optional[BaseException]
+                 traceback      # type: Optional[TracebackType]
+                 ):
         # type: (...) -> None
         """Close filesystem on exit.
         """
@@ -88,6 +95,7 @@ class FS(object):
 
     @property
     def walk(self):
+        # type: (_FS) -> BoundWalker[_FS]
         """`~fs.walk.BoundWalker`: a walker bound to this filesystem.
         """
         return self.walker_class.bind(self)
@@ -1321,7 +1329,7 @@ class FS(object):
                 errors=None,        # type: Optional[Text]
                 newline='',         # type: Text
                 ):
-        # typing:
+        # type: (...) -> None
         """Create or replace a file with text.
 
         Arguments:

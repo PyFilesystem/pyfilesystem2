@@ -19,8 +19,9 @@ from .path import abspath, normpath
 
 if typing.TYPE_CHECKING:
     from typing import (
-        Any, BinaryIO, Collection, Iterator, MutableMapping,
-        List, MutableSet, Optional, Text, Tuple)
+        Any, BinaryIO, Collection, Iterator, IO,
+        MutableMapping, List, MutableSet, Optional,
+        Text, Tuple)
     from .enums import ResourceType
     from .info import Info, RawInfo
     from .permissions import Permissions
@@ -402,6 +403,7 @@ class MultiFS(FS):
              newline='',       # type: Text
              **kwargs          # type: Any
              ):
+        # type: (...) -> IO
         self.check()
         if check_writable(mode):
             _fs = self._writable_required(path)
@@ -432,6 +434,7 @@ class MultiFS(FS):
                 errors=None,        # type: Optional[Text]
                 newline=''          # type: Text
                 ):
+        # type: (...) -> None
         write_fs = self._writable_required(path)
         return write_fs.settext(
             path,

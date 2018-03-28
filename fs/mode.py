@@ -91,7 +91,7 @@ class Mode(typing.Container[typing.Text]):
         return _mode if 'b' in _mode else _mode + 'b'
 
     def validate(self, _valid_chars=frozenset('rwxtab+')):
-        # type(Set[Text]) -> None
+        # type: (Union[Set[Text], FrozenSet[Text]]) -> None
         """Validate the mode string.
 
         Raises:
@@ -184,6 +184,7 @@ class Mode(typing.Container[typing.Text]):
 
     @property
     def text(self):
+        # type: () -> bool
         """`bool`: `True` if a mode specifies text.
         """
         return 't' in self or 'b' not in self

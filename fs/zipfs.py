@@ -200,7 +200,7 @@ class WriteZipFS(WrapFS):
         self.encoding = encoding
         self._temp_fs_url = temp_fs
         self._temp_fs = open_fs(temp_fs)
-        self._meta = self._temp_fs.getmeta().copy()
+        self._meta = dict(self._temp_fs.getmeta())  # type: ignore
         super(WriteZipFS, self).__init__(self._temp_fs)
 
     def __repr__(self):

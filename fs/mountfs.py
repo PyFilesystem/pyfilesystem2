@@ -119,7 +119,7 @@ class MountFS(FS):
         self.default_fs.makedirs(_path, recreate=True)
 
     def close(self):
-        # type() -> None
+        # type: () -> None
         # Explicitly closes children if requested
         if self.auto_close:
             for _path, fs in self.mounts:

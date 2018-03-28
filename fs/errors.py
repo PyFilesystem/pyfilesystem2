@@ -18,8 +18,8 @@ import six
 from six import text_type
 
 if typing.TYPE_CHECKING:
-    from typing import Callable, Optional, Text
-
+    from typing import Optional, Text
+    
 
 __all__ = [
     'CreateFailed',
@@ -111,7 +111,6 @@ class CreateFailed(FSError):
 
     @classmethod
     def catch_all(cls, func):
-        # type: (Callable) -> Callable
         @functools.wraps(func)
         def new_func(*args, **kwargs):
             try:
@@ -120,7 +119,7 @@ class CreateFailed(FSError):
                 raise
             except Exception as e:
                 raise cls(exc=e)
-        return new_func
+        return new_func  # type: ignore
 
 class PathError(FSError):
     """Base exception for errors to do with a path string.

@@ -10,10 +10,12 @@ from typing import Container, Iterable, Text
 import six
 
 if typing.TYPE_CHECKING:
-    from typing import Iterator, List, Optional, Tuple, Union
+    from typing import (
+        Iterator, List, Optional, Tuple, Type, Union)
 
 
 def make_mode(init):
+    # type: (Union[int, Iterable[Text], None]) -> int
     """Make a mode integer from an initial value.
     """
     return Permissions.get_mode(init)
@@ -29,9 +31,11 @@ class _PermProperty(object):
         self.__doc__ = "Boolean for '{}' permission.".format(name)
 
     def __get__(self, obj, obj_type=None):
+        # type: (Permissions, Optional[Type[Permissions]]) -> bool
         return self._name in obj
 
     def __set__(self, obj, value):
+        # type: (Permissions, bool) -> None
         if value:
             obj.add(self._name)
         else:
@@ -128,6 +132,7 @@ class Permissions(Container[Text], Iterable[Text]):
             return "Permissions(names=[{}])".format(_perms_str)
 
         def _check(perm, name):
+            # type: (Text, Text) -> Text
             return name if perm in self._perms else ''
 
         user = ''.join((
