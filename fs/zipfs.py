@@ -49,7 +49,7 @@ class _ZipExtFile(RawWrapper):
 
     def read1(self, size=-1):
         # type: (int) -> bytes
-        buf = self._f.read1(-1 if size is None else size)
+        buf = self._f.read1(-1 if size is None else size)   # type: ignore
         self._pos += len(buf)
         return buf
 
@@ -101,7 +101,7 @@ class _ZipExtFile(RawWrapper):
             )
 
         if offset < self._pos:
-            self._f = self._zip.open(self.name)
+            self._f = self._zip.open(self.name)  # type: ignore
             self._pos = 0
         self.read(offset - self._pos)
         return self._pos
