@@ -8,7 +8,6 @@ import typing
 
 import six
 
-from .base import _FS
 from .wrapfs import WrapFS
 from .path import abspath, join, normpath, relpath
 
@@ -17,8 +16,11 @@ if typing.TYPE_CHECKING:
     from .base import FS
 
 
+_F = typing.TypeVar('_F', bound='FS', covariant=True)
+
+
 @six.python_2_unicode_compatible
-class SubFS(WrapFS[_FS], typing.Generic[_FS]):
+class SubFS(WrapFS[_F], typing.Generic[_F]):
     """A sub-directory on another filesystem.
 
     A SubFS is a filesystem object that maps to a sub-directory of
@@ -28,7 +30,7 @@ class SubFS(WrapFS[_FS], typing.Generic[_FS]):
     """
 
     def __init__(self, parent_fs, path):
-        # type: (_FS, Text) -> None
+        # type: (_F, Text) -> None
         super(SubFS, self).__init__(parent_fs)
         self._sub_dir = abspath(normpath(path))
 
@@ -48,16 +50,16 @@ class SubFS(WrapFS[_FS], typing.Generic[_FS]):
         )
 
     def delegate_fs(self):
-        # type: () -> _FS
+        # type: () -> _F
         return self._wrap_fs
 
     def delegate_path(self, path):
-        # type: (Text) -> Tuple[_FS, Text]
+        # type: (Text) -> Tuple[_F, Text]
         _path = join(self._sub_dir, relpath(normpath(path)))
         return self._wrap_fs, _path
 
 
-class ClosingSubFS(SubFS[_FS], typing.Generic[_FS]):
+class ClosingSubFS(SubFS[_F], typing.Generic[_F]):
     """A version of `SubFS` which closes its parent when closed.
     """
 

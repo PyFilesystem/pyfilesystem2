@@ -231,7 +231,6 @@ class MultiFS(FS):
         directory = list(OrderedDict.fromkeys(directory))
         return directory
 
-    @typing.no_type_check
     def makedir(self,               # type: M
                 path,               # type: Text
                 permissions=None,   # type: Optional[Permissions]
@@ -316,7 +315,7 @@ class MultiFS(FS):
         )
 
     def getsize(self, path):
-        # type: (Text) -> int
+        # type: (Text) -> Optional[int]
         self.check()
         fs = self._delegate_required(path)
         return fs.getsize(path)
@@ -379,8 +378,7 @@ class MultiFS(FS):
         path = abspath(normpath(path))
         return path
 
-    @typing.no_type_check
-    def makedirs(self,              # type: M
+    def makedirs(self,
                  path,              # type: Text
                  permissions=None,  # type: Optional[Permissions]
                  recreate=False     # type: bool

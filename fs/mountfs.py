@@ -28,6 +28,7 @@ if typing.TYPE_CHECKING:
     from .subfs import SubFS
     M = typing.TypeVar('M', bound='MountFS')
 
+
 class MountError(Exception):
     """Thrown when mounts conflict.
     """
@@ -149,12 +150,8 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.listdir(_path)
 
-    # NOTE(@althonos): here, the returned FS does not always wrap
-    #     filesystems of the same type, so we cannot assume anything
-    #     about the type of the filesystem wrapped in the SubFS.
-    @typing.no_type_check
     def makedir(self, path, permissions=None, recreate=False):
-        # type: (M, Text, Optional[Permissions], bool) -> SubFS[FS]
+        # type: (Text, Optional[Permissions], bool) -> SubFS[FS]
         self.check()
         fs, _path = self._delegate(path)
         return fs.makedir(
@@ -210,7 +207,7 @@ class MountFS(FS):
         )
 
     def getsize(self, path):
-        # type: (Text) -> int
+        # type: (Text) -> Optional[int]
         self.check()
         fs, _path = self._delegate(path)
         return fs.getsize(_path)

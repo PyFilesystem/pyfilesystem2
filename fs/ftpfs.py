@@ -42,10 +42,13 @@ if typing.TYPE_CHECKING:
         Iterable, Iterator, Collection, Container,
         Dict, List, Optional, SupportsInt, Text,
         Tuple, Union)
+    from .base import _OpendirFactory
     from .info import RawInfo
     from .permissions import Permissions
     from .subfs import SubFS
-    F = typing.TypeVar('F', bound='FTPFS')
+
+
+_F = typing.TypeVar('_F', bound='FTPFS')
 
 
 __all__ = ['FTPFS']
@@ -577,6 +580,11 @@ class FTPFS(FS):
                 details['created'] = cls._parse_ftp_time(facts['create'])
             yield raw_info
 
+    if typing.TYPE_CHECKING:
+        def opendir(self, path, factory=None):
+            # type: (_F, Text, Optional[_OpendirFactory]) -> SubFS[_F]
+            pass
+
     def getinfo(self, path, namespaces=None):
         # type: (Text, Optional[Container[Text]]) -> Info
         _path = self.validatepath(path)
@@ -632,12 +640,12 @@ class FTPFS(FS):
             ]
         return dir_list
 
-    def makedir(self,               # type: F
+    def makedir(self,               # type: _F
                 path,               # type: Text
                 permissions=None,   # type: Optional[Permissions]
                 recreate=False      # type: bool
                 ):
-        # type: (...) -> SubFS[F]
+        # type: (...) -> SubFS[_F]
         _path = self.validatepath(path)
 
         with ftp_errors(self, path=path):

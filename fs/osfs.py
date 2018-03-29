@@ -42,11 +42,14 @@ from .errors import NoURL
 
 if typing.TYPE_CHECKING:
     from typing import (
-        Any, BinaryIO, Collection, Dict, Iterator, IO,
-        List, Optional, SupportsInt, Text, Tuple)
+        Any, BinaryIO, Callable, Collection, Dict,
+        Iterator, IO, List, Optional, SupportsInt,
+        Text, Tuple)
+    from .base import _OpendirFactory
     from .info import RawInfo
     from .subfs import SubFS
-    F = typing.TypeVar('F', bound='OSFS')
+
+    _O = typing.TypeVar('_O', bound='OSFS')
 
 
 log = logging.getLogger('fs.osfs')
@@ -285,12 +288,12 @@ class OSFS(FS):
             names = os.listdir(sys_path)
         return names
 
-    def makedir(self,               # type: F
+    def makedir(self,               # type: _O
                 path,               # type: Text
                 permissions=None,   # type: Optional[Permissions]
                 recreate=False      # type: bool
                 ):
-        # type: (...) -> SubFS[F]
+        # type: (...) -> SubFS[_O]
         self.check()
         mode = Permissions.get_mode(permissions)
         _path = self.validatepath(path)
@@ -357,6 +360,11 @@ class OSFS(FS):
     # --------------------------------------------------------
     # Optional Methods
     # --------------------------------------------------------
+
+    if typing.TYPE_CHECKING:
+        def opendir(self, path, factory=None):
+            # type: (_O, Text, Optional[_OpendirFactory]) -> SubFS[_O]
+            pass
 
     def getsyspath(self, path):
         # type: (Text) -> Text

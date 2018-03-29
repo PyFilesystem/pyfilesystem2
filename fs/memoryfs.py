@@ -26,10 +26,12 @@ if typing.TYPE_CHECKING:
     from typing import (
         Any, BinaryIO, Collection, Dict, Iterator, List,
         Optional, SupportsInt, Union, Text)
+    from .base import _OpendirFactory
     from .info import RawInfo
     from .permissions import Permissions
     from .subfs import SubFS
-    M = typing.TypeVar('M', bound='MemoryFS')
+
+    _M = typing.TypeVar('_M', bound='MemoryFS')
 
 
 @six.python_2_unicode_compatible
@@ -323,13 +325,13 @@ class MemoryFS(FS):
         """
         with self._lock:
             dir_path = normpath(dir_path)
-            current_entry = self.root
+            current_entry = self.root  # type: Optional[_DirEntry]
             for path_component in iteratepath(dir_path):
+                if current_entry is None:
+                    return None
                 if not current_entry.is_dir:
                     return None
                 current_entry = current_entry.get_entry(path_component)
-                if current_entry is None:
-                    return None
             return current_entry
 
     def getinfo(self, path, namespaces=None):
@@ -368,12 +370,17 @@ class MemoryFS(FS):
                 raise errors.DirectoryExpected(path)
             return dir_entry.list()
 
-    def makedir(self,               # type: M
+    if typing.TYPE_CHECKING:
+        def opendir(self, path, factory=None):
+            # type: (_M, Text, Optional[_OpendirFactory]) -> SubFS[_M]
+            pass
+
+    def makedir(self,               # type: _M
                 path,               # type: Text
                 permissions=None,   # type: Optional[Permissions]
                 recreate=False      # type: bool
                 ):
-        # type: (...) -> SubFS[M]
+        # type: (...) -> SubFS[_M]
         _path = self.validatepath(path)
         with self._lock:
             if _path == '/':
@@ -420,7 +427,7 @@ class MemoryFS(FS):
                     )
                     parent_dir_entry.set_entry(file_name, file_dir_entry)
                 else:
-                    file_dir_entry = self._get_dir_entry(_path)
+                    file_dir_entry = self._get_dir_entry(_path)  # type: ignore
                     if _mode.exclusive:
                         raise errors.FileExists(path)
 
@@ -440,7 +447,7 @@ class MemoryFS(FS):
             if file_name not in parent_dir_entry:
                 raise errors.ResourceNotFound(path)
 
-            file_dir_entry = parent_dir_entry.get_entry(file_name)
+            file_dir_entry = parent_dir_entry.get_entry(file_name)  # type: ignore
             if file_dir_entry.is_dir:
                 raise errors.FileExpected(path)
 

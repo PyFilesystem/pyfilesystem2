@@ -50,12 +50,13 @@ if typing.TYPE_CHECKING:
     from .permissions import Permissions
     from .walk import BoundWalker
 
+    _F = typing.TypeVar('_F', bound='FS')
+    _T = typing.TypeVar('_T', bound='FS')
+    _OpendirFactory = Callable[[_T, Text], SubFS[_T]]
+
+
 
 __all__ = ["FS"]
-
-
-# typing.TypeVar: the type variable of a filesystem subclass
-_FS = typing.TypeVar('_FS', bound='FS')
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -95,7 +96,7 @@ class FS(object):
 
     @property
     def walk(self):
-        # type: (_FS) -> BoundWalker[_FS]
+        # type: (_F) -> BoundWalker[_F]
         """`~fs.walk.BoundWalker`: a walker bound to this filesystem.
         """
         return self.walker_class.bind(self)
@@ -147,12 +148,12 @@ class FS(object):
         """
 
     @abc.abstractmethod
-    def makedir(self,               # type: _FS
+    def makedir(self,
                 path,               # type: Text
                 permissions=None,   # type: Optional[Permissions]
                 recreate=False      # type: bool
                 ):
-        # type: (...) -> SubFS[_FS]
+        # type: (...) -> SubFS[FS]
         """Make a directory.
 
         Arguments:
@@ -969,12 +970,12 @@ class FS(object):
                 dst_path
             )
 
-    def makedirs(self,              # type: _FS
+    def makedirs(self,
                  path,              # type: Text
                  permissions=None,  # type: Optional[Permissions]
                  recreate=False     # type: bool
                  ):
-        # type: (...) -> SubFS[_FS]
+        # type: (...) -> SubFS[FS]
         """Make a directory, and any missing intermediate directories.
 
         Arguments:
@@ -1104,11 +1105,11 @@ class FS(object):
         )
         return io_stream
 
-    def opendir(self,         # type: _FS
+    def opendir(self,         # type: _F
                 path,         # type: Text
-                factory=None  # type: Optional[Callable[[_FS, Text], SubFS[_FS]]]
+                factory=None  # type: Optional[_OpendirFactory]
                 ):
-        # type: (...) -> SubFS[_FS]
+        # type: (...) -> SubFS[FS]
         # FIXME(@althonos): use generics here if possible
         """Get a filesystem object for a sub-directory.
 

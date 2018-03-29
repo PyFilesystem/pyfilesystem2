@@ -9,7 +9,7 @@ import typing
 import six
 
 from . import errors
-from .base import FS, _FS
+from .base import FS
 from .copy import copy_file
 from .info import Info
 from .move import move_file
@@ -23,17 +23,20 @@ if typing.TYPE_CHECKING:
         Any, AnyStr, BinaryIO, Callable, Collection, Dict,
         Iterator, Iterable, IO, List, Mapping, Optional,
         Text, TextIO, Tuple, Union)
+    from .base import _OpendirFactory
     from .enums import ResourceType
     from .info import RawInfo
     from .permissions import Permissions
     from .subfs import SubFS
     from .walk import BoundWalker
 
-    W = typing.TypeVar('W', bound='WrapFS[FS]')
+
+_F = typing.TypeVar('_F', bound='FS', covariant=True)
+_W = typing.TypeVar('_W', bound='WrapFS[FS]')
 
 
 @six.python_2_unicode_compatible
-class WrapFS(FS, typing.Generic[_FS]):
+class WrapFS(FS, typing.Generic[_F]):
     """A proxy for a filesystem object.
 
     This class exposes an filesystem interface, where the data is
@@ -45,7 +48,7 @@ class WrapFS(FS, typing.Generic[_FS]):
     wrap_name = None    # type: Optional[Text]
 
     def __init__(self, wrap_fs):
-        # type: (_FS) -> None
+        # type: (_F) -> None
         self._wrap_fs = wrap_fs
         super(WrapFS, self).__init__()
 
@@ -72,7 +75,7 @@ class WrapFS(FS, typing.Generic[_FS]):
         return _str
 
     def delegate_path(self, path):
-        # type: (Text) -> Tuple[_FS, Text]
+        # type: (Text) -> Tuple[_F, Text]
         """Encode a path for proxied filesystem.
 
         Arguments:
@@ -85,7 +88,7 @@ class WrapFS(FS, typing.Generic[_FS]):
         return self._wrap_fs, path
 
     def delegate_fs(self):
-        # type: () -> _FS
+        # type: () -> _F
         """Get the proxied filesystem.
 
         This method should return a filesystem for methods not
@@ -143,7 +146,7 @@ class WrapFS(FS, typing.Generic[_FS]):
         _fs = self.delegate_fs()
         return _fs.lock()
 
-    def makedir(self,               # type: W
+    def makedir(self,
                 path,               # type: Text
                 permissions=None,   # type: Optional[Permissions]
                 recreate=False      # type: bool
@@ -320,7 +323,7 @@ class WrapFS(FS, typing.Generic[_FS]):
         return meta
 
     def getsize(self, path):
-        # type: (Text) -> int
+        # type: (Text) -> Optional[int]
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
@@ -390,12 +393,12 @@ class WrapFS(FS, typing.Generic[_FS]):
             _islink = _fs.islink(_path)
         return _islink
 
-    def makedirs(self,              # type: W
+    def makedirs(self,
                  path,              # type: Text
                  permissions=None,  # type: Optional[Permissions]
                  recreate=False     # type: bool
                  ):
-        # type: (...) -> SubFS[W]
+        # type: (...) -> SubFS[FS]
         self.check()
         _fs, _path = self.delegate_path(path)
         return _fs.makedirs(
@@ -431,11 +434,11 @@ class WrapFS(FS, typing.Generic[_FS]):
             )
         return open_file
 
-    def opendir(self,         # type: W
+    def opendir(self,         # type: _W
                 path,         # type: Text
-                factory=None  # type: Optional[Callable[[W, Text], SubFS[W]]]
+                factory=None  # type: Optional[_OpendirFactory]
                 ):
-        # type: (...) -> SubFS[W]
+        # type: (...) -> SubFS[_W]
         from .subfs import SubFS
         factory = factory or SubFS
         if not self.getinfo(path).is_dir:
