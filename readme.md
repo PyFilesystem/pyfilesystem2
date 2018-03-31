@@ -93,7 +93,7 @@ Credits
 -------
 
 * [Will McGugan](https://github.com/willmcgugan)
-* [Martin Larralde](https://github.com/althonos) for TarFS
+* [Martin Larralde](https://github.com/althonos)
 * [Giampaolo](https://github.com/gpcimino) for `copy_if_newer` and ftp fixes.
 
 PyFilesystem2 owes a massive debt of gratitude to the following

@@ -89,7 +89,7 @@ Credits
 -------
 
 -  `Will McGugan <https://github.com/willmcgugan>`__
--  `Martin Larralde <https://github.com/althonos>`__ for TarFS
+-  `Martin Larralde <https://github.com/althonos>`__
 -  `Giampaolo <https://github.com/gpcimino>`__ for ``copy_if_newer`` and
    ftp fixes.
 
