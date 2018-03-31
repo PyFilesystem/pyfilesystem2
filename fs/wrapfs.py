@@ -323,7 +323,7 @@ class WrapFS(FS, typing.Generic[_F]):
         return meta
 
     def getsize(self, path):
-        # type: (Text) -> Optional[int]
+        # type: (Text) -> int
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):

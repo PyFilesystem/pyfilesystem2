@@ -315,7 +315,7 @@ class MultiFS(FS):
         )
 
     def getsize(self, path):
-        # type: (Text) -> Optional[int]
+        # type: (Text) -> int
         self.check()
         fs = self._delegate_required(path)
         return fs.getsize(path)

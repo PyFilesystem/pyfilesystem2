@@ -207,7 +207,7 @@ class MountFS(FS):
         )
 
     def getsize(self, path):
-        # type: (Text) -> Optional[int]
+        # type: (Text) -> int
         self.check()
         fs, _path = self._delegate(path)
         return fs.getsize(_path)

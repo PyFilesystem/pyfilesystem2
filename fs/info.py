@@ -187,7 +187,7 @@ class Info(object):
         # type: () -> bool
         """`bool`: `True` if the resource references a directory.
         """
-        return self.get('basic', 'is_dir') 
+        return self.get('basic', 'is_dir')
 
     @property
     def is_file(self):

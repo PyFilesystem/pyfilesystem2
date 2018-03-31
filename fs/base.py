@@ -690,7 +690,7 @@ class FS(object):
         return meta
 
     def getsize(self, path):
-        # type: (Text) -> Optional[int]
+        # type: (Text) -> int
         """Get the size (in bytes) of a resource.
 
         Arguments:
