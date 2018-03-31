@@ -312,8 +312,7 @@ class Info(object):
 
     @property
     def size(self):
-        # type: () -> Optional[int]
-        # FIXME(@althonos): should this be always int ?
+        # type: () -> int
         """`int`: the size of the resource, in bytes.
 
         Requires the ``"details"`` namespace.
