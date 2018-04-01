@@ -33,8 +33,8 @@ class TempFS(OSFS):
         auto_clean (bool, optional): If `True` (the default), the directory
             contents will be wiped on close.
         ignore_clean_errors (bool, optional): If `True` (the default), any
-            errors in the clean process will be raised. If `False`, they
-            will be suppressed.
+            errors in the clean process will be suppressed. If `False`, they
+            will be raised.
 
     """
 
