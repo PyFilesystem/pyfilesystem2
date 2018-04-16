@@ -14,6 +14,7 @@ import uuid
 
 from fs import tarfs
 from fs import errors
+from fs.enums import ResourceType
 from fs.compress import write_tar
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
