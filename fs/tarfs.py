@@ -320,20 +320,8 @@ class ReadTarFS(FS):
             raise errors.DirectoryExpected(path)
 
         children = (frombase(_path, n) for n in self._directory if isbase(_path, n))
-        return list(set(parts(child)[1] for child in children if relpath(child)))
-
-        info = self._directory.get(_path)
-        if _path:
-            if info is None:
-                raise errors.ResourceNotFound(path)
-            if not info.isdir():
-                raise errors.DirectoryExpected(path)
-        dir_list = [
-            basename(name)
-            for name in self._directory.keys()
-            if dirname(name) == _path
-        ]
-        return dir_list
+        content = (parts(child)[1] for child in children if relpath(child))
+        return list(OrderedDict.fromkeys(content))
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
