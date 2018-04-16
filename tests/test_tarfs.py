@@ -1,13 +1,16 @@
 # -*- encoding: UTF-8
 from __future__ import unicode_literals
 
+import io
 import os
 import six
 import gzip
 import tarfile
 import getpass
+import tarfile
 import tempfile
 import unittest
+import uuid
 
 from fs import tarfs
 from fs import errors
@@ -182,6 +185,73 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         super(TestReadTarFS, self).test_getinfo()
         top = self.fs.getinfo('top.txt', ['tar'])
         self.assertTrue(top.get('tar', 'is_file'))
+
+
+class TestImplicitDirectories(unittest.TestCase):
+    """Regression tests for #160.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpfs = open_fs("temp://")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmpfs.close()
+
+    def setUp(self):
+        self.tempfile = self.tmpfs.open('test.tar', 'wb+')
+        with tarfile.open(mode="w", fileobj=self.tempfile) as tf:
+            tf.addfile(tarfile.TarInfo("foo/bar/baz/spam.txt"), io.StringIO())
+            tf.addfile(tarfile.TarInfo("foo/eggs.bin"), io.StringIO())
+            tf.addfile(tarfile.TarInfo("foo/yolk/beans.txt"), io.StringIO())
+            info = tarfile.TarInfo("foo/yolk")
+            info.type = tarfile.DIRTYPE
+            tf.addfile(info, io.BytesIO())
+        self.tempfile.seek(0)
+        self.fs = tarfs.TarFS(self.tempfile)
+
+    def tearDown(self):
+        self.fs.close()
+        self.tempfile.close()
+
+    def test_isfile(self):
+        self.assertFalse(self.fs.isfile("foo"))
+        self.assertFalse(self.fs.isfile("foo/bar"))
+        self.assertFalse(self.fs.isfile("foo/bar/baz"))
+        self.assertTrue(self.fs.isfile("foo/bar/baz/spam.txt"))
+        self.assertTrue(self.fs.isfile("foo/yolk/beans.txt"))
+        self.assertTrue(self.fs.isfile("foo/eggs.bin"))
+        self.assertFalse(self.fs.isfile("foo/eggs.bin/baz"))
+
+    def test_isdir(self):
+        self.assertTrue(self.fs.isdir("foo"))
+        self.assertTrue(self.fs.isdir("foo/yolk"))
+        self.assertTrue(self.fs.isdir("foo/bar"))
+        self.assertTrue(self.fs.isdir("foo/bar/baz"))
+        self.assertFalse(self.fs.isdir("foo/bar/baz/spam.txt"))
+        self.assertFalse(self.fs.isdir("foo/eggs.bin"))
+        self.assertFalse(self.fs.isdir("foo/eggs.bin/baz"))
+        self.assertFalse(self.fs.isdir("foo/yolk/beans.txt"))
+
+    def test_listdir(self):
+        self.assertEqual(sorted(self.fs.listdir("foo")), ["bar", "eggs.bin", "yolk"])
+        self.assertEqual(self.fs.listdir("foo/bar"), ["baz"])
+        self.assertEqual(self.fs.listdir("foo/bar/baz"), ["spam.txt"])
+        self.assertEqual(self.fs.listdir("foo/yolk"), ["beans.txt"])
+
+    def test_getinfo(self):
+        info = self.fs.getdetails("foo/bar/baz")
+        self.assertEqual(info.name, "baz")
+        self.assertEqual(info.size, 0)
+        self.assertIs(info.type, ResourceType.directory)
+
+        info = self.fs.getdetails("foo")
+        self.assertEqual(info.name, "foo")
+        self.assertEqual(info.size, 0)
+        self.assertIs(info.type, ResourceType.directory)
+
+
 
 
 class TestReadTarFSMem(TestReadTarFS):
