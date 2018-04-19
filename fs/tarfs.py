@@ -16,7 +16,7 @@ from .enums import ResourceType
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
-from .path import dirname, normpath, relpath, basename
+from .path import dirname, relpath, basename, isbase, parts, frombase
 from .wrapfs import WrapFS
 from .permissions import Permissions
 
@@ -256,9 +256,14 @@ class ReadTarFS(FS):
 
         else:
             try:
+                implicit = False
                 member = self._tar.getmember(self._encode(_path))
             except KeyError:
-                raise errors.ResourceNotFound(path)
+                if not self.isdir(_path):
+                    raise errors.ResourceNotFound(path)
+                implicit = True
+                member = tarfile.TarInfo(_path)
+                member.type = tarfile.DIRTYPE
 
             raw_info["basic"] = {
                 "name": basename(self._decode(member.name)),
@@ -268,10 +273,11 @@ class ReadTarFS(FS):
             if "details" in namespaces:
                 raw_info["details"] = {
                     "size": member.size,
-                    "type": int(self.type_map[member.type]),
-                    "modified": member.mtime,
+                    "type": int(self.type_map[member.type])
                 }
-            if "access" in namespaces:
+                if not implicit:
+                    raw_info["details"]["modified"] = member.mtime
+            if "access" in namespaces and not implicit:
                 raw_info["access"] = {
                     "gid": member.gid,
                     "group": member.gname,
@@ -279,7 +285,7 @@ class ReadTarFS(FS):
                     "uid": member.uid,
                     "user": member.uname,
                 }
-            if "tar" in namespaces:
+            if "tar" in namespaces and not implicit:
                 raw_info["tar"] = _get_member_info(member, self.encoding)
                 raw_info["tar"].update({
                     k.replace('is', 'is_'):getattr(member, k)()
@@ -289,39 +295,46 @@ class ReadTarFS(FS):
 
         return Info(raw_info)
 
+    def isdir(self, path):
+        _path = relpath(self.validatepath(path))
+        try:
+            return self._directory[_path].isdir()
+        except KeyError:
+            return any(isbase(_path, name) for name in self._directory)
+
+    def isfile(self, path):
+        _path = relpath(self.validatepath(path))
+        try:
+            return self._directory[_path].isfile()
+        except KeyError:
+            return False
+
     def setinfo(self, path, info):
         self.check()
         raise errors.ResourceReadOnly(path)
 
     def listdir(self, path):
-        self.check()
-        _path = relpath(path)
-        info = self._directory.get(_path)
-        if _path:
-            if info is None:
-                raise errors.ResourceNotFound(path)
-            if not info.isdir():
-                raise errors.DirectoryExpected(path)
-        dir_list = [
-            basename(name)
-            for name in self._directory.keys()
-            if dirname(name) == _path
-        ]
-        return dir_list
+        _path = relpath(self.validatepath(path))
+
+        if not self.gettype(path) is ResourceType.directory:
+            raise errors.DirectoryExpected(path)
+
+        children = (frombase(_path, n) for n in self._directory if isbase(_path, n))
+        content = (parts(child)[1] for child in children if relpath(child))
+        return list(OrderedDict.fromkeys(content))
 
     def makedir(self, path, permissions=None, recreate=False):
         self.check()
         raise errors.ResourceReadOnly(path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
-        self.check()
-        path = relpath(normpath(path))
+        _path = relpath(self.validatepath(path))
 
         if 'w' in mode or '+' in mode or 'a' in mode:
             raise errors.ResourceReadOnly(path)
 
         try:
-            member = self._tar.getmember(self._encode(path))
+            member = self._tar.getmember(self._encode(_path))
         except KeyError:
             six.raise_from(errors.ResourceNotFound(path), None)
 
