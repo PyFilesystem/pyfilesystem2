@@ -23,12 +23,14 @@ if False:  # typing.TYPE_CHECKING
         Any, AnyStr, BinaryIO, Callable, Collection, Dict,
         Iterator, Iterable, IO, List, Mapping, Optional,
         Text, TextIO, Tuple, Union)
-    from .base import _OpendirFactory
     from .enums import ResourceType
     from .info import RawInfo
     from .permissions import Permissions
     from .subfs import SubFS
     from .walk import BoundWalker
+
+    _T = typing.TypeVar('_T', bound='FS')
+    _OpendirFactory = Callable[[_T, Text], SubFS[_T]]
 
 
 _F = typing.TypeVar('_F', bound='FS', covariant=True)

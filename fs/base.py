@@ -55,7 +55,6 @@ if False:  # typing.TYPE_CHECKING
     _OpendirFactory = Callable[[_T, Text], SubFS[_T]]
 
 
-
 __all__ = ["FS"]
 
 
