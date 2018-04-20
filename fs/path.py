@@ -16,7 +16,7 @@ import typing
 
 from .errors import IllegalBackReference
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import List, Text, Tuple
 
 

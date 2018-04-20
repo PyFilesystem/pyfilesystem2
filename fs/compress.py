@@ -22,7 +22,7 @@ from .time import datetime_to_epoch
 from .errors import NoSysPath, MissingInfoNamespace
 from .walk import Walker
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import BinaryIO, Optional, Text, Tuple, Type, Union
     from .base import FS
     ZipTime = Tuple[int, int, int, int, int, int]

@@ -16,7 +16,7 @@ from __future__ import unicode_literals
 
 import typing
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Iterable, SupportsInt, Text
 
 

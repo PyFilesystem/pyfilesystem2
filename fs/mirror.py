@@ -26,7 +26,7 @@ from .errors import ResourceNotFound
 from .walk import Walker
 from .opener import manage_fs
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Optional, Text, Union
     from .base import FS
     from .info import Info

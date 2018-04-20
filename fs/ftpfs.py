@@ -35,7 +35,7 @@ from .path import normpath
 from .path import split
 from . import _ftp_parse as ftp_parse
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     import ftplib
     from typing import (
         Any, BinaryIO, ByteString, ContextManager,
@@ -580,7 +580,7 @@ class FTPFS(FS):
                 details['created'] = cls._parse_ftp_time(facts['create'])
             yield raw_info
 
-    if typing.TYPE_CHECKING:
+    if False:  # typing.TYPE_CHECKING
         def opendir(self, path, factory=None):
             # type: (_F, Text, Optional[_OpendirFactory]) -> SubFS[_F]
             pass

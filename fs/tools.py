@@ -15,7 +15,7 @@ from .path import dirname
 from .path import normpath
 from .path import recursepath
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import IO, List, Optional, Text
     from .base import FS
 

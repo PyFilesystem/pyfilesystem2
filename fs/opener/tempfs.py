@@ -10,7 +10,7 @@ import typing
 
 from .base import Opener
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Text
     from .parse import ParseResult
     from ..tempfs import TempFS

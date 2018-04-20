@@ -22,7 +22,7 @@ from .path import iteratepath
 from .path import normpath
 from .path import split
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import (
         Any, BinaryIO, Collection, Dict, Iterator, List,
         Optional, SupportsInt, Union, Text)
@@ -370,7 +370,7 @@ class MemoryFS(FS):
                 raise errors.DirectoryExpected(path)
             return dir_entry.list()
 
-    if typing.TYPE_CHECKING:
+    if False:  # typing.TYPE_CHECKING
         def opendir(self, path, factory=None):
             # type: (_M, Text, Optional[_OpendirFactory]) -> SubFS[_M]
             pass

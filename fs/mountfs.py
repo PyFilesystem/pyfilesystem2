@@ -18,7 +18,7 @@ from .path import normpath
 from .mode import validate_open_mode
 from .mode import validate_openbin_mode
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import (
         Any, BinaryIO, Collection, Iterator, IO, List,
         MutableSequence, Optional, Text, Tuple, Union)

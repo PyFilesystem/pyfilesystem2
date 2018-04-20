@@ -20,7 +20,7 @@ from .path import abspath
 from .path import join
 from .path import normpath
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import (
         Any, Callable, Collection, Iterator, List,
         Optional, MutableMapping, Text, Tuple, Type)

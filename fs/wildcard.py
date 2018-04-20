@@ -10,7 +10,7 @@ from functools import partial
 
 from .lrucache import LRUCache
 
-if typing.TYPE_CHECKING:  # typing imports
+if False:  # typing.TYPE_CHECKING
     from typing import (
         Callable, Iterable, MutableMapping, Text,
         Tuple, Pattern)

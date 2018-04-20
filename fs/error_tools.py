@@ -15,7 +15,7 @@ from six import reraise
 
 from . import errors
 
-if typing.TYPE_CHECKING:  # typing imports
+if False:  # typing.TYPE_CHECKING
     from types import TracebackType
     from typing import (
         Iterator, Optional, Mapping, Text, Type, Union)

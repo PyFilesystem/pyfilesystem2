@@ -40,7 +40,7 @@ from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
 from .errors import NoURL
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import (
         Any, BinaryIO, Callable, Collection, Dict,
         Iterator, IO, List, Optional, SupportsInt,
@@ -361,7 +361,7 @@ class OSFS(FS):
     # Optional Methods
     # --------------------------------------------------------
 
-    if typing.TYPE_CHECKING:
+    if False:  # typing.TYPE_CHECKING
         def opendir(self, path, factory=None):
             # type: (_O, Text, Optional[_OpendirFactory]) -> SubFS[_O]
             pass

@@ -13,7 +13,7 @@ from .errors import OpenerError
 from ..subfs import ClosingSubFS
 from .. import appfs
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Text, Union
     from .parse import ParseResult
     from ..appfs import _AppFS

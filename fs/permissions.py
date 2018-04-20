@@ -9,7 +9,7 @@ from typing import Container, Iterable, Text
 
 import six
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import (
         Iterator, List, Optional, Tuple, Type, Union)
 

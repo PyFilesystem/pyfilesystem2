@@ -11,7 +11,7 @@ import six
 from .wrapfs import WrapFS
 from .path import abspath, join, normpath, relpath
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Text, Tuple
     from .base import FS
 

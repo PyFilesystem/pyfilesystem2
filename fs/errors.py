@@ -17,7 +17,7 @@ import typing
 import six
 from six import text_type
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Optional, Text
     
 

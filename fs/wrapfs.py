@@ -16,7 +16,7 @@ from .move import move_file
 from .path import abspath, normpath
 from .error_tools import unwrap_errors
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from datetime import datetime
     from threading import RLock
     from typing import (

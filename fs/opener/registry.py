@@ -16,7 +16,7 @@ from .base import Opener
 from .errors import UnsupportedProtocol, EntryPointError
 from .parse import parse_fs_url
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Iterator, List, Text, Tuple, Union
     from ..base import FS
 

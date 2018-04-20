@@ -14,7 +14,7 @@ from .errors import MissingInfoNamespace
 from .permissions import Permissions
 from .time import epoch_to_datetime
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from datetime import datetime
     from typing import Callable, Mapping, Optional, Text
     RawInfo = Mapping[Text, Mapping[Text, object]]

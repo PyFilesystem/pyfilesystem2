@@ -11,7 +11,7 @@ import typing
 from .base import Opener
 from .errors import NotWriteable
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Text
     from .parse import ParseResult
     from ..tarfs import TarFS

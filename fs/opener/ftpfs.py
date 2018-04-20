@@ -10,7 +10,7 @@ import typing
 
 from .base import Opener
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import List, Text, Union
     from ..ftpfs import FTPFS
     from ..subfs import SubFS

@@ -14,7 +14,7 @@ from .path import frombase
 from .path import normpath
 from .errors import FSError
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Callable, Optional, Text, Union
     from .base import FS
     from .walk import Walker

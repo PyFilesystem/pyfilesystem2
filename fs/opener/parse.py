@@ -14,7 +14,7 @@ from six.moves.urllib.parse import parse_qs, unquote
 
 from .errors import ParseError
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Optional, Text
 
 

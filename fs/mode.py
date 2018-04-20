@@ -12,7 +12,7 @@ import typing
 
 import six
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import Container, FrozenSet, Set, Text, Union
 
 

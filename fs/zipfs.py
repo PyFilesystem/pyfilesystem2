@@ -23,7 +23,7 @@ from .path import dirname, forcedir, normpath, relpath
 from .time import datetime_to_epoch
 from .wrapfs import WrapFS
 
-if typing.TYPE_CHECKING:
+if False:  # typing.TYPE_CHECKING
     from typing import (
         Any, BinaryIO, Collection, Dict, List, Optional,
         SupportsInt, Text, Tuple, Union)
@@ -171,7 +171,7 @@ class ZipFS(WrapFS):
         else:
             return ReadZipFS(file, encoding=encoding)
 
-    if typing.TYPE_CHECKING:
+    if False:  # typing.TYPE_CHECKING
         def __init__(self,
                      file,                              # type: Union[Text, BinaryIO]
                      write=False,                       # type: bool
