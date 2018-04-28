@@ -336,9 +336,13 @@ def splitext(path):
         ('baz', '.txt')
         >>> splitext('foo/bar/baz.txt')
         ('foo/bar/baz', '.txt')
+        >>> splitext('foo/bar/.foo')
+        ('foo/bar/.foo', '')
 
     """
     parent_path, pathname = split(path)
+    if pathname.startswith('.') and pathname.count('.') == 1:
+        return path, ''
     if '.' not in pathname:
         return path, ''
     pathname, ext = pathname.rsplit('.', 1)

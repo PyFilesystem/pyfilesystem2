@@ -183,17 +183,47 @@ class Info(object):
         return self.get('basic', 'name')
 
     @property
-    def ext(self):
+    def suffix(self):
         # type: () -> Text
-        """`str`: the resource extension (including dot).
+        """`str`: the final resource extension (including dot), or an
+        empty string if there is no extension.
 
         Example:
-            >>> info.ext
+            >>> info
+            <info 'foo.py'>
+            >>> info.suffix
             '.py'
         """
         name = self.get('basic', 'name')
+        if name.startswith('.') and name.count('.') == 1:
+            return ''
         basename, dot, ext = name.rpartition('.')
-        return dot + ext if dot else ''
+        return '.' + ext if dot else ''
+
+    @property
+    def suffixes(self):
+        # type: () -> List[Text]
+        """`List`: a list of the resource's extensions.
+
+        Example:
+            >>> info
+            <info 'foo.tar.gz'>
+            >>> info.suffixes
+            ['.tar', '.py']
+        """
+        name = self.get('basic', 'name')
+        if name.startswith('.') and name.count('.') == 1:
+            return []
+        return ['.' + suffix for suffix in name.split('.')[1:]]
+
+    @property
+    def stem(self):
+        # type: () -> Text
+        """`str`: the name minus any extensions."""
+        name = self.get('basic', 'name')
+        if name.startswith('.'):
+            return name
+        return name.split('.')[0]
 
     @property
     def is_dir(self):

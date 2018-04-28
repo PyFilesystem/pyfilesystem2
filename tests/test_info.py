@@ -75,7 +75,7 @@ class TestInfo(unittest.TestCase):
         self.assertIsInstance(info.is_dir, bool)
         self.assertFalse(info.is_dir)
         self.assertEqual(repr(info), "<file 'bar.py'>")
-        self.assertEqual(info.ext, '.py')
+        self.assertEqual(info.suffix, '.py')
 
         # Check dir
         info = Info({
@@ -86,7 +86,7 @@ class TestInfo(unittest.TestCase):
         })
         self.assertTrue(info.is_dir)
         self.assertEqual(repr(info), "<dir 'foo'>")
-        self.assertEqual(info.ext, '')
+        self.assertEqual(info.suffix, '')
 
     def test_details(self):
         dates = [
@@ -137,3 +137,24 @@ class TestInfo(unittest.TestCase):
         info = Info({'baz': {}})
         self.assertIsNone(info.get('foo', 'bar'))
         self.assertIsNone(info.get('baz', 'bar'))
+
+    def test_suffix(self):
+        info = Info({
+            'basic': {'name': 'foo.tar.gz'}
+        })
+        self.assertEqual(info.suffix, '.gz')
+        self.assertEqual(info.suffixes, ['.tar', '.gz'])
+        self.assertEqual(info.stem, 'foo')
+        info = Info({
+            'basic': {'name': 'foo'}
+        })
+        self.assertEqual(info.suffix, '')
+        self.assertEqual(info.suffixes, [])
+        self.assertEqual(info.stem, 'foo')
+
+        info = Info({
+            'basic': {'name': '.foo'}
+        })
+        self.assertEqual(info.suffix, '')
+        self.assertEqual(info.suffixes, [])
+        self.assertEqual(info.stem, '.foo')

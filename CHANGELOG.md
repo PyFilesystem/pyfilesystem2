@@ -9,11 +9,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Typing information
-- Added ext attribute to info
+- Added Info.suffix, Info.suffixes, Info.stem attributes
 
 ### Fixed
 
 - Fixed issue with implied directories in TarFS
+
+### Changed
+
+- Changed path.splitext so that 'leading periods on the basename are
+    ignored', which is the behaviour of os.path.splitext
 
 ## [2.0.20] - 2018-03-13
 
