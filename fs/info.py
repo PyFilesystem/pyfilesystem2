@@ -183,6 +183,19 @@ class Info(object):
         return self.get('basic', 'name')
 
     @property
+    def ext(self):
+        # type: () -> Text
+        """`str`: the resource extension (including dot).
+
+        Example:
+            >>> info.ext
+            '.py'
+        """
+        name = self.get('basic', 'name')
+        basename, dot, ext = name.rpartition('.')
+        return dot + ext if dot else ''
+
+    @property
     def is_dir(self):
         # type: () -> bool
         """`bool`: `True` if the resource references a directory.

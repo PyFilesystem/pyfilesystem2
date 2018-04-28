@@ -5,3 +5,4 @@ omit = fs/test.py
 exclude_lines =
     pragma: no cover
     if False:
+    @typing.overload

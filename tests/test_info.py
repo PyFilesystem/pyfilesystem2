@@ -67,14 +67,15 @@ class TestInfo(unittest.TestCase):
         # Check simple file
         info = Info({
             "basic": {
-                "name": "bar",
+                "name": "bar.py",
                 "is_dir": False
             }
         })
-        self.assertEqual(info.name, "bar")
+        self.assertEqual(info.name, "bar.py")
         self.assertIsInstance(info.is_dir, bool)
         self.assertFalse(info.is_dir)
-        self.assertEqual(repr(info), "<file 'bar'>")
+        self.assertEqual(repr(info), "<file 'bar.py'>")
+        self.assertEqual(info.ext, '.py')
 
         # Check dir
         info = Info({
@@ -85,6 +86,7 @@ class TestInfo(unittest.TestCase):
         })
         self.assertTrue(info.is_dir)
         self.assertEqual(repr(info), "<dir 'foo'>")
+        self.assertEqual(info.ext, '')
 
     def test_details(self):
         dates = [
