@@ -209,7 +209,7 @@ class Info(object):
             >>> info
             <info 'foo.tar.gz'>
             >>> info.suffixes
-            ['.tar', '.py']
+            ['.tar', '.gz']
         """
         name = self.get('basic', 'name')
         if name.startswith('.') and name.count('.') == 1:
