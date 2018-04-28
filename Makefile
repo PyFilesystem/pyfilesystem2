@@ -9,12 +9,10 @@ release: readme
 .PHONY: test
 test:
 	nosetests --with-coverage --cover-package=fs -a "!slow" tests
-	rm .coverage
 
 .PHONY: slowtest
 slowtest:
 	nosetests --with-coverage --cover-erase --cover-package=fs tests
-	rm .coverage
 
 .PHONY: testall
 testall:
