@@ -3,9 +3,11 @@ from __future__ import unicode_literals
 import errno
 import os
 import sys
+from operator import attrgetter
 
 from six import text_type
 
+from ..path import join
 from ..errors import FSError, ResourceNotFound
 from .context import ModulePatch
 
@@ -66,7 +68,7 @@ class OsPathGetmtime(_OsPathTime):
 class OsPathGetctime(_OsPathTime):
     attrib = 'getctime'
 
-    time_filed = (
+    time_field = (
         'metadata_changed'
         if sys.platform == 'linux' else
         'created'
@@ -127,14 +129,30 @@ class OsListdir(ModulePatch):
 
     def listdir(self, context, path='.'):
         if not path:
-            raise OSError(2, "No such file or directory: ''")
+            _not_found(path)
         _path = context.get_path(path)
         try:
             dirlist = context.filesystem.listdir(_path)
         except ResourceNotFound as error:
-            raise OSError(
-                2, "No such file or directory: '{}'".format(path)
-            )
+            _not_found(path)
         except FSError as error:
             raise OSError(text_type(error))
         return dirlist
+
+
+class OsWalk(ModulePatch):
+    module = os
+    attrib = 'walk'
+
+    def walk(self, context,
+             top, topdown=True, onerror=None, followlinks=False):
+        _path = context.get_path(top)
+        walk_method = 'depth' if topdown else 'breadth'
+        getname = attrgetter('name')
+        with context.filesystem.opendir(_path) as dir_fs:
+            for _dirpath, _dirs, _files in dir_fs.walk(method=walk_method):
+                dirpath = join(_path, _dirpath)
+                dirs = [getname(info) for info in _dirs]
+                files = [getname(info) for info in _files]
+                yield dirpath, dirs, files
+

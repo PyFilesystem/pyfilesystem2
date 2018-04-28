@@ -23,10 +23,6 @@ PATCHES = [
 
 if PY3:
     from . import py3_patches
-    PATCHES += [
-        py3_patches.OsWalk()
-
-    ]
 
 
 
