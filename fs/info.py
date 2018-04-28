@@ -185,8 +185,8 @@ class Info(object):
     @property
     def suffix(self):
         # type: () -> Text
-        """`str`: the final resource extension (including dot), or an
-        empty string if there is no extension.
+        """`str`: the last component of the name (including dot), or an
+        empty string if there is no suffix.
 
         Example:
             >>> info
@@ -203,7 +203,7 @@ class Info(object):
     @property
     def suffixes(self):
         # type: () -> List[Text]
-        """`List`: a list of the resource's extensions.
+        """`List`: a list of any suffixes in the name.
 
         Example:
             >>> info
@@ -219,7 +219,15 @@ class Info(object):
     @property
     def stem(self):
         # type: () -> Text
-        """`str`: the name minus any extensions."""
+        """`str`: the name minus any suffixes.
+
+        Example:
+            >>> info
+            <info 'foo.tar.gz'>
+            >>> info.stem
+            'foo'
+
+        """
         name = self.get('basic', 'name')
         if name.startswith('.'):
             return name
