@@ -134,6 +134,6 @@ class TestInfo(unittest.TestCase):
         self.assertEqual(info.raw, info_copy.raw)
 
     def test_get(self):
-        info = Info({'baz':{}})
+        info = Info({'baz': {}})
         self.assertIsNone(info.get('foo', 'bar'))
         self.assertIsNone(info.get('baz', 'bar'))
