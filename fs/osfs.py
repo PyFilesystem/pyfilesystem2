@@ -16,6 +16,7 @@ import os
 import platform
 import stat
 import sys
+import typing
 
 import six
 
@@ -23,7 +24,7 @@ try:
     from os import scandir
 except ImportError:
     try:
-        from scandir import scandir
+        from scandir import scandir    # type: ignore
     except ImportError:  # pragma: nocover
         scandir = None
 
@@ -39,6 +40,18 @@ from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
 from .errors import NoURL
 
+if False:  # typing.TYPE_CHECKING
+    from typing import (
+        Any, BinaryIO, Callable, Collection, Dict,
+        Iterator, IO, List, Optional, SupportsInt,
+        Text, Tuple)
+    from .base import _OpendirFactory
+    from .info import RawInfo
+    from .subfs import SubFS
+
+    _O = typing.TypeVar('_O', bound='OSFS')
+
+
 log = logging.getLogger('fs.osfs')
 
 
@@ -52,11 +65,11 @@ class OSFS(FS):
     Arguments:
         root_path (str or ~os.PathLike): An OS path or path-like object to
             the location on your HD you wish to manage.
-        create (bool, optional): Set to `True` to create the root directory
-            if it does not already exist, otherwise the directory should exist
-            prior to creating the ``OSFS`` instance (default `False`).
-        create_mode (int, optional): The permissions that will be used to
-            create the directory if ``create`` is `True` and the path doesn't
+        create (bool): Set to `True` to create the root directory if it
+            does not already exist, otherwise the directory should exist
+            prior to creating the ``OSFS`` instance (defaults to `False`).
+        create_mode (int): The permissions that will be used to create
+            the directory if ``create`` is `True` and the path doesn't
             exist, defaults to ``0o777``.
 
     Raises:
@@ -71,9 +84,11 @@ class OSFS(FS):
     """
 
     def __init__(self,
-                 root_path,
-                 create=False,
-                 create_mode=0o777):
+                 root_path,             # type: Text
+                 create=False,          # type: bool
+                 create_mode=0o777      # type: SupportsInt
+                 ):
+        # type: (...) -> None
         """Create an OSFS instance.
         """
         super(OSFS, self).__init__()
@@ -85,7 +100,7 @@ class OSFS(FS):
         if create:
             try:
                 if not os.path.isdir(_root_path):
-                    os.makedirs(_root_path, mode=create_mode)
+                    os.makedirs(_root_path, mode=int(create_mode))
             except OSError as error:
                 raise errors.CreateFailed(
                     'unable to create {} ({})'.format(root_path, error),
@@ -120,16 +135,19 @@ class OSFS(FS):
                 )
 
     def __repr__(self):
+        # type: () -> str
         _fmt = "{}({!r})"
         return _fmt.format(self.__class__.__name__,
                            self.root_path)
 
     def __str__(self):
+        # type: () -> str
         fmt = "<{} '{}'>"
         return fmt.format(self.__class__.__name__.lower(),
                           self.root_path)
 
     def _to_sys_path(self, path):
+        # type: (Text) -> Text
         """Convert a FS path to a path on the OS.
         """
         sys_path = os.path.join(
@@ -140,6 +158,7 @@ class OSFS(FS):
 
     @classmethod
     def _make_details_from_stat(cls, stat_result):
+        # type: (os.stat_result) -> Dict[Text, object]
         """Make a *details* info dict from an `os.stat_result` object.
         """
         details = {
@@ -163,24 +182,25 @@ class OSFS(FS):
 
     @classmethod
     def _make_access_from_stat(cls, stat_result):
+        # type: (os.stat_result) -> Dict[Text, object]
         """Make an *access* info dict from an `os.stat_result` object.
         """
-        access = {}
+        access = {}   # type: Dict[Text, object]
         access['permissions'] = Permissions(
             mode=stat_result.st_mode
         ).dump()
-        access['gid'] = stat_result.st_gid
-        access['uid'] = stat_result.st_uid
+        access['gid'] = gid = stat_result.st_gid
+        access['uid'] = uid = stat_result.st_uid
         if not _WINDOWS_PLATFORM:
             import grp
             import pwd
             try:
-                access['group'] = grp.getgrgid(access['gid']).gr_name
+                access['group'] = grp.getgrgid(gid).gr_name
             except KeyError:  # pragma: nocover
                 pass
 
             try:
-                access['user'] = pwd.getpwuid(access['uid']).pw_name
+                access['user'] = pwd.getpwuid(uid).pw_name
             except KeyError:  # pragma: nocover
                 pass
         return access
@@ -197,6 +217,7 @@ class OSFS(FS):
 
     @classmethod
     def _get_type_from_stat(cls, _stat):
+        # type: (os.stat_result) -> ResourceType
         """Get the resource type from an `os.stat_result` object.
         """
         st_mode = _stat.st_mode
@@ -208,6 +229,7 @@ class OSFS(FS):
     # --------------------------------------------------------
 
     def _gettarget(self, sys_path):
+        # type: (Text) -> Optional[Text]
         try:
             target = os.readlink(sys_path)
         except OSError:
@@ -216,13 +238,12 @@ class OSFS(FS):
             return target
 
     def _make_link_info(self, sys_path):
+        # type: (Text) -> Dict[Text, object]
         _target = self._gettarget(sys_path)
-        link = {
-            'target': _target,
-        }
-        return link
+        return {'target': _target}
 
     def getinfo(self, path, namespaces=None):
+        # type: (Text, Optional[Collection[Text]]) -> Info
         self.check()
         namespaces = namespaces or ()
         _path = self.validatepath(path)
@@ -259,6 +280,7 @@ class OSFS(FS):
         return Info(info)
 
     def listdir(self, path):
+        # type: (Text) -> List[Text]
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
@@ -266,7 +288,12 @@ class OSFS(FS):
             names = os.listdir(sys_path)
         return names
 
-    def makedir(self, path, permissions=None, recreate=False):
+    def makedir(self,               # type: _O
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[_O]
         self.check()
         mode = Permissions.get_mode(permissions)
         _path = self.validatepath(path)
@@ -284,6 +311,7 @@ class OSFS(FS):
             return self.opendir(_path)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
+        # type: (Text, Text, int, **Any) -> BinaryIO
         _mode = Mode(mode)
         _mode.validate_bin()
         self.check()
@@ -298,9 +326,10 @@ class OSFS(FS):
                 buffering=buffering,
                 **options
             )
-        return binary_file
+        return binary_file  # type: ignore
 
     def remove(self, path):
+        # type: (Text) -> None
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
@@ -319,6 +348,7 @@ class OSFS(FS):
                 raise
 
     def removedir(self, path):
+        # type: (Text) -> None
         self.check()
         _path = self.validatepath(path)
         if _path == '/':
@@ -331,16 +361,24 @@ class OSFS(FS):
     # Optional Methods
     # --------------------------------------------------------
 
+    if False:  # typing.TYPE_CHECKING
+        def opendir(self, path, factory=None):
+            # type: (_O, Text, Optional[_OpendirFactory]) -> SubFS[_O]
+            pass
+
     def getsyspath(self, path):
+        # type: (Text) -> Text
         sys_path = self._to_sys_path(path)
         return sys_path
 
     def geturl(self, path, purpose='download'):
+        # type: (Text, Text) -> Text
         if purpose != 'download':
             raise NoURL(path, purpose)
         return "file://" + self.getsyspath(path)
 
     def gettype(self, path):
+        # type: (Text) -> ResourceType
         self.check()
         sys_path = self._to_sys_path(path)
         with convert_os_errors('gettype', path):
@@ -349,6 +387,7 @@ class OSFS(FS):
         return resource_type
 
     def islink(self, path):
+        # type: (Text) -> bool
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
@@ -358,14 +397,16 @@ class OSFS(FS):
             return os.path.islink(sys_path)
 
     def open(self,
-             path,
-             mode="r",
-             buffering=-1,
-             encoding=None,
-             errors=None,
-             newline='',
-             line_buffering=False,
-             **options):
+             path,                  # type: Text
+             mode="r",              # type: Text
+             buffering=-1,          # type: int
+             encoding=None,         # type: Optional[Text]
+             errors=None,           # type: Optional[Text]
+             newline='',            # type: Text
+             line_buffering=False,  # type: bool
+             **options              # type: Any
+             ):
+        # type: (...) -> IO
         _mode = Mode(mode)
         validate_open_mode(mode)
         self.check()
@@ -386,6 +427,7 @@ class OSFS(FS):
             )
 
     def setinfo(self, path, info):
+        # type: (Text, RawInfo) -> None
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
@@ -394,16 +436,17 @@ class OSFS(FS):
         if 'details' in info:
             details = info['details']
             if 'accessed' in details or 'modified' in details:
-                accessed = details.get("accessed")
-                modified = details.get("modified", accessed)
-                accessed = int(modified if accessed is None else accessed)
-                modified = int(modified)
+                _accessed = typing.cast(int, details.get("accessed"))
+                _modified = typing.cast(int, details.get("modified", _accessed))
+                accessed = int(_modified if _accessed is None else _accessed)
+                modified = int(_modified)
                 if accessed is not None or modified is not None:
                     with convert_os_errors('setinfo', path):
                         os.utime(sys_path, (accessed, modified))
 
     if scandir:
         def _scandir(self, path, namespaces=None):
+            # type: (Text, Optional[Collection[Text]]) -> Iterator[Info]
             self.check()
             namespaces = namespaces or ()
             _path = self.validatepath(path)
@@ -446,6 +489,7 @@ class OSFS(FS):
     else:
 
         def _scandir(self, path, namespaces=None):
+            # type: (Text, Optional[Collection[Text]]) -> Iterator[Info]
             self.check()
             namespaces = namespaces or ()
             _path = self.validatepath(path)
@@ -459,7 +503,7 @@ class OSFS(FS):
                             "name": entry_name,
                             "is_dir": stat.S_ISDIR(stat_result.st_mode),
                         }
-                    }
+                    }  # type: Dict[Text, Dict[Text, Any]]
                     if 'details' in namespaces:
                         info['details'] = \
                             self._make_details_from_stat(stat_result)
@@ -485,7 +529,12 @@ class OSFS(FS):
                     yield Info(info)
 
 
-    def scandir(self, path, namespaces=None, page=None):
+    def scandir(self,
+                path,               # type: Text
+                namespaces=None,    # type: Optional[Collection[Text]]
+                page=None           # type: Optional[Tuple[int, int]]
+                ):
+        # type: (...) -> Iterator[Info]
         iter_info = self._scandir(path, namespaces=namespaces)
         if page is not None:
             start, end = page

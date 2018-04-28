@@ -24,3 +24,7 @@ testall:
 docs:
 	cd docs && make html
 	python -c "import os, webbrowser; webbrowser.open('file://' + os.path.abspath('./docs/build/html/index.html'))"
+
+.PHONY: typecheck
+typecheck:
+	mypy -p fs --config setup.cfg

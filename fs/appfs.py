@@ -9,9 +9,15 @@ subclasses of `~fs.osfs.OSFS`.
 
 # see http://technet.microsoft.com/en-us/library/cc766489(WS.10).aspx
 
+import typing
+
 from .osfs import OSFS
 from ._repr import make_repr
 from appdirs import AppDirs
+
+if False:  # typing.TYPE_CHECKING
+    from typing import Optional, Text
+
 
 __all__ = ['UserDataFS',
            'UserConfigFS',
@@ -25,36 +31,44 @@ class _AppFS(OSFS):
     """Abstract base class for an app FS.
     """
 
-    app_dir = None
+    # FIXME(@althonos): replace by ClassVar[Text] once
+    # https://github.com/python/mypy/pull/4718 is accepted
+    # (subclass override will raise errors until then)
+    app_dir = None  # type: Text
 
     def __init__(self,
-                 appname,
-                 author=None,
-                 version=None,
-                 roaming=False,
-                 create=True):
+                 appname,          # type: Text
+                 author=None,      # type: Optional[Text]
+                 version=None,     # type: Optional[Text]
+                 roaming=False,    # type: bool
+                 create=True       # type: bool
+                 ):
+        # type: (...) -> None
         self.app_dirs = AppDirs(appname, author, version, roaming)
-        self.create = create
+        self._create = create
         super(_AppFS, self).__init__(
             getattr(self.app_dirs, self.app_dir),
             create=create
         )
 
     def __repr__(self):
+        # type: () -> Text
         return make_repr(
             self.__class__.__name__,
             self.app_dirs.appname,
             author=(self.app_dirs.appauthor, None),
             version=(self.app_dirs.version, None),
             roaming=(self.app_dirs.roaming, False),
-            create=(self.create, True)
+            create=(self._create, True)
         )
 
     def __str__(self):
+        # type: () -> Text
         return "<{} '{}'>".format(
             self.__class__.__name__.lower(),
             self.app_dirs.appname
         )
+
 
 class UserDataFS(_AppFS):
     """A filesystem for per-user application data.

@@ -4,10 +4,18 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+from typing import Container, Iterable, Text
+
 import six
+
+if False:  # typing.TYPE_CHECKING
+    from typing import (
+        Iterator, List, Optional, Tuple, Type, Union)
 
 
 def make_mode(init):
+    # type: (Union[int, Iterable[Text], None]) -> int
     """Make a mode integer from an initial value.
     """
     return Permissions.get_mode(init)
@@ -16,14 +24,18 @@ def make_mode(init):
 class _PermProperty(object):
     """Creates simple properties to get/set permissions.
     """
+
     def __init__(self, name):
+        # type: (Text) -> None
         self._name = name
         self.__doc__ = "Boolean for '{}' permission.".format(name)
 
     def __get__(self, obj, obj_type=None):
+        # type: (Permissions, Optional[Type[Permissions]]) -> bool
         return self._name in obj
 
     def __set__(self, obj, value):
+        # type: (Permissions, bool) -> None
         if value:
             obj.add(self._name)
         else:
@@ -31,7 +43,7 @@ class _PermProperty(object):
 
 
 @six.python_2_unicode_compatible
-class Permissions(object):
+class Permissions(Container[Text], Iterable[Text]):
     """An abstraction for file system permissions.
 
     Permissions objects store information regarding the permissions
@@ -76,18 +88,20 @@ class Permissions(object):
         ('o_r', 4),
         ('o_w', 2),
         ('o_x', 1)
-    ]
-    _LINUX_PERMS_NAMES = [_name for _name, _mask in _LINUX_PERMS]
+    ]  # type: List[Tuple[Text, int]]
+    _LINUX_PERMS_NAMES = [_name for _name, _mask in _LINUX_PERMS]  # type: List[Text]
 
     def __init__(self,
-                 names=None,
-                 mode=None,
-                 user=None,
-                 group=None,
-                 other=None,
-                 sticky=None,
-                 setuid=None,
-                 setguid=None):
+                 names=None,    # type: Optional[Iterable[Text]]
+                 mode=None,     # type: Optional[int]
+                 user=None,     # type: Optional[Text]
+                 group=None,    # type: Optional[Text]
+                 other=None,    # type: Optional[Text]
+                 sticky=None,   # type: Optional[bool]
+                 setuid=None,   # type: Optional[bool]
+                 setguid=None   # type: Optional[bool]
+                 ):
+        # type: (...) -> None
         if names is not None:
             self._perms = set(names)
         elif mode is not None:
@@ -110,6 +124,7 @@ class Permissions(object):
             self._perms.add('setguid')
 
     def __repr__(self):
+        # type: () -> Text
         if not self._perms.issubset(self._LINUX_PERMS_NAMES):
             _perms_str = ", ".join(
                 "'{}'".format(p) for p in sorted(self._perms)
@@ -117,6 +132,7 @@ class Permissions(object):
             return "Permissions(names=[{}])".format(_perms_str)
 
         def _check(perm, name):
+            # type: (Text, Text) -> Text
             return name if perm in self._perms else ''
 
         user = ''.join((
@@ -147,26 +163,32 @@ class Permissions(object):
         return "Permissions({})".format(', '.join(args))
 
     def __str__(self):
+        # type: () -> Text
         return self.as_str()
 
     def __iter__(self):
+        # type: () -> Iterator[Text]
         return iter(self._perms)
 
     def __contains__(self, permission):
+        # type: (object) -> bool
         return permission in self._perms
 
     def __eq__(self, other):
+        # type: (object) -> bool
         if isinstance(other, Permissions):
-            names = other.dump()
+            names = other.dump()            # type: object
         else:
             names = other
         return self.dump() == names
 
     def __ne__(self, other):
+        # type: (object) -> bool
         return not self.__eq__(other)
 
     @classmethod
     def parse(cls, ls):
+        # type: (Text) -> Permissions
         """Parse permissions in Linux notation.
         """
         user = ls[:3]
@@ -176,17 +198,19 @@ class Permissions(object):
 
     @classmethod
     def load(cls, permissions):
+        # type: (List[Text]) -> Permissions
         """Load a serialized permissions object.
         """
         return cls(names=permissions)
 
     @classmethod
     def create(cls, init=None):
+        # type: (Union[int, Iterable[Text], None]) -> Permissions
         """Create a permissions object from an initial value.
 
         Arguments:
-            init (int or list or None): May be None to use 0o777 permissions,
-                a mode integer, or a list of permission names.
+            init (int or list, optional): May be None to use `0o777`
+                permissions, a mode integer, or a list of permission names.
 
         Returns:
             int: mode integer that may be used for instance by `os.makedir`.
@@ -212,21 +236,25 @@ class Permissions(object):
 
     @classmethod
     def get_mode(cls, init):
+        # type: (Union[int, Iterable[Text], None]) -> int
         """Convert an initial value to a mode integer.
         """
         return cls.create(init).mode
 
     def copy(self):
+        # type: () -> Permissions
         """Make a copy of this permissions object.
         """
         return Permissions(names=list(self._perms))
 
     def dump(self):
+        # type: () -> List[Text]
         """Get a list suitable for serialization.
         """
         return sorted(self._perms)
 
     def as_str(self):
+        # type: () -> Text
         """Get a Linux-style string representation of permissions.
         """
         perms = [
@@ -248,6 +276,7 @@ class Permissions(object):
 
     @property
     def mode(self):
+        # type: () -> int
         """`int`: mode integer.
         """
         mode = 0
@@ -258,6 +287,7 @@ class Permissions(object):
 
     @mode.setter
     def mode(self, mode):
+        # type: (int) -> None
         self._perms = {
             name
             for name, mask in self._LINUX_PERMS
@@ -281,6 +311,7 @@ class Permissions(object):
     setguid = _PermProperty('setguid')
 
     def add(self, *permissions):
+        # type: (*Text) -> None
         """Add permission(s).
 
         Arguments:
@@ -291,6 +322,7 @@ class Permissions(object):
         self._perms.update(permissions)
 
     def remove(self, *permissions):
+        # type: (*Text) -> None
         """Remove permission(s).
 
         Arguments:
@@ -301,6 +333,7 @@ class Permissions(object):
         self._perms.difference_update(permissions)
 
     def check(self, *permissions):
+        # type: (*Text) -> bool
         """Check if one or more permissions are enabled.
 
         Arguments:
