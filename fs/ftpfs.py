@@ -418,8 +418,8 @@ class FTPFS(FS):
             self._features = {}
             try:
                 feat_response = _decode(_ftp.sendcmd("FEAT"), 'latin-1')
-            except error_perm:
-                self.encoding = 'latin-1'  # pragma: no cover
+            except error_perm:  # pragma: no cover
+                self.encoding = 'latin-1'
             else:
                 self._features = self._parse_features(feat_response)
                 self.encoding = (
