@@ -1,4 +1,4 @@
-# type: no cover
+# pragma: no cover
 """
 Typing objects missing from Python3.5.1
 
