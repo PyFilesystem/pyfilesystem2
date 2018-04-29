@@ -104,9 +104,7 @@ def _parse_ftp_error(error):
     # type: (ftplib.Error) -> Tuple[Union[int, Text], Text]
     """Extract code and message from ftp error."""
     code, _, message = text_type(error).partition(' ')
-    if code.isdigit():
-        return int(code), message
-    return code, message
+    return (int(code) if code.isdigit() else code), message
 
 
 if PY2:
