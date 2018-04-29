@@ -222,21 +222,6 @@ class _DirEntry(object):
                 _bytes_file.seek(0, os.SEEK_END)
                 return _bytes_file.tell()
 
-    @typing.overload
-    def get_entry(self, name, default):
-        # type: (Text, _DirEntry) -> _DirEntry
-        pass
-
-    @typing.overload
-    def get_entry(self, name):
-        # type: (Text) -> Optional[_DirEntry]
-        pass
-
-    @typing.overload
-    def get_entry(self, name, default):
-        # type: (Text, None) -> Optional[_DirEntry]
-        pass
-
     def get_entry(self, name, default=None):
         # type: (Text, Optional[_DirEntry]) -> Optional[_DirEntry]
         assert self.is_dir, 'must be a directory'

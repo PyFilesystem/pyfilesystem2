@@ -5,9 +5,13 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import typing
-from typing import Container, Iterable, Text
+from typing import Container, Iterable
 
 import six
+
+
+Text = six.text_type
+
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
@@ -43,7 +47,7 @@ class _PermProperty(object):
 
 
 @six.python_2_unicode_compatible
-class Permissions(Container[Text], Iterable[Text]):
+class Permissions(object):
     """An abstraction for file system permissions.
 
     Permissions objects store information regarding the permissions

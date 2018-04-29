@@ -12,6 +12,10 @@ import typing
 
 import six
 
+
+Text = six.text_type
+
+
 if False:  # typing.TYPE_CHECKING
     from typing import Container, FrozenSet, Set, Text, Union
 
@@ -24,7 +28,7 @@ __all__ = ["Mode",
 
 # https://docs.python.org/3/library/functions.html#open
 @six.python_2_unicode_compatible
-class Mode(typing.Container[typing.Text]):
+class Mode(typing.Container[Text]):
     """An abstraction for I/O modes.
 
     A mode object provides properties that can be used to interrogate the

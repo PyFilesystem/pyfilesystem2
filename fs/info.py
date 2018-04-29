@@ -58,37 +58,12 @@ class Info(object):
         # type: (object) -> bool
         return self.raw == getattr(other, 'raw', None)
 
-    @typing.overload
-    def _make_datetime(self, t):
-        # type: (None) -> None
-        pass
-
-    @typing.overload
-    def _make_datetime(self, t):
-        # type: (int) -> datetime
-        pass
-
     def _make_datetime(self, t):
         # type: (Optional[int]) -> Optional[datetime]
         if t is not None:
             return self._to_datetime(t)
         else:
             return None
-
-    @typing.overload
-    def get(self, namespace, key, default=None):
-        # type: (Text, Text, Optional[T]) -> Optional[T]
-        pass
-
-    @typing.overload
-    def get(self, namespace, key):
-        # type: (Text, Text) -> Optional[T]
-        pass
-
-    @typing.overload
-    def get(self, namespace, key, default):
-        # type: (Text, Text, T) -> T
-        pass
 
     def get(self, namespace, key, default=None):
         # type: (Text, Text, Optional[T]) -> Optional[T]
