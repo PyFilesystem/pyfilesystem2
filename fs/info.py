@@ -61,12 +61,12 @@ class Info(object):
         return self.raw == getattr(other, 'raw', None)
 
     @overload
-    def _make_datetime(self, t):
+    def _make_datetime(self, t):  # pragma: no cover
         # type: (None) -> None
         pass
 
     @overload
-    def _make_datetime(self, t):
+    def _make_datetime(self, t):  # pragma: no cover
         # type: (int) -> datetime
         pass
 
@@ -78,17 +78,17 @@ class Info(object):
             return None
 
     @overload
-    def get(self, namespace, key, default=None):
+    def get(self, namespace, key, default=None):  # pragma: no cover
         # type: (Text, Text, Optional[T]) -> Optional[T]
         pass
 
     @overload
-    def get(self, namespace, key):
+    def get(self, namespace, key):  # pragma: no cover
         # type: (Text, Text) -> Optional[T]
         pass
 
     @overload
-    def get(self, namespace, key, default):
+    def get(self, namespace, key, default):  # pragma: no cover
         # type: (Text, Text, T) -> T
         pass
 

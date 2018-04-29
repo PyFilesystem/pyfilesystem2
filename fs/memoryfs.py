@@ -222,17 +222,17 @@ class _DirEntry(object):
                 return _bytes_file.tell()
 
     @overload
-    def get_entry(self, name, default):
+    def get_entry(self, name, default):  # pragma: no cover
         # type: (Text, _DirEntry) -> _DirEntry
         pass
 
     @overload
-    def get_entry(self, name):
+    def get_entry(self, name):  # pragma: no cover
         # type: (Text) -> Optional[_DirEntry]
         pass
 
     @overload
-    def get_entry(self, name, default):
+    def get_entry(self, name, default):  # pragma: no cover
         # type: (Text, None) -> Optional[_DirEntry]
         pass
 
