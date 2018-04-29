@@ -9,8 +9,7 @@ from typing import Container, Iterable
 
 import six
 
-
-Text = six.text_type
+from ._typing import Text
 
 
 if False:  # typing.TYPE_CHECKING
