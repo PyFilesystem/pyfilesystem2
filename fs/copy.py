@@ -96,7 +96,7 @@ def _source_is_newer(src_fs, src_path, dst_fs, dst_path):
                 dst_modified = dst_fs.getinfo(dst_path, namespace).modified
                 return dst_modified is None or src_modified > dst_modified
         return True
-    except FSError:  # pragma: nocover
+    except FSError:  # pragma: no cover
         #todo: should log something here
         return True
 

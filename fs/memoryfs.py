@@ -120,8 +120,6 @@ class _MemoryFile(io.RawIOBase):
         # type: (Optional[int]) -> bytes
         if not self._mode.reading:
             raise IOError('File not open for reading')
-        if size is None:
-            size = -1
         with self._seek_lock():
             self.on_access()
             return self._bytes_io.read(size)
