@@ -96,7 +96,7 @@ def manage_ftp(ftp):
     finally:
         try:
             ftp.quit()
-        except:  # pragma: nocover
+        except:  # pragma: no cover
             pass
 
 
@@ -189,7 +189,7 @@ class FTPFile(io.RawIOBase):
                         self._read_conn = None
                     try:
                         self.ftp.quit()
-                    except error_temp:  # pragma: nocover
+                    except error_temp:  # pragma: no cover
                         pass
                 finally:
                     super(FTPFile, self).close()
@@ -219,7 +219,7 @@ class FTPFile(io.RawIOBase):
                     read_size = min(DEFAULT_CHUNK_SIZE, remaining)
                 try:
                     chunk = conn.recv(read_size)
-                except socket.error:  # pragma: nocover
+                except socket.error:  # pragma: no cover
                     break
                 if not chunk:
                     break

@@ -430,7 +430,7 @@ class ReadTarFS(FS):
         return self._tar.closed  # type: ignore
 
 
-if __name__ == "__main__":  # pragma: nocover
+if __name__ == "__main__":  # pragma: no cover
     from fs.tree import render
     from fs.opener import open_fs
 
