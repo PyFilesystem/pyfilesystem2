@@ -46,7 +46,7 @@ class _PermProperty(object):
 
 
 @six.python_2_unicode_compatible
-class Permissions(object):
+class Permissions(Container[Text], Iterable[Text]):
     """An abstraction for file system permissions.
 
     Permissions objects store information regarding the permissions
