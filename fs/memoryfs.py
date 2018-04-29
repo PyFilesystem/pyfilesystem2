@@ -21,6 +21,7 @@ from .mode import Mode
 from .path import iteratepath
 from .path import normpath
 from .path import split
+from ._typing import overload
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
@@ -219,6 +220,21 @@ class _DirEntry(object):
                 _bytes_file = typing.cast(io.BytesIO, self._bytes_file)
                 _bytes_file.seek(0, os.SEEK_END)
                 return _bytes_file.tell()
+
+    @overload
+    def get_entry(self, name, default):
+        # type: (Text, _DirEntry) -> _DirEntry
+        pass
+
+    @overload
+    def get_entry(self, name):
+        # type: (Text) -> Optional[_DirEntry]
+        pass
+
+    @overload
+    def get_entry(self, name, default):
+        # type: (Text, None) -> Optional[_DirEntry]
+        pass
 
     def get_entry(self, name, default=None):
         # type: (Text, Optional[_DirEntry]) -> Optional[_DirEntry]

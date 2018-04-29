@@ -13,10 +13,12 @@ from .enums import ResourceType
 from .errors import MissingInfoNamespace
 from .permissions import Permissions
 from .time import epoch_to_datetime
+from ._typing import overload
 
 if False:  # typing.TYPE_CHECKING
     from datetime import datetime
-    from typing import Callable, Mapping, Optional, Text
+    from typing import Callable, List, Mapping, Optional
+    from ._typing import Text
     RawInfo = Mapping[Text, Mapping[Text, object]]
     ToDatetime = Callable[[int], datetime]
     T = typing.TypeVar("T")
@@ -58,12 +60,37 @@ class Info(object):
         # type: (object) -> bool
         return self.raw == getattr(other, 'raw', None)
 
+    @overload
+    def _make_datetime(self, t):
+        # type: (None) -> None
+        pass
+
+    @overload
+    def _make_datetime(self, t):
+        # type: (int) -> datetime
+        pass
+
     def _make_datetime(self, t):
         # type: (Optional[int]) -> Optional[datetime]
         if t is not None:
             return self._to_datetime(t)
         else:
             return None
+
+    @overload
+    def get(self, namespace, key, default=None):
+        # type: (Text, Text, Optional[T]) -> Optional[T]
+        pass
+
+    @overload
+    def get(self, namespace, key):
+        # type: (Text, Text) -> Optional[T]
+        pass
+
+    @overload
+    def get(self, namespace, key, default):
+        # type: (Text, Text, T) -> T
+        pass
 
     def get(self, namespace, key, default=None):
         # type: (Text, Text, Optional[T]) -> Optional[T]

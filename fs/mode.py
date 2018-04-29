@@ -12,12 +12,11 @@ import typing
 
 import six
 
-
-Text = six.text_type
+from ._typing import Text
 
 
 if False:  # typing.TYPE_CHECKING
-    from typing import Container, FrozenSet, Set, Text, Union
+    from typing import Container, FrozenSet, Set, Union
 
 
 __all__ = ["Mode",

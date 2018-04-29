@@ -76,12 +76,12 @@ def ftp_errors(fs, path=None):
             )
     except error_perm as error:
         code, message = _parse_ftp_error(error)
-        if code == 552:
+        if code == '552':
             raise errors.InsufficientStorage(
                 path=path,
                 msg=message
             )
-        elif code in (501, 550):
+        elif code in ('501', '550'):
             raise errors.ResourceNotFound(path=path)
         raise errors.PermissionDenied(
             msg=message
@@ -101,10 +101,10 @@ def manage_ftp(ftp):
 
 
 def _parse_ftp_error(error):
-    # type: (ftplib.Error) -> Tuple[Union[int, Text], Text]
+    # type: (ftplib.Error) -> Tuple[Text, Text]
     """Extract code and message from ftp error."""
     code, _, message = text_type(error).partition(' ')
-    return (int(code) if code.isdigit() else code), message
+    return code, message
 
 
 if PY2:
@@ -658,7 +658,7 @@ class FTPFS(FS):
                     self.ftp.mkd(_encode(_path, self.ftp.encoding))
                 except error_perm as error:
                     code, _ = _parse_ftp_error(error)
-                    if code == 550:
+                    if code == '550':
                         if self.isdir(path):
                             raise errors.DirectoryExists(path)
                         else:
@@ -710,7 +710,7 @@ class FTPFS(FS):
                 self.ftp.rmd(_encode(_path, self.ftp.encoding))
             except error_perm as error:
                 code, _ = _parse_ftp_error(error)
-                if code == 550:
+                if code == '550':
                     if self.isfile(path):
                         raise errors.DirectoryExpected(path)
                     if not self.isempty(path):
@@ -793,7 +793,7 @@ class FTPFS(FS):
                     )
                 except error_perm as error:
                     code, _ = _parse_ftp_error(error)
-                    if code == 550:
+                    if code == '550':
                         if self.isdir(path):
                             raise errors.FileExpected(path)
                     raise
