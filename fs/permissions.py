@@ -5,9 +5,12 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import typing
-from typing import Container, Iterable, Text
+from typing import Container, Iterable
 
 import six
+
+from ._typing import Text
+
 
 if False:  # typing.TYPE_CHECKING
     from typing import (

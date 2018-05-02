@@ -25,7 +25,7 @@ try:
 except ImportError:
     try:
         from scandir import scandir    # type: ignore
-    except ImportError:  # pragma: nocover
+    except ImportError:  # pragma: no cover
         scandir = None
 
 from . import errors
@@ -120,7 +120,7 @@ class OSFS(FS):
             'virtual': False,
         }
 
-        if _WINDOWS_PLATFORM:  # pragma: nocover
+        if _WINDOWS_PLATFORM:  # pragma: no cover
             _meta["invalid_path_chars"] =\
                 ''.join(six.unichr(n) for n in range(31)) + '\\:*?"<>|'
         else:
@@ -196,12 +196,12 @@ class OSFS(FS):
             import pwd
             try:
                 access['group'] = grp.getgrgid(gid).gr_name
-            except KeyError:  # pragma: nocover
+            except KeyError:  # pragma: no cover
                 pass
 
             try:
                 access['user'] = pwd.getpwuid(uid).pw_name
-            except KeyError:  # pragma: nocover
+            except KeyError:  # pragma: no cover
                 pass
         return access
 
@@ -339,11 +339,11 @@ class OSFS(FS):
             except OSError as error:
                 if error.errno == errno.EACCES and sys.platform == "win32":
                     # sometimes windows says this for attempts to remove a dir
-                    if os.path.isdir(sys_path):  # pragma: nocover
+                    if os.path.isdir(sys_path):  # pragma: no cover
                         raise errors.FileExpected(path)
                 if error.errno == errno.EPERM and sys.platform == "darwin":
                     # sometimes OSX says this for attempts to remove a dir
-                    if os.path.isdir(sys_path):  # pragma: nocover
+                    if os.path.isdir(sys_path):  # pragma: no cover
                         raise errors.FileExpected(path)
                 raise
 

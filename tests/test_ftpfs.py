@@ -25,6 +25,7 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from fs import errors
 from fs.opener import open_fs
 from fs.ftpfs import FTPFS, ftp_errors
+from fs.subfs import SubFS
 from fs.test import FSTestCases
 
 
@@ -151,6 +152,17 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         del self.fs.features['UTF8']
         self.assertFalse(self.fs.getmeta().get('unicode_paths'))
 
+    def test_opener_path(self):
+        self.fs.makedir('foo')
+        self.fs.settext('foo/bar', 'baz')
+        ftp_fs = open_fs(
+            'ftp://user:1234@{}:{}/foo'.format(
+                self.server.host, self.server.port
+            )
+        )
+        self.assertIsInstance(ftp_fs, SubFS)
+        self.assertEqual(ftp_fs.gettext('bar'), 'baz')
+        ftp_fs.close()
 
 class TestFTPFSNoMLSD(TestFTPFS):
 

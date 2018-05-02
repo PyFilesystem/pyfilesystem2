@@ -76,12 +76,12 @@ def ftp_errors(fs, path=None):
             )
     except error_perm as error:
         code, message = _parse_ftp_error(error)
-        if code == 552:
+        if code == '552':
             raise errors.InsufficientStorage(
                 path=path,
                 msg=message
             )
-        elif code in (501, 550):
+        elif code in ('501', '550'):
             raise errors.ResourceNotFound(path=path)
         raise errors.PermissionDenied(
             msg=message
@@ -96,16 +96,14 @@ def manage_ftp(ftp):
     finally:
         try:
             ftp.quit()
-        except:  # pragma: nocover
+        except:  # pragma: no cover
             pass
 
 
 def _parse_ftp_error(error):
-    # type: (ftplib.Error) -> Tuple[Union[int, Text], Text]
+    # type: (ftplib.Error) -> Tuple[Text, Text]
     """Extract code and message from ftp error."""
     code, _, message = text_type(error).partition(' ')
-    if code.isdigit():
-        return int(code), message
     return code, message
 
 
@@ -189,7 +187,7 @@ class FTPFile(io.RawIOBase):
                         self._read_conn = None
                     try:
                         self.ftp.quit()
-                    except error_temp:  # pragma: nocover
+                    except error_temp:  # pragma: no cover
                         pass
                 finally:
                     super(FTPFile, self).close()
@@ -219,7 +217,7 @@ class FTPFile(io.RawIOBase):
                     read_size = min(DEFAULT_CHUNK_SIZE, remaining)
                 try:
                     chunk = conn.recv(read_size)
-                except socket.error:  # pragma: nocover
+                except socket.error:  # pragma: no cover
                     break
                 if not chunk:
                     break
@@ -420,7 +418,7 @@ class FTPFS(FS):
             self._features = {}
             try:
                 feat_response = _decode(_ftp.sendcmd("FEAT"), 'latin-1')
-            except error_perm:
+            except error_perm:  # pragma: no cover
                 self.encoding = 'latin-1'
             else:
                 self._features = self._parse_features(feat_response)
@@ -660,7 +658,7 @@ class FTPFS(FS):
                     self.ftp.mkd(_encode(_path, self.ftp.encoding))
                 except error_perm as error:
                     code, _ = _parse_ftp_error(error)
-                    if code == 550:
+                    if code == '550':
                         if self.isdir(path):
                             raise errors.DirectoryExists(path)
                         else:
@@ -712,7 +710,7 @@ class FTPFS(FS):
                 self.ftp.rmd(_encode(_path, self.ftp.encoding))
             except error_perm as error:
                 code, _ = _parse_ftp_error(error)
-                if code == 550:
+                if code == '550':
                     if self.isfile(path):
                         raise errors.DirectoryExpected(path)
                     if not self.isempty(path):
@@ -795,7 +793,7 @@ class FTPFS(FS):
                     )
                 except error_perm as error:
                     code, _ = _parse_ftp_error(error)
-                    if code == 550:
+                    if code == '550':
                         if self.isdir(path):
                             raise errors.FileExpected(path)
                     raise

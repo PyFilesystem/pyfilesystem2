@@ -21,6 +21,7 @@ from .mode import Mode
 from .path import iteratepath
 from .path import normpath
 from .path import split
+from ._typing import overload
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
@@ -120,8 +121,6 @@ class _MemoryFile(io.RawIOBase):
         # type: (Optional[int]) -> bytes
         if not self._mode.reading:
             raise IOError('File not open for reading')
-        if size is None:
-            size = -1
         with self._seek_lock():
             self.on_access()
             return self._bytes_io.read(size)
@@ -222,18 +221,18 @@ class _DirEntry(object):
                 _bytes_file.seek(0, os.SEEK_END)
                 return _bytes_file.tell()
 
-    @typing.overload
-    def get_entry(self, name, default):
+    @overload
+    def get_entry(self, name, default):  # pragma: no cover
         # type: (Text, _DirEntry) -> _DirEntry
         pass
 
-    @typing.overload
-    def get_entry(self, name):
+    @overload
+    def get_entry(self, name):  # pragma: no cover
         # type: (Text) -> Optional[_DirEntry]
         pass
 
-    @typing.overload
-    def get_entry(self, name, default):
+    @overload
+    def get_entry(self, name, default):  # pragma: no cover
         # type: (Text, None) -> Optional[_DirEntry]
         pass
 

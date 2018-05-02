@@ -43,8 +43,6 @@ class FTPOpener(Opener):
             passwd=parse_result.password,
             proxy=parse_result.params.get('proxy')
         )
-
         if dir_path:
             return ftp_fs.opendir(dir_path, factory=ClosingSubFS)
-
         return ftp_fs
