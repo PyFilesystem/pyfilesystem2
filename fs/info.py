@@ -8,6 +8,8 @@ from __future__ import unicode_literals
 import typing
 from copy import deepcopy
 
+import six
+
 from .path import join
 from .enums import ResourceType
 from .errors import MissingInfoNamespace
@@ -24,6 +26,7 @@ if False:  # typing.TYPE_CHECKING
     T = typing.TypeVar("T")
 
 
+@six.python_2_unicode_compatible
 class Info(object):
     """Container for :ref:`info`.
 
@@ -49,12 +52,14 @@ class Info(object):
         self._to_datetime = to_datetime
         self.namespaces = frozenset(self.raw.keys())
 
-    def __repr__(self):
+    def __str__(self):
         # type: () -> str
         if self.is_dir:
             return "<dir '{}'>".format(self.name)
         else:
             return "<file '{}'>".format(self.name)
+
+    __repr__ = __str__
 
     def __eq__(self, other):
         # type: (object) -> bool
