@@ -95,7 +95,7 @@ def parse_fs_url(fs_url):
     resource = unquote(url)
     if has_qs:
         _params = parse_qs(qs, keep_blank_values=True)
-        params = {k:v[0] for k, v in six.iteritems(_params)}
+        params = {k:unquote(v[0]) for k, v in six.iteritems(_params)}
     else:
         params = {}
     return ParseResult(
