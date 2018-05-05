@@ -26,6 +26,7 @@ class FTPOpener(Opener):
 
     protocols = ['ftp']
 
+    @CreateFailed.catch_all
     def open_fs(self,
                 fs_url,         # type: Text
                 parse_result,   # type: ParseResult
@@ -46,12 +47,9 @@ class FTPOpener(Opener):
             passwd=parse_result.password,
             proxy=parse_result.params.get('proxy')
         )
-        try:
-            if dir_path:
-                if create:
-                    ftp_fs.makedirs(dir_path, recreate=True)
-                return ftp_fs.opendir(dir_path, factory=ClosingSubFS)
-            else:
-                return ftp_fs
-        except Exception as err:
-            six.raise_from(CreateFailed, err)
+        if dir_path:
+            if create:
+                ftp_fs.makedirs(dir_path, recreate=True)
+            return ftp_fs.opendir(dir_path, factory=ClosingSubFS)
+        else:
+            return ftp_fs
