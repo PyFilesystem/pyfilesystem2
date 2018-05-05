@@ -6,9 +6,12 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import six
+
 import typing
 
 from .base import Opener
+from ..errors import FSError, CreateFailed
 
 if False:  # typing.TYPE_CHECKING
     from typing import List, Text, Union
@@ -43,6 +46,12 @@ class FTPOpener(Opener):
             passwd=parse_result.password,
             proxy=parse_result.params.get('proxy')
         )
-        if dir_path:
-            return ftp_fs.opendir(dir_path, factory=ClosingSubFS)
-        return ftp_fs
+        try:
+            if dir_path:
+                if create:
+                    ftp_fs.makedirs(dir_path, recreate=True)
+                return ftp_fs.opendir(dir_path, factory=ClosingSubFS)
+            else:
+                return ftp_fs
+        except Exception as err:
+            six.raise_from(CreateFailed, err)
