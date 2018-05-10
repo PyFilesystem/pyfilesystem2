@@ -5,7 +5,7 @@ across platforms, which vary in their conventions. They are all
 subclasses of `~fs.osfs.OSFS`.
 
 """
-# Thanks to authors of https://pypi.python.org/pypi/appdirs
+# Thanks to authors of https://pypi.org/project/appdirs
 
 # see http://technet.microsoft.com/en-us/library/cc766489(WS.10).aspx
 
