@@ -8,6 +8,7 @@ import tempfile
 import unittest
 
 from fs import osfs
+from fs import fsencode, fsdecode
 from fs.path import relpath
 from fs import errors
 
@@ -112,4 +113,3 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         bar_info = self.fs.getinfo('bar', namespaces=['link', 'lstat'])
         self.assertIn('link', bar_info.raw)
         self.assertIn('lstat', bar_info.raw)
-

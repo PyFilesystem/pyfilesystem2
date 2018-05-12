@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.22] - Unreleased
+
+### Fixed
+
+- Handling of broken unicode on Python2.7
+
+### Added
+
+- Added fs.getospath
+
 ## [2.0.21] - 2018-05-02
 
 ### Added
