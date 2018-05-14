@@ -4,7 +4,8 @@ readme:
 
 .PHONY: release
 release: readme
-	python setup.py sdist bdist_wheel upload
+	python setup.py sdist bdist_wheel
+	twine upload dist/*.whl dist/*.tar.gz
 
 .PHONY: test
 test:
