@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.0.23] - 2018-05-02
 
-- Fix for Markdown on PyPi, no code chang
+- Fix for Markdown on PyPi, no code changes
 
 ## [2.0.22] - 2018-05-02
 
