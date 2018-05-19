@@ -4,12 +4,19 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+
 from .copy import copy_dir
 from .copy import copy_file
 from .opener import manage_fs
 
+if False:  # typing.TYPE_CHECKING
+    from .base import FS
+    from typing import Text, Union
+
 
 def move_fs(src_fs, dst_fs):
+    # type: (Union[Text, FS], Union[Text, FS]) -> None
     """Move the contents of a filesystem to another filesystem.
 
     Arguments:
@@ -20,7 +27,12 @@ def move_fs(src_fs, dst_fs):
     move_dir(src_fs, '/', dst_fs, '/')
 
 
-def move_file(src_fs, src_path, dst_fs, dst_path):
+def move_file(src_fs,       # type: Union[Text, FS]
+              src_path,     # type: Text
+              dst_fs,       # type: Union[Text, FS]
+              dst_path      # type: Text
+              ):
+    # type: (...) -> None
     """Move a file from one filesystem to another.
 
     Arguments:
@@ -30,19 +42,24 @@ def move_file(src_fs, src_path, dst_fs, dst_path):
         dst_path (str): Path to a file on ``dst_fs``.
 
     """
-    with manage_fs(src_fs) as src_fs:
-        with manage_fs(dst_fs, create=True) as dst_fs:
-            if src_fs is dst_fs:
+    with manage_fs(src_fs) as _src_fs:
+        with manage_fs(dst_fs, create=True) as _dst_fs:
+            if _src_fs is _dst_fs:
                 # Same filesystem, may be optimized
-                src_fs.move(src_path, dst_path, overwrite=True)
+                _src_fs.move(src_path, dst_path, overwrite=True)
             else:
                 # Standard copy and delete
-                with src_fs.lock(), dst_fs.lock():
-                    copy_file(src_fs, src_path, dst_fs, dst_path)
-                    src_fs.remove(src_path)
+                with _src_fs.lock(), _dst_fs.lock():
+                    copy_file(_src_fs, src_path, _dst_fs, dst_path)
+                    _src_fs.remove(src_path)
 
 
-def move_dir(src_fs, src_path, dst_fs, dst_path):
+def move_dir(src_fs,        # type: Union[Text, FS]
+             src_path,      # type: Text
+             dst_fs,        # type: Union[Text, FS]
+             dst_path       # type: Text
+             ):
+    # type: (...) -> None
     """Move a directory from one filesystem to another.
 
     Arguments:
@@ -52,14 +69,14 @@ def move_dir(src_fs, src_path, dst_fs, dst_path):
         dst_path (str): Path to a directory on ``dst_fs``
 
     """
-    with manage_fs(src_fs) as src_fs:
-        with manage_fs(dst_fs, create=True) as dst_fs:
-            with src_fs.lock(), dst_fs.lock():
-                dst_fs.makedir(dst_path, recreate=True)
+    with manage_fs(src_fs) as _src_fs:
+        with manage_fs(dst_fs, create=True) as _dst_fs:
+            with _src_fs.lock(), _dst_fs.lock():
+                _dst_fs.makedir(dst_path, recreate=True)
                 copy_dir(
                     src_fs,
                     src_path,
                     dst_fs,
                     dst_path
                 )
-                src_fs.removetree(src_path)
+                _src_fs.removetree(src_path)

@@ -6,11 +6,19 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+
 from .base import Opener
 from .errors import OpenerError
 from ..subfs import ClosingSubFS
 from .. import appfs
 
+if False:  # typing.TYPE_CHECKING
+    from typing import Text, Union
+    from .parse import ParseResult
+    from ..appfs import _AppFS
+    from ..subfs import SubFS
+    
 
 class AppFSOpener(Opener):
     """``AppFS`` opener.
@@ -34,8 +42,14 @@ class AppFSOpener(Opener):
         'userlog': appfs.UserLogFS
     }
 
-    def open_fs(self, fs_url, parse_result, writeable, create, cwd):
-
+    def open_fs(self,
+                fs_url,        # type: Text
+                parse_result,  # type: ParseResult
+                writeable,     # type: bool
+                create,        # type: bool
+                cwd            # type: Text
+                ):
+        # type: (...) -> Union[_AppFS, SubFS[_AppFS]]
         fs_class = self._protocol_mapping[parse_result.protocol]
         resource, delim, path = parse_result.resource.partition('/')
         tokens = resource.split(':', 3)
@@ -57,10 +71,7 @@ class AppFSOpener(Opener):
             create=create
         )
 
-        app_fs = (
-            app_fs.opendir(path, factory=ClosingSubFS)
-            if delim
-            else app_fs
-        )
+        if delim:
+            return app_fs.opendir(path, factory=ClosingSubFS)
 
         return app_fs

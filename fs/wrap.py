@@ -16,14 +16,32 @@ Here's an example that opens a filesystem then makes it *read only*::
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+
 from .wrapfs import WrapFS
 from .path import abspath, normpath, split
 from .errors import ResourceReadOnly, ResourceNotFound
 from .info import Info
 from .mode import check_writable
 
+if False:  # typing.TYPE_CHECKING
+    from datetime import datetime
+    from typing import (
+        Any, BinaryIO, Collection, Dict, Iterator, IO,
+        Optional, Text, Tuple)
+    from .base import FS
+    from .info import Info, RawInfo
+    from .subfs import SubFS
+    from .permissions import Permissions
+
+
+_W = typing.TypeVar("_W", bound='WrapFS')
+_T = typing.TypeVar('_T', bound='FS')
+_F = typing.TypeVar('_F', bound='FS', covariant=True)
+
 
 def read_only(fs):
+    # type: (_T) -> WrapReadOnly[_T]
     """Make a read-only filesystem.
 
     Arguments:
@@ -37,6 +55,7 @@ def read_only(fs):
 
 
 def cache_directory(fs):
+    # type: (_T) -> WrapCachedDir[_T]
     """Make a filesystem that caches directory information.
 
     Arguments:
@@ -50,7 +69,7 @@ def cache_directory(fs):
     return WrapCachedDir(fs)
 
 
-class WrapCachedDir(WrapFS):
+class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
     """Caches filesystem directory information.
 
     This filesystem caches directory information retrieved from a
@@ -68,10 +87,16 @@ class WrapCachedDir(WrapFS):
     wrap_name = 'cached-dir'
 
     def __init__(self, wrap_fs):
+        # type: (_F) -> None
         super(WrapCachedDir, self).__init__(wrap_fs)
-        self._cache = {}
+        self._cache = {}  # type: Dict[Tuple[Text, frozenset], Dict[Text, Info]]
 
-    def scandir(self, path, namespaces=None, page=None):
+    def scandir(self,
+                path,               # type: Text
+                namespaces=None,    # type: Optional[Collection[Text]]
+                page=None           # type: Optional[Tuple[int, int]]
+                ):
+        # type: (...) -> Iterator[Info]
         _path = abspath(normpath(path))
         cache_key = (_path, frozenset(namespaces or ()))
         if cache_key not in self._cache:
@@ -85,7 +110,8 @@ class WrapCachedDir(WrapFS):
         gen_scandir = iter(self._cache[cache_key].values())
         return gen_scandir
 
-    def getinfo(self, path, *namespaces):
+    def getinfo(self, path, namespaces=None):
+        # type: (Text, Optional[Collection[Text]]) -> Info
         _path = abspath(normpath(path))
         if _path == '/':
             return Info({
@@ -108,13 +134,17 @@ class WrapCachedDir(WrapFS):
         return info
 
     def isdir(self, path):
+        # type: (Text) -> bool
+        # FIXME(@althonos): this raises an error on non-existing file !
         return self.getinfo(path).is_dir
 
     def isfile(self, path):
+        # type: (Text) -> bool
+        # FIXME(@althonos): this raises an error on non-existing file !
         return not self.getinfo(path).is_dir
 
 
-class WrapReadOnly(WrapFS):
+class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
     """Makes a Filesystem read-only.
 
     Any call that would would write data or modify the filesystem in any way
@@ -125,23 +155,37 @@ class WrapReadOnly(WrapFS):
     wrap_name = 'read-only'
 
     def appendbytes(self, path, data):
+        # type: (Text, bytes) -> None
         self.check()
         raise ResourceReadOnly(path)
 
-    def appendtext(self, path, text,
-                   encoding='utf-8', errors=None, newline=''):
+    def appendtext(self,
+                   path,                # type: Text
+                   text,                # type: Text
+                   encoding='utf-8',    # type: Text
+                   errors=None,         # type: Optional[Text]
+                   newline=''           # type: Text
+                   ):
+        # type: (...) -> None
         self.check()
         raise ResourceReadOnly(path)
 
-    def makedir(self, path, permissions=None, recreate=False):
+    def makedir(self,               # type: _W
+                path,               # type: Text
+                permissions=None,   # type: Optional[Permissions]
+                recreate=False      # type: bool
+                ):
+        # type: (...) -> SubFS[_W]
         self.check()
         raise ResourceReadOnly(path)
 
     def move(self, src_path, dst_path, overwrite=False):
+        # type: (Text, Text, bool) -> None
         self.check()
         raise ResourceReadOnly(dst_path)
 
     def openbin(self, path, mode='r', buffering=-1, **options):
+        # type: (Text, Text, int, **Any) -> BinaryIO
         self.check()
         if check_writable(mode):
             raise ResourceReadOnly(path)
@@ -153,51 +197,66 @@ class WrapReadOnly(WrapFS):
         )
 
     def remove(self, path):
+        # type: (Text) -> None
         self.check()
         raise ResourceReadOnly(path)
 
     def removedir(self, path):
+        # type: (Text) -> None
         self.check()
         raise ResourceReadOnly(path)
 
     def setinfo(self, path, info):
+        # type: (Text, RawInfo) -> None
         self.check()
         raise ResourceReadOnly(path)
 
     def settext(self,
-                path,
-                contents,
-                encoding='utf-8',
-                errors=None,
-                newline=''):
+                path,               # type: Text
+                contents,           # type: Text
+                encoding='utf-8',   # type: Text
+                errors=None,        # type: Optional[Text]
+                newline=''          # type: Text
+                ):
+        # type: (...) -> None
         self.check()
         raise ResourceReadOnly(path)
 
     def settimes(self, path, accessed=None, modified=None):
+        # type: (Text, Optional[datetime], Optional[datetime]) -> None
         self.check()
         raise ResourceReadOnly(path)
 
     def copy(self, src_path, dst_path, overwrite=False):
+        # type: (Text, Text, bool) -> None
         self.check()
         raise ResourceReadOnly(dst_path)
 
     def create(self, path, wipe=False):
+        # type: (Text, bool) -> bool
         self.check()
         raise ResourceReadOnly(path)
 
-    def makedirs(self, path, recreate=False, mode=0o777):
+    def makedirs(self,                  # type: _W
+                 path,                  # type: Text
+                 permissions=None,      # type: Optional[Permissions]
+                 recreate=False         # type: bool
+                 ):
+        # type: (...) -> SubFS[_W]
         self.check()
         raise ResourceReadOnly(path)
 
     def open(self,
-             path,
-             mode='r',
-             buffering=-1,
-             encoding=None,
-             errors=None,
-             newline='',
-             line_buffering=False,
-             **options):
+             path,                     # type: Text
+             mode='r',                 # type: Text
+             buffering=-1,             # type: int
+             encoding=None,            # type: Optional[Text]
+             errors=None,              # type: Optional[Text]
+             newline='',               # type: Text
+             line_buffering=False,     # type: bool
+             **options                 # type: Any
+             ):
+        # type: (...) -> IO
         self.check()
         if check_writable(mode):
             raise ResourceReadOnly(path)
@@ -213,22 +272,27 @@ class WrapReadOnly(WrapFS):
         )
 
     def setbytes(self, path, contents):
+        # type: (Text, bytes) -> None
         self.check()
         raise ResourceReadOnly(path)
 
     def setbinfile(self, path, file):
+        # type: (Text, BinaryIO) -> None
         self.check()
         raise ResourceReadOnly(path)
 
     def setfile(self,
-                path,
-                file,
-                encoding=None,
-                errors=None,
-                newline=''):
+                path,           # type: Text
+                file,           # type: IO
+                encoding=None,  # type: Optional[Text]
+                errors=None,    # type: Optional[Text]
+                newline=''      # type: Text
+                ):
+        # type: (...) -> None
         self.check()
         raise ResourceReadOnly(path)
 
     def touch(self, path):
+        # type: (Text) -> None
         self.check()
         raise ResourceReadOnly(path)

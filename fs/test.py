@@ -396,10 +396,12 @@ class FSTestCases(object):
     def test_getsyspath(self):
         self.fs.create('foo')
         try:
-            self.fs.getsyspath('foo')
+            syspath = self.fs.getsyspath('foo')
         except errors.NoSysPath:
             self.assertFalse(self.fs.hassyspath('foo'))
         else:
+            self.assertIsInstance(syspath, text_type)
+            self.assertIsInstance(self.fs.getospath('foo'), bytes)
             self.assertTrue(self.fs.hassyspath('foo'))
         # Should not throw an error
         self.fs.hassyspath('a/b/c/foo/bar')
@@ -877,7 +879,7 @@ class FSTestCases(object):
                 [b'Hello\n', b'World\n']
             )
             with self.assertRaises(IOError):
-                f.write('no')
+                f.write(b'no')
         self.assertTrue(f.closed)
 
         with self.fs.open('text', 'r') as f:

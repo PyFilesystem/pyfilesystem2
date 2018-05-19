@@ -8,12 +8,26 @@ Mode strings are used in in `~fs.base.FS.open` and
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
+
 import six
+
+from ._typing import Text
+
+
+if False:  # typing.TYPE_CHECKING
+    from typing import Container, FrozenSet, Set, Union
+
+
+__all__ = ["Mode",
+           "check_readable",
+           "check_writable",
+           "validate_openbin_mode"]
 
 
 # https://docs.python.org/3/library/functions.html#open
 @six.python_2_unicode_compatible
-class Mode(object):
+class Mode(typing.Container[Text]):
     """An abstraction for I/O modes.
 
     A mode object provides properties that can be used to interrogate the
@@ -40,21 +54,26 @@ class Mode(object):
     """
 
     def __init__(self, mode):
+        # type: (Text) -> None
         self._mode = mode
         self.validate()
 
     def __repr__(self):
+        # type: () -> Text
         return "Mode({!r})".format(self._mode)
 
     def __str__(self):
+        # type: () -> Text
         return self._mode
 
     def __contains__(self, character):
+        # type: (object) -> bool
         """Check if a mode contains a given character.
         """
         return character in self._mode
 
     def to_platform(self):
+        # type: () -> Text
         """Get a mode string for the current platform.
 
         Currently, this just removes the 'x' on PY2 because PY2 doesn't
@@ -64,6 +83,7 @@ class Mode(object):
         return self._mode.replace('x', 'w') if six.PY2 else self._mode
 
     def to_platform_bin(self):
+        # type: () -> Text
         """Get a *binary* mode string for the current platform.
 
         Currently, this just removes the 'x' on PY2 because PY2 doesn't
@@ -74,6 +94,7 @@ class Mode(object):
         return _mode if 'b' in _mode else _mode + 'b'
 
     def validate(self, _valid_chars=frozenset('rwxtab+')):
+        # type: (Union[Set[Text], FrozenSet[Text]]) -> None
         """Validate the mode string.
 
         Raises:
@@ -97,6 +118,7 @@ class Mode(object):
             )
 
     def validate_bin(self):
+        # type: () -> None
         """Validate a mode for opening a binary file.
 
         Raises:
@@ -109,60 +131,70 @@ class Mode(object):
 
     @property
     def create(self):
+        # type: () -> bool
         """`bool`: `True` if the mode would create a file.
         """
         return 'a' in self or 'w' in self or 'x' in self
 
     @property
     def reading(self):
+        # type: () -> bool
         """`bool`: `True` if the mode permits reading.
         """
         return 'r' in self or '+' in self
 
     @property
     def writing(self):
+        # type: () -> bool
         """`bool`: `True` if the mode permits writing.
         """
         return 'w' in self or 'a' in self or '+' in self or 'x' in self
 
     @property
     def appending(self):
+        # type: () -> bool
         """`bool`: `True` if the mode permits appending.
         """
         return 'a' in self
 
     @property
     def updating(self):
+        # type: () -> bool
         """`bool`: `True` if the mode permits both reading and writing.
         """
         return '+' in self
 
     @property
     def truncate(self):
+        # type: () -> bool
         """`bool`: `True` if the mode would truncate an existing file.
         """
         return 'w' in self or 'x' in self
 
     @property
     def exclusive(self):
+        # type: () -> bool
         """`bool`: `True` if the mode require exclusive creation.
         """
         return 'x' in self
 
     @property
     def binary(self):
+        # type: () -> bool
         """`bool`: `True` if a mode specifies binary.
         """
         return 'b' in self
 
     @property
     def text(self):
+        # type: () -> bool
         """`bool`: `True` if a mode specifies text.
         """
         return 't' in self or 'b' not in self
 
 
 def check_readable(mode):
+    # type: (Text) -> bool
     """Check a mode string allows reading.
 
     Arguments:
@@ -176,6 +208,7 @@ def check_readable(mode):
 
 
 def check_writable(mode):
+    # type: (Text) -> bool
     """Check a mode string allows writing.
 
     Arguments:
@@ -189,6 +222,7 @@ def check_writable(mode):
 
 
 def validate_open_mode(mode):
+    # type: (Text) -> None
     """Check ``mode`` parameter of `~fs.base.FS.open` is valid.
 
     Arguments:
@@ -202,6 +236,7 @@ def validate_open_mode(mode):
 
 
 def validate_openbin_mode(mode, _valid_chars=frozenset('rwxab+')):
+    # type: (Text, Union[Set[Text], FrozenSet[Text]]) -> None
     """Check ``mode`` parameter of `~fs.base.FS.openbin` is valid.
 
     Arguments:

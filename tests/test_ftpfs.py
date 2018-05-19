@@ -25,6 +25,7 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from fs import errors
 from fs.opener import open_fs
 from fs.ftpfs import FTPFS, ftp_errors
+from fs.subfs import SubFS
 from fs.test import FSTestCases
 
 
@@ -151,6 +152,45 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         del self.fs.features['UTF8']
         self.assertFalse(self.fs.getmeta().get('unicode_paths'))
 
+    def test_opener_path(self):
+        self.fs.makedir('foo')
+        self.fs.settext('foo/bar', 'baz')
+        ftp_fs = open_fs(
+            'ftp://user:1234@{}:{}/foo'.format(
+                self.server.host, self.server.port
+            )
+        )
+        self.assertIsInstance(ftp_fs, SubFS)
+        self.assertEqual(ftp_fs.gettext('bar'), 'baz')
+        ftp_fs.close()
+
+    def test_create(self):
+
+        directory = os.path.join("home", self.user, "test", "directory")
+        base = 'ftp://user:1234@{}:{}/foo'.format(self.server.host, self.server.port)
+        url = "{}/{}".format(base, directory)
+
+        # Make sure unexisting directory raises `CreateFailed`
+        with self.assertRaises(errors.CreateFailed):
+            ftp_fs = open_fs(url)
+
+        # Open with `create` and try touching a file
+        with open_fs(url, create=True) as ftp_fs:
+            ftp_fs.touch("foo")
+
+        # Open the base filesystem and check the subdirectory exists
+        with open_fs(base) as ftp_fs:
+            self.assertTrue(ftp_fs.isdir(directory))
+            self.assertTrue(ftp_fs.isfile(os.path.join(directory, "foo")))
+
+        # Open without `create` and check the file exists
+        with open_fs(url) as ftp_fs:
+            self.assertTrue(ftp_fs.isfile("foo"))
+
+        # Open with create and check this does fail
+        with open_fs(url, create=True) as ftp_fs:
+            self.assertTrue(ftp_fs.isfile("foo"))
+
 
 class TestFTPFSNoMLSD(TestFTPFS):
 
@@ -162,3 +202,4 @@ class TestFTPFSNoMLSD(TestFTPFS):
 
     def test_features(self):
         pass
+

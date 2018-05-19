@@ -4,7 +4,7 @@ PyFilesystem2
 Python's Filesystem abstraction layer.
 
 [![PyPI version](https://badge.fury.io/py/fs.svg)](https://badge.fury.io/py/fs)
-[![PyPI](https://img.shields.io/pypi/pyversions/fs.svg)](https://pypi.python.org/pypi/fs/)
+[![PyPI](https://img.shields.io/pypi/pyversions/fs.svg)](https://pypi.org/project/fs/)
 [![Build Status](https://travis-ci.org/PyFilesystem/pyfilesystem2.svg?branch=master)](https://travis-ci.org/PyFilesystem/pyfilesystem2)
 [![Coverage Status](https://coveralls.io/repos/github/PyFilesystem/pyfilesystem2/badge.svg)](https://coveralls.io/github/PyFilesystem/pyfilesystem2)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PyFilesystem/pyfilesystem2&amp;utm_campaign=Badge_Grade)
@@ -93,7 +93,7 @@ Credits
 -------
 
 * [Will McGugan](https://github.com/willmcgugan)
-* [Martin Larralde](https://github.com/althonos) for TarFS
+* [Martin Larralde](https://github.com/althonos)
 * [Giampaolo](https://github.com/gpcimino) for `copy_if_newer` and ftp fixes.
 
 PyFilesystem2 owes a massive debt of gratitude to the following

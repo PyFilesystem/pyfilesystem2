@@ -4,6 +4,36 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.23] - 2018-05-02
+
+- Fix for Markdown on PyPi, no code changes
+
+## [2.0.22] - 2018-05-02
+
+### Fixed
+
+- Handling of broken unicode on Python2.7
+
+### Added
+
+- Added fs.getospath
+
+## [2.0.21] - 2018-05-02
+
+### Added
+
+- Typing information
+- Added Info.suffix, Info.suffixes, Info.stem attributes
+
+### Fixed
+
+- Fixed issue with implied directories in TarFS
+
+### Changed
+
+- Changed path.splitext so that 'leading periods on the basename are
+    ignored', which is the behaviour of os.path.splitext
+
 ## [2.0.20] - 2018-03-13
 
 ### Fixed

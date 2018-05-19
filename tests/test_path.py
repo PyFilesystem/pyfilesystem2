@@ -135,6 +135,7 @@ class TestPathFunctions(unittest.TestCase):
         self.assertEqual(splitext('foo.bar'), ('foo', '.bar'))
         self.assertEqual(splitext('foo.bar.baz'), ('foo.bar', '.baz'))
         self.assertEqual(splitext('foo'), ('foo', ''))
+        self.assertEqual(splitext('.foo'), ('.foo', ''))
 
     def test_recursepath(self):
         self.assertEquals(recursepath("/"), ["/"])
@@ -147,7 +148,7 @@ class TestPathFunctions(unittest.TestCase):
 
     def test_isbase(self):
         self.assertTrue(isbase('foo', 'foo/bar'))
-        self.assertFalse(isbase('baz', 'foo/bar'))        
+        self.assertFalse(isbase('baz', 'foo/bar'))
 
     def test_isparent(self):
         self.assertTrue(isparent("foo/bar", "foo/bar/spam.txt"))

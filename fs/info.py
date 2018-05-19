@@ -5,15 +5,28 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import typing
 from copy import deepcopy
+
+import six
 
 from .path import join
 from .enums import ResourceType
 from .errors import MissingInfoNamespace
 from .permissions import Permissions
 from .time import epoch_to_datetime
+from ._typing import overload
+
+if False:  # typing.TYPE_CHECKING
+    from datetime import datetime
+    from typing import Callable, List, Mapping, Optional
+    from ._typing import Text
+    RawInfo = Mapping[Text, Mapping[Text, object]]
+    ToDatetime = Callable[[int], datetime]
+    T = typing.TypeVar("T")
 
 
+@six.python_2_unicode_compatible
 class Info(object):
     """Container for :ref:`info`.
 
@@ -25,37 +38,67 @@ class Info(object):
 
     Arguments:
         raw_info (dict): A dict containing resource info.
-        to_datetime (callable, optional): A callable that converts an
+        to_datetime (callable): A callable that converts an
             epoch time to a datetime object. The default uses
             :func:`~fs.time.epoch_to_datetime`.
 
     """
 
-    def __init__(self,
-                 raw_info,
-                 to_datetime=epoch_to_datetime):
+    def __init__(self, raw_info, to_datetime=epoch_to_datetime):
+        # type: (RawInfo, ToDatetime) -> None
         """Create a resource info object from a raw info dict.
         """
         self.raw = raw_info
         self._to_datetime = to_datetime
         self.namespaces = frozenset(self.raw.keys())
 
-    def __repr__(self):
+    def __str__(self):
+        # type: () -> str
         if self.is_dir:
             return "<dir '{}'>".format(self.name)
         else:
             return "<file '{}'>".format(self.name)
 
+    __repr__ = __str__
+
     def __eq__(self, other):
-        return self.raw == other.raw
+        # type: (object) -> bool
+        return self.raw == getattr(other, 'raw', None)
+
+    @overload
+    def _make_datetime(self, t):  # pragma: no cover
+        # type: (None) -> None
+        pass
+
+    @overload
+    def _make_datetime(self, t):  # pragma: no cover
+        # type: (int) -> datetime
+        pass
 
     def _make_datetime(self, t):
+        # type: (Optional[int]) -> Optional[datetime]
         if t is not None:
             return self._to_datetime(t)
         else:
             return None
 
+    @overload
+    def get(self, namespace, key, default=None):  # pragma: no cover
+        # type: (Text, Text, Optional[T]) -> Optional[T]
+        pass
+
+    @overload
+    def get(self, namespace, key):  # pragma: no cover
+        # type: (Text, Text) -> Optional[T]
+        pass
+
+    @overload
+    def get(self, namespace, key, default):  # pragma: no cover
+        # type: (Text, Text, T) -> T
+        pass
+
     def get(self, namespace, key, default=None):
+        # type: (Text, Text, Optional[T]) -> Optional[T]
         """Get a raw info value.
 
         Arguments:
@@ -71,11 +114,12 @@ class Info(object):
 
         """
         try:
-            return self.raw[namespace].get(key, default)
+            return self.raw[namespace].get(key, default)  # type: ignore
         except KeyError:
             return default
 
     def _require_namespace(self, namespace):
+        # type: (Text) -> None
         """Check if the given namespace is present in the info.
 
         Raises:
@@ -87,6 +131,7 @@ class Info(object):
             raise MissingInfoNamespace(namespace)
 
     def is_writeable(self, namespace, key):
+        # type: (Text, Text) -> bool
         """Check if a given key in a namespace is writable.
 
         Uses `~fs.base.FS.setinfo`.
@@ -103,6 +148,7 @@ class Info(object):
         return key in _writeable
 
     def has_namespace(self, namespace):
+        # type: (Text) -> bool
         """Check if the resource info contains a given namespace.
 
         Arguments:
@@ -115,6 +161,7 @@ class Info(object):
         return namespace in self.raw
 
     def copy(self, to_datetime=None):
+        # type: (Optional[ToDatetime]) -> Info
         """Create a copy of this resource info object.
         """
         return Info(
@@ -123,6 +170,7 @@ class Info(object):
         )
 
     def make_path(self, dir_path):
+        # type: (Text) -> Text
         """Make a path by joining ``dir_path`` with the resource name.
 
         Arguments:
@@ -136,31 +184,87 @@ class Info(object):
 
     @property
     def name(self):
+        # type: () -> Text
         """`str`: the resource name.
         """
         return self.get('basic', 'name')
 
     @property
+    def suffix(self):
+        # type: () -> Text
+        """`str`: the last component of the name (including dot), or an
+        empty string if there is no suffix.
+
+        Example:
+            >>> info
+            <info 'foo.py'>
+            >>> info.suffix
+            '.py'
+        """
+        name = self.get('basic', 'name')
+        if name.startswith('.') and name.count('.') == 1:
+            return ''
+        basename, dot, ext = name.rpartition('.')
+        return '.' + ext if dot else ''
+
+    @property
+    def suffixes(self):
+        # type: () -> List[Text]
+        """`List`: a list of any suffixes in the name.
+
+        Example:
+            >>> info
+            <info 'foo.tar.gz'>
+            >>> info.suffixes
+            ['.tar', '.gz']
+        """
+        name = self.get('basic', 'name')
+        if name.startswith('.') and name.count('.') == 1:
+            return []
+        return ['.' + suffix for suffix in name.split('.')[1:]]
+
+    @property
+    def stem(self):
+        # type: () -> Text
+        """`str`: the name minus any suffixes.
+
+        Example:
+            >>> info
+            <info 'foo.tar.gz'>
+            >>> info.stem
+            'foo'
+
+        """
+        name = self.get('basic', 'name')
+        if name.startswith('.'):
+            return name
+        return name.split('.')[0]
+
+    @property
     def is_dir(self):
+        # type: () -> bool
         """`bool`: `True` if the resource references a directory.
         """
         return self.get('basic', 'is_dir')
 
     @property
     def is_file(self):
+        # type: () -> bool
         """`bool`: `True` if the resource references a file.
         """
         return not self.get('basic', 'is_dir')
 
     @property
     def is_link(self):
+        # type: () -> bool
         """`bool`: `True` if the resource is a symlink.
         """
         self._require_namespace('link')
-        return self.get('link', 'target') is not None
+        return self.get('link', 'target', None) is not None
 
     @property
     def type(self):
+        # type: () -> ResourceType
         """`~fs.ResourceType`: the type of the resource.
 
         Requires the ``"details"`` namespace.
@@ -175,6 +279,7 @@ class Info(object):
 
     @property
     def accessed(self):
+        # type: () -> Optional[datetime]
         """`~datetime.datetime`: the resource last access time, or `None`.
 
         Requires the ``"details"`` namespace.
@@ -192,6 +297,7 @@ class Info(object):
 
     @property
     def modified(self):
+        # type: () -> Optional[datetime]
         """`~datetime.datetime`: the resource last modification time, or `None`.
 
         Requires the ``"details"`` namespace.
@@ -209,6 +315,7 @@ class Info(object):
 
     @property
     def created(self):
+        # type: () -> Optional[datetime]
         """`~datetime.datetime`: the resource creation time, or `None`.
 
         Requires the ``"details"`` namespace.
@@ -226,6 +333,7 @@ class Info(object):
 
     @property
     def metadata_changed(self):
+        # type: () -> Optional[datetime]
         """`~datetime.datetime`: the resource metadata change time, or `None`.
 
         Requires the ``"details"`` namespace.
@@ -243,6 +351,7 @@ class Info(object):
 
     @property
     def permissions(self):
+        # type: () -> Optional[Permissions]
         """`Permissions`: the permissions of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
@@ -261,6 +370,7 @@ class Info(object):
 
     @property
     def size(self):
+        # type: () -> int
         """`int`: the size of the resource, in bytes.
 
         Requires the ``"details"`` namespace.
@@ -275,6 +385,7 @@ class Info(object):
 
     @property
     def user(self):
+        # type: () -> Optional[Text]
         """`str`: the owner of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
@@ -289,6 +400,7 @@ class Info(object):
 
     @property
     def uid(self):
+        # type: () -> Optional[int]
         """`int`: the user id of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
@@ -303,6 +415,7 @@ class Info(object):
 
     @property
     def group(self):
+        # type: () -> Optional[Text]
         """`str`: the group of the resource owner, or `None`.
 
         Requires the ``"access"`` namespace.
@@ -317,6 +430,7 @@ class Info(object):
 
     @property
     def gid(self):
+        # type: () -> Optional[int]
         """`int`: the group id of the resource, or `None`.
 
         Requires the ``"access"`` namespace.
@@ -331,6 +445,7 @@ class Info(object):
 
     @property
     def target(self):  # noqa: D402
+        # type: () -> Optional[Text]
         """`str`: the link target (if resource is a symlink), or `None`.
 
         Requires the ``"link"`` namespace.

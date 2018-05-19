@@ -19,9 +19,6 @@ CLASSIFIERS = [
     'Topic :: System :: Filesystems',
 ]
 
-with open('README.rst', 'rt') as f:
-    DESCRIPTION = f.read()
-
 REQUIREMENTS = [
     "appdirs~=1.4.3",
     "pytz",
@@ -37,7 +34,9 @@ setup(
     install_requires=REQUIREMENTS,
     extras_require={
         "scandir :python_version < '3.5'": ['scandir~=1.5'],
-        ":python_version < '3.4'": ['enum34~=1.1.6']
+        ":python_version < '3.4'": ['enum34~=1.1.6'],
+        ":python_version < '3.6'": ['typing~=3.6'],
+        ":python_version < '3.0'": ['backports.os~=0.1']
     },
     entry_points={'fs.opener': [
         'ftp  = fs.opener.ftpfs:FTPOpener',
@@ -56,7 +55,6 @@ setup(
         'userlog = fs.opener.appfs:AppFSOpener',
     ]},
     license="MIT",
-    long_description=DESCRIPTION,
     name='fs',
     packages=find_packages(exclude=("tests",)),
     platforms=['any'],

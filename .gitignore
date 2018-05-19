@@ -90,7 +90,11 @@ ENV/
 # Rope project settings
 .ropeproject
 
-
-#PyCharm
-
+# PyCharm
 .idea/
+
+# MyPy cache
+.mypy_cache
+
+.vscode
+

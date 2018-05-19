@@ -4,14 +4,21 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import collections
 import errno
-from contextlib import contextmanager
-import sys
 import platform
+import sys
+import typing
+from contextlib import contextmanager
+
+from six import reraise
 
 from . import errors
 
-from six import reraise
+if False:  # typing.TYPE_CHECKING
+    from types import TracebackType
+    from typing import (
+        Iterator, Optional, Mapping, Text, Type, Union)
 
 
 _WINDOWS_PLATFORM = platform.system() == 'Windows'
@@ -54,14 +61,21 @@ class _ConvertOSErrors(object):
         FILE_ERRORS[13] = errors.FileExpected
 
     def __init__(self, opname, path, directory=False):
+        # type: (Text, Text, bool) -> None
         self._opname = opname
         self._path = path
         self._directory = directory
 
     def __enter__(self):
+        # type: () -> _ConvertOSErrors
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self,
+                 exc_type,      # type: Optional[Type[BaseException]]
+                 exc_value,     # type: Optional[BaseException]
+                 traceback      # type: Optional[TracebackType]
+                 ):
+        # type: (...) -> None
         os_errors = (
             self.DIR_ERRORS
             if self._directory
@@ -88,6 +102,7 @@ convert_os_errors = _ConvertOSErrors
 
 @contextmanager
 def unwrap_errors(path_replace):
+    # type: (Union[Text, Mapping[Text, Text]]) -> Iterator[None]
     """Get a context to map OS errors to their `fs.errors` counterpart.
 
     The context will re-write the paths in resource exceptions to be
@@ -102,7 +117,7 @@ def unwrap_errors(path_replace):
         yield
     except errors.ResourceError as e:
         if hasattr(e, 'path'):
-            if isinstance(path_replace, dict):
+            if isinstance(path_replace, collections.Mapping):
                 e.path = path_replace.get(e.path, e.path)
             else:
                 e.path = path_replace
