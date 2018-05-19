@@ -1,7 +1,3 @@
-.PHONY: readme
-readme:
-	pandoc --from=markdown --to=rst --output=README.rst README.md
-
 .PHONY: release
 release: readme
 	python setup.py sdist bdist_wheel
