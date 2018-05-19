@@ -19,9 +19,6 @@ CLASSIFIERS = [
     'Topic :: System :: Filesystems',
 ]
 
-with open('README.rst', 'rt') as f:
-    DESCRIPTION = f.read()
-
 REQUIREMENTS = [
     "appdirs~=1.4.3",
     "pytz",
@@ -58,7 +55,6 @@ setup(
         'userlog = fs.opener.appfs:AppFSOpener',
     ]},
     license="MIT",
-    long_description=DESCRIPTION,
     name='fs',
     packages=find_packages(exclude=("tests",)),
     platforms=['any'],

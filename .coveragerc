@@ -1,8 +1,0 @@
-[run]
-omit = fs/test.py
-
-[report]
-exclude_lines =
-    pragma: no cover
-    if False:
-    @typing.overload
