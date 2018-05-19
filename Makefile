@@ -1,5 +1,6 @@
+
 .PHONY: release
-release: readme
+release:
 	python setup.py sdist bdist_wheel
 	twine upload dist/*.whl dist/*.tar.gz
 
