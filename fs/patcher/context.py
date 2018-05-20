@@ -2,7 +2,11 @@ from __future__ import unicode_literals
 
 from functools import partial
 
+import six
+
+from .stack import context_stack
 from ..path import join
+
 
 
 class Patch(object):
@@ -20,27 +24,62 @@ class Patch(object):
 class ModulePatch(Patch):
     module = None
     attrib = None
-    patch_method = None
+    method_name = None
 
     def __init__(self):
         assert self.module is not None, "module must be a classvar"
         self._restore = None
+        self.context = None
 
     def __repr__(self):
-        return '<patch {}.{}>'.format(
+        return '<{} {}.{}>'.format(
+            self.__class__.__name__,
             self.module.__name__,
             self.attrib
         )
 
+    @property
+    def replace_method(self):
+        return getattr(self, (self.method_name or self.attrib))
+
     def apply(self, context):
+        self.context = context
         self._restore = getattr(self.module, self.attrib)
-        patched = partial(getattr(self, (self.patch_method or self.attrib)), context)
-        setattr(self.module, self.attrib, patched)
+        setattr(self.module, self.attrib, self.replace_method)
 
     def revert(self, context):
         setattr(self.module, self.attrib, self._restore)
         self._restore = None
 
+
+class CodePatch(ModulePatch):
+    module = None
+    attrib = None
+
+    def apply(self, context):
+        self.context = context
+        original_method = getattr(self.module, self.attrib)
+
+        self._restore = getattr(
+            original_method,
+            '__code__'
+        )
+        patch = getattr(self, (self.method_name or self.attrib))
+        replace_code = patch.__code__
+        setattr(
+            original_method,
+            '__code__',
+            replace_code
+        )
+
+    def revert(self, context):
+        setattr(
+            getattr(self.module, self.attrib),
+            '__code__',
+            self._restore
+        )
+        self._restore = None
+        self.context = None
 
 
 class PatchContext(object):
@@ -62,12 +101,14 @@ class PatchContext(object):
         return path
 
     def __enter__(self):
+        context_stack.append(self)
         for patch in self.patches:
             patch.apply(self)
             self._applied_patches.append(patch)
         return self
 
     def __exit__(self, exc_type, exc_value, tb):
+        context_stack.pop()
         pop = self._applied_patches.pop
         try:
             while self._applied_patches:

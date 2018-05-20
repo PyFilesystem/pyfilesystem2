@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import builtins
 import errno
 import os
 import sys
@@ -9,7 +10,9 @@ from six import text_type
 
 from ..path import join
 from ..errors import FSError, ResourceNotFound
-from .context import ModulePatch
+from .context import ModulePatch, CodePatch
+
+from . import stack
 
 
 def _not_found(path):
@@ -18,68 +21,99 @@ def _not_found(path):
     raise OSError(errno.ENOENT, _error, path)
 
 
-class OsPathExists(ModulePatch):
+from fs.patcher.stack import get_context
+
+class OsPathExists(CodePatch):
     module = os.path
     attrib = 'exists'
 
-    def exists(self, context, path):
+    def exists(path):
+        from fs.patcher.stack import get_context
+        context = get_context()
         _path = context.get_path(path)
         return context.filesystem.exists(_path)
 
 
-class OsPathLExists(ModulePatch):
+class OsPathLExists(CodePatch):
     module = os.path
     attrib = 'lexists'
 
-    def lexists(self, context, path):
+    def lexists(path):
+        from fs.patcher.stack import get_context
+        context = get_context()
         _path = context.get_path(path)
         return context.filesystem.exists(_path)
 
 
-class _OsPathTime(ModulePatch):
+class OsPathGetatime(CodePatch):
     module = os.path
-    attrib = 'gettime'
-    patch_method = 'gettime'
-    time_field = ''
+    attrib = 'getatime'
 
-    def gettime(self, context, path):
+    def getatime(path):
+        from fs.patcher.stack import get_context
+        context = get_context()
         _path = context.get_path(path)
         try:
             info = context.filesystem.getdetails(_path)
         except ResourceNotFound:
             _not_found(_path)
         try:
-            _time = info.raw['details'][self.time_field]
+            _time = info.raw['details']['accessed']
         except KeyError:
             raise OSError('unable to get time')
         return _time
 
 
-class OsPathGetatime(_OsPathTime):
-    attrib = 'getatime'
-    time_field = 'accessed'
-
-
-class OsPathGetmtime(_OsPathTime):
+class OsPathGetmtime(CodePatch):
+    module = os.path
     attrib = 'getmtime'
-    time_field = 'modified'
+
+    def getmtime(path):
+        from fs.patcher.stack import get_context
+        context = get_context()
+        _path = context.get_path(path)
+        try:
+            info = context.filesystem.getdetails(_path)
+        except ResourceNotFound:
+            _not_found(_path)
+        try:
+            _time = info.raw['details']['modified']
+        except KeyError:
+            raise OSError('unable to get time')
+        return _time
 
 
-class OsPathGetctime(_OsPathTime):
+class OsPathGetctime(CodePatch):
+    module = os.path
     attrib = 'getctime'
 
-    time_field = (
-        'metadata_changed'
-        if sys.platform == 'linux' else
-        'created'
-    )
+    def getctime(path):
+        from fs.patcher.stack import get_context
+        context = get_context()
+        _path = context.get_path(path)
+        try:
+            info = context.filesystem.getdetails(_path)
+        except ResourceNotFound:
+            _not_found(_path)
+        time_field = (
+            'metadata_changed'
+            if sys.platform == 'linux' else
+            'created'
+        )
+        try:
+            _time = info.raw['details'][time_field]
+        except KeyError:
+            raise OSError('unable to get time')
+        return _time
 
 
-class OsPathGetsize(ModulePatch):
+class OsPathGetsize(CodePatch):
     module = os.path
     attrib = 'getsize'
 
-    def getsize(self, context, path):
+    def getsize(path):
+        from fs.patcher.stack import get_context
+        context = get_context()
         _path = context.get_path(path)
         try:
             return context.filesystem.getsize(_path)
@@ -87,11 +121,14 @@ class OsPathGetsize(ModulePatch):
             _not_found(_path)
 
 
-class OsPathIsfile(ModulePatch):
+class OsPathIsfile(CodePatch):
     module = os.path
     attrib = 'isfile'
 
-    def isfile(self, context, path):
+    def isfile(path):
+        from fs.patcher.stack import get_context
+        from fs.errors import ResourceNotFound
+        context = get_context()
         _path = context.get_path(path)
         try:
             return context.filesystem.isfile(_path)
@@ -99,11 +136,13 @@ class OsPathIsfile(ModulePatch):
             _not_found(_path)
 
 
-class OsPathIsdir(ModulePatch):
+class OsPathIsdir(CodePatch):
     module = os.path
     attrib = 'isdir'
 
-    def isdir(self, context, path):
+    def isdir(path):
+        from fs.patcher.stack import get_context
+        context = get_context()
         _path = context.get_path(path)
         try:
             return context.filesystem.isdir(_path)
@@ -111,14 +150,16 @@ class OsPathIsdir(ModulePatch):
             _not_found(_path)
 
 
-class OsPathIslink(ModulePatch):
+class OsPathIslink(CodePatch):
     module = os.path
     attrib = 'islink'
 
-    def islink(self, context, path):
-        _path = context.get_path(path)
+    def islink(path):
+        from fs.patcher.stack import get_context
+        context = get_context()
+        _path = self.context.get_path(path)
         try:
-            return context.filesystem.islink(_path)
+            return self.context.filesystem.islink(_path)
         except ResourceNotFound:
             _not_found(_path)
 
@@ -127,12 +168,12 @@ class OsListdir(ModulePatch):
     module = os
     attrib = 'listdir'
 
-    def listdir(self, context, path='.'):
+    def listdir(self, path='.'):
         if not path:
             _not_found(path)
-        _path = context.get_path(path)
+        _path = self.context.get_path(path)
         try:
-            dirlist = context.filesystem.listdir(_path)
+            dirlist = self.context.filesystem.listdir(_path)
         except ResourceNotFound as error:
             _not_found(path)
         except FSError as error:
@@ -144,12 +185,11 @@ class OsWalk(ModulePatch):
     module = os
     attrib = 'walk'
 
-    def walk(self, context,
-             top, topdown=True, onerror=None, followlinks=False):
-        _path = context.get_path(top)
+    def walk(self, top, topdown=True, onerror=None, followlinks=False):
+        _path = self.context.get_path(top)
         walk_method = 'depth' if topdown else 'breadth'
         getname = attrgetter('name')
-        with context.filesystem.opendir(_path) as dir_fs:
+        with self.context.filesystem.opendir(_path) as dir_fs:
             for _dirpath, _dirs, _files in dir_fs.walk(method=walk_method):
                 dirpath = join(_path, _dirpath)
                 dirs = [getname(info) for info in _dirs]
