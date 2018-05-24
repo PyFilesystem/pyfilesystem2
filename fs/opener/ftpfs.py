@@ -45,7 +45,8 @@ class FTPOpener(Opener):
             port=ftp_port,
             user=parse_result.username,
             passwd=parse_result.password,
-            proxy=parse_result.params.get('proxy')
+            proxy=parse_result.params.get('proxy'),
+            timeout=int(parse_result.params.get('timeout', '10'))
         )
         if dir_path:
             if create:
