@@ -92,10 +92,13 @@ class OSFS(FS):
         """Create an OSFS instance.
         """
         super(OSFS, self).__init__()
-        root_path = fsdecode(fspath(root_path))
+        if isinstance(root_path, bytes):
+            root_path = fsdecode(root_path)
+        self.root_path = root_path
+        _root_path = fsdecode(fspath(root_path))
         _root_path = os.path.expanduser(os.path.expandvars(root_path))
         _root_path = os.path.normpath(os.path.abspath(_root_path))
-        self.root_path = _root_path
+        self._root_path = _root_path
 
         if create:
             try:
@@ -137,22 +140,24 @@ class OSFS(FS):
     def __repr__(self):
         # type: () -> str
         _fmt = "{}({!r})"
-        return _fmt.format(self.__class__.__name__,
-                           self.root_path)
+        _class_name = self.__class__.__name__
+        return _fmt.format(_class_name, self.root_path)
 
     def __str__(self):
         # type: () -> str
         fmt = "<{} '{}'>"
-        return fmt.format(self.__class__.__name__.lower(),
-                          self.root_path)
+        _class_name = self.__class__.__name__
+        return fmt.format(_class_name.lower(), self.root_path)
 
     def _to_sys_path(self, path):
         # type: (Text) -> Text
         """Convert a FS path to a path on the OS.
         """
-        sys_path = os.path.join(
-            self.root_path,
-            path.lstrip('/').replace('/', os.sep)
+        sys_path = fsencode(
+            os.path.join(
+                self._root_path,
+                path.lstrip('/').replace('/', os.sep)
+            )
         )
         return sys_path
 
@@ -231,7 +236,7 @@ class OSFS(FS):
     def _gettarget(self, sys_path):
         # type: (Text) -> Optional[Text]
         try:
-            target = os.readlink(sys_path)
+            target = os.readlink(fsencode(sys_path))
         except OSError:
             return None
         else:
@@ -250,9 +255,9 @@ class OSFS(FS):
         sys_path = self.getsyspath(_path)
         _lstat = None
         with convert_os_errors('getinfo', path):
-            _stat = os.stat(sys_path)
+            _stat = os.stat(fsencode(sys_path))
             if 'lstat' in namespaces:
-                _stat = os.lstat(sys_path)
+                _stat = os.lstat(fsencode(sys_path))
 
         info = {
             'basic': {
@@ -285,8 +290,9 @@ class OSFS(FS):
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
         with convert_os_errors('listdir', path, directory=True):
-            names = os.listdir(sys_path)
-        return names
+            names = os.listdir(fsencode(sys_path))
+        return [fsdecode(name) for name in names]
+        #return names
 
     def makedir(self,               # type: _O
                 path,               # type: Text
@@ -368,7 +374,10 @@ class OSFS(FS):
 
     def getsyspath(self, path):
         # type: (Text) -> Text
-        sys_path = self._to_sys_path(path)
+        sys_path = os.path.join(
+            self._root_path,
+            path.lstrip('/').replace('/', os.sep)
+        )
         return sys_path
 
     def geturl(self, path, purpose='download'):
@@ -455,7 +464,7 @@ class OSFS(FS):
                 for dir_entry in scandir(sys_path):
                     info = {
                         "basic": {
-                            "name": dir_entry.name,
+                            "name": fsdecode(dir_entry.name),
                             "is_dir": dir_entry.is_dir()
                         }
                     }
@@ -493,14 +502,16 @@ class OSFS(FS):
             self.check()
             namespaces = namespaces or ()
             _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path)
+            sys_path = self.getsyspath(_path)
+            _sys_path = fsencode(sys_path)
             with convert_os_errors('scandir', path, directory=True):
                 for entry_name in os.listdir(sys_path):
-                    entry_path = os.path.join(sys_path, entry_name)
-                    stat_result = os.stat(entry_path)
+                    _entry_name = fsdecode(entry_name)
+                    entry_path = os.path.join(sys_path, _entry_name)
+                    stat_result = os.stat(fsencode(entry_path))
                     info = {
                         "basic": {
-                            "name": entry_name,
+                            "name": _entry_name,
                             "is_dir": stat.S_ISDIR(stat_result.st_mode),
                         }
                     }  # type: Dict[Text, Dict[Text, Any]]

@@ -24,6 +24,7 @@ import six
 
 from . import copy
 from . import errors
+from . import fsencode
 from . import iotools
 from . import move
 from . import tools
@@ -732,6 +733,10 @@ class FS(object):
         data anywhere the OS knows about. It is also possible for some
         paths to have a system path, whereas others don't.
 
+        This method will always return a str on Py3.* and unicode
+        on Py2.7. See `~getospath` if you need to encode the path as
+        bytes.
+
         If ``path`` doesn't have a system path, a `~fs.errors.NoSysPath`
         exception will be thrown.
 
@@ -742,6 +747,36 @@ class FS(object):
 
         """
         raise errors.NoSysPath(path=path)
+
+    def getospath(self, path):
+        # type: (Text) -> bytes
+        """Get a *system path* to a resource, encoded in the operating
+        system's prefered encoding.
+
+        Parameters:
+            path (str): A path on the filesystem.
+
+        Returns:
+            str: the *system path* of the resource, if any.
+
+        Raises:
+            fs.errors.NoSysPath: If there is no corresponding system path.
+
+        This method takes the output of `~getsyspath` and encodes it to
+        the filesystem's prefered encoding. In Python3 this step is
+        not required, as the `os` module will do it automatically. In
+        Python2.7, the encoding step is required to support filenames
+        on the filesystem that don't encode correctly.
+
+        Note:
+            If you want your code to work in Python2.7 and Python3 then
+            use this method if you want to work will the OS filesystem
+            outside of the OSFS interface.
+
+        """
+        syspath = self.getsyspath(path)
+        ospath = fsencode(syspath)
+        return ospath
 
     def gettype(self, path):
         # type: (Text) -> ResourceType

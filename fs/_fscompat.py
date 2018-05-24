@@ -5,40 +5,7 @@ import six
 try:
     from os import fsencode, fsdecode
 except ImportError:
-    def _fscodec():
-        encoding = sys.getfilesystemencoding()
-        errors = 'strict' if encoding == 'mbcs' else 'surrogateescape'
-
-        def fsencode(filename):
-            """
-            Encode filename to the filesystem encoding with 'surrogateescape' error
-            handler, return bytes unchanged. On Windows, use 'strict' error handler if
-            the file system encoding is 'mbcs' (which is the default encoding).
-            """
-            if isinstance(filename, bytes):
-                return filename
-            elif isinstance(filename, six.text_type):
-                return filename.encode(encoding, errors)
-            else:
-                raise TypeError("expect string type, not %s" % type(filename).__name__)
-
-        def fsdecode(filename):
-            """
-            Decode filename from the filesystem encoding with 'surrogateescape' error
-            handler, return str unchanged. On Windows, use 'strict' error handler if
-            the file system encoding is 'mbcs' (which is the default encoding).
-            """
-            if isinstance(filename, six.text_type):
-                return filename
-            elif isinstance(filename, bytes):
-                return filename.decode(encoding, errors)
-            else:
-                raise TypeError("expect string type, not %s" % type(filename).__name__)
-
-        return fsencode, fsdecode
-
-    fsencode, fsdecode = _fscodec()
-    del _fscodec
+    from backports.os import fsencode, fsdecode
 
 try:
     from os import fspath
