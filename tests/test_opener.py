@@ -102,6 +102,20 @@ class TestParse(unittest.TestCase):
         )
         self.assertEqual(expected, parsed)
 
+    def test_parse_params_timeout(self):
+        parsed = opener.parse('ftp://ftp.example.org?timeout=30')
+        expected = ParseResult(
+            'ftp',
+            None,
+            None,
+            'ftp.example.org',
+            {
+                'timeout':'30'
+            },
+            None
+        )
+        self.assertEqual(expected, parsed)
+
     def test_parse_user_password_proxy(self):
         parsed = opener.parse('ftp://user:password@ftp.example.org?proxy=ftp.proxy.org')
         expected = ParseResult(
@@ -136,20 +150,6 @@ class TestParse(unittest.TestCase):
             'password',
             'ftp.example.org/~connolly',
             {},
-            None
-        )
-        self.assertEqual(expected, parsed)
-
-    def test_parse_timeout(self):
-        parsed = opener.parse('ftp://ftp.example.org?timeout=30')
-        expected = ParseResult(
-            'ftp',
-            None,
-            None,
-            'ftp.example.org',
-            {
-                'timeout':'30'
-            },
             None
         )
         self.assertEqual(expected, parsed)
