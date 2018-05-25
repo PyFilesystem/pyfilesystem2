@@ -154,6 +154,20 @@ class TestParse(unittest.TestCase):
         )
         self.assertEqual(expected, parsed)
 
+    def test_parse_params_decode(self):
+        parsed = opener.parse('ftp://ftp.example.org?decode=is%20working')
+        expected = ParseResult(
+            'ftp',
+            None,
+            None,
+            'ftp.example.org',
+            {
+                'decode':'is working'
+            },
+            None
+        )
+        self.assertEqual(expected, parsed)
+
 
 class TestRegistry(unittest.TestCase):
 
