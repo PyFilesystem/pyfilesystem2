@@ -102,6 +102,20 @@ class TestParse(unittest.TestCase):
         )
         self.assertEqual(expected, parsed)
 
+    def test_parse_params_timeout(self):
+        parsed = opener.parse('ftp://ftp.example.org?timeout=30')
+        expected = ParseResult(
+            'ftp',
+            None,
+            None,
+            'ftp.example.org',
+            {
+                'timeout':'30'
+            },
+            None
+        )
+        self.assertEqual(expected, parsed)
+
     def test_parse_user_password_proxy(self):
         parsed = opener.parse('ftp://user:password@ftp.example.org?proxy=ftp.proxy.org')
         expected = ParseResult(
@@ -136,6 +150,20 @@ class TestParse(unittest.TestCase):
             'password',
             'ftp.example.org/~connolly',
             {},
+            None
+        )
+        self.assertEqual(expected, parsed)
+
+    def test_parse_params_decode(self):
+        parsed = opener.parse('ftp://ftp.example.org?decode=is%20working')
+        expected = ParseResult(
+            'ftp',
+            None,
+            None,
+            'ftp.example.org',
+            {
+                'decode':'is working'
+            },
             None
         )
         self.assertEqual(expected, parsed)
@@ -309,10 +337,12 @@ class TestOpeners(unittest.TestCase):
     @mock.patch("fs.ftpfs.FTPFS")
     def test_open_ftp(self, mock_FTPFS):
         open_fs('ftp://foo:bar@ftp.example.org')
-        mock_FTPFS.assert_called_once_with('ftp.example.org', passwd='bar', port=21, user='foo', proxy=None)
+        mock_FTPFS.assert_called_once_with('ftp.example.org', passwd='bar', port=21, user='foo', proxy=None,
+                                           timeout=10)
 
     @mock.patch("fs.ftpfs.FTPFS")
     def test_open_ftp_proxy(self, mock_FTPFS):
         open_fs('ftp://foo:bar@ftp.example.org?proxy=ftp.proxy.org')
-        mock_FTPFS.assert_called_once_with('ftp.example.org', passwd='bar', port=21, user='foo', proxy='ftp.proxy.org')
+        mock_FTPFS.assert_called_once_with('ftp.example.org', passwd='bar', port=21, user='foo', proxy='ftp.proxy.org',
+                                           timeout=10)
 
