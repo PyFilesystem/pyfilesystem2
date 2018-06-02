@@ -9,15 +9,15 @@ from ..base import FS
 
 
 PATCHES = [
-    common_patches.OsPathExists(),
-    common_patches.OsPathLExists(),
-    common_patches.OsPathGetatime(),
-    common_patches.OsPathGetmtime(),
-    common_patches.OsPathGetctime(),
-    common_patches.OsPathGetsize(),
-    common_patches.OsPathIsfile(),
-    common_patches.OsPathIsdir(),
-    common_patches.OsPathIslink(),
+    # common_patches.OsPathExists(),
+    # common_patches.OsPathLExists(),
+    # common_patches.OsPathGetatime(),
+    # common_patches.OsPathGetmtime(),
+    # common_patches.OsPathGetctime(),
+    # common_patches.OsPathGetsize(),
+    # common_patches.OsPathIsfile(),
+    # common_patches.OsPathIsdir(),
+    # common_patches.OsPathIslink(),
     common_patches.OsListdir(),
 ]
 
