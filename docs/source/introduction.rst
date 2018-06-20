@@ -20,5 +20,11 @@ Or to upgrade to the most recent version::
 
     pip install fs --upgrade
 
+PyFilesystem is also available on conda_::
+
+    conda install fs -c conda-forge
+
 Alternatively, if you would like to install from source, you can check
 out `the code from Github <https://github.com/PyFilesystem/pyfilesystem2>`_.
+
+.. _conda: https://conda.io/docs/
