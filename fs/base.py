@@ -94,6 +94,15 @@ class FS(object):
         """
         self.close()
 
+    def __getstate__(self):
+        out = self.__dict__.copy()
+        out.pop('_lock', None)
+        return out
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        self._lock = threading.RLock()
+
     @property
     def walk(self):
         # type: (_F) -> BoundWalker[_F]
