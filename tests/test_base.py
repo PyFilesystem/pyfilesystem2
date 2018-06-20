@@ -2,6 +2,7 @@
 
 from __future__ import unicode_literals
 
+import pickle
 import unittest
 
 try:
@@ -69,3 +70,7 @@ class TestBase(unittest.TestCase):
 
         with self.assertRaises(errors.InvalidPath):
             self.fs.validatepath('0123456789A')
+
+    def test_ispickleable(self):
+        fs2 = pickle.loads(pickle.dumps(self.fs))
+        assert isinstance(fs2, TestFS)
