@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.24] - 2018-06-28
+
+### Added timeout to FTP opener
+
 ## [2.0.23] - 2018-05-02
 
 - Fix for Markdown on PyPi, no code changes
