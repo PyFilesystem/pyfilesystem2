@@ -59,10 +59,14 @@ class MissingInfoNamespace(AttributeError):
 
     def __init__(self, namespace):
         # type: (Text) -> None
+        self.namespace=namespace
         msg = "namespace '{}' is required for this attribute"
         super(MissingInfoNamespace, self).__init__(
             msg.format(namespace)
         )
+
+    def __reduce__(self):
+        return type(self), (self.namespace,)
 
 
 @six.python_2_unicode_compatible
@@ -121,6 +125,10 @@ class CreateFailed(FSError):
                 raise cls(exc=e)
         return new_func  # type: ignore
 
+    def __reduce__(self):
+        return type(self), (self._msg, self.exc)
+
+
 class PathError(FSError):
     """Base exception for errors to do with a path string.
     """
@@ -131,6 +139,9 @@ class PathError(FSError):
         # type: (Text, Optional[Text]) -> None
         self.path = path
         super(PathError, self).__init__(msg=msg)
+
+    def __reduce__(self):
+        return type(self), (self.path, self._msg)
 
 
 class NoSysPath(PathError):
@@ -150,6 +161,9 @@ class NoURL(PathError):
         # type: (Text, Text, Optional[Text]) -> None
         self.purpose = purpose
         super(NoURL, self).__init__(path, msg=msg)
+
+    def __reduce__(self):
+        return type(self), (self.path, self.purpose, self._msg)
 
 
 class InvalidPath(PathError):
@@ -183,6 +197,9 @@ class OperationFailed(FSError):
         self.details = '' if exc is None else text_type(exc)
         self.errno = getattr(exc, "errno", None)
         super(OperationFailed, self).__init__(msg=msg)
+
+    def __reduce__(self):
+        return type(self), (self.path, self.exc, self._msg)
 
 
 class Unsupported(OperationFailed):
@@ -238,6 +255,9 @@ class ResourceError(FSError):
         self.path = path
         self.exc = exc
         super(ResourceError, self).__init__(msg=msg)
+
+    def __reduce__(self):
+        return type(self), (self.path, self.exc, self._msg)
 
 
 class ResourceNotFound(ResourceError):
@@ -325,7 +345,11 @@ class IllegalBackReference(ValueError):
 
     def __init__(self, path):
         # type: (Text) -> None
+        self.path = path
         _msg = \
             "path '{path}' contains back-references outside of filesystem"
         _msg = _msg.format(path=path)
         super(IllegalBackReference, self).__init__(_msg)
+
+    def __reduce__(self):
+        return type(self), (self.path,)
