@@ -216,17 +216,19 @@ class TestRegistry(unittest.TestCase):
 
     def test_entry_point_create_error(self):
 
+        class BadOpener(opener.Opener):
+            def __init__(self, *args, **kwargs):
+                raise ValueError("some creation error")
+            def open_fs(self, *args, **kwargs):
+                pass
+        
         entry_point = mock.MagicMock()
-        entry_point.load = mock.MagicMock(return_value=entry_point)
-        entry_point.side_effect = ValueError("some creation error")
-
+        entry_point.load = mock.MagicMock(return_value=BadOpener)
         iter_entry_points = mock.MagicMock(return_value=iter([entry_point]))
-        builtins = 'builtins' if six.PY3 else '__builtin__'
 
         with mock.patch('pkg_resources.iter_entry_points', iter_entry_points):
-            with mock.patch(builtins+'.issubclass', return_value=True):
-                with self.assertRaises(errors.EntryPointError) as ctx:
-                    opener.open_fs('test://')
+            with self.assertRaises(errors.EntryPointError) as ctx:
+                opener.open_fs('test://')
             self.assertEqual(
                 'could not instantiate opener; some creation error', str(ctx.exception))
 
