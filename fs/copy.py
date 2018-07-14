@@ -5,7 +5,6 @@ from __future__ import print_function, unicode_literals
 
 import typing
 
-from .bulk import Copier
 from .errors import FSError
 from .opener import manage_fs
 from .path import abspath, combine, frombase, normpath
@@ -284,6 +283,8 @@ def copy_dir(
     def dst():
         return manage_fs(dst_fs, create=True)
 
+    from ._bulk import Copier
+
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
             with Copier(num_workers=workers) as copier:
@@ -341,6 +342,8 @@ def copy_dir_if_newer(
 
     def dst():
         return manage_fs(dst_fs, create=True)
+
+    from ._bulk import Copier
 
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():

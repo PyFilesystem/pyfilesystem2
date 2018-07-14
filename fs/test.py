@@ -1194,11 +1194,11 @@ class FSTestCases(object):
             self.fs.copy('dir', 'folder')
 
     def test_upload(self):
+        data1 = b'foo' * 512 * 1024
+        data2 = b'bar' * 2 * 512 * 1024
+        data3 = b'baz' * 3 * 512 * 1024
+        data4 = b'egg' * 7 * 512 * 1024
         for workers in (0, 1, 2, 4):
-            data1 = b'foo' * 512 * 1024
-            data2 = b'bar' * 2 * 512 * 1024
-            data3 = b'baz' * 3 * 512 * 1024
-            data4 = b'egg' * 7 * 512 * 1024
             with open_fs('temp://') as src_fs:
                 src_fs.setbytes('foo', data1)
                 src_fs.setbytes('bar', data2)
@@ -1206,10 +1206,10 @@ class FSTestCases(object):
                 src_fs.makedirs('dir2/dir3').setbytes('egg', data4)
                 dst_fs = self.fs
                 fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
-                self.assertEqual(src_fs.getbytes('foo'), data1)
-                self.assertEqual(src_fs.getbytes('bar'), data2)
-                self.assertEqual(src_fs.getbytes('dir1/baz'), data3)
-                self.assertEqual(src_fs.getbytes('dir2/dir3/egg'), data4)
+                self.assertEqual(dst_fs.getbytes('foo'), data1)
+                self.assertEqual(dst_fs.getbytes('bar'), data2)
+                self.assertEqual(dst_fs.getbytes('dir1/baz'), data3)
+                self.assertEqual(dst_fs.getbytes('dir2/dir3/egg'), data4)
 
     def test_create(self):
         # Test create new file
