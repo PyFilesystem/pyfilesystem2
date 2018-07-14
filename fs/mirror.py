@@ -22,14 +22,14 @@ from __future__ import unicode_literals
 from contextlib import contextmanager
 import typing
 
-from .bulk import Copier
+from ._bulk import Copier
 from .copy import copy_file_internal
 from .errors import ResourceNotFound
 from .walk import Walker
 from .opener import manage_fs
 
 if False:  # typing.TYPE_CHECKING
-    from typing import Optional, Text, Union
+    from typing import Callable, Optional, Text, Union
     from .base import FS
     from .info import Info
 
@@ -51,12 +51,13 @@ def _compare(info1, info2):
     return date1 is None or date2 is None or date1 > date2
 
 
-def mirror(src_fs,              # type: Union[FS, Text]
-           dst_fs,              # type: Union[FS, Text]
-           walker=None,         # type: Optional[Walker]
-           copy_if_newer=True,  # type: bool
-           workers=0            # type: int
-           ):
+def mirror(
+    src_fs,  # type: Union[FS, Text]
+    dst_fs,  # type: Union[FS, Text]
+    walker=None,  # type: Optional[Walker]
+    copy_if_newer=True,  # type: bool
+    workers=0,  # type: int
+):
     # type: (...) -> None
     """Mirror files / directories from one filesystem to another.
 
@@ -73,32 +74,40 @@ def mirror(src_fs,              # type: Union[FS, Text]
             (0 for single threaded). Set to a relatively low number
             for network filesystems, 4 would be a good start.
     """
+
     def src():
         return manage_fs(src_fs, writeable=False)
+
     def dst():
         return manage_fs(dst_fs, create=True)
 
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
             with Copier(num_workers=workers) as copier:
-                return _mirror(
+                _mirror(
                     _src_fs,
                     _dst_fs,
                     walker=walker,
                     copy_if_newer=copy_if_newer,
-                    copy_file=copier.copy
-            )
+                    copy_file=copier.copy,
+                )
 
 
-def _mirror(src_fs, dst_fs, walker=None, copy_if_newer=True, copy_file=copy_file_internal):
-    # type: (FS, FS, Optional[Walker], bool) -> None
+def _mirror(
+    src_fs,
+    dst_fs,
+    walker=None,
+    copy_if_newer=True,
+    copy_file=copy_file_internal,
+):
+    # type: (FS, FS, Optional[Walker], bool, Callable[[FS, str, FS, str], None]) -> None
     walker = walker or Walker()
-    walk = walker.walk(src_fs, namespaces=['details'])
+    walk = walker.walk(src_fs, namespaces=["details"])
     for path, dirs, files in walk:
         try:
             dst = {
                 info.name: info
-                for info in dst_fs.scandir(path, namespaces=['details'])
+                for info in dst_fs.scandir(path, namespaces=["details"])
             }
         except ResourceNotFound:
             dst_fs.makedir(path)

@@ -16,32 +16,53 @@ from fs import open_fs
 class TestCopy(unittest.TestCase):
 
     def test_copy_fs(self):
-        src_fs = open_fs('mem://')
-        src_fs.makedirs('foo/bar')
-        src_fs.makedirs('foo/empty')
-        src_fs.touch('test.txt')
-        src_fs.touch('foo/bar/baz.txt')
+        for workers in (0, 1, 2, 4):
+            src_fs = open_fs('mem://')
+            src_fs.makedirs('foo/bar')
+            src_fs.makedirs('foo/empty')
+            src_fs.touch('test.txt')
+            src_fs.touch('foo/bar/baz.txt')
 
-        dst_fs = open_fs('mem://')
-        fs.copy.copy_fs(src_fs, dst_fs)
+            dst_fs = open_fs('mem://')
+            fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
 
-        self.assertTrue(dst_fs.isdir('foo/empty'))
-        self.assertTrue(dst_fs.isdir('foo/bar'))
-        self.assertTrue(dst_fs.isfile('test.txt'))
+            self.assertTrue(dst_fs.isdir('foo/empty'))
+            self.assertTrue(dst_fs.isdir('foo/bar'))
+            self.assertTrue(dst_fs.isfile('test.txt'))
 
     def test_copy_dir(self):
-        src_fs = open_fs('mem://')
-        src_fs.makedirs('foo/bar')
-        src_fs.makedirs('foo/empty')
-        src_fs.touch('test.txt')
-        src_fs.touch('foo/bar/baz.txt')
+        for workers in (0, 1, 2, 4):
+            src_fs = open_fs('mem://')
+            src_fs.makedirs('foo/bar')
+            src_fs.makedirs('foo/empty')
+            src_fs.touch('test.txt')
+            src_fs.touch('foo/bar/baz.txt')
 
-        dst_fs = open_fs('mem://')
-        fs.copy.copy_dir(src_fs, '/foo', dst_fs, '/')
+            dst_fs = open_fs('mem://')
+            fs.copy.copy_dir(src_fs, '/foo', dst_fs, '/', workers=workers)
 
-        self.assertTrue(dst_fs.isdir('bar'))
-        self.assertTrue(dst_fs.isdir('empty'))
-        self.assertTrue(dst_fs.isfile('bar/baz.txt'))
+            self.assertTrue(dst_fs.isdir('bar'))
+            self.assertTrue(dst_fs.isdir('empty'))
+            self.assertTrue(dst_fs.isfile('bar/baz.txt'))
+
+    def test_copy_large(self):
+        for workers in (0, 1, 2, 4):
+            data1 = b'foo' * 512 * 1024
+            data2 = b'bar' * 2 * 512 * 1024
+            data3 = b'baz' * 3 * 512 * 1024
+            data4 = b'egg' * 7 * 512 * 1024
+            src_fs = open_fs('temp://')
+            src_fs.setbytes('foo', data1)
+            src_fs.setbytes('bar', data2)
+            src_fs.makedir('dir1').setbytes('baz', data3)
+            src_fs.makedirs('dir2/dir3').setbytes('egg', data4)
+
+            dst_fs = open_fs('temp://')
+            fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
+            self.assertEqual(src_fs.getbytes('foo'), data1)
+            self.assertEqual(src_fs.getbytes('bar'), data2)
+            self.assertEqual(src_fs.getbytes('dir1/baz'), data3)
+            self.assertEqual(src_fs.getbytes('dir2/dir3/egg'), data4)
 
     def test_copy_dir_on_copy(self):
         src_fs = open_fs('mem://')
@@ -53,7 +74,6 @@ class TestCopy(unittest.TestCase):
 
         dst_fs = open_fs('mem://')
         fs.copy.copy_dir(src_fs, '/', dst_fs, '/', on_copy=on_copy)
-        print(on_copy_calls)
         self.assertEqual(
             on_copy_calls,
             [(src_fs, '/baz.txt', dst_fs, '/baz.txt')]
@@ -178,7 +198,6 @@ class TestCopy(unittest.TestCase):
         finally:
             shutil.rmtree(src_dir)
             shutil.rmtree(dst_dir)
-
 
     def test_copy_fs_if_newer_dst_older(self):
         try:
@@ -338,7 +357,6 @@ class TestCopy(unittest.TestCase):
             shutil.rmtree(src_dir)
 
     def test_copy_dir_if_newer_multiple_files(self):
-
         try:
             src_dir = self._create_sandbox_dir()
             src_fs = open_fs('osfs://' + src_dir)
