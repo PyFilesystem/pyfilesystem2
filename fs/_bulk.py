@@ -49,7 +49,7 @@ class _Task(object):
 
     def __call__(self):
         # type: () -> None
-        pass
+        """Task implementation."""
 
 
 class _CopyTask(_Task):
@@ -59,9 +59,6 @@ class _CopyTask(_Task):
         # type: (IO, IO) -> None
         self.src_file = src_file
         self.dst_file = dst_file
-
-    def __repr__(self):
-        return "_CopyTask(%r, %r)".format(self.src_file, self.dst_file)
 
     def __call__(self):
         # type: () -> None
