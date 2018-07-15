@@ -4,9 +4,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.24] - Unreleased
+
+### Added
+
+- workers parameter to fs.copy, fs.move, and fs.mirror for concurrent copies
+
 ## [2.0.24] - 2018-06-28
 
-### Added timeout to FTP opener
+### Added
+
+- timeout to FTP opener
 
 ## [2.0.23] - 2018-05-02
 
@@ -210,5 +218,3 @@ No changes, pushed wrong branch to PyPi.
 ## [2.0.0] - 2016-12-07
 
 New version of the PyFilesystem API.
-
-
