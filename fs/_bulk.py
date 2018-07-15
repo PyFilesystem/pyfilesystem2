@@ -36,7 +36,7 @@ class _Worker(threading.Thread):
             task = queue.get(block=True)
             try:
                 if task is None:
-                    break
+                    break  # Sentinel to exit thread
                 task()
             except Exception as error:
                 self.copier.add_error(error)
@@ -77,7 +77,7 @@ class Copier(object):
     def __init__(self, num_workers=4):
         # type: (int) -> None
         if num_workers < 0:
-            raise ValueError('num_workers must be < 0')
+            raise ValueError('num_workers must be >= 0')
         self.num_workers = num_workers
         self.queue = None  # type: Optional[Queue[_Task]]
         self.workers = []  # type: List[_Worker]

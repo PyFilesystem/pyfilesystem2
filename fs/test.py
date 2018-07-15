@@ -1194,6 +1194,7 @@ class FSTestCases(object):
             self.fs.copy('dir', 'folder')
 
     def test_upload(self):
+        """Test fs.copy with varying number of worker threads."""
         data1 = b'foo' * 512 * 1024
         data2 = b'bar' * 2 * 512 * 1024
         data3 = b'baz' * 3 * 512 * 1024

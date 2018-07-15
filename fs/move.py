@@ -15,16 +15,18 @@ if False:  # typing.TYPE_CHECKING
     from typing import Text, Union
 
 
-def move_fs(src_fs, dst_fs):
+def move_fs(src_fs, dst_fs, workers=0):
     # type: (Union[Text, FS], Union[Text, FS]) -> None
     """Move the contents of a filesystem to another filesystem.
 
     Arguments:
         src_fs (FS or str): Source filesystem (instance or URL).
         dst_fs (FS or str): Destination filesystem (instance or URL).
+        workers (int): Use `worker` threads to copy data, or ``0`` (default) for
+            a single-threaded copy.
 
     """
-    move_dir(src_fs, "/", dst_fs, "/")
+    move_dir(src_fs, "/", dst_fs, "/", workers=workers)
 
 
 def move_file(
