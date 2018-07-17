@@ -422,8 +422,8 @@ class OSFS(FS):
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
         with convert_os_errors('open', path):
-            if six.PY2 and _mode.exclusive and self.exists(path):
-                raise FileExists(path)
+            if six.PY2 and _mode.exclusive:
+                sys_path = os.open(sys_path, os.O_CREAT | os.O_EXCL)
             _encoding = encoding or 'utf-8'
             return io.open(
                 sys_path,
