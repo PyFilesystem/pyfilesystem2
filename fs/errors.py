@@ -59,7 +59,7 @@ class MissingInfoNamespace(AttributeError):
 
     def __init__(self, namespace):
         # type: (Text) -> None
-        self.namespace=namespace
+        self.namespace = namespace
         msg = "namespace '{}' is required for this attribute"
         super(MissingInfoNamespace, self).__init__(
             msg.format(namespace)
