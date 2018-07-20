@@ -31,31 +31,29 @@ class TestCopy(unittest.TestCase):
             self.assertTrue(dst_fs.isfile('test.txt'))
 
     def test_copy_dir(self):
+        src_fs = open_fs('mem://')
+        src_fs.makedirs('foo/bar')
+        src_fs.makedirs('foo/empty')
+        src_fs.touch('test.txt')
+        src_fs.touch('foo/bar/baz.txt')
         for workers in (0, 1, 2, 4):
-            src_fs = open_fs('mem://')
-            src_fs.makedirs('foo/bar')
-            src_fs.makedirs('foo/empty')
-            src_fs.touch('test.txt')
-            src_fs.touch('foo/bar/baz.txt')
-
-            dst_fs = open_fs('mem://')
-            fs.copy.copy_dir(src_fs, '/foo', dst_fs, '/', workers=workers)
-
-            self.assertTrue(dst_fs.isdir('bar'))
-            self.assertTrue(dst_fs.isdir('empty'))
-            self.assertTrue(dst_fs.isfile('bar/baz.txt'))
+            with open_fs('mem://') as dst_fs:
+                fs.copy.copy_dir(src_fs, '/foo', dst_fs, '/', workers=workers)
+                self.assertTrue(dst_fs.isdir('bar'))
+                self.assertTrue(dst_fs.isdir('empty'))
+                self.assertTrue(dst_fs.isfile('bar/baz.txt'))
 
     def test_copy_large(self):
         data1 = b'foo' * 512 * 1024
         data2 = b'bar' * 2 * 512 * 1024
         data3 = b'baz' * 3 * 512 * 1024
         data4 = b'egg' * 7 * 512 * 1024
-        for workers in (0, 1, 2, 4):
-            with open_fs('temp://') as src_fs:
-                src_fs.setbytes('foo', data1)
-                src_fs.setbytes('bar', data2)
-                src_fs.makedir('dir1').setbytes('baz', data3)
-                src_fs.makedirs('dir2/dir3').setbytes('egg', data4)
+        with open_fs('temp://') as src_fs:
+            src_fs.setbytes('foo', data1)
+            src_fs.setbytes('bar', data2)
+            src_fs.makedir('dir1').setbytes('baz', data3)
+            src_fs.makedirs('dir2/dir3').setbytes('egg', data4)
+            for workers in (0, 1, 2, 4):
                 with open_fs('temp://') as dst_fs:
                     fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
                     self.assertEqual(dst_fs.getbytes('foo'), data1)

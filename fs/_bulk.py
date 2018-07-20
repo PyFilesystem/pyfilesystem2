@@ -124,7 +124,7 @@ class Copier(object):
             raise BulkCopyFailed(self.errors)
 
     def copy(self, src_fs, src_path, dst_fs, dst_path):
-        # type: (FS, str, FS, str) -> None
+        # type: (FS, Text, FS, Text) -> None
         """Copy a file from one fs to another."""
         if self.queue is None:
             # This should be the most performant for a single-thread
