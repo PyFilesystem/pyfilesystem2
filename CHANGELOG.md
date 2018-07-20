@@ -4,11 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.0.24] - Unreleased
+## [2.0.25] - 2018-07-20
 
 ### Added
 
-- workers parameter to fs.copy, fs.move, and fs.mirror for concurrent copies
+- workers parameter to fs.copy, fs.move, and fs.mirror for concurrent
+    copies
 
 ## [2.0.24] - 2018-06-28
 
