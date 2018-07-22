@@ -90,7 +90,8 @@ def write_zip(src_fs,                            # type: FS
             zip_info = zipfile.ZipInfo(zip_name, zip_time)  # type: ignore
 
             try:
-                zip_info.external_attr = info.permissions.mode << 16
+                if info.permissions is not None:
+                    zip_info.external_attr = info.permissions.mode << 16
             except MissingInfoNamespace:
                 pass
 

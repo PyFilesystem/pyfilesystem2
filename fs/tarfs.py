@@ -9,6 +9,7 @@ import os
 import tarfile
 import typing
 from collections import OrderedDict
+from typing import cast, IO
 
 import six
 
@@ -22,6 +23,7 @@ from .opener import open_fs
 from .path import dirname, relpath, basename, isbase, parts, frombase
 from .wrapfs import WrapFS
 from .permissions import Permissions
+
 
 if False:  # typing.TYPE_CHECKING
     from tarfile import TarInfo
@@ -401,7 +403,7 @@ class ReadTarFS(FS):
         if not member.isfile():
             raise errors.FileExpected(path)
 
-        rw = RawWrapper(self._tar.extractfile(member))
+        rw = RawWrapper(cast(IO, self._tar.extractfile(member)))
 
         if six.PY2: # Patch nonexistent file.flush in Python2
             def _flush():

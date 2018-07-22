@@ -82,6 +82,7 @@ def count_py_loc(path):
             if name.endswith('.py'):
                 with open(os.path.join(root, name), 'rt') as python_file:
                     count += sum(1 for line in python_file if line.strip())
+    return count
 ```
 
 This version is similar to the PyFilesystem code above, but would only

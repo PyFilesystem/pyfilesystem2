@@ -6,6 +6,7 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import typing
+from typing import cast
 from copy import deepcopy
 
 import six
@@ -15,12 +16,11 @@ from .enums import ResourceType
 from .errors import MissingInfoNamespace
 from .permissions import Permissions
 from .time import epoch_to_datetime
-from ._typing import overload
+from ._typing import overload, Text
 
 if False:  # typing.TYPE_CHECKING
     from datetime import datetime
-    from typing import Callable, List, Mapping, Optional
-    from ._typing import Text
+    from typing import Any, Callable, List, Mapping, Optional, Union
     RawInfo = Mapping[Text, Mapping[Text, object]]
     ToDatetime = Callable[[int], datetime]
     T = typing.TypeVar("T")
@@ -83,22 +83,17 @@ class Info(object):
             return None
 
     @overload
-    def get(self, namespace, key, default=None):  # pragma: no cover
-        # type: (Text, Text, Optional[T]) -> Optional[T]
-        pass
-
-    @overload
     def get(self, namespace, key):  # pragma: no cover
-        # type: (Text, Text) -> Optional[T]
+        # type: (Text, Text) -> Any
         pass
 
     @overload
     def get(self, namespace, key, default):  # pragma: no cover
-        # type: (Text, Text, T) -> T
+        # type: (Text, Text, T) -> Union[Any, T]
         pass
 
     def get(self, namespace, key, default=None):
-        # type: (Text, Text, Optional[T]) -> Optional[T]
+        # type: (Text, Text, Optional[Any]) -> Optional[Any]
         """Get a raw info value.
 
         Arguments:
@@ -187,7 +182,7 @@ class Info(object):
         # type: () -> Text
         """`str`: the resource name.
         """
-        return self.get('basic', 'name')
+        return cast(Text, self.get('basic', 'name'))
 
     @property
     def suffix(self):
@@ -245,14 +240,14 @@ class Info(object):
         # type: () -> bool
         """`bool`: `True` if the resource references a directory.
         """
-        return self.get('basic', 'is_dir')
+        return cast(bool, self.get('basic', 'is_dir'))
 
     @property
     def is_file(self):
         # type: () -> bool
         """`bool`: `True` if the resource references a file.
         """
-        return not self.get('basic', 'is_dir')
+        return not cast(bool, self.get('basic', 'is_dir'))
 
     @property
     def is_link(self):
@@ -381,7 +376,7 @@ class Info(object):
 
         """
         self._require_namespace('details')
-        return self.get('details', 'size')
+        return cast(int, self.get('details', 'size'))
 
     @property
     def user(self):

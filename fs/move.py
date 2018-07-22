@@ -16,7 +16,7 @@ if False:  # typing.TYPE_CHECKING
 
 
 def move_fs(src_fs, dst_fs, workers=0):
-    # type: (Union[Text, FS], Union[Text, FS]) -> None
+    # type: (Union[Text, FS], Union[Text, FS], int) -> None
     """Move the contents of a filesystem to another filesystem.
 
     Arguments:
