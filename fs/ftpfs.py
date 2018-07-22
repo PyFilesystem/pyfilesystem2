@@ -16,6 +16,7 @@ from contextlib import contextmanager
 from ftplib import FTP
 from ftplib import error_perm
 from ftplib import error_temp
+from typing import cast
 
 from six import PY2
 from six import text_type
@@ -82,7 +83,7 @@ def ftp_errors(fs, path=None):
                 msg=message
             )
         elif code in ('501', '550'):
-            raise errors.ResourceNotFound(path=path)
+            raise errors.ResourceNotFound(path=cast(str, path))
         raise errors.PermissionDenied(
             msg=message
         )

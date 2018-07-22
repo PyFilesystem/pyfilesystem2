@@ -8,12 +8,11 @@ import six
 
 _PY = sys.version_info
 
+from typing import overload  # type: ignore
 
 if _PY.major == 3 and _PY.minor == 5 and _PY.micro in (0, 1):
     def overload(func):  # pragma: no cover
         return func
-else:
-    from typing import overload  # type: ignore
 
 try:
     from typing import Text
