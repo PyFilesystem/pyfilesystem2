@@ -1810,6 +1810,10 @@ class FSTestCases(object):
 
     def test_match(self):
         self.assertTrue(self.fs.match(['*.py'], 'foo.py'))
+        self.assertEqual(
+            self.fs.match(['*.py'], 'FOO.PY'),
+            self.fs.getmeta().get('case_insensitive', False)
+        )
 
     def test_tree(self):
         self.fs.makedirs('foo/bar')

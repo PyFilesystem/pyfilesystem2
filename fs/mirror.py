@@ -25,8 +25,9 @@ import typing
 from ._bulk import Copier
 from .copy import copy_file_internal
 from .errors import ResourceNotFound
-from .walk import Walker
 from .opener import manage_fs
+from .tools import is_thread_safe
+from .walk import Walker
 
 if False:  # typing.TYPE_CHECKING
     from typing import Callable, Optional, Text, Union
@@ -83,7 +84,8 @@ def mirror(
 
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
-            with Copier(num_workers=workers) as copier:
+            _thread_safe = is_thread_safe(_src_fs, _dst_fs)
+            with Copier(num_workers=workers if _thread_safe else 0) as copier:
                 _mirror(
                     _src_fs,
                     _dst_fs,

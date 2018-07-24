@@ -35,11 +35,14 @@ class TestErrors(unittest.TestCase):
             [errors.CreateFailed],
             [errors.NoSysPath, 'some_path'],
             [errors.NoURL, 'some_path', 'some_purpose'],
-            [errors.Unsupported]
+            [errors.Unsupported],
+            [errors.IllegalBackReference, 'path']
         ]
         try:
             pool = multiprocessing.Pool(1)
             for args in tests:
+                exc = args[0](*args[1:])
+                exc.__reduce__()
                 with self.assertRaises(args[0]):
                     pool.apply(_multiprocessing_test_task, args)
         finally:
