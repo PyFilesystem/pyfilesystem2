@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import multiprocessing
 import unittest
 
 from six import text_type
@@ -25,6 +26,27 @@ class TestErrors(unittest.TestCase):
             text_type(err),
             "not supported"
         )
+
+    def test_raise_in_multiprocessing(self):
+        # Without the __reduce__ methods in FSError subclasses, this test will hang forever.
+        tests = [
+            [errors.ResourceNotFound, 'some_path'],
+            [errors.FilesystemClosed],
+            [errors.CreateFailed],
+            [errors.NoSysPath, 'some_path'],
+            [errors.NoURL, 'some_path', 'some_purpose'],
+            [errors.Unsupported]
+        ]
+        try:
+            pool = multiprocessing.Pool(1)
+            for args in tests:
+                with self.assertRaises(args[0]):
+                    pool.apply(_multiprocessing_test_task, args)
+        finally:
+            pool.close()
+
+def _multiprocessing_test_task(err, *args):
+    raise err(*args)
 
 
 class TestCreateFailed(unittest.TestCase):
