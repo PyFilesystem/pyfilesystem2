@@ -55,7 +55,7 @@ def imatch(pattern, name):
     try:
         re_pat = _PATTERN_CACHE[(pattern, False)]
     except KeyError:
-        res = _translate(pattern, case_sensitive=False)
+        res = _translate(pattern, case_insensitive=True)
         _PATTERN_CACHE[(pattern, False)] = re_pat =\
             re.compile(res, re.IGNORECASE)
     return re_pat.match(name) is not None
@@ -101,15 +101,15 @@ def imatch_any(patterns, name):
     return any(imatch(pattern, name) for pattern in patterns)
 
 
-def get_matcher(patterns, case_sensitive):
+def get_matcher(patterns, case_insensitive):
     # type: (Iterable[Text], bool) -> Callable[[Text], bool]
     """Get a callable that matches names against the given patterns.
 
     Arguments:
         patterns (list): A list of wildcard pattern. e.g. ``["*.py",
             "*.pyc"]``
-        case_sensitive (bool): If `True`, then the callable will be case
-            sensitive, otherwise it will be case insensitive.
+        case_insensitive (bool): If `True`, then the callable will be case
+            insensitive, otherwise it will be case sensitive.
 
     Returns:
         callable: a matcher that will return `True` if the name given as
@@ -126,13 +126,13 @@ def get_matcher(patterns, case_sensitive):
     """
     if not patterns:
         return lambda name: True
-    if case_sensitive:
-        return partial(match_any, patterns)
-    else:
+    if case_insensitive:
         return partial(imatch_any, patterns)
+    else:
+        return partial(match_any, patterns)
 
 
-def _translate(pattern, case_sensitive=True):
+def _translate(pattern, case_insensitive=False):
     # type: (Text, bool) -> Text
     """Translate a wildcard pattern to a regular expression.
 
@@ -140,14 +140,14 @@ def _translate(pattern, case_sensitive=True):
 
     Arguments:
         pattern (str): A wildcard pattern.
-        case_sensitive (bool): Set to `False` to use a case
-            insensitive regex (default `True`).
+        case_insensitive (bool): Set to `True` to use a case
+            insensitive regex (default `False`).
 
     Returns:
         str: A regex equivalent to the given pattern.
 
     """
-    if not case_sensitive:
+    if case_insensitive:
         pattern = pattern.lower()
     i, n = 0, len(pattern)
     res = ''

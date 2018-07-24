@@ -36,11 +36,11 @@ class TestFNMatch(unittest.TestCase):
         self.assertTrue(wildcard.imatch_any(['*.py', '*.pyc'], 'FOO.pyc'))
 
     def test_get_matcher(self):
-        matcher = wildcard.get_matcher([], True)
+        matcher = wildcard.get_matcher([], False)
         self.assertTrue(matcher('foo.py'))
-        matcher = wildcard.get_matcher(['*.py'], True)
+        matcher = wildcard.get_matcher(['*.py'], False)
         self.assertTrue(matcher('foo.py'))
         self.assertFalse(matcher('foo.PY'))
-        matcher = wildcard.get_matcher(['*.py'], False)
+        matcher = wildcard.get_matcher(['*.py'], True)
         self.assertTrue(matcher('foo.py'))
         self.assertTrue(matcher('FOO.py'))
