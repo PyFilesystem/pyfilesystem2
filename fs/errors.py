@@ -22,34 +22,35 @@ if False:  # typing.TYPE_CHECKING
 
 
 __all__ = [
-    'CreateFailed',
-    'DestinationExists',
-    'DirectoryExists',
-    'DirectoryExpected',
-    'DirectoryNotEmpty',
-    'FileExists',
-    'FileExpected',
-    'FilesystemClosed',
-    'FSError',
-    'IllegalBackReference',
-    'InsufficientStorage',
-    'InvalidCharsInPath',
-    'InvalidPath',
-    'MissingInfoNamespace',
-    'NoSysPath',
-    'NoURL',
-    'OperationFailed',
-    'OperationTimeout',
-    'PathError',
-    'PermissionDenied',
-    'RemoteConnectionError',
-    'RemoveRootError',
-    'ResourceError',
-    'ResourceInvalid',
-    'ResourceLocked',
-    'ResourceNotFound',
-    'ResourceReadOnly',
-    'Unsupported',
+    "BulkCopyFailed",
+    "CreateFailed",
+    "DestinationExists",
+    "DirectoryExists",
+    "DirectoryExpected",
+    "DirectoryNotEmpty",
+    "FileExists",
+    "FileExpected",
+    "FilesystemClosed",
+    "FSError",
+    "IllegalBackReference",
+    "InsufficientStorage",
+    "InvalidCharsInPath",
+    "InvalidPath",
+    "MissingInfoNamespace",
+    "NoSysPath",
+    "NoURL",
+    "OperationFailed",
+    "OperationTimeout",
+    "PathError",
+    "PermissionDenied",
+    "RemoteConnectionError",
+    "RemoveRootError",
+    "ResourceError",
+    "ResourceInvalid",
+    "ResourceLocked",
+    "ResourceNotFound",
+    "ResourceReadOnly",
+    "Unsupported",
 ]
 
 
@@ -61,9 +62,7 @@ class MissingInfoNamespace(AttributeError):
         # type: (Text) -> None
         self.namespace = namespace
         msg = "namespace '{}' is required for this attribute"
-        super(MissingInfoNamespace, self).__init__(
-            msg.format(namespace)
-        )
+        super(MissingInfoNamespace, self).__init__(msg.format(namespace))
 
     def __reduce__(self):
         return type(self), (self.namespace,)
@@ -101,6 +100,18 @@ class FilesystemClosed(FSError):
     default_message = "attempt to use closed filesystem"
 
 
+class BulkCopyFailed(FSError):
+    """A copy operation failed in worker threads."""
+
+    default_message = (
+        "One or more copy operations failed (see errors attribute)"
+    )
+
+    def __init__(self, errors):
+        self.errors = errors
+        super(BulkCopyFailed, self).__init__()
+
+
 class CreateFailed(FSError):
     """Filesystem could not be created.
     """
@@ -110,7 +121,7 @@ class CreateFailed(FSError):
     def __init__(self, msg=None, exc=None):
         # type: (Optional[Text], Optional[Exception]) -> None
         self._msg = msg or self.default_message
-        self.details = '' if exc is None else text_type(exc)
+        self.details = "" if exc is None else text_type(exc)
         self.exc = exc
 
     @classmethod
@@ -123,12 +134,13 @@ class CreateFailed(FSError):
                 raise
             except Exception as e:
                 raise cls(exc=e)
+
         return new_func  # type: ignore
 
     def __reduce__(self):
         return type(self), (self._msg, self.exc)
 
-
+      
 class PathError(FSError):
     """Base exception for errors to do with a path string.
     """
@@ -186,15 +198,16 @@ class OperationFailed(FSError):
 
     default_message = "operation failed, {details}"
 
-    def __init__(self,
-                 path=None,     # type: Optional[Text]
-                 exc=None,      # type: Optional[Exception]
-                 msg=None       # type: Optional[Text]
-                 ):
+    def __init__(
+        self,
+        path=None,  # type: Optional[Text]
+        exc=None,  # type: Optional[Exception]
+        msg=None,  # type: Optional[Text]
+    ):
         # type: (...) -> None
         self.path = path
         self.exc = exc
-        self.details = '' if exc is None else text_type(exc)
+        self.details = "" if exc is None else text_type(exc)
         self.errno = getattr(exc, "errno", None)
         super(OperationFailed, self).__init__(msg=msg)
 
@@ -346,10 +359,10 @@ class IllegalBackReference(ValueError):
     def __init__(self, path):
         # type: (Text) -> None
         self.path = path
-        _msg = \
+        msg = (
             "path '{path}' contains back-references outside of filesystem"
-        _msg = _msg.format(path=path)
-        super(IllegalBackReference, self).__init__(_msg)
+        ).format(path=path)
+        super(IllegalBackReference, self).__init__(msg)
 
     def __reduce__(self):
         return type(self), (self.path,)

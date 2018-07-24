@@ -1193,6 +1193,67 @@ class FSTestCases(object):
         with self.assertRaises(errors.FileExpected):
             self.fs.copy('dir', 'folder')
 
+    def _test_upload(self, workers):
+        """Test fs.copy with varying number of worker threads."""
+        data1 = b'foo' * 256 * 1024
+        data2 = b'bar' * 2 * 256 * 1024
+        data3 = b'baz' * 3 * 256 * 1024
+        data4 = b'egg' * 7 * 256 * 1024
+
+        with open_fs('temp://') as src_fs:
+            src_fs.setbytes('foo', data1)
+            src_fs.setbytes('bar', data2)
+            src_fs.makedir('dir1').setbytes('baz', data3)
+            src_fs.makedirs('dir2/dir3').setbytes('egg', data4)
+            dst_fs = self.fs
+            fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
+            self.assertEqual(dst_fs.getbytes('foo'), data1)
+            self.assertEqual(dst_fs.getbytes('bar'), data2)
+            self.assertEqual(dst_fs.getbytes('dir1/baz'), data3)
+            self.assertEqual(dst_fs.getbytes('dir2/dir3/egg'), data4)
+
+    def test_upload_0(self):
+        self._test_upload(0)
+
+    def test_upload_1(self):
+        self._test_upload(1)
+
+    def test_upload_2(self):
+        self._test_upload(2)
+
+    def test_upload_4(self):
+        self._test_upload(4)
+
+    def _test_download(self, workers):
+        """Test fs.copy with varying number of worker threads."""
+        data1 = b'foo' * 256 * 1024
+        data2 = b'bar' * 2 * 256 * 1024
+        data3 = b'baz' * 3 * 256 * 1024
+        data4 = b'egg' * 7 * 256 * 1024
+        src_fs = self.fs
+        with open_fs('temp://') as dst_fs:
+            src_fs.setbytes('foo', data1)
+            src_fs.setbytes('bar', data2)
+            src_fs.makedir('dir1').setbytes('baz', data3)
+            src_fs.makedirs('dir2/dir3').setbytes('egg', data4)
+            fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
+            self.assertEqual(dst_fs.getbytes('foo'), data1)
+            self.assertEqual(dst_fs.getbytes('bar'), data2)
+            self.assertEqual(dst_fs.getbytes('dir1/baz'), data3)
+            self.assertEqual(dst_fs.getbytes('dir2/dir3/egg'), data4)
+
+    def test_download_0(self):
+        self._test_download(0)
+
+    def test_download_1(self):
+        self._test_download(1)
+
+    def test_download_2(self):
+        self._test_download(2)
+
+    def test_download_4(self):
+        self._test_download(4)
+
     def test_create(self):
         # Test create new file
         self.assertFalse(self.fs.exists('foo'))

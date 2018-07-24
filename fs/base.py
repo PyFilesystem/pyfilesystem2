@@ -1368,7 +1368,8 @@ class FS(object):
         """Create or replace a file with text.
 
         Arguments:
-            contents (str): A path on the filesystem.
+            path (str): Destination path on the filesystem.
+            contents (str): Text to be written.
             encoding (str, optional): Encoding of destination file
                 (defaults to ``'ut-8'``).
             errors (str, optional): How encoding errors should be treated
