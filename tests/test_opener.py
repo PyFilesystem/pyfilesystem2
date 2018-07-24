@@ -204,8 +204,11 @@ class TestRegistry(unittest.TestCase):
 
     def test_entry_point_type_error(self):
 
-        entry_point = mock.MagicMock()
+        class NotAnOpener(object):
+            pass
 
+        entry_point = mock.MagicMock()
+        entry_point.load = mock.MagicMock(return_value=NotAnOpener)
         iter_entry_points = mock.MagicMock(return_value=iter([entry_point]))
 
         with mock.patch('pkg_resources.iter_entry_points', iter_entry_points):
