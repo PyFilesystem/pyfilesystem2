@@ -85,3 +85,20 @@ def get_intermediate_dirs(fs, dir_path):
                     break
                 raise errors.DirectoryExpected(dir_path)
     return intermediates[::-1][:-1]
+
+
+def is_thread_safe(*filesystems):
+    # type: (FS) -> bool
+    """Check if all filesystems are thread-safe.
+
+    Arguments:
+        filesystems (FS): Filesystems instances to check.
+
+    Returns:
+        bool: if all filesystems are thread safe.
+
+    """
+    return all(
+        fs.getmeta().get('thread_safe', False)
+        for fs in filesystems
+    )

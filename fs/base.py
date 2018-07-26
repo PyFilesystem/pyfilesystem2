@@ -1552,8 +1552,9 @@ class FS(object):
             return True
         if isinstance(patterns, six.text_type):
             raise TypeError('patterns must be a list or sequence')
-        case_sensitive = typing.cast(
-            bool, self.getmeta().get('case_sensitive', True))
+        case_sensitive = not typing.cast(
+            bool, self.getmeta().get('case_insensitive', False)
+        )
         matcher = wildcard.get_matcher(patterns, case_sensitive)
         return matcher(name)
 

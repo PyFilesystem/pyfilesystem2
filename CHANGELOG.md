@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.26] - 2018-07-26
+
+### Fixed
+
+- fs.copy and fs.move disable workers if not thread-safe
+- fs.match detects case insensitivity
+- Open in exclusive mode is atomic (@squishy)
+- Exceptions can be pickleabe (@Spacerat)
+
 ## [2.0.25] - 2018-07-20
 
 ### Added

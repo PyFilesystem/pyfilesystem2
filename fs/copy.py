@@ -8,6 +8,7 @@ import typing
 from .errors import FSError
 from .opener import manage_fs
 from .path import abspath, combine, frombase, normpath
+from .tools import is_thread_safe
 from .walk import Walker
 
 if False:  # typing.TYPE_CHECKING
@@ -287,7 +288,8 @@ def copy_dir(
 
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
-            with Copier(num_workers=workers) as copier:
+            _thread_safe = is_thread_safe(_src_fs, _dst_fs)
+            with Copier(num_workers=workers if _thread_safe else 0) as copier:
                 _dst_fs.makedir(_dst_path, recreate=True)
                 for dir_path, dirs, files in walker.walk(_src_fs, _src_path):
                     copy_path = combine(_dst_path, frombase(_src_path, dir_path))
@@ -347,7 +349,8 @@ def copy_dir_if_newer(
 
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
-            with Copier(num_workers=workers) as copier:
+            _thread_safe = is_thread_safe(_src_fs, _dst_fs)
+            with Copier(num_workers=workers if _thread_safe else 0) as copier:
                 _dst_fs.makedir(_dst_path, recreate=True)
                 namespace = ("details", "modified")
                 dst_state = {
