@@ -699,7 +699,9 @@ class FTPFS(FS):
                 raise  # pragma: no cover
 
     def _scandir(
-        self, path, namespaces=None  # type: Text  # type: Optional[Container[Text]]
+        self,
+        path,  # type: Text
+        namespaces=None   # type: Optional[Container[Text]]
     ):
         # type: (...) -> Iterator[Info]
         _path = self.validatepath(path)

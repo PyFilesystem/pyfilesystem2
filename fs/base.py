@@ -122,7 +122,9 @@ class FS(object):
 
     @abc.abstractmethod
     def getinfo(
-        self, path, namespaces=None  # type: Text  # type: Optional[Collection[Text]]
+        self,
+        path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
     ):
         # type: (...) -> Info
         """Get information about a resource on a filesystem.
