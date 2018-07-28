@@ -21,23 +21,20 @@ class TarOpener(Opener):
     """`TarFS` opener.
     """
 
-    protocols = ['tar']
+    protocols = ["tar"]
 
-    def open_fs(self,
-                fs_url,         # type: Text
-                parse_result,   # type: ParseResult
-                writeable,      # type: bool
-                create,         # type: bool
-                cwd             # type: Text
-                ):
+    def open_fs(
+        self,
+        fs_url,  # type: Text
+        parse_result,  # type: ParseResult
+        writeable,  # type: bool
+        create,  # type: bool
+        cwd,  # type: Text
+    ):
         # type: (...) -> TarFS
         from ..tarfs import TarFS
+
         if not create and writeable:
-            raise NotWriteable(
-                'Unable to open existing TAR file for writing'
-            )
-        tar_fs = TarFS(
-            parse_result.resource,
-            write=create
-        )
+            raise NotWriteable("Unable to open existing TAR file for writing")
+        tar_fs = TarFS(parse_result.resource, write=create)
         return tar_fs

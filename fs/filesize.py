@@ -20,7 +20,7 @@ if False:  # typing.TYPE_CHECKING
     from typing import Iterable, SupportsInt, Text
 
 
-__all__ = ['traditional', 'decimal', 'binary']
+__all__ = ["traditional", "decimal", "binary"]
 
 
 def _to_str(size, suffixes, base):
@@ -28,13 +28,11 @@ def _to_str(size, suffixes, base):
     try:
         size = int(size)
     except ValueError:
-        raise TypeError(
-            "filesize requires a numeric value, not {!r}".format(size)
-        )
+        raise TypeError("filesize requires a numeric value, not {!r}".format(size))
     if size == 1:
-        return '1 byte'
+        return "1 byte"
     elif size < base:
-        return '{:,} bytes'.format(size)
+        return "{:,} bytes".format(size)
 
     for i, suffix in enumerate(suffixes, 2):
         unit = base ** i
@@ -66,11 +64,7 @@ def traditional(size):
         '29.3 KB'
 
     """
-    return _to_str(
-        size,
-        ('KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'),
-        1024
-    )
+    return _to_str(size, ("KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"), 1024)
 
 
 def binary(size):
@@ -96,11 +90,7 @@ def binary(size):
         '29.3 KiB'
 
     """
-    return _to_str(
-        size,
-        ('KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB'),
-        1024
-    )
+    return _to_str(size, ("KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"), 1024)
 
 
 def decimal(size):
@@ -125,8 +115,4 @@ def decimal(size):
         '30.0 kB'
 
     """
-    return _to_str(
-        size,
-        ('kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'),
-        1000
-    )
+    return _to_str(size, ("kB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"), 1000)

@@ -11,7 +11,7 @@ from pytz import UTC, timezone
 
 utcfromtimestamp = datetime.utcfromtimestamp
 utclocalize = UTC.localize
-GMT = timezone('GMT')
+GMT = timezone("GMT")
 
 
 def datetime_to_epoch(d):

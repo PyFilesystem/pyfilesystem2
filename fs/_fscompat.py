@@ -10,6 +10,7 @@ except ImportError:
 try:
     from os import fspath
 except ImportError:
+
     def fspath(path):
         """Return the path representation of a path-like object.
 
@@ -27,14 +28,17 @@ except ImportError:
         try:
             path_repr = path_type.__fspath__(path)
         except AttributeError:
-            if hasattr(path_type, '__fspath__'):
+            if hasattr(path_type, "__fspath__"):
                 raise
             else:
-                raise TypeError("expected string type or os.PathLike object, "
-                                "not " + path_type.__name__)
+                raise TypeError(
+                    "expected string type or os.PathLike object, "
+                    "not " + path_type.__name__
+                )
         if isinstance(path_repr, (six.text_type, bytes)):
             return path_repr
         else:
-            raise TypeError("expected {}.__fspath__() to return string type "
-                            "not {}".format(path_type.__name__,
-                                            type(path_repr).__name__))
+            raise TypeError(
+                "expected {}.__fspath__() to return string type "
+                "not {}".format(path_type.__name__, type(path_repr).__name__)
+            )

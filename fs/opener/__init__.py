@@ -3,7 +3,7 @@
 """
 
 # Declare fs.opener as a namespace package
-__import__('pkg_resources').declare_namespace(__name__)
+__import__("pkg_resources").declare_namespace(__name__)
 
 # Import objects into fs.opener namespace
 from .base import Opener
@@ -16,11 +16,4 @@ open = registry.open
 manage_fs = registry.manage_fs
 
 # __all__ with aliases and classes
-__all__ = [
-    "registry",
-    "Opener",
-    'open_fs',
-    'open',
-    'manage_fs',
-    'parse',
-]
+__all__ = ["registry", "Opener", "open_fs", "open", "manage_fs", "parse"]

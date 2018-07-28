@@ -20,16 +20,18 @@ class TempOpener(Opener):
     """`TempFS` opener.
     """
 
-    protocols = ['temp']
+    protocols = ["temp"]
 
-    def open_fs(self,
-                fs_url,         # type: Text
-                parse_result,   # type: ParseResult
-                writeable,      # type: bool
-                create,         # type: bool
-                cwd             # type: Text
-                ):
+    def open_fs(
+        self,
+        fs_url,  # type: Text
+        parse_result,  # type: ParseResult
+        writeable,  # type: bool
+        create,  # type: bool
+        cwd,  # type: Text
+    ):
         # type: (...) -> TempFS
         from ..tempfs import TempFS
+
         temp_fs = TempFS(identifier=parse_result.resource)
         return temp_fs

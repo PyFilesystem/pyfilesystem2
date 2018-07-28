@@ -12,19 +12,18 @@ from fs.test import UNICODE_TEXT
 
 
 class ArchiveTestCases(object):
-
     def make_source_fs(self):
-        return open_fs('temp://')
+        return open_fs("temp://")
 
     def build_source(self, fs):
-        fs.makedirs('foo/bar/baz')
-        fs.makedir('tmp')
-        fs.settext('Файл', 'unicode filename')
-        fs.settext('top.txt', 'Hello, World')
-        fs.settext('top2.txt', 'Hello, World')
-        fs.settext('foo/bar/egg', 'foofoo')
-        fs.makedir('unicode')
-        fs.settext('unicode/text.txt', UNICODE_TEXT)
+        fs.makedirs("foo/bar/baz")
+        fs.makedir("tmp")
+        fs.settext("Файл", "unicode filename")
+        fs.settext("top.txt", "Hello, World")
+        fs.settext("top2.txt", "Hello, World")
+        fs.settext("foo/bar/egg", "foofoo")
+        fs.makedir("unicode")
+        fs.settext("unicode/text.txt", UNICODE_TEXT)
 
     def compress(self, fs):
         pass
@@ -54,100 +53,81 @@ class ArchiveTestCases(object):
 
     def test_readonly(self):
         with self.assertRaises(errors.ResourceReadOnly):
-            self.fs.makedir('newdir')
+            self.fs.makedir("newdir")
         with self.assertRaises(errors.ResourceReadOnly):
-            self.fs.remove('top.txt')
+            self.fs.remove("top.txt")
         with self.assertRaises(errors.ResourceReadOnly):
-            self.fs.removedir('foo/bar/baz')
+            self.fs.removedir("foo/bar/baz")
         with self.assertRaises(errors.ResourceReadOnly):
-            self.fs.create('foo.txt')
+            self.fs.create("foo.txt")
         with self.assertRaises(errors.ResourceReadOnly):
-            self.fs.setinfo('foo.txt', {})
+            self.fs.setinfo("foo.txt", {})
 
     def test_getinfo(self):
-        root = self.fs.getinfo('/', ["details"])
-        self.assertEqual(root.name, '')
+        root = self.fs.getinfo("/", ["details"])
+        self.assertEqual(root.name, "")
         self.assertTrue(root.is_dir)
-        self.assertEqual(root.get('details', 'type'), ResourceType.directory)
+        self.assertEqual(root.get("details", "type"), ResourceType.directory)
 
-        bar = self.fs.getinfo('foo/bar', ['details'])
-        self.assertEqual(bar.name, 'bar')
+        bar = self.fs.getinfo("foo/bar", ["details"])
+        self.assertEqual(bar.name, "bar")
         self.assertTrue(bar.is_dir)
-        self.assertEqual(bar.get('details', 'type'), ResourceType.directory)
+        self.assertEqual(bar.get("details", "type"), ResourceType.directory)
 
-        top = self.fs.getinfo('top.txt', ['details', 'access'])
+        top = self.fs.getinfo("top.txt", ["details", "access"])
         self.assertEqual(top.size, 12)
         self.assertFalse(top.is_dir)
         if not isinstance(self.source_fs, MemoryFS):
             self.assertEqual(top.permissions.mode, 0o644)
-        self.assertEqual(top.get('details', 'type'), ResourceType.file)
+        self.assertEqual(top.get("details", "type"), ResourceType.file)
 
     def test_listdir(self):
         self.assertEqual(
-            sorted(self.source_fs.listdir('/')),
-            sorted(self.fs.listdir('/'))
+            sorted(self.source_fs.listdir("/")), sorted(self.fs.listdir("/"))
         )
         with self.assertRaises(errors.DirectoryExpected):
-            self.fs.listdir('top.txt')
+            self.fs.listdir("top.txt")
         with self.assertRaises(errors.ResourceNotFound):
-            self.fs.listdir('nothere')
+            self.fs.listdir("nothere")
 
     def test_open(self):
-        with self.fs.open('top.txt') as f:
+        with self.fs.open("top.txt") as f:
             chars = []
             while True:
                 c = f.read(2)
                 if not c:
                     break
                 chars.append(c)
-            self.assertEqual(
-                ''.join(chars),
-                'Hello, World'
-            )
+            self.assertEqual("".join(chars), "Hello, World")
         with self.assertRaises(errors.ResourceNotFound):
-            with self.fs.open('nothere.txt') as f:
+            with self.fs.open("nothere.txt") as f:
                 pass
         with self.assertRaises(errors.FileExpected):
-            with self.fs.open('foo') as f:
+            with self.fs.open("foo") as f:
                 pass
 
     def test_gets(self):
-        self.assertEqual(
-            self.fs.gettext('top.txt'),
-            'Hello, World'
-        )
-        self.assertEqual(
-            self.fs.gettext('foo/bar/egg'),
-            'foofoo'
-        )
-        self.assertEqual(
-            self.fs.getbytes('top.txt'),
-            b'Hello, World'
-        )
-        self.assertEqual(
-            self.fs.getbytes('foo/bar/egg'),
-            b'foofoo'
-        )
+        self.assertEqual(self.fs.gettext("top.txt"), "Hello, World")
+        self.assertEqual(self.fs.gettext("foo/bar/egg"), "foofoo")
+        self.assertEqual(self.fs.getbytes("top.txt"), b"Hello, World")
+        self.assertEqual(self.fs.getbytes("foo/bar/egg"), b"foofoo")
         with self.assertRaises(errors.ResourceNotFound):
-            self.fs.getbytes('what.txt')
+            self.fs.getbytes("what.txt")
 
     def test_walk_files(self):
         source_files = sorted(walk.walk_files(self.source_fs))
         archive_files = sorted(walk.walk_files(self.fs))
 
-        self.assertEqual(
-            source_files,
-            archive_files
-        )
+        self.assertEqual(source_files, archive_files)
 
     def test_implied_dir(self):
-        self.fs.getinfo('foo/bar')
-        self.fs.getinfo('foo')
+        self.fs.getinfo("foo/bar")
+        self.fs.getinfo("foo")
 
     def test_listdir(self):
-        for name in self.fs.listdir('/'):
+        for name in self.fs.listdir("/"):
             self.assertIsInstance(name, text_type)
         with self.assertRaises(errors.ResourceNotFound):
-            self.fs.listdir('nope')
+            self.fs.listdir("nope")
         with self.assertRaises(errors.DirectoryExpected):
-            self.fs.listdir('top.txt')
+            self.fs.listdir("top.txt")

@@ -41,9 +41,22 @@ if False:  # typing.TYPE_CHECKING
     from datetime import datetime
     from threading import RLock
     from typing import (
-        Any, BinaryIO, Callable, Collection, Dict, IO,
-        Iterable, Iterator, List, Mapping, Optional, Text,
-        Tuple, Type, Union)
+        Any,
+        BinaryIO,
+        Callable,
+        Collection,
+        Dict,
+        IO,
+        Iterable,
+        Iterator,
+        List,
+        Mapping,
+        Optional,
+        Text,
+        Tuple,
+        Type,
+        Union,
+    )
     from types import TracebackType
     from .enums import ResourceType
     from .info import Info, RawInfo
@@ -51,8 +64,8 @@ if False:  # typing.TYPE_CHECKING
     from .permissions import Permissions
     from .walk import BoundWalker
 
-    _F = typing.TypeVar('_F', bound='FS')
-    _T = typing.TypeVar('_T', bound='FS')
+    _F = typing.TypeVar("_F", bound="FS")
+    _T = typing.TypeVar("_T", bound="FS")
     _OpendirFactory = Callable[[_T, Text], SubFS[_T]]
 
 
@@ -65,7 +78,7 @@ class FS(object):
     """
 
     # This is the "standard" meta namespace.
-    _meta = {}      # type: Dict[Text, Union[Text, int, bool, None]]
+    _meta = {}  # type: Dict[Text, Union[Text, int, bool, None]]
 
     # most FS will use default walking algorithms
     walker_class = Walker
@@ -84,11 +97,12 @@ class FS(object):
         """
         return self
 
-    def __exit__(self,
-                 exc_type,      # type: Optional[Type[BaseException]]
-                 exc_value,     # type: Optional[BaseException]
-                 traceback      # type: Optional[TracebackType]
-                 ):
+    def __exit__(
+        self,
+        exc_type,  # type: Optional[Type[BaseException]]
+        exc_value,  # type: Optional[BaseException]
+        traceback,  # type: Optional[TracebackType]
+    ):
         # type: (...) -> None
         """Close filesystem on exit.
         """
@@ -107,10 +121,9 @@ class FS(object):
     # ---------------------------------------------------------------- #
 
     @abc.abstractmethod
-    def getinfo(self,
-                path,            # type: Text
-                namespaces=None  # type: Optional[Collection[Text]]
-                ):
+    def getinfo(
+        self, path, namespaces=None  # type: Text  # type: Optional[Collection[Text]]
+    ):
         # type: (...) -> Info
         """Get information about a resource on a filesystem.
 
@@ -148,11 +161,12 @@ class FS(object):
         """
 
     @abc.abstractmethod
-    def makedir(self,
-                path,               # type: Text
-                permissions=None,   # type: Optional[Permissions]
-                recreate=False      # type: bool
-                ):
+    def makedir(
+        self,
+        path,  # type: Text
+        permissions=None,  # type: Optional[Permissions]
+        recreate=False,  # type: bool
+    ):
         # type: (...) -> SubFS[FS]
         """Make a directory.
 
@@ -173,12 +187,13 @@ class FS(object):
         """
 
     @abc.abstractmethod
-    def openbin(self,
-                path,           # type: Text
-                mode="r",       # type: Text
-                buffering=-1,   # type: int
-                **options       # type: Any
-                ):
+    def openbin(
+        self,
+        path,  # type: Text
+        mode="r",  # type: Text
+        buffering=-1,  # type: int
+        **options  # type: Any
+    ):
         # type: (...) -> BinaryIO
         """Open a binary file-like object.
 
@@ -287,18 +302,19 @@ class FS(object):
 
         """
         if not isinstance(data, bytes):
-            raise TypeError('must be bytes')
+            raise TypeError("must be bytes")
         with self._lock:
-            with self.open(path, 'ab') as append_file:
+            with self.open(path, "ab") as append_file:
                 append_file.write(data)
 
-    def appendtext(self,
-                   path,                # type: Text
-                   text,                # type: Text
-                   encoding='utf-8',    # type: Text
-                   errors=None,         # type: Optional[Text]
-                   newline=''           # type: Text
-                   ):
+    def appendtext(
+        self,
+        path,  # type: Text
+        text,  # type: Text
+        encoding="utf-8",  # type: Text
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+    ):
         # type: (...) -> None
         """Append text to the end of a file, creating it if needed.
 
@@ -317,13 +333,11 @@ class FS(object):
 
         """
         if not isinstance(text, six.text_type):
-            raise TypeError('must be unicode string')
+            raise TypeError("must be unicode string")
         with self._lock:
-            with self.open(path,
-                           'at',
-                           encoding=encoding,
-                           errors=errors,
-                           newline=newline) as append_file:
+            with self.open(
+                path, "at", encoding=encoding, errors=errors, newline=newline
+            ) as append_file:
                 append_file.write(text)
 
     def close(self):
@@ -370,9 +384,9 @@ class FS(object):
         with self._lock:
             if not overwrite and self.exists(dst_path):
                 raise errors.DestinationExists(dst_path)
-            with closing(self.open(src_path, 'rb')) as read_file:
+            with closing(self.open(src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.setbinfile(dst_path, read_file)   # type: ignore
+                self.setbinfile(dst_path, read_file)  # type: ignore
 
     def copydir(self, src_path, dst_path, create=False):
         # type: (Text, Text, bool) -> None
@@ -394,12 +408,7 @@ class FS(object):
                 raise errors.ResourceNotFound(dst_path)
             if not self.getinfo(src_path).is_dir:
                 raise errors.DirectoryExpected(src_path)
-            copy.copy_dir(
-                self,
-                src_path,
-                self,
-                dst_path
-            )
+            copy.copy_dir(self, src_path, self, dst_path)
 
     def create(self, path, wipe=False):
         # type: (Text, bool) -> bool
@@ -421,7 +430,7 @@ class FS(object):
         with self._lock:
             if not wipe and self.exists(path):
                 return False
-            with closing(self.open(path, 'wb')):
+            with closing(self.open(path, "wb")):
                 pass
             return True
 
@@ -463,15 +472,16 @@ class FS(object):
         else:
             return True
 
-    def filterdir(self,
-                  path,                 # type: Text
-                  files=None,           # type: Optional[Iterable[Text]]
-                  dirs=None,            # type: Optional[Iterable[Text]]
-                  exclude_dirs=None,    # type: Optional[Iterable[Text]]
-                  exclude_files=None,   # type: Optional[Iterable[Text]]
-                  namespaces=None,      # type: Optional[Collection[Text]]
-                  page=None,            # type: Optional[Tuple[int, int]]
-                  ):
+    def filterdir(
+        self,
+        path,  # type: Text
+        files=None,  # type: Optional[Iterable[Text]]
+        dirs=None,  # type: Optional[Iterable[Text]]
+        exclude_dirs=None,  # type: Optional[Iterable[Text]]
+        exclude_files=None,  # type: Optional[Iterable[Text]]
+        namespaces=None,  # type: Optional[Collection[Text]]
+        page=None,  # type: Optional[Tuple[int, int]]
+    ):
         # type: (...) -> Iterator[Info]
         """Get an iterator of resource info, filtered by patterns.
 
@@ -538,9 +548,7 @@ class FS(object):
 
         if filters:
             resources = (
-                info
-                for info in resources
-                if all(_filter(info) for _filter in filters)
+                info for info in resources if all(_filter(info) for _filter in filters)
             )
 
         iter_info = iter(resources)
@@ -563,7 +571,7 @@ class FS(object):
             fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         """
-        with closing(self.open(path, mode='rb')) as read_file:
+        with closing(self.open(path, mode="rb")) as read_file:
             contents = read_file.read()
         return contents
 
@@ -595,18 +603,15 @@ class FS(object):
         """
         with self._lock:
             with self.openbin(path, **options) as read_file:
-                tools.copy_file_data(
-                    read_file,
-                    file,
-                    chunk_size=chunk_size
-                )
+                tools.copy_file_data(read_file, file, chunk_size=chunk_size)
 
-    def gettext(self,
-                path,           # type: Text
-                encoding=None,  # type: Optional[Text]
-                errors=None,    # type: Optional[Text]
-                newline=''      # type: Text
-                ):
+    def gettext(
+        self,
+        path,  # type: Text
+        encoding=None,  # type: Optional[Text]
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+    ):
         # type: (...) -> Text
         """Get the contents of a file as a string.
 
@@ -626,11 +631,8 @@ class FS(object):
         """
         with closing(
             self.open(
-                path,
-                mode='rt',
-                encoding=encoding,
-                errors=errors,
-                newline=newline)
+                path, mode="rt", encoding=encoding, errors=errors, newline=newline
+            )
         ) as read_file:
             contents = read_file.read()
         return contents
@@ -683,7 +685,7 @@ class FS(object):
             filesystem, and may be cached.
 
         """
-        if namespace == 'standard':
+        if namespace == "standard":
             meta = self._meta.copy()
         else:
             meta = {}
@@ -816,7 +818,7 @@ class FS(object):
         resource_type = self.getdetails(path).type
         return resource_type
 
-    def geturl(self, path, purpose='download'):
+    def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
         """Get the URL to a given resource.
 
@@ -855,7 +857,7 @@ class FS(object):
             has_sys_path = False
         return has_sys_path
 
-    def hasurl(self, path, purpose='download'):
+    def hasurl(self, path, purpose="download"):
         # type: (Text, Text) -> bool
         """Check if a path has a corresponding URL.
 
@@ -879,7 +881,7 @@ class FS(object):
         # type: () -> bool
         """Check if the filesystem is closed.
         """
-        return getattr(self, '_closed', False)
+        return getattr(self, "_closed", False)
 
     def isdir(self, path):
         # type: (Text) -> bool
@@ -997,18 +999,14 @@ class FS(object):
         with self._lock:
             if not create and not self.exists(dst_path):
                 raise errors.ResourceNotFound(dst_path)
-            move.move_dir(
-                self,
-                src_path,
-                self,
-                dst_path
-            )
+            move.move_dir(self, src_path, self, dst_path)
 
-    def makedirs(self,
-                 path,              # type: Text
-                 permissions=None,  # type: Optional[Permissions]
-                 recreate=False     # type: bool
-                 ):
+    def makedirs(
+        self,
+        path,  # type: Text
+        permissions=None,  # type: Optional[Permissions]
+        recreate=False,  # type: bool
+    ):
         # type: (...) -> SubFS[FS]
         """Make a directory, and any missing intermediate directories.
 
@@ -1067,7 +1065,7 @@ class FS(object):
             raise errors.DestinationExists(dst_path)
         if self.getinfo(src_path).is_dir:
             raise errors.FileExpected(src_path)
-        if self.getmeta().get('supports_rename', False):
+        if self.getmeta().get("supports_rename", False):
             try:
                 src_sys_path = self.getsyspath(src_path)
                 dst_sys_path = self.getsyspath(dst_path)
@@ -1081,20 +1079,21 @@ class FS(object):
                 else:
                     return
         with self._lock:
-            with self.open(src_path, 'rb') as read_file:
+            with self.open(src_path, "rb") as read_file:
                 # FIXME(@althonos): typing complains because open return IO
                 self.setbinfile(dst_path, read_file)  # type: ignore
             self.remove(src_path)
 
-    def open(self,
-             path,           # type: Text
-             mode='r',       # type: Text
-             buffering=-1,   # type: int
-             encoding=None,  # type: Optional[Text]
-             errors=None,    # type: Optional[Text]
-             newline='',     # type: Text
-             **options       # type: Any
-             ):
+    def open(
+        self,
+        path,  # type: Text
+        mode="r",  # type: Text
+        buffering=-1,  # type: int
+        encoding=None,  # type: Optional[Text]
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+        **options  # type: Any
+    ):
         # type: (...) -> IO
         """Open a file.
 
@@ -1125,24 +1124,25 @@ class FS(object):
 
         """
         validate_open_mode(mode)
-        bin_mode = mode.replace('t', '')
+        bin_mode = mode.replace("t", "")
         bin_file = self.openbin(path, mode=bin_mode, buffering=buffering)
         io_stream = iotools.make_stream(
             path,
             bin_file,
             mode=mode,
             buffering=buffering,
-            encoding=encoding or 'utf-8',
+            encoding=encoding or "utf-8",
             errors=errors,
             newline=newline,
             **options
         )
         return io_stream
 
-    def opendir(self,         # type: _F
-                path,         # type: Text
-                factory=None  # type: Optional[_OpendirFactory]
-                ):
+    def opendir(
+        self,  # type: _F
+        path,  # type: Text
+        factory=None,  # type: Optional[_OpendirFactory]
+    ):
         # type: (...) -> SubFS[FS]
         # FIXME(@althonos): use generics here if possible
         """Get a filesystem object for a sub-directory.
@@ -1163,12 +1163,11 @@ class FS(object):
 
         """
         from .subfs import SubFS
+
         _factory = factory or SubFS
 
         if not self.getbasic(path).is_dir:
-            raise errors.DirectoryExpected(
-                path=path
-            )
+            raise errors.DirectoryExpected(path=path)
         return _factory(self, path)
 
     def removetree(self, dir_path):
@@ -1191,14 +1190,15 @@ class FS(object):
                     self.removedir(_path)
                 else:
                     self.remove(_path)
-            if _dir_path != '/':
+            if _dir_path != "/":
                 self.removedir(dir_path)
 
-    def scandir(self,
-                path,             # type: Text
-                namespaces=None,  # type: Optional[Collection[Text]]
-                page=None,        # type: Optional[Tuple[int, int]]
-                ):
+    def scandir(
+        self,
+        path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+        page=None,  # type: Optional[Tuple[int, int]]
+    ):
         # type: (...) -> Iterator[Info]
         """Get an iterator of resource info.
 
@@ -1224,10 +1224,7 @@ class FS(object):
         _path = abspath(normpath(path))
 
         info = (
-            self.getinfo(
-                join(_path, name),
-                namespaces=namespaces
-            )
+            self.getinfo(join(_path, name), namespaces=namespaces)
             for name in self.listdir(path)
         )
         iter_info = iter(info)
@@ -1250,8 +1247,8 @@ class FS(object):
 
         """
         if not isinstance(contents, bytes):
-            raise TypeError('contents must be bytes')
-        with closing(self.open(path, mode='wb')) as write_file:
+            raise TypeError("contents must be bytes")
+        with closing(self.open(path, mode="wb")) as write_file:
             write_file.write(contents)
 
     def setbinfile(self, path, file):
@@ -1277,16 +1274,17 @@ class FS(object):
 
         """
         with self._lock:
-            with self.open(path, 'wb') as dst_file:
+            with self.open(path, "wb") as dst_file:
                 tools.copy_file_data(file, dst_file)
 
-    def setfile(self,
-                path,           # type: Text
-                file,           # type: IO
-                encoding=None,  # type: Optional[Text]
-                errors=None,    # type: Optional[Text]
-                newline='',     # type: Text
-                ):
+    def setfile(
+        self,
+        path,  # type: Text
+        file,  # type: IO
+        encoding=None,  # type: Optional[Text]
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+    ):
         # type: (...) -> None
         """Set a file to the contents of a file object.
 
@@ -1315,14 +1313,12 @@ class FS(object):
             ...     my_fs.setfile('myfile.bin', read_file)
 
         """
-        mode = 'wb' if encoding is None else 'wt'
+        mode = "wb" if encoding is None else "wt"
 
         with self._lock:
-            with self.open(path,
-                           mode=mode,
-                           encoding=encoding,
-                           errors=errors,
-                           newline=newline) as dst_file:
+            with self.open(
+                path, mode=mode, encoding=encoding, errors=errors, newline=newline
+            ) as dst_file:
                 tools.copy_file_data(file, dst_file)
 
     def settimes(self, path, accessed=None, modified=None):
@@ -1339,31 +1335,26 @@ class FS(object):
 
         """
         details = {}  # type: dict
-        raw_info = {
-            "details": details
-        }
+        raw_info = {"details": details}
 
-        details['accessed'] = (
-            time.time()
-            if accessed is None
-            else datetime_to_epoch(accessed)
+        details["accessed"] = (
+            time.time() if accessed is None else datetime_to_epoch(accessed)
         )
 
-        details['modified'] = (
-            details['accessed']
-            if modified is None
-            else datetime_to_epoch(modified)
+        details["modified"] = (
+            details["accessed"] if modified is None else datetime_to_epoch(modified)
         )
 
         self.setinfo(path, raw_info)
 
-    def settext(self,
-                path,               # type: Text
-                contents,           # type: Text
-                encoding='utf-8',   # type: Text
-                errors=None,        # type: Optional[Text]
-                newline='',         # type: Text
-                ):
+    def settext(
+        self,
+        path,  # type: Text
+        contents,  # type: Text
+        encoding="utf-8",  # type: Text
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+    ):
         # type: (...) -> None
         """Create or replace a file with text.
 
@@ -1381,12 +1372,12 @@ class FS(object):
 
         """
         if not isinstance(contents, six.text_type):
-            raise TypeError('contents must be unicode')
-        with closing(self.open(path,
-                               mode="wt",
-                               encoding=encoding,
-                               errors=errors,
-                               newline=newline)) as write_file:
+            raise TypeError("contents must be unicode")
+        with closing(
+            self.open(
+                path, mode="wt", encoding=encoding, errors=errors, newline=newline
+            )
+        ) as write_file:
             write_file.write(contents)
 
     def touch(self, path):
@@ -1405,12 +1396,7 @@ class FS(object):
         with self._lock:
             now = time.time()
             if not self.create(path):
-                raw_info = {
-                    "details": {
-                        "accessed": now,
-                        "modified": now
-                    }
-                }
+                raw_info = {"details": {"accessed": now, "modified": now}}
                 self.setinfo(path, raw_info)
 
     def validatepath(self, path):
@@ -1441,21 +1427,19 @@ class FS(object):
 
         if isinstance(path, bytes):
             raise TypeError(
-                'paths must be unicode (not str)'
-                if six.PY2 else
-                'paths must be str (not bytes)'
+                "paths must be unicode (not str)"
+                if six.PY2
+                else "paths must be str (not bytes)"
             )
 
         meta = self.getmeta()
 
-        invalid_chars = typing.cast(
-            six.text_type, meta.get('invalid_path_chars'))
+        invalid_chars = typing.cast(six.text_type, meta.get("invalid_path_chars"))
         if invalid_chars:
             if set(path).intersection(invalid_chars):
                 raise errors.InvalidCharsInPath(path)
 
-        max_sys_path_length = typing.cast(
-            int, meta.get('max_sys_path_length', -1))
+        max_sys_path_length = typing.cast(int, meta.get("max_sys_path_length", -1))
         if max_sys_path_length != -1:
             try:
                 sys_path = self.getsyspath(path)
@@ -1463,8 +1447,7 @@ class FS(object):
                 pass
             else:
                 if len(sys_path) > max_sys_path_length:
-                    _msg = 'path too long '\
-                        '(max {max_chars} characters in sys path)'
+                    _msg = "path too long " "(max {max_chars} characters in sys path)"
                     msg = _msg.format(max_chars=max_sys_path_length)
                     raise errors.InvalidPath(path, msg=msg)
         path = abspath(normpath(path))
@@ -1490,7 +1473,7 @@ class FS(object):
             ~fs.info.Info: Resource information object for ``path``.
 
         """
-        return self.getinfo(path, namespaces=['basic'])
+        return self.getinfo(path, namespaces=["basic"])
 
     def getdetails(self, path):
         # type: (Text) -> Info
@@ -1507,7 +1490,7 @@ class FS(object):
             ~fs.info.Info: Resource information object for ``path``.
 
         """
-        return self.getinfo(path, namespaces=['details'])
+        return self.getinfo(path, namespaces=["details"])
 
     def check(self):
         # type: () -> None
@@ -1551,9 +1534,9 @@ class FS(object):
         if patterns is None:
             return True
         if isinstance(patterns, six.text_type):
-            raise TypeError('patterns must be a list or sequence')
+            raise TypeError("patterns must be a list or sequence")
         case_sensitive = not typing.cast(
-            bool, self.getmeta().get('case_insensitive', False)
+            bool, self.getmeta().get("case_insensitive", False)
         )
         matcher = wildcard.get_matcher(patterns, case_sensitive)
         return matcher(name)
@@ -1583,4 +1566,5 @@ class FS(object):
 
         """
         from .tree import render
+
         render(self, **kwargs)

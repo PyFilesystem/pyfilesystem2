@@ -25,19 +25,27 @@ from ._typing import overload
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
-        Any, BinaryIO, Collection, Dict, Iterator, List,
-        Optional, SupportsInt, Union, Text)
+        Any,
+        BinaryIO,
+        Collection,
+        Dict,
+        Iterator,
+        List,
+        Optional,
+        SupportsInt,
+        Union,
+        Text,
+    )
     from .base import _OpendirFactory
     from .info import RawInfo
     from .permissions import Permissions
     from .subfs import SubFS
 
-    _M = typing.TypeVar('_M', bound='MemoryFS')
+    _M = typing.TypeVar("_M", bound="MemoryFS")
 
 
 @six.python_2_unicode_compatible
 class _MemoryFile(io.RawIOBase):
-
     def __init__(self, path, memory_fs, mode, dir_entry):
         # type: (Text, MemoryFS, Text, _DirEntry) -> None
         super(_MemoryFile, self).__init__()
@@ -120,7 +128,7 @@ class _MemoryFile(io.RawIOBase):
     def read(self, size=-1):
         # type: (Optional[int]) -> bytes
         if not self._mode.reading:
-            raise IOError('File not open for reading')
+            raise IOError("File not open for reading")
         with self._seek_lock():
             self.on_access()
             return self._bytes_io.read(size)
@@ -156,8 +164,8 @@ class _MemoryFile(io.RawIOBase):
             new_size = self._bytes_io.truncate(size)
             if size is not None and self._bytes_io.tell() < size:
                 file_size = self._bytes_io.seek(0, os.SEEK_END)
-                self._bytes_io.write(b'\0' * (size - file_size))
-                self._bytes_io.seek(-size+file_size, os.SEEK_END)
+                self._bytes_io.write(b"\0" * (size - file_size))
+                self._bytes_io.seek(-size + file_size, os.SEEK_END)
             return size or new_size
 
     def writable(self):
@@ -167,7 +175,7 @@ class _MemoryFile(io.RawIOBase):
     def write(self, data):
         # type: (bytes) -> int
         if not self._mode.writing:
-            raise IOError('File not open for writing')
+            raise IOError("File not open for writing")
         with self._seek_lock():
             self.on_modify()
             return self._bytes_io.write(data)
@@ -182,14 +190,13 @@ class _MemoryFile(io.RawIOBase):
 
 
 class _DirEntry(object):
-
     def __init__(self, resource_type, name):
         # type: (ResourceType, Text) -> None
         self.resource_type = resource_type
         self.name = name
         self._dir = OrderedDict()  # type: typing.MutableMapping[Text, _DirEntry]
-        self._open_files = []      # type: typing.MutableSequence[_MemoryFile]
-        self._bytes_file = None    # type: Optional[io.BytesIO]
+        self._open_files = []  # type: typing.MutableSequence[_MemoryFile]
+        self._bytes_file = None  # type: Optional[io.BytesIO]
         self.lock = RLock()
 
         current_time = time.time()
@@ -238,7 +245,7 @@ class _DirEntry(object):
 
     def get_entry(self, name, default=None):
         # type: (Text, Optional[_DirEntry]) -> Optional[_DirEntry]
-        assert self.is_dir, 'must be a directory'
+        assert self.is_dir, "must be a directory"
         return self._dir.get(name, default)
 
     def set_entry(self, name, dir_entry):
@@ -289,13 +296,13 @@ class MemoryFS(FS):
     """
 
     _meta = {
-        'case_insensitive': False,
-        'invalid_path_chars': '\0',
-        'network': False,
-        'read_only': False,
-        'thread_safe': True,
-        'unicode_paths': True,
-        'virtual': False,
+        "case_insensitive": False,
+        "invalid_path_chars": "\0",
+        "network": False,
+        "read_only": False,
+        "thread_safe": True,
+        "unicode_paths": True,
+        "virtual": False,
     }  # type: Dict[Text, Union[Text, int, bool, None]]
 
     def __init__(self):
@@ -303,7 +310,7 @@ class MemoryFS(FS):
         """Create an in-memory filesystem.
         """
         self._meta = self._meta.copy()
-        self.root = self._make_dir_entry(ResourceType.directory, '')
+        self.root = self._make_dir_entry(ResourceType.directory, "")
         super(MemoryFS, self).__init__()
 
     def __repr__(self):
@@ -340,15 +347,10 @@ class MemoryFS(FS):
         dir_entry = self._get_dir_entry(_path)
         if dir_entry is None:
             raise errors.ResourceNotFound(path)
-        info = {
-            'basic': {
-                'name': dir_entry.name,
-                'is_dir': dir_entry.is_dir
-            }
-        }
-        if 'details' in namespaces:
-            info['details'] = {
-                "_write": ['accessed', 'modified'],
+        info = {"basic": {"name": dir_entry.name, "is_dir": dir_entry.is_dir}}
+        if "details" in namespaces:
+            info["details"] = {
+                "_write": ["accessed", "modified"],
                 "type": int(dir_entry.resource_type),
                 "size": dir_entry.size,
                 "accessed": dir_entry.accessed_time,
@@ -370,19 +372,21 @@ class MemoryFS(FS):
             return dir_entry.list()
 
     if False:  # typing.TYPE_CHECKING
+
         def opendir(self, path, factory=None):
             # type: (_M, Text, Optional[_OpendirFactory]) -> SubFS[_M]
             pass
 
-    def makedir(self,               # type: _M
-                path,               # type: Text
-                permissions=None,   # type: Optional[Permissions]
-                recreate=False      # type: bool
-                ):
+    def makedir(
+        self,  # type: _M
+        path,  # type: Text
+        permissions=None,  # type: Optional[Permissions]
+        recreate=False,  # type: bool
+    ):
         # type: (...) -> SubFS[_M]
         _path = self.validatepath(path)
         with self._lock:
-            if _path == '/':
+            if _path == "/":
                 if recreate:
                     return self.opendir(path)
                 else:
@@ -399,10 +403,7 @@ class MemoryFS(FS):
                 raise errors.DirectoryExists(path)
 
             if dir_entry is None:
-                new_dir = self._make_dir_entry(
-                    ResourceType.directory,
-                    dir_name
-                )
+                new_dir = self._make_dir_entry(ResourceType.directory, dir_name)
                 parent_dir.set_entry(dir_name, new_dir)
             return self.opendir(path)
 
@@ -420,10 +421,7 @@ class MemoryFS(FS):
 
             if _mode.create:
                 if file_name not in parent_dir_entry:
-                    file_dir_entry = self._make_dir_entry(
-                        ResourceType.file,
-                        file_name
-                    )
+                    file_dir_entry = self._make_dir_entry(ResourceType.file, file_name)
                     parent_dir_entry.set_entry(file_name, file_dir_entry)
                 else:
                     file_dir_entry = self._get_dir_entry(_path)  # type: ignore
@@ -434,10 +432,7 @@ class MemoryFS(FS):
                     raise errors.FileExpected(path)
 
                 mem_file = _MemoryFile(
-                    path=_path,
-                    memory_fs=self,
-                    mode=mode,
-                    dir_entry=file_dir_entry
+                    path=_path, memory_fs=self, mode=mode, dir_entry=file_dir_entry
                 )
 
                 file_dir_entry.add_open_file(mem_file)
@@ -451,10 +446,7 @@ class MemoryFS(FS):
                 raise errors.FileExpected(path)
 
             mem_file = _MemoryFile(
-                path=_path,
-                memory_fs=self,
-                mode=mode,
-                dir_entry=file_dir_entry
+                path=_path, memory_fs=self, mode=mode, dir_entry=file_dir_entry
             )
             file_dir_entry.add_open_file(mem_file)
             return mem_file  # type: ignore
@@ -480,7 +472,7 @@ class MemoryFS(FS):
         # type: (Text) -> None
         _path = self.validatepath(path)
 
-        if _path == '/':
+        if _path == "/":
             raise errors.RemoveRootError()
 
         with self._lock:
@@ -510,11 +502,12 @@ class MemoryFS(FS):
                 raise errors.ResourceNotFound(path)
 
             resource_entry = typing.cast(
-                _DirEntry, parent_dir_entry.get_entry(file_name))
+                _DirEntry, parent_dir_entry.get_entry(file_name)
+            )
 
-            if 'details' in info:
-                details = info['details']
-                if 'accessed' in details:
-                    resource_entry.accessed_time = details['accessed'] # type: ignore
-                if 'modified' in details:
-                    resource_entry.modified_time = details['modified'] # type: ignore
+            if "details" in info:
+                details = info["details"]
+                if "accessed" in details:
+                    resource_entry.accessed_time = details["accessed"]  # type: ignore
+                if "modified" in details:
+                    resource_entry.modified_time = details["modified"]  # type: ignore

@@ -21,23 +21,20 @@ class ZipOpener(Opener):
     """`ZipFS` opener.
     """
 
-    protocols = ['zip']
+    protocols = ["zip"]
 
-    def open_fs(self,
-                fs_url,         # type: Text
-                parse_result,   # type: ParseResult
-                writeable,      # type: bool
-                create,         # type: bool
-                cwd             # type: Text
-                ):
+    def open_fs(
+        self,
+        fs_url,  # type: Text
+        parse_result,  # type: ParseResult
+        writeable,  # type: bool
+        create,  # type: bool
+        cwd,  # type: Text
+    ):
         # type: (...) -> ZipFS
         from ..zipfs import ZipFS
+
         if not create and writeable:
-            raise NotWriteable(
-                'Unable to open existing ZIP file for writing'
-            )
-        zip_fs = ZipFS(
-            parse_result.resource,
-            write=create
-        )
+            raise NotWriteable("Unable to open existing ZIP file for writing")
+        zip_fs = ZipFS(parse_result.resource, write=create)
         return zip_fs

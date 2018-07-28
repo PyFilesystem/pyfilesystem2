@@ -25,21 +25,30 @@ from .wrapfs import WrapFS
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
-        Any, BinaryIO, Collection, Dict, List, Optional,
-        SupportsInt, Text, Tuple, Union)
+        Any,
+        BinaryIO,
+        Collection,
+        Dict,
+        List,
+        Optional,
+        SupportsInt,
+        Text,
+        Tuple,
+        Union,
+    )
     from .info import RawInfo
     from .subfs import SubFS
+
     R = typing.TypeVar("R", bound="ReadZipFS")
 
 
 class _ZipExtFile(RawWrapper):
-
     def __init__(self, fs, name):
         # type: (ReadZipFS, Text) -> None
         self._zip = _zip = fs._zip
         self._end = _zip.getinfo(name).file_size
         self._pos = 0
-        super(_ZipExtFile, self).__init__(_zip.open(name), 'r', name)
+        super(_ZipExtFile, self).__init__(_zip.open(name), "r", name)
 
     def read(self, size=-1):
         # type: (int) -> bytes
@@ -49,7 +58,7 @@ class _ZipExtFile(RawWrapper):
 
     def read1(self, size=-1):
         # type: (int) -> bytes
-        buf = self._f.read1(-1 if size is None else size)   # type: ignore
+        buf = self._f.read1(-1 if size is None else size)  # type: ignore
         self._pos += len(buf)
         return buf
 
@@ -153,32 +162,34 @@ class ZipFS(WrapFS):
 
     """
 
-    def __new__(cls,
-                file,                              # type: Union[Text, BinaryIO]
-                write=False,                       # type: bool
-                compression=zipfile.ZIP_DEFLATED,  # type: int
-                encoding="utf-8",                  # type: Text
-                temp_fs="temp://__ziptemp__"       # type: Text
-                ):
+    def __new__(
+        cls,
+        file,  # type: Union[Text, BinaryIO]
+        write=False,  # type: bool
+        compression=zipfile.ZIP_DEFLATED,  # type: int
+        encoding="utf-8",  # type: Text
+        temp_fs="temp://__ziptemp__",  # type: Text
+    ):
         # type: (...) -> FS
         # This magic returns a different class instance based on the
         # value of the ``write`` parameter.
         if write:
-            return WriteZipFS(file,
-                              compression=compression,
-                              encoding=encoding,
-                              temp_fs=temp_fs)
+            return WriteZipFS(
+                file, compression=compression, encoding=encoding, temp_fs=temp_fs
+            )
         else:
             return ReadZipFS(file, encoding=encoding)
 
     if False:  # typing.TYPE_CHECKING
-        def __init__(self,
-                     file,                              # type: Union[Text, BinaryIO]
-                     write=False,                       # type: bool
-                     compression=zipfile.ZIP_DEFLATED,  # type: int
-                     encoding="utf-8",                  # type: Text
-                     temp_fs="temp://__ziptemp__"       # type: Text
-                     ):
+
+        def __init__(
+            self,
+            file,  # type: Union[Text, BinaryIO]
+            write=False,  # type: bool
+            compression=zipfile.ZIP_DEFLATED,  # type: int
+            encoding="utf-8",  # type: Text
+            temp_fs="temp://__ziptemp__",  # type: Text
+        ):
             # type: (...) -> None
             pass
 
@@ -188,12 +199,13 @@ class WriteZipFS(WrapFS):
     """A writable zip file.
     """
 
-    def __init__(self,
-                 file,                               # type: Union[Text, BinaryIO]
-                 compression=zipfile.ZIP_DEFLATED,   # type: int
-                 encoding="utf-8",                   # type: Text
-                 temp_fs="temp://__ziptemp__"        # type: Text
-                 ):
+    def __init__(
+        self,
+        file,  # type: Union[Text, BinaryIO]
+        compression=zipfile.ZIP_DEFLATED,  # type: int
+        encoding="utf-8",  # type: Text
+        temp_fs="temp://__ziptemp__",  # type: Text
+    ):
         # type: (...) -> None
         self._file = file
         self.compression = compression
@@ -206,12 +218,7 @@ class WriteZipFS(WrapFS):
     def __repr__(self):
         # type: () -> Text
         t = "WriteZipFS({!r}, compression={!r}, encoding={!r}, temp_fs={!r})"
-        return t.format(
-            self._file,
-            self.compression,
-            self.encoding,
-            self._temp_fs_url
-        )
+        return t.format(self._file, self.compression, self.encoding, self._temp_fs_url)
 
     def __str__(self):
         # type: () -> Text
@@ -234,11 +241,12 @@ class WriteZipFS(WrapFS):
                 self._temp_fs.close()
         super(WriteZipFS, self).close()
 
-    def write_zip(self,
-                  file=None,         # type: Union[Text, BinaryIO, None]
-                  compression=None,  # type: Optional[int]
-                  encoding=None      # type: Optional[Text]
-                  ):
+    def write_zip(
+        self,
+        file=None,  # type: Union[Text, BinaryIO, None]
+        compression=None,  # type: Optional[int]
+        encoding=None,  # type: Optional[Text]
+    ):
         # type: (...) -> None
         """Write zip to a file.
 
@@ -260,7 +268,7 @@ class WriteZipFS(WrapFS):
                 self._temp_fs,
                 file or self._file,
                 compression=compression or self.compression,
-                encoding=encoding or self.encoding
+                encoding=encoding or self.encoding,
             )
 
 
@@ -270,23 +278,23 @@ class ReadZipFS(FS):
     """
 
     _meta = {
-        'case_insensitive': True,
-        'network': False,
-        'read_only': True,
-        'supports_rename': False,
-        'thread_safe': True,
-        'unicode_paths': True,
-        'virtual': False,
+        "case_insensitive": True,
+        "network": False,
+        "read_only": True,
+        "supports_rename": False,
+        "thread_safe": True,
+        "unicode_paths": True,
+        "virtual": False,
     }
 
     @errors.CreateFailed.catch_all
-    def __init__(self, file, encoding='utf-8'):
+    def __init__(self, file, encoding="utf-8"):
         # type: (Union[BinaryIO, Text], Text) -> None
         super(ReadZipFS, self).__init__()
         self._file = file
         self.encoding = encoding
-        self._zip = zipfile.ZipFile(file, 'r')
-        self._directory_fs = None   # type: Optional[MemoryFS]
+        self._zip = zipfile.ZipFile(file, "r")
+        self._directory_fs = None  # type: Optional[MemoryFS]
 
     def __repr__(self):
         # type: () -> Text
@@ -319,9 +327,8 @@ class ReadZipFS(FS):
                 for zip_name in self._zip.namelist():
                     resource_name = zip_name
                     if six.PY2:
-                        resource_name =\
-                            resource_name.decode(self.encoding, 'replace')
-                    if resource_name.endswith('/'):
+                        resource_name = resource_name.decode(self.encoding, "replace")
+                    if resource_name.endswith("/"):
                         _fs.makedirs(resource_name, recreate=True)
                     else:
                         _fs.makedirs(dirname(resource_name), recreate=True)
@@ -334,22 +341,14 @@ class ReadZipFS(FS):
         namespaces = namespaces or ()
         raw_info = {}  # type: Dict[Text, Dict[Text, object]]
 
-        if _path == '/':
-            raw_info["basic"] = {
-                "name": "",
-                "is_dir": True,
-            }
+        if _path == "/":
+            raw_info["basic"] = {"name": "", "is_dir": True}
             if "details" in namespaces:
-                raw_info["details"] = {
-                    "type": int(ResourceType.directory)
-                }
+                raw_info["details"] = {"type": int(ResourceType.directory)}
 
         else:
             basic_info = self._directory.getinfo(_path)
-            raw_info["basic"] = {
-                "name": basic_info.name,
-                "is_dir": basic_info.is_dir,
-            }
+            raw_info["basic"] = {"name": basic_info.name, "is_dir": basic_info.is_dir}
 
             if not {"details", "access", "zip"}.isdisjoint(namespaces):
                 zip_name = self._path_to_zip_name(path)
@@ -364,27 +363,26 @@ class ReadZipFS(FS):
                             "size": zip_info.file_size,
                             "type": int(
                                 ResourceType.directory
-                                if basic_info.is_dir else
-                                ResourceType.file
+                                if basic_info.is_dir
+                                else ResourceType.file
                             ),
                             "modified": datetime_to_epoch(
                                 datetime(*zip_info.date_time)
-                            )
+                            ),
                         }
                     if "zip" in namespaces:
                         raw_info["zip"] = {
                             k: getattr(zip_info, k)
                             for k in zip_info.__slots__  # type: ignore
-                            if not k.startswith('_')
+                            if not k.startswith("_")
                         }
                     if "access" in namespaces:
                         # check the zip was created on UNIX to get permissions
-                        if zip_info.external_attr \
-                                and zip_info.create_system == 3:
+                        if zip_info.external_attr and zip_info.create_system == 3:
                             raw_info["access"] = {
                                 "permissions": Permissions(
                                     mode=zip_info.external_attr >> 16 & 0xFFF
-                                ).dump(),
+                                ).dump()
                             }
 
         return Info(raw_info)
@@ -399,11 +397,12 @@ class ReadZipFS(FS):
         self.check()
         return self._directory.listdir(path)
 
-    def makedir(self,               # type: R
-                path,               # type: Text
-                permissions=None,   # type: Optional[Permissions]
-                recreate=False      # type: bool
-                ):
+    def makedir(
+        self,  # type: R
+        path,  # type: Text
+        permissions=None,  # type: Optional[Permissions]
+        recreate=False,  # type: bool
+    ):
         # type: (...) -> SubFS[R]
         self.check()
         raise errors.ResourceReadOnly(path)
@@ -411,7 +410,7 @@ class ReadZipFS(FS):
     def openbin(self, path, mode="r", buffering=-1, **kwargs):
         # type: (Text, Text, int, **Any) -> BinaryIO
         self.check()
-        if 'w' in mode or '+' in mode or 'a' in mode:
+        if "w" in mode or "+" in mode or "a" in mode:
             raise errors.ResourceReadOnly(path)
 
         if not self._directory.exists(path):
@@ -420,7 +419,7 @@ class ReadZipFS(FS):
             raise errors.FileExpected(path)
 
         zip_name = self._path_to_zip_name(path)
-        return _ZipExtFile(self, zip_name)         # type: ignore
+        return _ZipExtFile(self, zip_name)  # type: ignore
 
     def remove(self, path):
         # type: (Text) -> None

@@ -20,16 +20,18 @@ class MemOpener(Opener):
     """`MemoryFS` opener.
     """
 
-    protocols = ['mem']
+    protocols = ["mem"]
 
-    def open_fs(self,
-                fs_url,         # type: Text
-                parse_result,   # type: ParseResult
-                writeable,      # type: bool
-                create,         # type: bool
-                cwd             # type: Text
-                ):
+    def open_fs(
+        self,
+        fs_url,  # type: Text
+        parse_result,  # type: ParseResult
+        writeable,  # type: bool
+        create,  # type: bool
+        cwd,  # type: Text
+    ):
         # type: (...) -> MemoryFS
         from ..memoryfs import MemoryFS
+
         mem_fs = MemoryFS()
         return mem_fs

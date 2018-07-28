@@ -8,9 +8,8 @@ from fs import errors as fserrors
 
 
 class TestErrorTools(unittest.TestCase):
-
     def assert_convert_os_errors(self):
 
         with self.assertRaises(fserrors.ResourceNotFound):
-            with convert_os_errors('foo', 'test'):
+            with convert_os_errors("foo", "test"):
                 raise OSError(errno.ENOENT)

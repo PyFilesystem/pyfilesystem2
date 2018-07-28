@@ -13,8 +13,7 @@ from ._typing import Text
 
 
 if False:  # typing.TYPE_CHECKING
-    from typing import (
-        Iterator, List, Optional, Tuple, Type, Union)
+    from typing import Iterator, List, Optional, Tuple, Type, Union
 
 
 def make_mode(init):
@@ -79,91 +78,74 @@ class Permissions(object):
     """
 
     _LINUX_PERMS = [
-        ('setuid', 2048),
-        ('setguid', 1024),
-        ('sticky', 512),
-        ('u_r', 256),
-        ('u_w', 128),
-        ('u_x', 64),
-        ('g_r', 32),
-        ('g_w', 16),
-        ('g_x', 8),
-        ('o_r', 4),
-        ('o_w', 2),
-        ('o_x', 1)
+        ("setuid", 2048),
+        ("setguid", 1024),
+        ("sticky", 512),
+        ("u_r", 256),
+        ("u_w", 128),
+        ("u_x", 64),
+        ("g_r", 32),
+        ("g_w", 16),
+        ("g_x", 8),
+        ("o_r", 4),
+        ("o_w", 2),
+        ("o_x", 1),
     ]  # type: List[Tuple[Text, int]]
     _LINUX_PERMS_NAMES = [_name for _name, _mask in _LINUX_PERMS]  # type: List[Text]
 
-    def __init__(self,
-                 names=None,    # type: Optional[Iterable[Text]]
-                 mode=None,     # type: Optional[int]
-                 user=None,     # type: Optional[Text]
-                 group=None,    # type: Optional[Text]
-                 other=None,    # type: Optional[Text]
-                 sticky=None,   # type: Optional[bool]
-                 setuid=None,   # type: Optional[bool]
-                 setguid=None   # type: Optional[bool]
-                 ):
+    def __init__(
+        self,
+        names=None,  # type: Optional[Iterable[Text]]
+        mode=None,  # type: Optional[int]
+        user=None,  # type: Optional[Text]
+        group=None,  # type: Optional[Text]
+        other=None,  # type: Optional[Text]
+        sticky=None,  # type: Optional[bool]
+        setuid=None,  # type: Optional[bool]
+        setguid=None,  # type: Optional[bool]
+    ):
         # type: (...) -> None
         if names is not None:
             self._perms = set(names)
         elif mode is not None:
-            self._perms = {
-                name
-                for name, mask in self._LINUX_PERMS
-                if mode & mask
-            }
+            self._perms = {name for name, mask in self._LINUX_PERMS if mode & mask}
         else:
             perms = self._perms = set()
-            perms.update('u_' + p for p in user or '' if p != '-')
-            perms.update('g_' + p for p in group or '' if p != '-')
-            perms.update('o_' + p for p in other or '' if p != '-')
+            perms.update("u_" + p for p in user or "" if p != "-")
+            perms.update("g_" + p for p in group or "" if p != "-")
+            perms.update("o_" + p for p in other or "" if p != "-")
 
         if sticky:
-            self._perms.add('sticky')
+            self._perms.add("sticky")
         if setuid:
-            self._perms.add('setuid')
+            self._perms.add("setuid")
         if setguid:
-            self._perms.add('setguid')
+            self._perms.add("setguid")
 
     def __repr__(self):
         # type: () -> Text
         if not self._perms.issubset(self._LINUX_PERMS_NAMES):
-            _perms_str = ", ".join(
-                "'{}'".format(p) for p in sorted(self._perms)
-            )
+            _perms_str = ", ".join("'{}'".format(p) for p in sorted(self._perms))
             return "Permissions(names=[{}])".format(_perms_str)
 
         def _check(perm, name):
             # type: (Text, Text) -> Text
-            return name if perm in self._perms else ''
+            return name if perm in self._perms else ""
 
-        user = ''.join((
-            _check('u_r', 'r'),
-            _check('u_w', 'w'),
-            _check('u_x', 'x')
-        ))
-        group = ''.join((
-            _check('g_r', 'r'),
-            _check('g_w', 'w'),
-            _check('g_x', 'x')
-        ))
-        other = ''.join((
-            _check('o_r', 'r'),
-            _check('o_w', 'w'),
-            _check('o_x', 'x')
-        ))
+        user = "".join((_check("u_r", "r"), _check("u_w", "w"), _check("u_x", "x")))
+        group = "".join((_check("g_r", "r"), _check("g_w", "w"), _check("g_x", "x")))
+        other = "".join((_check("o_r", "r"), _check("o_w", "w"), _check("o_x", "x")))
         args = []
         _fmt = "user='{}', group='{}', other='{}'"
         basic = _fmt.format(user, group, other)
         args.append(basic)
         if self.sticky:
-            args.append('sticky=True')
+            args.append("sticky=True")
         if self.setuid:
-            args.append('setuid=True')
+            args.append("setuid=True")
         if self.setuid:
-            args.append('setguid=True')
-        return "Permissions({})".format(', '.join(args))
+            args.append("setguid=True")
+        return "Permissions({})".format(", ".join(args))
 
     def __str__(self):
         # type: () -> Text
@@ -180,7 +162,7 @@ class Permissions(object):
     def __eq__(self, other):
         # type: (object) -> bool
         if isinstance(other, Permissions):
-            names = other.dump()            # type: object
+            names = other.dump()  # type: object
         else:
             names = other
         return self.dump() == names
@@ -235,7 +217,7 @@ class Permissions(object):
             return cls(mode=init)
         if isinstance(init, list):
             return cls(names=init)
-        raise ValueError('permissions is invalid')
+        raise ValueError("permissions is invalid")
 
     @classmethod
     def get_mode(cls, init):
@@ -261,20 +243,17 @@ class Permissions(object):
         """Get a Linux-style string representation of permissions.
         """
         perms = [
-            c if name in self._perms else '-'
-            for name, c in zip(
-                self._LINUX_PERMS_NAMES[-9:],
-                'rwxrwxrwx'
-            )
+            c if name in self._perms else "-"
+            for name, c in zip(self._LINUX_PERMS_NAMES[-9:], "rwxrwxrwx")
         ]
-        if 'setuid' in self._perms:
-            perms[2] = 's' if 'u_x' in self._perms else 'S'
-        if 'setguid' in self._perms:
-            perms[5] = 's' if 'g_x' in self._perms else 'S'
-        if 'sticky' in self._perms:
-            perms[8] = 't' if 'o_x' in self._perms else 'T'
+        if "setuid" in self._perms:
+            perms[2] = "s" if "u_x" in self._perms else "S"
+        if "setguid" in self._perms:
+            perms[5] = "s" if "g_x" in self._perms else "S"
+        if "sticky" in self._perms:
+            perms[8] = "t" if "o_x" in self._perms else "T"
 
-        perm_str = ''.join(perms)
+        perm_str = "".join(perms)
         return perm_str
 
     @property
@@ -291,27 +270,23 @@ class Permissions(object):
     @mode.setter
     def mode(self, mode):
         # type: (int) -> None
-        self._perms = {
-            name
-            for name, mask in self._LINUX_PERMS
-            if mode & mask
-        }
+        self._perms = {name for name, mask in self._LINUX_PERMS if mode & mask}
 
-    u_r = _PermProperty('u_r')
-    u_w = _PermProperty('u_w')
-    u_x = _PermProperty('u_x')
+    u_r = _PermProperty("u_r")
+    u_w = _PermProperty("u_w")
+    u_x = _PermProperty("u_x")
 
-    g_r = _PermProperty('g_r')
-    g_w = _PermProperty('g_w')
-    g_x = _PermProperty('g_x')
+    g_r = _PermProperty("g_r")
+    g_w = _PermProperty("g_w")
+    g_x = _PermProperty("g_x")
 
-    o_r = _PermProperty('o_r')
-    o_w = _PermProperty('o_w')
-    o_x = _PermProperty('o_x')
+    o_r = _PermProperty("o_r")
+    o_w = _PermProperty("o_w")
+    o_x = _PermProperty("o_x")
 
-    sticky = _PermProperty('sticky')
-    setuid = _PermProperty('setuid')
-    setguid = _PermProperty('setguid')
+    sticky = _PermProperty("sticky")
+    setuid = _PermProperty("setuid")
+    setguid = _PermProperty("setguid")
 
     def add(self, *permissions):
         # type: (*Text) -> None

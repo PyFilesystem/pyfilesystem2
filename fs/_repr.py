@@ -31,9 +31,11 @@ def make_repr(class_name, *args, **kwargs):
 
     """
     arguments = [repr(arg) for arg in args]
-    arguments.extend([
-        "{}={!r}".format(name, value)
-        for name, (value, default) in sorted(kwargs.items())
-        if value != default
-    ])
-    return "{}({})".format(class_name, ', '.join(arguments))
+    arguments.extend(
+        [
+            "{}={!r}".format(name, value)
+            for name, (value, default) in sorted(kwargs.items())
+            if value != default
+        ]
+    )
+    return "{}({})".format(class_name, ", ".join(arguments))

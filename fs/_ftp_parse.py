@@ -34,14 +34,12 @@ re_linux = re.compile(
     (.*?)
     $
     """,
-    re.VERBOSE
+    re.VERBOSE,
 )
 
 
 def get_decoders():
-    decoders = [
-        (re_linux, decode_linux),
-    ]
+    decoders = [(re_linux, decode_linux)]
     return decoders
 
 
@@ -65,12 +63,12 @@ def parse_line(line):
 
 
 def _parse_time(t):
-    t = ' '.join(token.strip() for token in t.lower().split(' '))
+    t = " ".join(token.strip() for token in t.lower().split(" "))
     try:
         try:
-            _t = time.strptime(t, '%b %d %Y')
+            _t = time.strptime(t, "%b %d %Y")
         except ValueError:
-            _t = time.strptime(t, '%b %d %H:%M')
+            _t = time.strptime(t, "%b %d %H:%M")
     except ValueError:
         # Unknown time format
         return None
@@ -80,11 +78,7 @@ def _parse_time(t):
     day = _t.tm_mday
     hour = _t.tm_hour
     minutes = _t.tm_min
-    dt = datetime.datetime(
-        year, month, day,
-        hour, minutes,
-        tzinfo=UTC
-    )
+    dt = datetime.datetime(year, month, day, hour, minutes, tzinfo=UTC)
 
     epoch_time = (dt - epoch_dt).total_seconds()
     return epoch_time
@@ -92,44 +86,33 @@ def _parse_time(t):
 
 def decode_linux(line, match):
     perms, links, uid, gid, size, mtime, name = match.groups()
-    is_link = perms.startswith('l')
-    is_dir = perms.startswith('d') or is_link
+    is_link = perms.startswith("l")
+    is_dir = perms.startswith("d") or is_link
     if is_link:
-        name, _, _link_name = name.partition('->')
+        name, _, _link_name = name.partition("->")
         name = name.strip()
         _link_name = _link_name.strip()
     permissions = Permissions.parse(perms[1:])
 
     mtime_epoch = _parse_time(mtime)
 
-    name = unicodedata.normalize('NFC', name)
+    name = unicodedata.normalize("NFC", name)
 
     raw_info = {
-        "basic": {
-            "name": name,
-            "is_dir": is_dir
-        },
+        "basic": {"name": name, "is_dir": is_dir},
         "details": {
             "size": int(size),
-            "type": int(
-                ResourceType.directory
-                if is_dir else
-                ResourceType.file
-            )
+            "type": int(ResourceType.directory if is_dir else ResourceType.file),
         },
-        "access": {
-            "permissions": permissions.dump()
-        },
-        "ftp": {
-            "ls": line
-        }
+        "access": {"permissions": permissions.dump()},
+        "ftp": {"ls": line},
     }
-    access = raw_info['access']
-    details = raw_info['details']
+    access = raw_info["access"]
+    details = raw_info["details"]
     if mtime_epoch is not None:
-        details['modified'] = mtime_epoch
+        details["modified"] = mtime_epoch
 
-    access['user'] = uid
-    access['group'] = gid
+    access["user"] = uid
+    access["group"] = gid
 
     return raw_info

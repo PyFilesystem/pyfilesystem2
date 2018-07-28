@@ -96,11 +96,7 @@ def mirror(
 
 
 def _mirror(
-    src_fs,
-    dst_fs,
-    walker=None,
-    copy_if_newer=True,
-    copy_file=copy_file_internal,
+    src_fs, dst_fs, walker=None, copy_if_newer=True, copy_file=copy_file_internal
 ):
     # type: (FS, FS, Optional[Walker], bool, Callable[[FS, str, FS, str], None]) -> None
     walker = walker or Walker()
@@ -108,8 +104,7 @@ def _mirror(
     for path, dirs, files in walk:
         try:
             dst = {
-                info.name: info
-                for info in dst_fs.scandir(path, namespaces=["details"])
+                info.name: info for info in dst_fs.scandir(path, namespaces=["details"])
             }
         except ResourceNotFound:
             dst_fs.makedir(path)

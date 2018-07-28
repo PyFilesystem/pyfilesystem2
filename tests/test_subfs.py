@@ -15,8 +15,8 @@ class TestSubFS(TestOSFS):
     def setUp(self):
         self.temp_dir = tempfile.mkdtemp("fstest")
         self.parent_fs = osfs.OSFS(self.temp_dir)
-        self.parent_fs.makedir('__subdir__')
-        self.fs = self.parent_fs.opendir('__subdir__')
+        self.parent_fs.makedir("__subdir__")
+        self.fs = self.parent_fs.opendir("__subdir__")
 
     def tearDown(self):
         shutil.rmtree(self.temp_dir)
@@ -24,5 +24,5 @@ class TestSubFS(TestOSFS):
         self.fs.close()
 
     def _get_real_path(self, path):
-        _path = os.path.join(self.temp_dir, '__subdir__', relpath(path))
+        _path = os.path.join(self.temp_dir, "__subdir__", relpath(path))
         return _path

@@ -103,9 +103,7 @@ class FilesystemClosed(FSError):
 class BulkCopyFailed(FSError):
     """A copy operation failed in worker threads."""
 
-    default_message = (
-        "One or more copy operations failed (see errors attribute)"
-    )
+    default_message = "One or more copy operations failed (see errors attribute)"
 
     def __init__(self, errors):
         self.errors = errors
@@ -140,7 +138,7 @@ class CreateFailed(FSError):
     def __reduce__(self):
         return type(self), (self._msg, self.exc)
 
-      
+
 class PathError(FSError):
     """Base exception for errors to do with a path string.
     """
@@ -359,9 +357,9 @@ class IllegalBackReference(ValueError):
     def __init__(self, path):
         # type: (Text) -> None
         self.path = path
-        msg = (
-            "path '{path}' contains back-references outside of filesystem"
-        ).format(path=path)
+        msg = ("path '{path}' contains back-references outside of filesystem").format(
+            path=path
+        )
         super(IllegalBackReference, self).__init__(msg)
 
     def __reduce__(self):

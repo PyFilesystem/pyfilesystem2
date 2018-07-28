@@ -42,24 +42,22 @@ class TempFS(OSFS):
 
     """
 
-    def __init__(self,
-                 identifier='__tempfs__',   # type: Text
-                 temp_dir=None,             # type: Optional[Text]
-                 auto_clean=True,           # type: bool
-                 ignore_clean_errors=True   # type: bool
-                 ):
+    def __init__(
+        self,
+        identifier="__tempfs__",  # type: Text
+        temp_dir=None,  # type: Optional[Text]
+        auto_clean=True,  # type: bool
+        ignore_clean_errors=True,  # type: bool
+    ):
         # type: (...) -> None
         self.identifier = identifier
         self._auto_clean = auto_clean
         self._ignore_clean_errors = ignore_clean_errors
         self._cleaned = False
 
-        self.identifier = identifier.replace('/', '-')
+        self.identifier = identifier.replace("/", "-")
 
-        self._temp_dir = tempfile.mkdtemp(
-            identifier or "fsTempFS",
-            dir=temp_dir
-        )
+        self._temp_dir = tempfile.mkdtemp(identifier or "fsTempFS", dir=temp_dir)
         super(TempFS, self).__init__(self._temp_dir)
 
     def __repr__(self):
@@ -88,7 +86,6 @@ class TempFS(OSFS):
         except Exception as error:
             if not self._ignore_clean_errors:
                 raise errors.OperationFailed(
-                    msg="failed to remove temporary directory",
-                    exc=error
+                    msg="failed to remove temporary directory", exc=error
                 )
         self._cleaned = True
