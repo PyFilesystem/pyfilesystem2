@@ -483,7 +483,16 @@ class FSTestCases(object):
         # Check a number of standard namespaces
         # FS objects may not support all these, but we can at least
         # invoke the code
-        self.fs.getinfo("foo", namespaces=["access", "stat", "details"])
+        info = self.fs.getinfo("foo", namespaces=["access", "stat", "details"])
+
+        # Check that if the details namespace is present, times are
+        # of valid types.
+        if 'details' in info.namespaces:
+            details = info.raw['details']
+            self.assertIsInstance(details.get('accessed'), (type(None), int, float))
+            self.assertIsInstance(details.get('modified'), (type(None), int, float))
+            self.assertIsInstance(details.get('created'), (type(None), int, float))
+            self.assertIsInstance(details.get('metadata_changed'), (type(None), int, float))
 
     def test_exists(self):
         # Test exists method.
