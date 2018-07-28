@@ -25,7 +25,7 @@ class Registry(object):
     """A registry for `Opener` instances.
     """
 
-    def __init__(self, default_opener='osfs'):
+    def __init__(self, default_opener="osfs"):
         # type: (Text) -> None
         """Create a registry object.
 
@@ -50,8 +50,7 @@ class Registry(object):
         if self._protocols is None:
             self._protocols = [
                 entry_point.name
-                for entry_point in
-                pkg_resources.iter_entry_points('fs.opener')
+                for entry_point in pkg_resources.iter_entry_points("fs.opener")
             ]
         return self._protocols
 
@@ -74,50 +73,40 @@ class Registry(object):
 
         """
         protocol = protocol or self.default_opener
-        entry_point = next(
-            pkg_resources.iter_entry_points('fs.opener', protocol),
-            None
-        )
+        entry_point = next(pkg_resources.iter_entry_points("fs.opener", protocol), None)
 
         if entry_point is None:
-            raise UnsupportedProtocol(
-                "protocol '{}' is not supported".format(protocol)
-            )
+            raise UnsupportedProtocol("protocol '{}' is not supported".format(protocol))
 
         try:
             opener = entry_point.load()
         except Exception as exception:
             six.raise_from(
-                EntryPointError(
-                    'could not load entry point; {}'.format(exception)
-                ),
-                exception
+                EntryPointError("could not load entry point; {}".format(exception)),
+                exception,
             )
         else:
             if not issubclass(opener, Opener):
-                raise EntryPointError(
-                    'entry point did not return an opener'
-                )
+                raise EntryPointError("entry point did not return an opener")
 
         try:
             opener_instance = opener()
         except Exception as exception:
             six.raise_from(
-                EntryPointError(
-                    'could not instantiate opener; {}'.format(exception)
-                ),
-                exception
+                EntryPointError("could not instantiate opener; {}".format(exception)),
+                exception,
             )
 
         return opener_instance
 
-    def open(self,
-             fs_url,                    # type: Text
-             writeable=True,            # type: bool
-             create=False,              # type: bool
-             cwd=".",                   # type: Text
-             default_protocol='osfs'    # type: Text
-             ):
+    def open(
+        self,
+        fs_url,  # type: Text
+        writeable=True,  # type: bool
+        create=False,  # type: bool
+        cwd=".",  # type: Text
+        default_protocol="osfs",  # type: Text
+    ):
         # type: (...) -> Tuple[FS, Text]
         """Open a filesystem from a FS URL.
 
@@ -136,7 +125,7 @@ class Registry(object):
             (FS, str): a tuple of ``(<filesystem>, <path from url>)``
 
         """
-        if '://' not in fs_url:
+        if "://" not in fs_url:
             # URL may just be a path
             fs_url = "{}://{}".format(default_protocol, fs_url)
 
@@ -146,22 +135,17 @@ class Registry(object):
 
         opener = self.get_opener(protocol)
 
-        open_fs = opener.open_fs(
-            fs_url,
-            parse_result,
-            writeable,
-            create,
-            cwd
-        )
+        open_fs = opener.open_fs(fs_url, parse_result, writeable, create, cwd)
         return open_fs, open_path
 
-    def open_fs(self,
-                fs_url,                     # type: Text
-                writeable=False,            # type: bool
-                create=False,               # type: bool
-                cwd=".",                    # type: Text
-                default_protocol='osfs'     # type: Text
-                ):
+    def open_fs(
+        self,
+        fs_url,  # type: Text
+        writeable=False,  # type: bool
+        create=False,  # type: bool
+        cwd=".",  # type: Text
+        default_protocol="osfs",  # type: Text
+    ):
         # type: (...) -> FS
         """Open a filesystem from a FS URL (ignoring the path component).
 
@@ -181,6 +165,7 @@ class Registry(object):
 
         """
         from ..base import FS
+
         if isinstance(fs_url, FS):
             _fs = fs_url
         else:
@@ -189,17 +174,18 @@ class Registry(object):
                 writeable=writeable,
                 create=create,
                 cwd=cwd,
-                default_protocol=default_protocol
+                default_protocol=default_protocol,
             )
         return _fs
 
     @contextlib.contextmanager
-    def manage_fs(self,
-                  fs_url,           # type: Union[FS, Text]
-                  create=False,     # type: bool
-                  writeable=False,  # type: bool
-                  cwd='.'           # type: Text
-                  ):
+    def manage_fs(
+        self,
+        fs_url,  # type: Union[FS, Text]
+        create=False,  # type: bool
+        writeable=False,  # type: bool
+        cwd=".",  # type: Text
+    ):
         # type: (...) -> Iterator[FS]
         """Get a context manager to open and close a filesystem.
 
@@ -235,15 +221,11 @@ class Registry(object):
 
         """
         from ..base import FS
+
         if isinstance(fs_url, FS):
             yield fs_url
         else:
-            _fs = self.open_fs(
-                fs_url,
-                create=create,
-                writeable=writeable,
-                cwd=cwd
-            )
+            _fs = self.open_fs(fs_url, create=create, writeable=writeable, cwd=cwd)
             try:
                 yield _fs
             except:

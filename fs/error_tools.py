@@ -17,11 +17,10 @@ from . import errors
 
 if False:  # typing.TYPE_CHECKING
     from types import TracebackType
-    from typing import (
-        Iterator, Optional, Mapping, Text, Type, Union)
+    from typing import Iterator, Optional, Mapping, Text, Type, Union
 
 
-_WINDOWS_PLATFORM = platform.system() == 'Windows'
+_WINDOWS_PLATFORM = platform.system() == "Windows"
 
 
 class _ConvertOSErrors(object):
@@ -37,7 +36,7 @@ class _ConvertOSErrors(object):
         errno.ENOTEMPTY: errors.DirectoryNotEmpty,
         errno.EEXIST: errors.FileExists,
         183: errors.DirectoryExists,
-        #errno.ENOTDIR: errors.DirectoryExpected,
+        # errno.ENOTDIR: errors.DirectoryExpected,
         errno.ENOTDIR: errors.ResourceNotFound,
         errno.EISDIR: errors.FileExpected,
         errno.EINVAL: errors.FileExpected,
@@ -70,31 +69,22 @@ class _ConvertOSErrors(object):
         # type: () -> _ConvertOSErrors
         return self
 
-    def __exit__(self,
-                 exc_type,      # type: Optional[Type[BaseException]]
-                 exc_value,     # type: Optional[BaseException]
-                 traceback      # type: Optional[TracebackType]
-                 ):
+    def __exit__(
+        self,
+        exc_type,  # type: Optional[Type[BaseException]]
+        exc_value,  # type: Optional[BaseException]
+        traceback,  # type: Optional[TracebackType]
+    ):
         # type: (...) -> None
-        os_errors = (
-            self.DIR_ERRORS
-            if self._directory
-            else self.FILE_ERRORS
-        )
+        os_errors = self.DIR_ERRORS if self._directory else self.FILE_ERRORS
         if exc_type and isinstance(exc_value, EnvironmentError):
             _errno = exc_value.errno
             fserror = os_errors.get(_errno, errors.OperationFailed)
             if _errno == errno.EACCES and sys.platform == "win32":
-                if getattr(exc_value, 'args', None) == 32:  # pragma: no cover
+                if getattr(exc_value, "args", None) == 32:  # pragma: no cover
                     fserror = errors.ResourceLocked
-            reraise(
-                fserror,
-                fserror(
-                    self._path,
-                    exc=exc_value
-                ),
-                traceback
-            )
+            reraise(fserror, fserror(self._path, exc=exc_value), traceback)
+
 
 # Stops linter complaining about invalid class name
 convert_os_errors = _ConvertOSErrors
@@ -116,7 +106,7 @@ def unwrap_errors(path_replace):
     try:
         yield
     except errors.ResourceError as e:
-        if hasattr(e, 'path'):
+        if hasattr(e, "path"):
             if isinstance(path_replace, collections.Mapping):
                 e.path = path_replace.get(e.path, e.path)
             else:

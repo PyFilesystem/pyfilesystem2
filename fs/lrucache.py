@@ -8,8 +8,8 @@ import typing
 from collections import OrderedDict
 
 
-_K = typing.TypeVar('_K')
-_V = typing.TypeVar('_V')
+_K = typing.TypeVar("_K")
+_V = typing.TypeVar("_V")
 
 
 class LRUCache(OrderedDict, typing.Generic[_K, _V]):

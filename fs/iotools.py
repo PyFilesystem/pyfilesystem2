@@ -13,8 +13,16 @@ from .mode import Mode
 if False:  # typing.TYPE_CHECKING
     from io import RawIOBase, IOBase
     from typing import (
-        Any, BinaryIO, Iterable, Iterator, IO,
-        List, Optional, Text, Union)
+        Any,
+        BinaryIO,
+        Iterable,
+        Iterator,
+        IO,
+        List,
+        Optional,
+        Text,
+        Union,
+    )
 
 
 class RawWrapper(io.RawIOBase):
@@ -24,7 +32,7 @@ class RawWrapper(io.RawIOBase):
     def __init__(self, f, mode=None, name=None):
         # type: (IO[bytes], Optional[Text], Optional[Text]) -> None
         self._f = f
-        self.mode = mode or getattr(f, 'mode', None)
+        self.mode = mode or getattr(f, "mode", None)
         self.name = name
         super(RawWrapper, self).__init__()
 
@@ -55,19 +63,11 @@ class RawWrapper(io.RawIOBase):
 
     def readable(self):
         # type: () -> bool
-        return getattr(
-            self._f,
-            'readable',
-            lambda: Mode(self.mode).reading
-        )()
+        return getattr(self._f, "readable", lambda: Mode(self.mode).reading)()
 
     def writable(self):
         # type: () -> bool
-        return getattr(
-            self._f,
-            'writable',
-            lambda: Mode(self.mode).writing
-        )()
+        return getattr(self._f, "writable", lambda: Mode(self.mode).writing)()
 
     def seekable(self):
         # type: () -> bool
@@ -103,7 +103,7 @@ class RawWrapper(io.RawIOBase):
 
     def read1(self, n=-1):
         # type: (int) -> bytes
-        return getattr(self._f, 'read1', self.read)(n)
+        return getattr(self._f, "read1", self.read)(n)
 
     @typing.no_type_check
     def readall(self):
@@ -118,7 +118,7 @@ class RawWrapper(io.RawIOBase):
         except AttributeError:
             data = self._f.read(len(b))
             bytes_read = len(data)
-            b[:len(data)] = data
+            b[: len(data)] = data
             return bytes_read
 
     @typing.no_type_check
@@ -129,7 +129,7 @@ class RawWrapper(io.RawIOBase):
         except AttributeError:
             data = self._f.read1(len(b))
             bytes_read = len(data)
-            b[:len(data)] = data
+            b[: len(data)] = data
             return bytes_read
 
     def readline(self, limit=-1):
@@ -150,45 +150,46 @@ class RawWrapper(io.RawIOBase):
 
 
 @typing.no_type_check
-def make_stream(name,                       # type: Text
-                bin_file,                   # type: RawIOBase
-                mode='r',                   # type: Text
-                buffering=-1,               # type: int
-                encoding=None,              # type: Optional[Text]
-                errors=None,                # type: Optional[Text]
-                newline='',                 # type: Optional[Text]
-                line_buffering=False,       # type: bool
-                **kwargs                    # type: Any
-                ):
+def make_stream(
+    name,  # type: Text
+    bin_file,  # type: RawIOBase
+    mode="r",  # type: Text
+    buffering=-1,  # type: int
+    encoding=None,  # type: Optional[Text]
+    errors=None,  # type: Optional[Text]
+    newline="",  # type: Optional[Text]
+    line_buffering=False,  # type: bool
+    **kwargs  # type: Any
+):
     # type: (...) -> IO
     """Take a Python 2.x binary file and return an IO Stream.
     """
-    reading = 'r' in mode
-    writing = 'w' in mode
-    appending = 'a' in mode
-    binary = 'b' in mode
-    if '+' in mode:
+    reading = "r" in mode
+    writing = "w" in mode
+    appending = "a" in mode
+    binary = "b" in mode
+    if "+" in mode:
         reading = True
         writing = True
 
-    encoding = None if binary else (encoding or 'utf-8')
+    encoding = None if binary else (encoding or "utf-8")
 
     io_object = RawWrapper(bin_file, mode=mode, name=name)  # type: io.IOBase
     if buffering >= 0:
         if reading and writing:
             io_object = io.BufferedRandom(
                 typing.cast(io.RawIOBase, io_object),
-                buffering or io.DEFAULT_BUFFER_SIZE
+                buffering or io.DEFAULT_BUFFER_SIZE,
             )
         elif reading:
             io_object = io.BufferedReader(
                 typing.cast(io.RawIOBase, io_object),
-                buffering or io.DEFAULT_BUFFER_SIZE
+                buffering or io.DEFAULT_BUFFER_SIZE,
             )
         elif writing or appending:
             io_object = io.BufferedWriter(
                 typing.cast(io.RawIOBase, io_object),
-                buffering or io.DEFAULT_BUFFER_SIZE
+                buffering or io.DEFAULT_BUFFER_SIZE,
             )
 
     if not binary:
@@ -216,13 +217,13 @@ def line_iterator(readable_file, size=None):
     """
     read = readable_file.read
     line = []
-    byte = b'1'
+    byte = b"1"
     if size is None or size < 0:
         while byte:
             byte = read(1)
             line.append(byte)
-            if byte in b'\n':
-                yield b''.join(line)
+            if byte in b"\n":
+                yield b"".join(line)
                 del line[:]
 
     else:
@@ -230,6 +231,6 @@ def line_iterator(readable_file, size=None):
             byte = read(1)
             size -= len(byte)
             line.append(byte)
-            if byte in b'\n' or not size:
-                yield b''.join(line)
+            if byte in b"\n" or not size:
+                yield b"".join(line)
                 del line[:]

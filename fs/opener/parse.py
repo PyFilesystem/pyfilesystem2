@@ -19,16 +19,9 @@ if False:  # typing.TYPE_CHECKING
 
 
 _ParseResult = collections.namedtuple(
-    'ParseResult',
-    [
-        'protocol',
-        'username',
-        'password',
-        'resource',
-        'params',
-        'path'
-    ]
+    "ParseResult", ["protocol", "username", "password", "resource", "params", "path"]
 )
+
 
 class ParseResult(_ParseResult):
     """A named tuple containing fields of a parsed FS URL.
@@ -47,7 +40,8 @@ class ParseResult(_ParseResult):
     """
 
 
-_RE_FS_URL = re.compile(r'''
+_RE_FS_URL = re.compile(
+    r"""
 ^
 (.*?)
 :\/\/
@@ -60,7 +54,9 @@ _RE_FS_URL = re.compile(r'''
 (?:
 !(.*?)$
 )*$
-''', re.VERBOSE)
+""",
+    re.VERBOSE,
+)
 
 
 def parse_fs_url(fs_url):
@@ -79,30 +75,23 @@ def parse_fs_url(fs_url):
     """
     match = _RE_FS_URL.match(fs_url)
     if match is None:
-        raise ParseError('{!r} is not a fs2 url'.format(fs_url))
+        raise ParseError("{!r} is not a fs2 url".format(fs_url))
 
     fs_name, credentials, url1, url2, path = match.groups()
     if not credentials:
-        username = None     # type: Optional[Text]
-        password = None     # type: Optional[Text]
+        username = None  # type: Optional[Text]
+        password = None  # type: Optional[Text]
         url = url2
     else:
-        username, _, password = credentials.partition(':')
+        username, _, password = credentials.partition(":")
         username = unquote(username)
         password = unquote(password)
         url = url1
-    url, has_qs, qs = url.partition('?')
+    url, has_qs, qs = url.partition("?")
     resource = unquote(url)
     if has_qs:
         _params = parse_qs(qs, keep_blank_values=True)
-        params = {k:unquote(v[0]) for k, v in six.iteritems(_params)}
+        params = {k: unquote(v[0]) for k, v in six.iteritems(_params)}
     else:
         params = {}
-    return ParseResult(
-        fs_name,
-        username,
-        password,
-        resource,
-        params,
-        path
-    )
+    return ParseResult(fs_name, username, password, resource, params, path)

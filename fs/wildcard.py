@@ -11,9 +11,7 @@ from functools import partial
 from .lrucache import LRUCache
 
 if False:  # typing.TYPE_CHECKING
-    from typing import (
-        Callable, Iterable, MutableMapping, Text,
-        Tuple, Pattern)
+    from typing import Callable, Iterable, MutableMapping, Text, Tuple, Pattern
 
 
 _MAXCACHE = 1000
@@ -56,8 +54,7 @@ def imatch(pattern, name):
         re_pat = _PATTERN_CACHE[(pattern, False)]
     except KeyError:
         res = _translate(pattern, case_sensitive=False)
-        _PATTERN_CACHE[(pattern, False)] = re_pat =\
-            re.compile(res, re.IGNORECASE)
+        _PATTERN_CACHE[(pattern, False)] = re_pat = re.compile(res, re.IGNORECASE)
     return re_pat.match(name) is not None
 
 
@@ -150,32 +147,32 @@ def _translate(pattern, case_sensitive=True):
     if not case_sensitive:
         pattern = pattern.lower()
     i, n = 0, len(pattern)
-    res = ''
+    res = ""
     while i < n:
         c = pattern[i]
         i = i + 1
-        if c == '*':
-            res = res + '.*'
-        elif c == '?':
-            res = res + '.'
-        elif c == '[':
+        if c == "*":
+            res = res + ".*"
+        elif c == "?":
+            res = res + "."
+        elif c == "[":
             j = i
-            if j < n and pattern[j] == '!':
+            if j < n and pattern[j] == "!":
                 j = j + 1
-            if j < n and pattern[j] == ']':
+            if j < n and pattern[j] == "]":
                 j = j + 1
-            while j < n and pattern[j] != ']':
+            while j < n and pattern[j] != "]":
                 j = j + 1
             if j >= n:
-                res = res + '\\['
+                res = res + "\\["
             else:
-                stuff = pattern[i:j].replace('\\', '\\\\')
+                stuff = pattern[i:j].replace("\\", "\\\\")
                 i = j + 1
-                if stuff[0] == '!':
-                    stuff = '^' + stuff[1:]
-                elif stuff[0] == '^':
-                    stuff = '\\' + stuff
-                res = '%s[%s]' % (res, stuff)
+                if stuff[0] == "!":
+                    stuff = "^" + stuff[1:]
+                elif stuff[0] == "^":
+                    stuff = "\\" + stuff
+                res = "%s[%s]" % (res, stuff)
         else:
             res = res + re.escape(c)
-    return res + '\Z(?ms)'
+    return res + "\Z(?ms)"

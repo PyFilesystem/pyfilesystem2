@@ -27,17 +27,25 @@ from .mode import check_writable
 if False:  # typing.TYPE_CHECKING
     from datetime import datetime
     from typing import (
-        Any, BinaryIO, Collection, Dict, Iterator, IO,
-        Optional, Text, Tuple)
+        Any,
+        BinaryIO,
+        Collection,
+        Dict,
+        Iterator,
+        IO,
+        Optional,
+        Text,
+        Tuple,
+    )
     from .base import FS
     from .info import Info, RawInfo
     from .subfs import SubFS
     from .permissions import Permissions
 
 
-_W = typing.TypeVar("_W", bound='WrapFS')
-_T = typing.TypeVar('_T', bound='FS')
-_F = typing.TypeVar('_F', bound='FS', covariant=True)
+_W = typing.TypeVar("_W", bound="WrapFS")
+_T = typing.TypeVar("_T", bound="FS")
+_F = typing.TypeVar("_F", bound="FS", covariant=True)
 
 
 def read_only(fs):
@@ -84,27 +92,24 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
 
     """
 
-    wrap_name = 'cached-dir'
+    wrap_name = "cached-dir"
 
     def __init__(self, wrap_fs):
         # type: (_F) -> None
         super(WrapCachedDir, self).__init__(wrap_fs)
         self._cache = {}  # type: Dict[Tuple[Text, frozenset], Dict[Text, Info]]
 
-    def scandir(self,
-                path,               # type: Text
-                namespaces=None,    # type: Optional[Collection[Text]]
-                page=None           # type: Optional[Tuple[int, int]]
-                ):
+    def scandir(
+        self,
+        path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+        page=None,  # type: Optional[Tuple[int, int]]
+    ):
         # type: (...) -> Iterator[Info]
         _path = abspath(normpath(path))
         cache_key = (_path, frozenset(namespaces or ()))
         if cache_key not in self._cache:
-            _scan_result = self._wrap_fs.scandir(
-                path,
-                namespaces=namespaces,
-                page=page
-            )
+            _scan_result = self._wrap_fs.scandir(path, namespaces=namespaces, page=page)
             _dir = {info.name: info for info in _scan_result}
             self._cache[cache_key] = _dir
         gen_scandir = iter(self._cache[cache_key].values())
@@ -113,13 +118,8 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
     def getinfo(self, path, namespaces=None):
         # type: (Text, Optional[Collection[Text]]) -> Info
         _path = abspath(normpath(path))
-        if _path == '/':
-            return Info({
-                "basic": {
-                    "name": "",
-                    "is_dir": True
-                }
-            })
+        if _path == "/":
+            return Info({"basic": {"name": "", "is_dir": True}})
         dir_path, resource_name = split(_path)
         cache_key = (dir_path, frozenset(namespaces or ()))
 
@@ -152,29 +152,31 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
 
     """
 
-    wrap_name = 'read-only'
+    wrap_name = "read-only"
 
     def appendbytes(self, path, data):
         # type: (Text, bytes) -> None
         self.check()
         raise ResourceReadOnly(path)
 
-    def appendtext(self,
-                   path,                # type: Text
-                   text,                # type: Text
-                   encoding='utf-8',    # type: Text
-                   errors=None,         # type: Optional[Text]
-                   newline=''           # type: Text
-                   ):
+    def appendtext(
+        self,
+        path,  # type: Text
+        text,  # type: Text
+        encoding="utf-8",  # type: Text
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+    ):
         # type: (...) -> None
         self.check()
         raise ResourceReadOnly(path)
 
-    def makedir(self,               # type: _W
-                path,               # type: Text
-                permissions=None,   # type: Optional[Permissions]
-                recreate=False      # type: bool
-                ):
+    def makedir(
+        self,  # type: _W
+        path,  # type: Text
+        permissions=None,  # type: Optional[Permissions]
+        recreate=False,  # type: bool
+    ):
         # type: (...) -> SubFS[_W]
         self.check()
         raise ResourceReadOnly(path)
@@ -184,17 +186,12 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         self.check()
         raise ResourceReadOnly(dst_path)
 
-    def openbin(self, path, mode='r', buffering=-1, **options):
+    def openbin(self, path, mode="r", buffering=-1, **options):
         # type: (Text, Text, int, **Any) -> BinaryIO
         self.check()
         if check_writable(mode):
             raise ResourceReadOnly(path)
-        return self._wrap_fs.openbin(
-            path,
-            mode=mode,
-            buffering=-1,
-            **options
-        )
+        return self._wrap_fs.openbin(path, mode=mode, buffering=-1, **options)
 
     def remove(self, path):
         # type: (Text) -> None
@@ -211,13 +208,14 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         self.check()
         raise ResourceReadOnly(path)
 
-    def settext(self,
-                path,               # type: Text
-                contents,           # type: Text
-                encoding='utf-8',   # type: Text
-                errors=None,        # type: Optional[Text]
-                newline=''          # type: Text
-                ):
+    def settext(
+        self,
+        path,  # type: Text
+        contents,  # type: Text
+        encoding="utf-8",  # type: Text
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+    ):
         # type: (...) -> None
         self.check()
         raise ResourceReadOnly(path)
@@ -237,25 +235,27 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         self.check()
         raise ResourceReadOnly(path)
 
-    def makedirs(self,                  # type: _W
-                 path,                  # type: Text
-                 permissions=None,      # type: Optional[Permissions]
-                 recreate=False         # type: bool
-                 ):
+    def makedirs(
+        self,  # type: _W
+        path,  # type: Text
+        permissions=None,  # type: Optional[Permissions]
+        recreate=False,  # type: bool
+    ):
         # type: (...) -> SubFS[_W]
         self.check()
         raise ResourceReadOnly(path)
 
-    def open(self,
-             path,                     # type: Text
-             mode='r',                 # type: Text
-             buffering=-1,             # type: int
-             encoding=None,            # type: Optional[Text]
-             errors=None,              # type: Optional[Text]
-             newline='',               # type: Text
-             line_buffering=False,     # type: bool
-             **options                 # type: Any
-             ):
+    def open(
+        self,
+        path,  # type: Text
+        mode="r",  # type: Text
+        buffering=-1,  # type: int
+        encoding=None,  # type: Optional[Text]
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+        line_buffering=False,  # type: bool
+        **options  # type: Any
+    ):
         # type: (...) -> IO
         self.check()
         if check_writable(mode):
@@ -281,13 +281,14 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         self.check()
         raise ResourceReadOnly(path)
 
-    def setfile(self,
-                path,           # type: Text
-                file,           # type: IO
-                encoding=None,  # type: Optional[Text]
-                errors=None,    # type: Optional[Text]
-                newline=''      # type: Text
-                ):
+    def setfile(
+        self,
+        path,  # type: Text
+        file,  # type: IO
+        encoding=None,  # type: Optional[Text]
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+    ):
         # type: (...) -> None
         self.check()
         raise ResourceReadOnly(path)

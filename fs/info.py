@@ -21,6 +21,7 @@ from ._typing import overload, Text
 if False:  # typing.TYPE_CHECKING
     from datetime import datetime
     from typing import Any, Callable, List, Mapping, Optional, Union
+
     RawInfo = Mapping[Text, Mapping[Text, object]]
     ToDatetime = Callable[[int], datetime]
     T = typing.TypeVar("T")
@@ -63,7 +64,7 @@ class Info(object):
 
     def __eq__(self, other):
         # type: (object) -> bool
-        return self.raw == getattr(other, 'raw', None)
+        return self.raw == getattr(other, "raw", None)
 
     @overload
     def _make_datetime(self, t):  # pragma: no cover
@@ -139,7 +140,7 @@ class Info(object):
             bool: `True` if the key can be modified, `False` otherwise.
 
         """
-        _writeable = self.get(namespace, '_write', ())
+        _writeable = self.get(namespace, "_write", ())
         return key in _writeable
 
     def has_namespace(self, namespace):
@@ -159,10 +160,7 @@ class Info(object):
         # type: (Optional[ToDatetime]) -> Info
         """Create a copy of this resource info object.
         """
-        return Info(
-            deepcopy(self.raw),
-            to_datetime=to_datetime or self._to_datetime
-        )
+        return Info(deepcopy(self.raw), to_datetime=to_datetime or self._to_datetime)
 
     def make_path(self, dir_path):
         # type: (Text) -> Text
@@ -182,7 +180,7 @@ class Info(object):
         # type: () -> Text
         """`str`: the resource name.
         """
-        return cast(Text, self.get('basic', 'name'))
+        return cast(Text, self.get("basic", "name"))
 
     @property
     def suffix(self):
@@ -196,11 +194,11 @@ class Info(object):
             >>> info.suffix
             '.py'
         """
-        name = self.get('basic', 'name')
-        if name.startswith('.') and name.count('.') == 1:
-            return ''
-        basename, dot, ext = name.rpartition('.')
-        return '.' + ext if dot else ''
+        name = self.get("basic", "name")
+        if name.startswith(".") and name.count(".") == 1:
+            return ""
+        basename, dot, ext = name.rpartition(".")
+        return "." + ext if dot else ""
 
     @property
     def suffixes(self):
@@ -213,10 +211,10 @@ class Info(object):
             >>> info.suffixes
             ['.tar', '.gz']
         """
-        name = self.get('basic', 'name')
-        if name.startswith('.') and name.count('.') == 1:
+        name = self.get("basic", "name")
+        if name.startswith(".") and name.count(".") == 1:
             return []
-        return ['.' + suffix for suffix in name.split('.')[1:]]
+        return ["." + suffix for suffix in name.split(".")[1:]]
 
     @property
     def stem(self):
@@ -230,32 +228,32 @@ class Info(object):
             'foo'
 
         """
-        name = self.get('basic', 'name')
-        if name.startswith('.'):
+        name = self.get("basic", "name")
+        if name.startswith("."):
             return name
-        return name.split('.')[0]
+        return name.split(".")[0]
 
     @property
     def is_dir(self):
         # type: () -> bool
         """`bool`: `True` if the resource references a directory.
         """
-        return cast(bool, self.get('basic', 'is_dir'))
+        return cast(bool, self.get("basic", "is_dir"))
 
     @property
     def is_file(self):
         # type: () -> bool
         """`bool`: `True` if the resource references a file.
         """
-        return not cast(bool, self.get('basic', 'is_dir'))
+        return not cast(bool, self.get("basic", "is_dir"))
 
     @property
     def is_link(self):
         # type: () -> bool
         """`bool`: `True` if the resource is a symlink.
         """
-        self._require_namespace('link')
-        return self.get('link', 'target', None) is not None
+        self._require_namespace("link")
+        return self.get("link", "target", None) is not None
 
     @property
     def type(self):
@@ -269,8 +267,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('details')
-        return ResourceType(self.get('details', 'type', 0))
+        self._require_namespace("details")
+        return ResourceType(self.get("details", "type", 0))
 
     @property
     def accessed(self):
@@ -284,10 +282,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('details')
-        _time = self._make_datetime(
-            self.get('details', 'accessed')
-        )
+        self._require_namespace("details")
+        _time = self._make_datetime(self.get("details", "accessed"))
         return _time
 
     @property
@@ -302,10 +298,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('details')
-        _time = self._make_datetime(
-            self.get('details', 'modified')
-        )
+        self._require_namespace("details")
+        _time = self._make_datetime(self.get("details", "modified"))
         return _time
 
     @property
@@ -320,10 +314,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('details')
-        _time = self._make_datetime(
-            self.get('details', 'created')
-        )
+        self._require_namespace("details")
+        _time = self._make_datetime(self.get("details", "created"))
         return _time
 
     @property
@@ -338,10 +330,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('details')
-        _time = self._make_datetime(
-            self.get('details', 'metadata_changed')
-        )
+        self._require_namespace("details")
+        _time = self._make_datetime(self.get("details", "metadata_changed"))
         return _time
 
     @property
@@ -356,8 +346,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('access')
-        _perm_names = self.get('access', 'permissions')
+        self._require_namespace("access")
+        _perm_names = self.get("access", "permissions")
         if _perm_names is None:
             return None
         permissions = Permissions(_perm_names)
@@ -375,8 +365,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('details')
-        return cast(int, self.get('details', 'size'))
+        self._require_namespace("details")
+        return cast(int, self.get("details", "size"))
 
     @property
     def user(self):
@@ -390,8 +380,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('access')
-        return self.get('access', 'user')
+        self._require_namespace("access")
+        return self.get("access", "user")
 
     @property
     def uid(self):
@@ -405,8 +395,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('access')
-        return self.get('access', 'uid')
+        self._require_namespace("access")
+        return self.get("access", "uid")
 
     @property
     def group(self):
@@ -420,8 +410,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('access')
-        return self.get('access', 'group')
+        self._require_namespace("access")
+        return self.get("access", "group")
 
     @property
     def gid(self):
@@ -435,8 +425,8 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('access')
-        return self.get('access', 'gid')
+        self._require_namespace("access")
+        return self.get("access", "gid")
 
     @property
     def target(self):  # noqa: D402
@@ -450,5 +440,5 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace('link')
-        return self.get('link', 'target')
+        self._require_namespace("link")
+        return self.get("link", "target")

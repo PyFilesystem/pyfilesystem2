@@ -19,12 +19,14 @@ if False:  # typing.TYPE_CHECKING
     from typing import Optional, Text
 
 
-__all__ = ['UserDataFS',
-           'UserConfigFS',
-           'SiteDataFS',
-           'SiteConfigFS',
-           'UserCacheFS',
-           'UserLogFS']
+__all__ = [
+    "UserDataFS",
+    "UserConfigFS",
+    "SiteDataFS",
+    "SiteConfigFS",
+    "UserCacheFS",
+    "UserLogFS",
+]
 
 
 class _AppFS(OSFS):
@@ -36,19 +38,19 @@ class _AppFS(OSFS):
     # (subclass override will raise errors until then)
     app_dir = None  # type: Text
 
-    def __init__(self,
-                 appname,          # type: Text
-                 author=None,      # type: Optional[Text]
-                 version=None,     # type: Optional[Text]
-                 roaming=False,    # type: bool
-                 create=True       # type: bool
-                 ):
+    def __init__(
+        self,
+        appname,  # type: Text
+        author=None,  # type: Optional[Text]
+        version=None,  # type: Optional[Text]
+        roaming=False,  # type: bool
+        create=True,  # type: bool
+    ):
         # type: (...) -> None
         self.app_dirs = AppDirs(appname, author, version, roaming)
         self._create = create
         super(_AppFS, self).__init__(
-            getattr(self.app_dirs, self.app_dir),
-            create=create
+            getattr(self.app_dirs, self.app_dir), create=create
         )
 
     def __repr__(self):
@@ -59,14 +61,13 @@ class _AppFS(OSFS):
             author=(self.app_dirs.appauthor, None),
             version=(self.app_dirs.version, None),
             roaming=(self.app_dirs.roaming, False),
-            create=(self._create, True)
+            create=(self._create, True),
         )
 
     def __str__(self):
         # type: () -> Text
         return "<{} '{}'>".format(
-            self.__class__.__name__.lower(),
-            self.app_dirs.appname
+            self.__class__.__name__.lower(), self.app_dirs.appname
         )
 
 
@@ -88,7 +89,7 @@ class UserDataFS(_AppFS):
 
     """
 
-    app_dir = 'user_data_dir'
+    app_dir = "user_data_dir"
 
 
 class UserConfigFS(_AppFS):
@@ -109,7 +110,7 @@ class UserConfigFS(_AppFS):
 
     """
 
-    app_dir = 'user_config_dir'
+    app_dir = "user_config_dir"
 
 
 class UserCacheFS(_AppFS):
@@ -130,7 +131,7 @@ class UserCacheFS(_AppFS):
 
     """
 
-    app_dir = 'user_cache_dir'
+    app_dir = "user_cache_dir"
 
 
 class SiteDataFS(_AppFS):
@@ -151,7 +152,7 @@ class SiteDataFS(_AppFS):
 
     """
 
-    app_dir = 'site_data_dir'
+    app_dir = "site_data_dir"
 
 
 class SiteConfigFS(_AppFS):
@@ -172,7 +173,7 @@ class SiteConfigFS(_AppFS):
 
     """
 
-    app_dir = 'site_config_dir'
+    app_dir = "site_config_dir"
 
 
 class UserLogFS(_AppFS):
@@ -193,4 +194,4 @@ class UserLogFS(_AppFS):
 
     """
 
-    app_dir = 'user_log_dir'
+    app_dir = "user_log_dir"

@@ -44,10 +44,7 @@ __all__ = [
     "splitext",
 ]
 
-_requires_normalization = re.compile(
-    r'(^|/)\.\.?($|/)|//',
-    re.UNICODE
-).search
+_requires_normalization = re.compile(r"(^|/)\.\.?($|/)|//", re.UNICODE).search
 
 
 def normpath(path):
@@ -72,27 +69,25 @@ def normpath(path):
         IllegalBackReference: Too many backrefs in 'foo/../../bar'
 
     """
-    if path in '/':
+    if path in "/":
         return path
 
     # An early out if there is no need to normalize this path
     if not _requires_normalization(path):
-        return path.rstrip('/')
+        return path.rstrip("/")
 
-    prefix = '/' if path.startswith('/') else ''
+    prefix = "/" if path.startswith("/") else ""
     components = []  # type: List[Text]
     try:
-        for component in path.split('/'):
-            if component in '..':  # True for '..', '.', and ''
-                if component == '..':
+        for component in path.split("/"):
+            if component in "..":  # True for '..', '.', and ''
+                if component == "..":
                     components.pop()
             else:
                 components.append(component)
     except IndexError:
-        raise IllegalBackReference(
-            "Too many backrefs in '{}'".format(path)
-        )
-    return prefix + '/'.join(components)
+        raise IllegalBackReference("Too many backrefs in '{}'".format(path))
+    return prefix + "/".join(components)
 
 
 def iteratepath(path):
@@ -113,7 +108,7 @@ def iteratepath(path):
     path = relpath(normpath(path))
     if not path:
         return []
-    return path.split('/')
+    return path.split("/")
 
 
 def recursepath(path, reverse=False):
@@ -133,19 +128,19 @@ def recursepath(path, reverse=False):
         ['/', '/a', '/a/b', '/a/b/c']
 
     """
-    if path in '/':
-        return ['/']
+    if path in "/":
+        return ["/"]
 
-    path = abspath(normpath(path)) + '/'
+    path = abspath(normpath(path)) + "/"
 
-    paths = ['/']
+    paths = ["/"]
     find = path.find
     append = paths.append
     pos = 1
     len_path = len(path)
 
     while pos < len_path:
-        pos = find('/', pos)
+        pos = find("/", pos)
         append(path[:pos])
         pos += 1
 
@@ -166,7 +161,7 @@ def isabs(path):
 
     """
     # Somewhat trivial, but helps to make code self-documenting
-    return path.startswith('/')
+    return path.startswith("/")
 
 
 def abspath(path):
@@ -184,8 +179,8 @@ def abspath(path):
         str: An absolute path.
 
     """
-    if not path.startswith('/'):
-        return '/' + path
+    if not path.startswith("/"):
+        return "/" + path
     return path
 
 
@@ -207,7 +202,7 @@ def relpath(path):
         'a/b'
 
     """
-    return path.lstrip('/')
+    return path.lstrip("/")
 
 
 def join(*paths):
@@ -230,10 +225,10 @@ def join(*paths):
 
     """
     absolute = False
-    relpaths = []       # type: List[Text]
+    relpaths = []  # type: List[Text]
     for p in paths:
         if p:
-            if p[0] == '/':
+            if p[0] == "/":
                 del relpaths[:]
                 absolute = True
             relpaths.append(p)
@@ -266,7 +261,7 @@ def combine(path1, path2):
     """
     if not path1:
         return path2.lstrip()
-    return "{}/{}".format(path1.rstrip('/'), path2.lstrip('/'))
+    return "{}/{}".format(path1.rstrip("/"), path2.lstrip("/"))
 
 
 def parts(path):
@@ -285,11 +280,11 @@ def parts(path):
 
     """
     _path = normpath(path)
-    components = _path.strip('/')
+    components = _path.strip("/")
 
-    _parts = ['/' if _path.startswith('/') else './']
+    _parts = ["/" if _path.startswith("/") else "./"]
     if components:
-        _parts += components.split('/')
+        _parts += components.split("/")
     return _parts
 
 
@@ -315,10 +310,10 @@ def split(path):
         ('/foo/bar', 'baz')
 
     """
-    if '/' not in path:
-        return ('', path)
-    split = path.rsplit('/', 1)
-    return (split[0] or '/', split[1])
+    if "/" not in path:
+        return ("", path)
+    split = path.rsplit("/", 1)
+    return (split[0] or "/", split[1])
 
 
 def splitext(path):
@@ -341,13 +336,13 @@ def splitext(path):
 
     """
     parent_path, pathname = split(path)
-    if pathname.startswith('.') and pathname.count('.') == 1:
-        return path, ''
-    if '.' not in pathname:
-        return path, ''
-    pathname, ext = pathname.rsplit('.', 1)
+    if pathname.startswith(".") and pathname.count(".") == 1:
+        return path, ""
+    if "." not in pathname:
+        return path, ""
+    pathname, ext = pathname.rsplit(".", 1)
     path = join(parent_path, pathname)
-    return path, '.' + ext
+    return path, "." + ext
 
 
 def isdotfile(path):
@@ -369,7 +364,7 @@ def isdotfile(path):
         False
 
     """
-    return basename(path).startswith('.')
+    return basename(path).startswith(".")
 
 
 def dirname(path):
@@ -517,8 +512,8 @@ def forcedir(path):
         'foo/spam.txt'
 
     """
-    if not path.endswith('/'):
-        return path + '/'
+    if not path.endswith("/"):
+        return path + "/"
     return path
 
 
@@ -540,7 +535,7 @@ def frombase(path1, path2):
     """
     if not isparent(path1, path2):
         raise ValueError("path1 must be a prefix of path2")
-    return path2[len(path1):]
+    return path2[len(path1) :]
 
 
 def relativefrom(base, path):
@@ -569,10 +564,10 @@ def relativefrom(base, path):
             break
         common += 1
 
-    return '/'.join(['..'] * (len(base_parts) - common) + path_parts[common:])
+    return "/".join([".."] * (len(base_parts) - common) + path_parts[common:])
 
 
-_WILD_CHARS = frozenset('*?[]!{}')
+_WILD_CHARS = frozenset("*?[]!{}")
 
 
 def iswildcard(path):

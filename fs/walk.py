@@ -22,23 +22,34 @@ from .path import normpath
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
-        Any, Callable, Collection, Iterator, List,
-        Optional, MutableMapping, Text, Tuple, Type)
+        Any,
+        Callable,
+        Collection,
+        Iterator,
+        List,
+        Optional,
+        MutableMapping,
+        Text,
+        Tuple,
+        Type,
+    )
     from .base import FS
     from .info import Info
+
     OnError = Callable[[Text, Exception], bool]
 
 
-_F = typing.TypeVar('_F', bound='FS')
+_F = typing.TypeVar("_F", bound="FS")
 
 
-Step = namedtuple('Step', 'path, dirs, files')
+Step = namedtuple("Step", "path, dirs, files")
 """type: a *step* in a directory walk.
 """
 
 
 # TODO(@althonos): It could be a good idea to create an Abstract Base Class
 #                  BaseWalker (with methods walk, files, dirs and info) ?
+
 
 class Walker(object):
     """A walker object recursively lists directories in a filesystem.
@@ -64,31 +75,26 @@ class Walker(object):
 
     """
 
-    def __init__(self,
-                 ignore_errors=False,       # type: bool
-                 on_error=None,             # type: Optional[OnError]
-                 search="breadth",          # type: Text
-                 filter=None,               # type: Optional[List[Text]]
-                 exclude_dirs=None,         # type: Optional[List[Text]]
-                 max_depth=None             # type: Optional[int]
-                 ):
+    def __init__(
+        self,
+        ignore_errors=False,  # type: bool
+        on_error=None,  # type: Optional[OnError]
+        search="breadth",  # type: Text
+        filter=None,  # type: Optional[List[Text]]
+        exclude_dirs=None,  # type: Optional[List[Text]]
+        max_depth=None,  # type: Optional[int]
+    ):
         # type: (...) -> None
-        if search not in ('breadth', 'depth'):
+        if search not in ("breadth", "depth"):
             raise ValueError("search must be 'breadth' or 'depth'")
         self.ignore_errors = ignore_errors
         if on_error:
             if ignore_errors:
-                raise ValueError(
-                    'on_error is invalid when ignore_errors==True'
-                )
+                raise ValueError("on_error is invalid when ignore_errors==True")
         else:
-            on_error = (
-                self._ignore_errors
-                if ignore_errors
-                else self._raise_errors
-            )
+            on_error = self._ignore_errors if ignore_errors else self._raise_errors
         if not callable(on_error):
-            raise TypeError('on_error must be callable')
+            raise TypeError("on_error must be callable")
 
         self.on_error = on_error
         self.search = search
@@ -115,8 +121,8 @@ class Walker(object):
         """Calculate the 'depth' of a directory path (number of
         components).
         """
-        _path = path.strip('/')
-        return _path.count('/') + 1 if _path else 0
+        _path = path.strip("/")
+        return _path.count("/") + 1 if _path else 0
 
     @classmethod
     def bind(cls, fs):
@@ -161,20 +167,21 @@ class Walker(object):
             self.__class__.__name__,
             ignore_errors=(self.ignore_errors, False),
             on_error=(self.on_error, None),
-            search=(self.search, 'breadth'),
+            search=(self.search, "breadth"),
             filter=(self.filter, None),
             exclude_dirs=(self.exclude_dirs, None),
-            max_depth=(self.max_depth, None)
+            max_depth=(self.max_depth, None),
         )
 
-    def _iter_walk(self,
-                   fs,                # type: FS
-                   path,              # type: Text
-                   namespaces=None    # type: Optional[Collection[Text]]
-                   ):
+    def _iter_walk(
+        self,
+        fs,  # type: FS
+        path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
         # type: (...) -> Iterator[Tuple[Text, Optional[Info]]]
         """Get the walk generator."""
-        if self.search == 'breadth':
+        if self.search == "breadth":
             return self._walk_breadth(fs, path, namespaces=namespaces)
         else:
             return self._walk_depth(fs, path, namespaces=namespaces)
@@ -183,8 +190,7 @@ class Walker(object):
         # type: (FS, Text, Info) -> bool
         """Check if a directory should be considered in the walk.
         """
-        if (self.exclude_dirs is not None and
-                fs.match(self.exclude_dirs, info.name)):
+        if self.exclude_dirs is not None and fs.match(self.exclude_dirs, info.name):
             return False
         return self.check_open_dir(fs, path, info)
 
@@ -247,11 +253,12 @@ class Walker(object):
         """
         return fs.match(self.filter, info.name)
 
-    def _scan(self,
-              fs,               # type: FS
-              dir_path,         # type: Text
-              namespaces=None   # type: Optional[Collection[Text]]
-              ):
+    def _scan(
+        self,
+        fs,  # type: FS
+        dir_path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
         # type: (...) -> Iterator[Info]
         """Get an iterator of `Info` objects for a directory path.
 
@@ -273,11 +280,12 @@ class Walker(object):
             if not self.on_error(dir_path, error):
                 six.reraise(type(error), error)
 
-    def walk(self,
-             fs,                # type: FS
-             path='/',          # type: Text
-             namespaces=None    # type: Optional[Collection[Text]]
-             ):
+    def walk(
+        self,
+        fs,  # type: FS
+        path="/",  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
         # type: (...) -> Iterator[Step]
         """Walk the directory structure of a filesystem.
 
@@ -311,8 +319,8 @@ class Walker(object):
         _walk = self._iter_walk(fs, _path, namespaces=namespaces)
         for dir_path, info in _walk:
             if info is None:
-                dirs = []       # type: List[Info]
-                files = []      # type: List[Info]
+                dirs = []  # type: List[Info]
+                files = []  # type: List[Info]
                 for _info in dir_info[dir_path]:
                     (dirs if _info.is_dir else files).append(_info)
                 yield Step(dir_path, dirs, files)
@@ -320,7 +328,7 @@ class Walker(object):
             else:
                 dir_info[dir_path].append(info)
 
-    def files(self, fs, path='/'):
+    def files(self, fs, path="/"):
         # type: (FS, Text) -> Iterator[Text]
         """Walk a filesystem, yielding absolute paths to files.
 
@@ -337,7 +345,7 @@ class Walker(object):
             if info is not None and not info.is_dir:
                 yield join(_path, info.name)
 
-    def dirs(self, fs, path='/'):
+    def dirs(self, fs, path="/"):
         # type: (FS, Text) -> Iterator[Text]
         """Walk a filesystem, yielding absolute paths to directories.
 
@@ -354,11 +362,12 @@ class Walker(object):
             if info is not None and info.is_dir:
                 yield join(_path, info.name)
 
-    def info(self,
-             fs,              # type: FS
-             path='/',        # type: Text
-             namespaces=None  # type: Optional[Collection[Text]]
-             ):
+    def info(
+        self,
+        fs,  # type: FS
+        path="/",  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
         # type: (...) -> Iterator[Tuple[Text, Info]]
         """Walk a filesystem, yielding tuples of ``(<path>, <info>)``.
 
@@ -377,11 +386,12 @@ class Walker(object):
             if info is not None:
                 yield join(_path, info.name), info
 
-    def _walk_breadth(self,
-                      fs,               # type: FS
-                      path,             # type: Text
-                      namespaces=None   # type: Optional[Collection[Text]]
-                      ):
+    def _walk_breadth(
+        self,
+        fs,  # type: FS
+        path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
         # type: (...) -> Iterator[Tuple[Text, Optional[Info]]]
         """Walk files using a *breadth first* search.
         """
@@ -404,11 +414,12 @@ class Walker(object):
                         yield dir_path, info  # Found a file
             yield dir_path, None  # End of directory
 
-    def _walk_depth(self,
-                    fs,               # type: FS
-                    path,             # type: Text
-                    namespaces=None   # type: Optional[Collection[Text]]
-                    ):
+    def _walk_depth(
+        self,
+        fs,  # type: FS
+        path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
         # type: (...) -> Iterator[Tuple[Text, Optional[Info]]]
         """Walk files using a *depth first* search.
         """
@@ -419,7 +430,9 @@ class Walker(object):
             """Perform scan."""
             return self._scan(fs, path, namespaces=namespaces)
 
-        stack = [(path, scan(path), None)]  # type: List[Tuple[Text, Iterator[Info], Optional[Tuple[Text, Info]]]]
+        stack = [
+            (path, scan(path), None)
+        ]  # type: List[Tuple[Text, Iterator[Info], Optional[Tuple[Text, Info]]]]
         depth = self._calculate_depth(path)
         push = stack.append
 
@@ -483,11 +496,12 @@ class BoundWalker(typing.Generic[_F]):
         walker = self.walker_class(*args, **kwargs)
         return walker
 
-    def walk(self,
-             path='/',          # type: Text
-             namespaces=None,   # type: Optional[Collection[Text]]
-             **kwargs           # type: Any
-             ):
+    def walk(
+        self,
+        path="/",  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+        **kwargs  # type: Any
+    ):
         # type: (...) -> Iterator[Step]
         """Walk the directory structure of a filesystem.
 
@@ -539,7 +553,7 @@ class BoundWalker(typing.Generic[_F]):
 
     __call__ = walk
 
-    def files(self, path='/', **kwargs):
+    def files(self, path="/", **kwargs):
         # type: (Text, **Any) -> Iterator[Text]
         """Walk a filesystem, yielding absolute paths to files.
 
@@ -575,7 +589,7 @@ class BoundWalker(typing.Generic[_F]):
         walker = self._make_walker(**kwargs)
         return walker.files(self.fs, path=path)
 
-    def dirs(self, path='/', **kwargs):
+    def dirs(self, path="/", **kwargs):
         # type: (Text, **Any) -> Iterator[Text]
         """Walk a filesystem, yielding absolute paths to directories.
 
@@ -607,11 +621,12 @@ class BoundWalker(typing.Generic[_F]):
         walker = self._make_walker(**kwargs)
         return walker.dirs(self.fs, path=path)
 
-    def info(self,
-             path='/',          # type: Text
-             namespaces=None,   # type: Optional[Collection[Text]]
-             **kwargs           # type: Any
-             ):
+    def info(
+        self,
+        path="/",  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+        **kwargs  # type: Any
+    ):
         # type: (...) -> Iterator[Tuple[Text, Info]]
         """Walk a filesystem, yielding path and `Info` of resources.
 
@@ -648,11 +663,8 @@ class BoundWalker(typing.Generic[_F]):
 
         """
         walker = self._make_walker(**kwargs)
-        return walker.info(
-            self.fs,
-            path=path,
-            namespaces=namespaces
-        )
+        return walker.info(self.fs, path=path, namespaces=namespaces)
+
 
 # Allow access to default walker from the module
 # For example:

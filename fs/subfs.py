@@ -16,7 +16,7 @@ if False:  # typing.TYPE_CHECKING
     from .base import FS
 
 
-_F = typing.TypeVar('_F', bound='FS', covariant=True)
+_F = typing.TypeVar("_F", bound="FS", covariant=True)
 
 
 @six.python_2_unicode_compatible
@@ -37,17 +37,12 @@ class SubFS(WrapFS[_F], typing.Generic[_F]):
     def __repr__(self):
         # type: () -> Text
         return "{}({!r}, {!r})".format(
-            self.__class__.__name__,
-            self._wrap_fs,
-            self._sub_dir
+            self.__class__.__name__, self._wrap_fs, self._sub_dir
         )
 
     def __str__(self):
         # type: () -> Text
-        return "{parent}{dir}".format(
-            parent=self._wrap_fs,
-            dir=self._sub_dir
-        )
+        return "{parent}{dir}".format(parent=self._wrap_fs, dir=self._sub_dir)
 
     def delegate_fs(self):
         # type: () -> _F

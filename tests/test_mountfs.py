@@ -14,7 +14,7 @@ class TestMountFS(FSTestCases, unittest.TestCase):
     def make_fs(self):
         fs = MountFS()
         mem_fs = MemoryFS()
-        fs.mount('/', mem_fs)
+        fs.mount("/", mem_fs)
         return fs
 
 
@@ -24,47 +24,40 @@ class TestMountFS2(FSTestCases, unittest.TestCase):
     def make_fs(self):
         fs = MountFS()
         mem_fs = MemoryFS()
-        fs.mount('/foo', mem_fs)
-        return fs.opendir('foo')
+        fs.mount("/foo", mem_fs)
+        return fs.opendir("foo")
 
 
 class TestMountFSBehaviours(unittest.TestCase):
-
     def test_bad_mount(self):
         mount_fs = MountFS()
         with self.assertRaises(TypeError):
-            mount_fs.mount('foo', 5)
+            mount_fs.mount("foo", 5)
         with self.assertRaises(TypeError):
-            mount_fs.mount('foo', b'bar')
+            mount_fs.mount("foo", b"bar")
 
     def test_listdir(self):
         mount_fs = MountFS()
-        self.assertEqual(mount_fs.listdir('/'), [])
+        self.assertEqual(mount_fs.listdir("/"), [])
         m1 = MemoryFS()
         m3 = MemoryFS()
         m4 = TempFS()
-        mount_fs.mount('/m1', m1)
-        mount_fs.mount('/m2', 'temp://')
-        mount_fs.mount('/m3', m3)
+        mount_fs.mount("/m1", m1)
+        mount_fs.mount("/m2", "temp://")
+        mount_fs.mount("/m3", m3)
         with self.assertRaises(MountError):
-            mount_fs.mount('/m3/foo', m4)
-        self.assertEqual(
-            sorted(mount_fs.listdir('/')),
-            ['m1', 'm2', 'm3']
-        )
-        m3.makedir('foo')
-        self.assertEqual(
-            sorted(mount_fs.listdir('/m3')),
-            ['foo']
-        )
+            mount_fs.mount("/m3/foo", m4)
+        self.assertEqual(sorted(mount_fs.listdir("/")), ["m1", "m2", "m3"])
+        m3.makedir("foo")
+        self.assertEqual(sorted(mount_fs.listdir("/m3")), ["foo"])
 
     def test_auto_close(self):
         """Test MountFS auto close is working"""
         mount_fs = MountFS()
         m1 = MemoryFS()
         m2 = MemoryFS()
-        mount_fs.mount('/m1', m1)
-        mount_fs.mount('/m2', m2)
+        mount_fs.mount("/m1", m1)
+        mount_fs.mount("/m2", m2)
         self.assertFalse(m1.isclosed())
         self.assertFalse(m2.isclosed())
         mount_fs.close()
@@ -76,8 +69,8 @@ class TestMountFSBehaviours(unittest.TestCase):
         mount_fs = MountFS(auto_close=False)
         m1 = MemoryFS()
         m2 = MemoryFS()
-        mount_fs.mount('/m1', m1)
-        mount_fs.mount('/m2', m2)
+        mount_fs.mount("/m1", m1)
+        mount_fs.mount("/m2", m2)
         self.assertFalse(m1.isclosed())
         self.assertFalse(m2.isclosed())
         mount_fs.close()
@@ -87,13 +80,13 @@ class TestMountFSBehaviours(unittest.TestCase):
     def test_empty(self):
         """Test MountFS with nothing mounted."""
         mount_fs = MountFS()
-        self.assertEqual(mount_fs.listdir('/'), [])
+        self.assertEqual(mount_fs.listdir("/"), [])
 
     def test_mount_self(self):
         mount_fs = MountFS()
         with self.assertRaises(ValueError):
-            mount_fs.mount('/', mount_fs)
+            mount_fs.mount("/", mount_fs)
 
     def test_desc(self):
         mount_fs = MountFS()
-        mount_fs.desc('/')
+        mount_fs.desc("/")

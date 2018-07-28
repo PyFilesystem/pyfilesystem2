@@ -24,29 +24,31 @@ class FTPOpener(Opener):
     """`FTPFS` opener.
     """
 
-    protocols = ['ftp']
+    protocols = ["ftp"]
 
     @CreateFailed.catch_all
-    def open_fs(self,
-                fs_url,         # type: Text
-                parse_result,   # type: ParseResult
-                writeable,      # type: bool
-                create,         # type: bool
-                cwd             # type: Text
-                ):
+    def open_fs(
+        self,
+        fs_url,  # type: Text
+        parse_result,  # type: ParseResult
+        writeable,  # type: bool
+        create,  # type: bool
+        cwd,  # type: Text
+    ):
         # type: (...) -> Union[FTPFS, SubFS[FTPFS]]
         from ..ftpfs import FTPFS
         from ..subfs import ClosingSubFS
-        ftp_host, _, dir_path = parse_result.resource.partition('/')
-        ftp_host, _, ftp_port = ftp_host.partition(':')
+
+        ftp_host, _, dir_path = parse_result.resource.partition("/")
+        ftp_host, _, ftp_port = ftp_host.partition(":")
         ftp_port = int(ftp_port) if ftp_port.isdigit() else 21
         ftp_fs = FTPFS(
             ftp_host,
             port=ftp_port,
             user=parse_result.username,
             passwd=parse_result.password,
-            proxy=parse_result.params.get('proxy'),
-            timeout=int(parse_result.params.get('timeout', '10'))
+            proxy=parse_result.params.get("proxy"),
+            timeout=int(parse_result.params.get("timeout", "10")),
         )
         if dir_path:
             if create:

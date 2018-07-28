@@ -13,15 +13,9 @@ from fs.time import datetime_to_epoch
 
 
 class TestInfo(unittest.TestCase):
-
     def test_empty(self):
         """Test missing info."""
-        info = Info({
-            'basic': {},
-            'details': {},
-            'access': {},
-            'link': {}
-        })
+        info = Info({"basic": {}, "details": {}, "access": {}, "link": {}})
 
         self.assertIsNone(info.name)
         self.assertIsNone(info.is_dir)
@@ -38,74 +32,64 @@ class TestInfo(unittest.TestCase):
         self.assertFalse(info.is_link)
 
     def test_access(self):
-        info = Info({
-            "access": {
-                "uid": 10,
-                "gid": 12,
-                "user": 'will',
-                "group": 'devs',
-                "permissions": ['u_r']
+        info = Info(
+            {
+                "access": {
+                    "uid": 10,
+                    "gid": 12,
+                    "user": "will",
+                    "group": "devs",
+                    "permissions": ["u_r"],
+                }
             }
-        })
+        )
         self.assertIsInstance(info.permissions, Permissions)
-        self.assertEqual(info.permissions, Permissions(user='r'))
-        self.assertEqual(info.user, 'will')
-        self.assertEqual(info.group, 'devs')
+        self.assertEqual(info.permissions, Permissions(user="r"))
+        self.assertEqual(info.user, "will")
+        self.assertEqual(info.group, "devs")
         self.assertEqual(info.uid, 10)
         self.assertEqual(info.gid, 12)
 
     def test_link(self):
-        info = Info({
-            'link': {
-                'target': 'foo'
-            }
-        })
+        info = Info({"link": {"target": "foo"}})
         self.assertTrue(info.is_link)
-        self.assertEqual(info.target, 'foo')
+        self.assertEqual(info.target, "foo")
 
     def test_basic(self):
         # Check simple file
-        info = Info({
-            "basic": {
-                "name": "bar.py",
-                "is_dir": False
-            }
-        })
+        info = Info({"basic": {"name": "bar.py", "is_dir": False}})
         self.assertEqual(info.name, "bar.py")
         self.assertIsInstance(info.is_dir, bool)
         self.assertFalse(info.is_dir)
         self.assertEqual(repr(info), "<file 'bar.py'>")
-        self.assertEqual(info.suffix, '.py')
+        self.assertEqual(info.suffix, ".py")
 
         # Check dir
-        info = Info({
-            "basic": {
-                "name": "foo",
-                "is_dir": True
-            }
-        })
+        info = Info({"basic": {"name": "foo", "is_dir": True}})
         self.assertTrue(info.is_dir)
         self.assertEqual(repr(info), "<dir 'foo'>")
-        self.assertEqual(info.suffix, '')
+        self.assertEqual(info.suffix, "")
 
     def test_details(self):
         dates = [
             datetime.datetime(2016, 7, 5, tzinfo=pytz.UTC),
             datetime.datetime(2016, 7, 6, tzinfo=pytz.UTC),
             datetime.datetime(2016, 7, 7, tzinfo=pytz.UTC),
-            datetime.datetime(2016, 7, 8, tzinfo=pytz.UTC)
+            datetime.datetime(2016, 7, 8, tzinfo=pytz.UTC),
         ]
         epochs = [datetime_to_epoch(d) for d in dates]
 
-        info = Info({
-            "details": {
-                "accessed": epochs[0],
-                "modified": epochs[1],
-                "created": epochs[2],
-                "metadata_changed": epochs[3],
-                "type": int(ResourceType.file)
+        info = Info(
+            {
+                "details": {
+                    "accessed": epochs[0],
+                    "modified": epochs[1],
+                    "created": epochs[2],
+                    "metadata_changed": epochs[3],
+                    "type": int(ResourceType.file),
+                }
             }
-        })
+        )
         self.assertEqual(info.accessed, dates[0])
         self.assertEqual(info.modified, dates[1])
         self.assertEqual(info.created, dates[2])
@@ -115,46 +99,32 @@ class TestInfo(unittest.TestCase):
         self.assertEqual(info.type, 2)
 
     def test_has_namespace(self):
-        info = Info({
-            "basic": {},
-            "details": {}
-        })
-        self.assertTrue(info.has_namespace('basic'))
-        self.assertTrue(info.has_namespace('details'))
-        self.assertFalse(info.has_namespace('access'))
+        info = Info({"basic": {}, "details": {}})
+        self.assertTrue(info.has_namespace("basic"))
+        self.assertTrue(info.has_namespace("details"))
+        self.assertFalse(info.has_namespace("access"))
 
     def test_copy(self):
-        info = Info({
-            "basic": {
-                "name": "bar",
-                "is_dir": False
-            }
-        })
+        info = Info({"basic": {"name": "bar", "is_dir": False}})
         info_copy = info.copy()
         self.assertEqual(info.raw, info_copy.raw)
 
     def test_get(self):
-        info = Info({'baz': {}})
-        self.assertIsNone(info.get('foo', 'bar'))
-        self.assertIsNone(info.get('baz', 'bar'))
+        info = Info({"baz": {}})
+        self.assertIsNone(info.get("foo", "bar"))
+        self.assertIsNone(info.get("baz", "bar"))
 
     def test_suffix(self):
-        info = Info({
-            'basic': {'name': 'foo.tar.gz'}
-        })
-        self.assertEqual(info.suffix, '.gz')
-        self.assertEqual(info.suffixes, ['.tar', '.gz'])
-        self.assertEqual(info.stem, 'foo')
-        info = Info({
-            'basic': {'name': 'foo'}
-        })
-        self.assertEqual(info.suffix, '')
+        info = Info({"basic": {"name": "foo.tar.gz"}})
+        self.assertEqual(info.suffix, ".gz")
+        self.assertEqual(info.suffixes, [".tar", ".gz"])
+        self.assertEqual(info.stem, "foo")
+        info = Info({"basic": {"name": "foo"}})
+        self.assertEqual(info.suffix, "")
         self.assertEqual(info.suffixes, [])
-        self.assertEqual(info.stem, 'foo')
+        self.assertEqual(info.stem, "foo")
 
-        info = Info({
-            'basic': {'name': '.foo'}
-        })
-        self.assertEqual(info.suffix, '')
+        info = Info({"basic": {"name": ".foo"}})
+        self.assertEqual(info.suffix, "")
         self.assertEqual(info.suffixes, [])
-        self.assertEqual(info.stem, '.foo')
+        self.assertEqual(info.stem, ".foo")

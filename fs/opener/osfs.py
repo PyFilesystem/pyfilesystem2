@@ -20,18 +20,20 @@ class OSFSOpener(Opener):
     """`OSFS` opener.
     """
 
-    protocols = ['file', 'osfs']
+    protocols = ["file", "osfs"]
 
-    def open_fs(self,
-                fs_url,         # type: Text
-                parse_result,   # type: ParseResult
-                writeable,      # type: bool
-                create,         # type: bool
-                cwd             # type: Text
-                ):
+    def open_fs(
+        self,
+        fs_url,  # type: Text
+        parse_result,  # type: ParseResult
+        writeable,  # type: bool
+        create,  # type: bool
+        cwd,  # type: Text
+    ):
         # type: (...) -> OSFS
         from ..osfs import OSFS
         from os.path import abspath, expanduser, normpath, join
+
         _path = abspath(join(cwd, expanduser(parse_result.resource)))
         path = normpath(_path)
         osfs = OSFS(path, create=create)

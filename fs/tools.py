@@ -31,7 +31,7 @@ def remove_empty(fs, path):
     """
     path = abspath(normpath(path))
     try:
-        while path not in ('', '/'):
+        while path not in ("", "/"):
             fs.removedir(path)
             path = dirname(path)
     except DirectoryNotEmpty:
@@ -98,7 +98,4 @@ def is_thread_safe(*filesystems):
         bool: if all filesystems are thread safe.
 
     """
-    return all(
-        fs.getmeta().get('thread_safe', False)
-        for fs in filesystems
-    )
+    return all(fs.getmeta().get("thread_safe", False) for fs in filesystems)
