@@ -106,8 +106,9 @@ class OSFS(FS):
         if isinstance(root_path, bytes):
             root_path = fsdecode(root_path)
         self.root_path = root_path
-        _root_path = fsdecode(fspath(root_path))
-        _root_path = os.path.expanduser(os.path.expandvars(root_path))
+        _drive, _root_path = os.path.splitdrive(fsdecode(fspath(root_path)))
+        _root_path = _drive + (_root_path or '/') if _drive else _root_path
+        _root_path = os.path.expanduser(os.path.expandvars(_root_path))
         _root_path = os.path.normpath(os.path.abspath(_root_path))
         self._root_path = _root_path
 
