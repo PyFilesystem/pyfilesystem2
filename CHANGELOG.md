@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.0.27] - Unreleased
+
+### Fixed for Winows paths #152
+
 ## [2.0.26] - 2018-07-26
 
 ### Fixed
