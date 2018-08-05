@@ -723,6 +723,11 @@ class FTPFS(FS):
                         raise  # pragma: no cover
                 if lines:
                     for raw_info in self._parse_mlsx(lines):
+                        try:
+                            if raw_info['ftp']['type'] in {'cdir', 'pdir'}:
+                                continue
+                        except KeyError as exc:
+                            pass
                         yield Info(raw_info)
                     return
             with self._lock:
