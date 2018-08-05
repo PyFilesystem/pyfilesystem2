@@ -48,7 +48,7 @@ def _glob(fs, pattern, path="/", namespaces=None, case_sensitive=True):
         path=path,
         namespaces=namespaces,
         max_depth=None if recursive else levels,
-        search="depth" if pattern.endswith("/") else "breadth",
+        search="depth",
     ):
         if info.is_dir:
             path += "/"
@@ -85,6 +85,16 @@ class GlobGenerator(object):
             case_sensitive=self.case_sensitive,
         ):
             yield path, info
+
+    def files(self):
+        for path, info in self:
+            if info.is_dir:
+                yield path
+
+    def dirs(self):
+        for path, info in self:
+            if info.is_file:
+                yield path
 
     def count(self):
         # type: () -> Counts
