@@ -111,7 +111,7 @@ class FS(object):
 
     @property
     def glob(self):
-        """`~fs.glob.GLobber`: a globber object..
+        """`~fs.glob.Globber`: a globber object..
         """
         return Globber(self)
 

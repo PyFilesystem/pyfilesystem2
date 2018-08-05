@@ -1,10 +1,20 @@
 from __future__ import unicode_literals
 
+from collections import namedtuple
 import re
 
 from ._repr import make_repr
 from . import path
 from . import wildcard
+
+
+Counts = namedtuple("Counts", ["files", "directories", "data"])
+
+
+if False:  # typing.TYPE_CHECKING
+    from typing import Iterator, List, Optional, Tuple
+    from .base import FS
+    from .info import Info
 
 
 def _translate_glob(pattern, case_sensitive=True):
@@ -35,7 +45,10 @@ def _glob(fs, pattern, path="/", namespaces=None, case_sensitive=True):
         pattern, case_sensitive=case_sensitive
     )
     for path, info in fs.walk.info(
-        path=path, namespaces=namespaces, max_depth=None if recursive else levels
+        path=path,
+        namespaces=namespaces,
+        max_depth=None if recursive else levels,
+        search="depth" if pattern.endswith("/") else "breadth",
     ):
         if info.is_dir:
             path += "/"
@@ -44,7 +57,8 @@ def _glob(fs, pattern, path="/", namespaces=None, case_sensitive=True):
 
 
 class GlobGenerator(object):
-    def __init__(self, fs, pattern, path='/', namespaces=None, case_sensitive=True):
+    def __init__(self, fs, pattern, path="/", namespaces=None, case_sensitive=True):
+        # type: (FS, str, str, Optional[List[str]], bool) -> None
         self.fs = fs
         self.pattern = pattern
         self.path = path
@@ -56,12 +70,13 @@ class GlobGenerator(object):
             self.__class__.__name__,
             self.fs,
             self.pattern,
-            path=(self.path, '/'),
+            path=(self.path, "/"),
             namespaces=(self.namespaces, None),
             case_sensitive=(self.case_sensitive, True),
         )
 
     def __iter__(self):
+        # type: () -> Iterator[Tuple[str, Info]]
         for path, info in _glob(
             self.fs,
             self.pattern,
@@ -72,16 +87,34 @@ class GlobGenerator(object):
             yield path, info
 
     def count(self):
-        size = 0
+        # type: () -> Tuple[int, int, int]
+        directories = 0
+        files = 0
+        data = 0
         for path, info in _glob(
             self.fs,
             self.pattern,
             path=self.path,
-            namespaces=['details'],
+            namespaces=["details"],
             case_sensitive=self.case_sensitive,
         ):
-            size += info.size
-        return size
+            if info.is_dir:
+                directories += 1
+            else:
+                files += 1
+                data += info.size
+        return Counts(directories=directories, files=files, data=data)
+
+    def remove(self):
+        # type: () -> int
+        removes = 0
+        for path, info in self:
+            if info.is_dir:
+                self.fs.removedir(path)
+            else:
+                self.fs.remove(path)
+            removes += 1
+        return removes
 
 
 class Globber(object):
@@ -89,12 +122,14 @@ class Globber(object):
     __slots__ = ["fs"]
 
     def __init__(self, fs):
+        # type: (FS) -> None
         self.fs = fs
 
     def __repr__(self):
         return make_repr(self.__class__.__name__, self.fs)
 
     def __call__(self, pattern, path="/", namespaces=None, case_sensitive=True):
+        # type: (str, str, Optional[List[str]], bool) -> GlobGenerator
         return GlobGenerator(self.fs, pattern, path, namespaces, case_sensitive)
 
 
@@ -106,10 +141,10 @@ if __name__ == "__main__":
 
     print(m.glob)
 
-    print(m.glob('*.py'))
+    print(m.glob("*.py"))
 
-    for info, path in m.glob('*/*.py'):
+    for info, path in m.glob("*/*.py"):
         print(info)
 
-    print(m.glob('**/*.py').count())
+    print(m.glob("**/*.py").count())
 
