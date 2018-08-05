@@ -9,7 +9,7 @@ from . import wildcard
 
 
 Counts = namedtuple("Counts", ["files", "directories", "data"])
-
+LineCounts = namedtuple("LineCounts", ["lines", "non_blank"])
 
 if False:  # typing.TYPE_CHECKING
     from typing import Iterator, List, Optional, Tuple
@@ -87,7 +87,7 @@ class GlobGenerator(object):
             yield path, info
 
     def count(self):
-        # type: () -> Tuple[int, int, int]
+        # type: () -> Counts
         directories = 0
         files = 0
         data = 0
@@ -104,6 +104,18 @@ class GlobGenerator(object):
                 files += 1
                 data += info.size
         return Counts(directories=directories, files=files, data=data)
+
+    def count_lines(self):
+        # type: () -> LineCounts
+        lines = 0
+        non_blank = 0
+        for path, info in self:
+            if info.is_file:
+                for line in self.fs.open(path):
+                    lines += 1
+                    if line.rstrip():
+                        non_blank += 1
+        return LineCounts(lines=lines, non_blank=non_blank)
 
     def remove(self):
         # type: () -> int
@@ -147,4 +159,6 @@ if __name__ == "__main__":
         print(info)
 
     print(m.glob("**/*.py").count())
+
+    print(m.glob("*/*.py").count_lines())
 
