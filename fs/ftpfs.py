@@ -542,14 +542,17 @@ class FTPFS(FS):
             name, facts = cls._parse_facts(line.strip())
             if name is None:
                 continue
-            is_dir = facts.get("type", None) in ("dir", "cdir", "pdir")
+            _type = facts.get("type", "file")
+            if _type not in {"dir", "file"}:
+                continue
+            is_dir = _type == "dir"
             raw_info = {}  # type: Dict[Text, Dict[Text, object]]
 
             raw_info["basic"] = {"name": name, "is_dir": is_dir}
             raw_info["ftp"] = facts  # type: ignore
             raw_info["details"] = {
                 "type": (
-                    int(ResourceType.directory) if is_dir else int(ResourceType.file)
+                    int(ResourceType.directory if is_dir else ResourceType.file)
                 )
             }
 

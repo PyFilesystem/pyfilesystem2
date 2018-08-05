@@ -49,6 +49,38 @@ class TestFTPFSClass(unittest.TestCase):
         info = list(FTPFS._parse_mlsx(["foo=bar; .."]))
         self.assertEqual(info, [])
 
+    def test_parse_mlsx_type(self):
+        lines = [
+            "Type=cdir;Modify=20180731114724;UNIX.mode=0755; /tmp",
+            "Type=pdir;Modify=20180731112024;UNIX.mode=0775; /",
+            "Type=file;Size=331523;Modify=20180731112041;UNIX.mode=0644; a.csv",
+            "Type=file;Size=368340;Modify=20180731112041;UNIX.mode=0644; b.csv",
+        ]
+        expected = [
+            {
+                "basic": {"name": "a.csv", "is_dir": False},
+                "ftp": {
+                    "type": "file",
+                    "size": "331523",
+                    "modify": "20180731112041",
+                    "unix.mode": "0644",
+                },
+                "details": {"type": 2, "size": 331523, "modified": 1533036041},
+            },
+            {
+                "basic": {"name": "b.csv", "is_dir": False},
+                "ftp": {
+                    "type": "file",
+                    "size": "368340",
+                    "modify": "20180731112041",
+                    "unix.mode": "0644",
+                },
+                "details": {"type": 2, "size": 368340, "modified": 1533036041},
+            },
+        ]
+        info = list(FTPFS._parse_mlsx(lines))
+        self.assertEqual(info, expected)
+
     def test_opener(self):
         ftp_fs = open_fs("ftp://will:wfc@ftp.example.org")
         self.assertIsInstance(ftp_fs, FTPFS)

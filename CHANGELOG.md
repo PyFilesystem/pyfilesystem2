@@ -6,7 +6,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.0.27] - Unreleased
 
-### Fixed for Winows paths #152
+### Fixed
+
+- Fixed for Winows paths #152
+- Fixed ftp dir parsing (@dhirschfeld)
 
 ## [2.0.26] - 2018-07-26
 
