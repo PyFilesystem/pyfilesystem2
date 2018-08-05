@@ -22,7 +22,7 @@ import fs.move
 from fs import ResourceType, Seek
 from fs import errors
 from fs import walk
-from fs import Glob
+from fs import glob
 from fs.opener import open_fs
 from fs.subfs import ClosingSubFS, SubFS
 

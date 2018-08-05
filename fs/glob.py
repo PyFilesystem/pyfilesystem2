@@ -40,7 +40,7 @@ def _translate_glob(pattern, case_sensitive=True):
     )
 
 
-def _glob(fs, pattern, path="/", namespaces=None, case_sensitive=True):
+def _glob(fs, pattern, search="breadth", path="/", namespaces=None, case_sensitive=True):
     levels, recursive, _re_glob = _translate_glob(
         pattern, case_sensitive=case_sensitive
     )
@@ -48,7 +48,7 @@ def _glob(fs, pattern, path="/", namespaces=None, case_sensitive=True):
         path=path,
         namespaces=namespaces,
         max_depth=None if recursive else levels,
-        search="depth",
+        search=search,
     ):
         if info.is_dir:
             path += "/"
@@ -75,23 +75,29 @@ class GlobGenerator(object):
             case_sensitive=(self.case_sensitive, True),
         )
 
-    def __iter__(self):
-        # type: () -> Iterator[Tuple[str, Info]]
-        for path, info in _glob(
+    def _make_iter(self, search="breadth", namespaces=None):
+        # type: (str) -> Iterator[str, Tuple[str, Info]]
+        return _glob(
             self.fs,
             self.pattern,
+            search=search,
             path=self.path,
-            namespaces=self.namespaces,
+            namespaces=namespaces or self.namespaces,
             case_sensitive=self.case_sensitive,
-        ):
-            yield path, info
+        )
+
+    def __iter__(self):
+        # type: () -> Iterator[Tuple[str, Info]]
+        return self._make_iter()
 
     def files(self):
+        # type: () -> Iterator[str]
         for path, info in self:
             if info.is_dir:
                 yield path
 
     def dirs(self):
+        # type: () -> Iterator[str]
         for path, info in self:
             if info.is_file:
                 yield path
@@ -101,13 +107,7 @@ class GlobGenerator(object):
         directories = 0
         files = 0
         data = 0
-        for path, info in _glob(
-            self.fs,
-            self.pattern,
-            path=self.path,
-            namespaces=["details"],
-            case_sensitive=self.case_sensitive,
-        ):
+        for path, info in self._make_iter(namespaces=['details']):
             if info.is_dir:
                 directories += 1
             else:
@@ -119,7 +119,7 @@ class GlobGenerator(object):
         # type: () -> LineCounts
         lines = 0
         non_blank = 0
-        for path, info in self:
+        for path, info in self._make_iter():
             if info.is_file:
                 for line in self.fs.open(path):
                     lines += 1
@@ -130,7 +130,7 @@ class GlobGenerator(object):
     def remove(self):
         # type: () -> int
         removes = 0
-        for path, info in self:
+        for path, info in self._make_iter(search='depth'):
             if info.is_dir:
                 self.fs.removetree(path)
             else:
@@ -140,7 +140,6 @@ class GlobGenerator(object):
 
 
 class Globber(object):
-
     __slots__ = ["fs"]
 
     def __init__(self, fs):
