@@ -30,6 +30,7 @@ from . import move
 from . import tools
 from . import walk
 from . import wildcard
+from .glob import Globber
 from .mode import validate_open_mode
 from .path import abspath
 from .path import join
@@ -107,6 +108,12 @@ class FS(object):
         """Close filesystem on exit.
         """
         self.close()
+
+    @property
+    def glob(self):
+        """`~fs.glob.GLobber`: a globber object..
+        """
+        return Globber(self)
 
     @property
     def walk(self):
