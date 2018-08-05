@@ -36,7 +36,7 @@ def _translate_glob(pattern, case_sensitive=True):
     return (
         levels,
         recursive,
-        re.compile(re_glob, re.IGNORECASE if case_sensitive else None),
+        re.compile(re_glob, 0 if case_sensitive else re.IGNORECASE),
     )
 
 
@@ -102,7 +102,7 @@ class GlobGenerator(object):
                 directories += 1
             else:
                 files += 1
-                data += info.size
+            data += info.size
         return Counts(directories=directories, files=files, data=data)
 
     def count_lines(self):
@@ -122,7 +122,7 @@ class GlobGenerator(object):
         removes = 0
         for path, info in self:
             if info.is_dir:
-                self.fs.removedir(path)
+                self.fs.removetree(path)
             else:
                 self.fs.remove(path)
             removes += 1
@@ -145,7 +145,7 @@ class Globber(object):
         return GlobGenerator(self.fs, pattern, path, namespaces, case_sensitive)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":  # pragma: no cover
 
     from fs import open_fs
 
