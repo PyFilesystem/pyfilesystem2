@@ -33,7 +33,7 @@ def match(pattern, name):
     try:
         re_pat = _PATTERN_CACHE[(pattern, True)]
     except KeyError:
-        res = "(?ms)" + _translate(pattern) + '\Z'
+        res = "(?ms)" + _translate(pattern) + r'\Z'
         _PATTERN_CACHE[(pattern, True)] = re_pat = re.compile(res)
     return re_pat.match(name) is not None
 
@@ -53,7 +53,7 @@ def imatch(pattern, name):
     try:
         re_pat = _PATTERN_CACHE[(pattern, False)]
     except KeyError:
-        res = "(?ms)" + _translate(pattern, case_sensitive=False) + '\Z'
+        res = "(?ms)" + _translate(pattern, case_sensitive=False) + r'\Z'
         _PATTERN_CACHE[(pattern, False)] = re_pat = re.compile(res, re.IGNORECASE)
     return re_pat.match(name) is not None
 

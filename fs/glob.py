@@ -5,7 +5,7 @@ import re
 
 from .lrucache import LRUCache
 from ._repr import make_repr
-from . import path
+from .path import iteratepath
 from . import wildcard
 
 
@@ -27,7 +27,7 @@ def _translate_glob(pattern, case_sensitive=True):
     levels = 0
     recursive = False
     re_patterns = [""]
-    for component in path.iteratepath(pattern):
+    for component in iteratepath(pattern):
         if component == "**":
             re_patterns.append(".*/?")
             recursive = True
@@ -161,6 +161,7 @@ class Globber(object):
         return self._make_iter()
 
     def count(self):
+        # type: () -> Counts
         """Count files / directories / data in matched paths.
 
         Example:
@@ -172,7 +173,6 @@ class Globber(object):
             `~Counts`: A named tuple containing results.
 
         """
-        # type: () -> Counts
         directories = 0
         files = 0
         data = 0
@@ -185,6 +185,7 @@ class Globber(object):
         return Counts(directories=directories, files=files, data=data)
 
     def count_lines(self):
+        # type: () -> LineCounts
         """Count the lines in the matched files.
 
         Returns:
@@ -197,7 +198,6 @@ class Globber(object):
 
         """
 
-        # type: () -> LineCounts
         lines = 0
         non_blank = 0
         for path, info in self._make_iter():
@@ -209,6 +209,7 @@ class Globber(object):
         return LineCounts(lines=lines, non_blank=non_blank)
 
     def remove(self):
+        # type: () -> int
         """Removed all matched paths.
 
         Returns:
@@ -220,7 +221,6 @@ class Globber(object):
             29
 
         """
-        # type: () -> int
         removes = 0
         for path, info in self._make_iter(search="depth"):
             if info.is_dir:
@@ -254,6 +254,7 @@ class BoundGlobber(object):
     def __call__(
         self, pattern, path="/", namespaces=None, case_sensitive=True, exclude_dirs=None
     ):
+        # type: (str, str, Optional[List[str]], bool, Optional[List[str]]) -> Globber
         """A generator of glob results.
 
         Arguments:
@@ -272,7 +273,6 @@ class BoundGlobber(object):
 
 
         """
-        # type: (str, str, Optional[List[str]], bool, Optional[List[str]]) -> Globber
         return Globber(
             self.fs,
             pattern,
