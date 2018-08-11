@@ -47,12 +47,14 @@ PyFilesystem supports globbing via the ``glob`` attribute on every FS
 instance, which is an instance of :class:`~fs.glob.BoundGlobber`. Here's
 how you might use it to find all the Python files in your filesystem::
 
-    for path, info in my_fs.glob("**/*.py"):
-        print(path)
+    for match in my_fs.glob("**/*.py"):
+        print(f"{match.path} is {match.info.size} bytes long")
 
-Calling ``.glob`` with a pattern will return an iterator of every
-path and corresponding :class:`~fs.info.Info` for each matched file and
-directory.
+Calling ``.glob`` with a pattern will return an iterator of
+:class:`~fs.glob.GlobMatch` named tuples for each matching file or
+directory. A  glob match contains two attributes; ``path`` which is the
+full path in the filesystem, and ``info`` which is an
+:class:`fs.info.Info` info object for the matched resource.
 
 
 Batch Methods

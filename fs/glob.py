@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from collections import namedtuple
+from typing import Iterator, List
 import re
 
 from .lrucache import LRUCache
@@ -13,7 +14,7 @@ _PATTERN_CACHE = LRUCache(
     1000
 )  # type: LRUCache[Tuple[Text, bool], Tuple[int, bool, Pattern]]
 
-
+GlobMatch = namedtuple('GlobMatch', ["path", "info"])
 Counts = namedtuple("Counts", ["files", "directories", "data"])
 LineCounts = namedtuple("LineCounts", ["lines", "non_blank"])
 
@@ -135,6 +136,7 @@ class Globber(object):
         )
 
     def _make_iter(self, search="breadth", namespaces=None):
+        # type: (str, List[str]) -> Iterator[GlobMatch]
         try:
             levels, recursive, re_pattern = _PATTERN_CACHE[
                 (self.pattern, self.case_sensitive)
@@ -154,10 +156,11 @@ class Globber(object):
             if info.is_dir:
                 path += "/"
             if re_pattern.match(path):
-                yield path, info
+                yield GlobMatch(path, info)
 
     def __iter__(self):
-        # type: () -> Iterator[Tuple[str, Info]]
+        # type: () -> Iterator[GlobMatch]
+        """An iterator of :class:`fs.glob.GlobMatch` objects."""
         return self._make_iter()
 
     def count(self):
@@ -255,7 +258,7 @@ class BoundGlobber(object):
         self, pattern, path="/", namespaces=None, case_sensitive=True, exclude_dirs=None
     ):
         # type: (str, str, Optional[List[str]], bool, Optional[List[str]]) -> Globber
-        """A generator of glob results.
+        """Match resources on the bound filesystem againsts a glob pattern.
 
         Arguments:
             pattern (str): A glob pattern, e.g. ``"**/*.py"``
@@ -268,8 +271,7 @@ class BoundGlobber(object):
 
         Returns:
             `~Globber`:
-                An object that may be iterated over,
-                yielding tuples of ``(path, info)`` for matching paths.
+                An object that may be queried for the glob matches.
 
 
         """
