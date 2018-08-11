@@ -1,4 +1,4 @@
-appdirs==1.4.0
+appdirs~=1.4.3
 backports.os==0.1.1;  python_version == '2.7'
 enum34==1.1.6 ; python_version < '3.4'
 pytz

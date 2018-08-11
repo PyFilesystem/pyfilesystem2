@@ -15,8 +15,7 @@ if False:  # typing.TYPE_CHECKING
     from typing import Callable, Iterable, MutableMapping, Text, Tuple, Pattern
 
 
-_MAXCACHE = 1000
-_PATTERN_CACHE = LRUCache(_MAXCACHE)  # type: LRUCache[Tuple[Text, bool], Pattern]
+_PATTERN_CACHE = LRUCache(1000)  # type: LRUCache[Tuple[Text, bool], Pattern]
 
 
 def match(pattern, name):
@@ -106,7 +105,7 @@ def get_matcher(patterns, case_sensitive):
     Arguments:
         patterns (list): A list of wildcard pattern. e.g. ``["*.py",
             "*.pyc"]``
-        case_sensitive (bool): If `True`, then the callable will be case
+        case_sensitive (bool): If ``True``, then the callable will be case
             sensitive, otherwise it will be case insensitive.
 
     Returns:
