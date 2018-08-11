@@ -40,8 +40,8 @@ Here's a summary of glob patterns:
     Recursively matches all the git directories.
 
 
-Glob Interface
-~~~~~~~~~~~~~~
+Interface
+~~~~~~~~~
 
 PyFilesystem supports globbing via the ``glob`` attribute on every FS
 instance, which is an instance of :class:`~fs.glob.BoundGlobber`. Here's
@@ -55,8 +55,8 @@ path and corresponding :class:`~fs.info.Info` for each matched file and
 directory.
 
 
-Glob Methods
-~~~~~~~~~~~~
+Batch Methods
+~~~~~~~~~~~~~
 
 In addition to iterating over the results, you can also call methods on
 the :class:`~fs.glob.Globber` which apply to every matched path.
