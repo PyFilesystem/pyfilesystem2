@@ -45,6 +45,23 @@ def _translate_glob(pattern, case_sensitive=True):
 
 
 def match(pattern, path):
+    # type: (str, str) -> bool
+    """Compare a glob pattern with a path (case sensitive).
+
+    Arguments:
+        pattern (str): A glob pattern.
+        path (str): A path.
+
+    Returns:
+        bool: ``True`` if the path matches the pattern.
+
+    Example:
+
+        >>> from fs.glob import match
+        >>> match("**/*.py", "/fs/glob.py")
+        True
+
+    """
     try:
         levels, recursive, re_pattern = _PATTERN_CACHE[(pattern, True)]
     except KeyError:
@@ -54,6 +71,17 @@ def match(pattern, path):
 
 
 def imatch(pattern, path):
+    # type: (str, str) -> bool
+    """Compare a glob pattern with a path (case insensitive).
+
+    Arguments:
+        pattern (str): A glob pattern.
+        path (str): A path.
+
+    Returns:
+        bool: ``True`` if the path matches the pattern.
+
+    """
     try:
         levels, recursive, re_pattern = _PATTERN_CACHE[(pattern, False)]
     except KeyError:
@@ -67,7 +95,8 @@ class Globber(object):
 
         Arguments:
             fs (~fs.base.FS): A filesystem object
-            pattern (str): A glob pattern, e.g. ``"**/*.py"`
+            pattern (str): A glob pattern, e.g. ``"**/*.py"``
+            path (str): A path to a directory in the filesystem.
             namespaces (list): A list of additional info namespaces.
             case_sensitive (bool): If ``True``, the path matching will be
                 case *sensitive* i.e. ``"FOO.py"`` and ``"foo.py"`` will
@@ -134,17 +163,13 @@ class Globber(object):
     def count(self):
         """Count files / directories / data in matched paths.
 
-        Example::
-
-            counts = Globber(my_fs, '*.py').counts()
-            print(f"files={counts.files}")
-            print(f"directories={counts.directories}")
-            print(f"data={count.data} bytes")
+        Example:
+            >>> import fs
+            >>> fs.open_fs('~/projects').glob('**/*.py').count()
+            Counts(files=18519, directories=0, data=206690458)
 
         Returns:
             `~Counts`: A named tuple containing results.
-
-
 
         """
         # type: () -> Counts
@@ -160,18 +185,41 @@ class Globber(object):
         return Counts(directories=directories, files=files, data=data)
 
     def count_lines(self):
+        """Count the lines in the matched files.
+
+        Returns:
+            `~LineCounts`: A named tuple containing line counts.
+
+        Example:
+            >>> import fs
+            >>> fs.open_fs('~/projects').glob('**/*.py').count_lines()
+            LineCounts(lines=5767102, non_blank=4915110)
+
+        """
+
         # type: () -> LineCounts
         lines = 0
         non_blank = 0
         for path, info in self._make_iter():
             if info.is_file:
-                for line in self.fs.open(path):
+                for line in self.fs.open(path, "rb"):
                     lines += 1
                     if line.rstrip():
                         non_blank += 1
         return LineCounts(lines=lines, non_blank=non_blank)
 
     def remove(self):
+        """Removed all matched paths.
+
+        Returns:
+            int: Number of file and directories removed.
+
+        Example:
+            >>> import fs
+            >>> fs.open_fs('~/projects/my_project').glob('**/*.pyc').remove()
+            29
+
+        """
         # type: () -> int
         removes = 0
         for path, info in self._make_iter(search="depth"):
@@ -184,13 +232,16 @@ class Globber(object):
 
 
 class BoundGlobber(object):
-    """An object which searches a filesystem for paths matching a *glob*
-    pattern.
+    """A :class:`~Globber` object bound to a filesystem.
+
+    An instance of this object is available on every Filesystem object
+    as ``.glob``.
 
     Arguments:
         fs (FS): A filesystem object.
 
     """
+
     __slots__ = ["fs"]
 
     def __init__(self, fs):
@@ -215,13 +266,14 @@ class BoundGlobber(object):
                 e.g. ``["*.git"]``.
 
         Returns:
-            ~fs.flob.Globber: An object that may be iterated over,
+            `~Globber`:
+                An object that may be iterated over,
                 yielding tuples of ``(path, info)`` for matching paths.
 
 
         """
         # type: (str, str, Optional[List[str]], bool, Optional[List[str]]) -> Globber
-        return GlobMatcher(
+        return Globber(
             self.fs,
             pattern,
             path,

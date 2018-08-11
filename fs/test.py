@@ -1801,5 +1801,5 @@ class FSTestCases(object):
     def test_glob(self):
         self.assertIsInstance(
             self.fs.glob,
-            glob.Globber
+            glob.BoundGlobber
         )

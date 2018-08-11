@@ -78,7 +78,6 @@ class Copier(object):
         # type: (int) -> None
         if num_workers < 0:
             raise ValueError("num_workers must be >= 0")
-        self.num_workers = num_workers
         self.queue = None  # type: Optional[Queue[_Task]]
         self.workers = []  # type: List[_Worker]
         self.errors = []  # type: List[Exception]

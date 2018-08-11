@@ -196,6 +196,20 @@ The ``walk`` attribute on FS objects is instance of a :class:`~fs.walk.BoundWalk
 
 See :ref:`walking` for more information on walking directories.
 
+Globbing
+~~~~~~~~
+
+*Globbing* is a slightly higher level way of scanning filesystem. Paths can be filtered by a *glob* pattern, which is similar to a wildcard (such as *.py), but can match multiple levels of a directory structure.
+
+Here's an example of globbing, which removes all the ``.pyc`` files in your project directory::
+
+    >>> from fs import open_fs
+    >>> open_fs('~/project').glob('**/*.pyc').remove()
+    62
+
+See :ref:`globbing` for more information.
+
+
 Moving and Copying
 ~~~~~~~~~~~~~~~~~~
 

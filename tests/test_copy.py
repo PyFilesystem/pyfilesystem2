@@ -29,6 +29,12 @@ class TestCopy(unittest.TestCase):
             self.assertTrue(dst_fs.isdir("foo/bar"))
             self.assertTrue(dst_fs.isfile("test.txt"))
 
+    def test_copy_value_error(self):
+        src_fs = open_fs("mem://")
+        dst_fs = open_fs("mem://")
+        with self.assertRaises(ValueError):
+            fs.copy.copy_fs(src_fs, dst_ds, workers=-1)
+
     def test_copy_dir(self):
         src_fs = open_fs("mem://")
         src_fs.makedirs("foo/bar")
