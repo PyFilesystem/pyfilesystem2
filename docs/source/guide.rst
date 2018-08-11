@@ -199,7 +199,7 @@ See :ref:`walking` for more information on walking directories.
 Globbing
 ~~~~~~~~
 
-*Globbing* is a slightly higher level way of scanning filesystem. Paths can be filtered by a *glob* pattern, which is similar to a wildcard (such as *.py), but can match multiple levels of a directory structure.
+Closely related to walking a filesystem is *Globbing*, which is a slightly higher level way of scanning filesystems. Paths can be filtered by a *glob* pattern, which is similar to a wildcard (such as ``*.py``), but can match multiple levels of a directory structure.
 
 Here's an example of globbing, which removes all the ``.pyc`` files in your project directory::
 
