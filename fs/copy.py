@@ -71,7 +71,7 @@ def copy_fs_if_newer(
         on_copy (callable):A function callback called after a single file copy
             is executed. Expected signature is ``(src_fs, src_path, dst_fs,
             dst_path)``.
-         workers (int): Use `worker` threads to copy data, or ``0`` (default) for
+        workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
 
     """
@@ -269,7 +269,7 @@ def copy_dir(
         on_copy (callable, optional):  A function callback called after
             a single file copy is executed. Expected signature is
             ``(src_fs, src_path, dst_fs, dst_path)``.
-        workers (int): Use `worker` threads to copy data, or ``0`` (default) for
+        workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
 
     """
@@ -330,7 +330,7 @@ def copy_dir_if_newer(
         on_copy (callable, optional):  A function callback called after
             a single file copy is executed. Expected signature is
             ``(src_fs, src_path, dst_fs, dst_path)``.
-        workers (int): Use `worker` threads to copy data, or ``0`` (default) for
+        workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
 
     """
