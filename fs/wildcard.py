@@ -2,20 +2,20 @@
 """
 # Adapted from https://hg.python.org/cpython/file/2.7/Lib/fnmatch.py
 
-from __future__ import unicode_literals
+from __future__ import unicode_literals, print_function
 
 import re
 import typing
 from functools import partial
 
 from .lrucache import LRUCache
+from . import path
 
 if False:  # typing.TYPE_CHECKING
     from typing import Callable, Iterable, MutableMapping, Text, Tuple, Pattern
 
 
-_MAXCACHE = 1000
-_PATTERN_CACHE = LRUCache(_MAXCACHE)  # type: LRUCache[Tuple[Text, bool], Pattern]
+_PATTERN_CACHE = LRUCache(1000)  # type: LRUCache[Tuple[Text, bool], Pattern]
 
 
 def match(pattern, name):
@@ -33,7 +33,7 @@ def match(pattern, name):
     try:
         re_pat = _PATTERN_CACHE[(pattern, True)]
     except KeyError:
-        res = _translate(pattern)
+        res = "(?ms)" + _translate(pattern) + r'\Z'
         _PATTERN_CACHE[(pattern, True)] = re_pat = re.compile(res)
     return re_pat.match(name) is not None
 
@@ -53,7 +53,7 @@ def imatch(pattern, name):
     try:
         re_pat = _PATTERN_CACHE[(pattern, False)]
     except KeyError:
-        res = _translate(pattern, case_sensitive=False)
+        res = "(?ms)" + _translate(pattern, case_sensitive=False) + r'\Z'
         _PATTERN_CACHE[(pattern, False)] = re_pat = re.compile(res, re.IGNORECASE)
     return re_pat.match(name) is not None
 
@@ -105,7 +105,7 @@ def get_matcher(patterns, case_sensitive):
     Arguments:
         patterns (list): A list of wildcard pattern. e.g. ``["*.py",
             "*.pyc"]``
-        case_sensitive (bool): If `True`, then the callable will be case
+        case_sensitive (bool): If ``True``, then the callable will be case
             sensitive, otherwise it will be case insensitive.
 
     Returns:
@@ -152,7 +152,7 @@ def _translate(pattern, case_sensitive=True):
         c = pattern[i]
         i = i + 1
         if c == "*":
-            res = res + ".*"
+            res = res + "[^/]*"
         elif c == "?":
             res = res + "."
         elif c == "[":
@@ -175,4 +175,4 @@ def _translate(pattern, case_sensitive=True):
                 res = "%s[%s]" % (res, stuff)
         else:
             res = res + re.escape(c)
-    return res + "\Z(?ms)"
+    return res

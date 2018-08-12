@@ -17,6 +17,7 @@ Contents:
    info.rst
    openers.rst
    walking.rst
+   globbing.rst
    builtin.rst
    implementers.rst
    extension.rst

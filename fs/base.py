@@ -6,34 +6,23 @@ can work with any of the supported filesystems.
 
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import abc
+import itertools
 import os
 import threading
 import time
 import typing
-from functools import partial
-
 from contextlib import closing
-import itertools
+from functools import partial
 
 import six
 
-from . import copy
-from . import errors
-from . import fsencode
-from . import iotools
-from . import move
-from . import tools
-from . import walk
-from . import wildcard
+from . import copy, errors, fsencode, iotools, move, tools, walk, wildcard
+from .glob import BoundGlobber
 from .mode import validate_open_mode
-from .path import abspath
-from .path import join
-from .path import normpath
+from .path import abspath, join, normpath
 from .time import datetime_to_epoch
 from .walk import Walker
 
@@ -107,6 +96,12 @@ class FS(object):
         """Close filesystem on exit.
         """
         self.close()
+
+    @property
+    def glob(self):
+        """`~fs.glob.BoundGlobber`: a globber object..
+        """
+        return BoundGlobber(self)
 
     @property
     def walk(self):

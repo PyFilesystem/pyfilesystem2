@@ -22,6 +22,7 @@ import fs.move
 from fs import ResourceType, Seek
 from fs import errors
 from fs import walk
+from fs import glob
 from fs.opener import open_fs
 from fs.subfs import ClosingSubFS, SubFS
 
@@ -1796,3 +1797,9 @@ class FSTestCases(object):
         self.assert_isdir("foo")
         self.assert_isdir("Foo")
         self.assert_isfile("fOO")
+
+    def test_glob(self):
+        self.assertIsInstance(
+            self.fs.glob,
+            glob.BoundGlobber
+        )
