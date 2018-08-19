@@ -7,7 +7,7 @@ from typing import List, Optional, Type
 from ..base import FS
 
 
-logging.getLogger("fs.patch")
+log = logging.getLogger("fs.patch")
 
 
 class NotPatched(Exception):
@@ -29,16 +29,15 @@ def patch_method():
 
 class Patch(object):
 
-    def __init__(self, module):
-        self.module = module
-        super(Patch, self).__init__()
+    def get_module(self):
+        raise NotImplementedError()
 
     @property
     def fs(self):
         if PatchContext.stack:
-            return fs[-1].fs_obj
+            return fs[-1]
         else:
-            raise NotPatch()
+            raise NotPatched()
 
     def install(self):
         for method_name in dir(self):
@@ -60,6 +59,7 @@ class PatchContext(object):
 
     def __enter__(self):
         self.stack.append(self.fs_obj)
+        log.debug('%r patched', self.fs_obj)
         return self
 
     def __exit__(
@@ -69,6 +69,6 @@ class PatchContext(object):
         traceback,  # type: Optional[TracebackType]
     ):
         fs_obj = self.stack.pop()
+        log.debug('%r un-patched', fs_obj)
         if self.auto_close:
             fs_obj.close()
-

@@ -4,6 +4,6 @@ from .base import Patch
 
 
 class OSPatch(Patch):
-    def __init__(self):
+    def get_module(self):
         import os
-        super(OSPatch, self).__init__(os)
+        return os

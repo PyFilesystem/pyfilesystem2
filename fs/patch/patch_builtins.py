@@ -2,9 +2,9 @@ from .base import patch_method, NotPatched, Patch
 
 
 class PatchBuiltins(Patch):
-    def __init__(self):
+    def get_module(self):
         module = globals()["__builtins__"]
-        super(GlobalsPatch, self).__init__(module)
+        return module
 
     @patch_method()
     def open(
