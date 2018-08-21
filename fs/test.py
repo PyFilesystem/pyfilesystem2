@@ -543,14 +543,13 @@ class FSTestCases(object):
         self.assertEqual(self.fs.listdir("."), [])
         self.assertEqual(self.fs.listdir("./"), [])
 
-        # Make a few files
+        # Make a few objects
         self.fs.setbytes("foo", b"egg")
         self.fs.setbytes("bar", b"egg")
-        self.fs.setbytes("baz", b"egg")
+        self.fs.makedir("baz")
 
-        # Check paths are unicode
-        for name in self.fs.listdir("/"):
-            self.assertIsInstance(name, six.text_type)
+        # This should not be listed
+        self.fs.setbytes("baz/egg", b"egg")
 
         # Check list works
         six.assertCountEqual(self, self.fs.listdir("/"), ["foo", "bar", "baz"])
