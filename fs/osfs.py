@@ -258,7 +258,7 @@ class OSFS(FS):
         with convert_os_errors("getinfo", path):
             _stat = os.stat(fsencode(sys_path))
             if "lstat" in namespaces:
-                _stat = os.lstat(fsencode(sys_path))
+                _lstat = os.lstat(fsencode(sys_path))
 
         info = {
             "basic": {"name": basename(_path), "is_dir": stat.S_ISDIR(_stat.st_mode)}
