@@ -668,8 +668,8 @@ class FTPFS(FS):
             else:
                 if info.is_dir:
                     raise errors.FileExpected(path)
-            if _mode.exclusive:
-                raise errors.FileExists(path)
+                if _mode.exclusive:
+                    raise errors.FileExists(path)
             ftp_file = FTPFile(self, _path, mode)
         return ftp_file  # type: ignore
 
