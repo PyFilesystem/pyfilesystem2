@@ -321,8 +321,8 @@ class OSFS(FS):
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
         with convert_os_errors("openbin", path):
-            if six.PY2 and _mode.exclusive and self.exists(path):
-                raise errors.FileExists(path)
+            if six.PY2 and _mode.exclusive:
+                sys_path = os.open(sys_path, os.O_RDWR | os.O_CREAT | os.O_EXCL)
             binary_file = io.open(
                 sys_path, mode=_mode.to_platform_bin(), buffering=buffering, **options
             )
@@ -416,7 +416,7 @@ class OSFS(FS):
         sys_path = self._to_sys_path(_path)
         with convert_os_errors("open", path):
             if six.PY2 and _mode.exclusive:
-                sys_path = os.open(sys_path, os.O_CREAT | os.O_EXCL)
+                sys_path = os.open(sys_path, os.O_RDWR | os.O_CREAT | os.O_EXCL)
             _encoding = encoding or "utf-8"
             return io.open(
                 sys_path,

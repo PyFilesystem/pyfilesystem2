@@ -712,10 +712,6 @@ class FSTestCases(object):
             f.write(text)
         self.assertTrue(f.closed)
 
-        with self.assertRaises(errors.FileExists):
-            with self.fs.open("foo/hello", "xt") as f:
-                pass
-
         # Read it back
         with self.fs.open("foo/hello", "rt") as f:
             self.assertIsInstance(f, io.IOBase)
@@ -970,6 +966,20 @@ class FSTestCases(object):
         # Opening with a invalid mode
         with self.assertRaises(ValueError):
             self.fs.openbin("foo.bin", "h")
+
+    def test_open_exclusive(self):
+        with self.fs.open("test_open_exclusive", "x") as f:
+            f.write("bananas")
+
+        with self.assertRaises(errors.FileExists):
+            self.fs.open("test_open_exclusive", "x")
+
+    def test_openbin_exclusive(self):
+        with self.fs.openbin("test_openbin_exclusive", "x") as f:
+            f.write(b"bananas")
+
+        with self.assertRaises(errors.FileExists):
+            self.fs.openbin("test_openbin_exclusive", "x")
 
     def test_opendir(self):
         # Make a simple directory structure
