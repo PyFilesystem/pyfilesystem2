@@ -968,18 +968,18 @@ class FSTestCases(object):
             self.fs.openbin("foo.bin", "h")
 
     def test_open_exclusive(self):
-        with self.fs.open("some_file", "x") as f:
+        with self.fs.open("test_open_exclusive", "x") as f:
             f.write("bananas")
 
         with self.assertRaises(errors.FileExists):
-            self.fs.open("some_file", "x")
+            self.fs.open("test_open_exclusive", "x")
 
     def test_openbin_exclusive(self):
-        with self.fs.openbin("some_file", "x") as f:
-            f.write("bananas")
+        with self.fs.openbin("test_openbin_exclusive", "x") as f:
+            f.write(b"bananas")
 
         with self.assertRaises(errors.FileExists):
-            self.fs.openbin("some_file", "x")
+            self.fs.openbin("test_openbin_exclusive", "x")
 
     def test_opendir(self):
         # Make a simple directory structure
