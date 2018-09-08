@@ -2,9 +2,11 @@ from __future__ import unicode_literals
 
 from .. import open_fs
 from .base import PatchContext
+from ._install import install
 
 
 def patch(fs_url, auto_close=True):
+    install()
     if isinstance(fs_url, str):
         fs_obj = open_fs(fs_url)
         return PatchContext(fs_obj, auto_close=True)

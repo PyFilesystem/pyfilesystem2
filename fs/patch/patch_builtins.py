@@ -3,8 +3,8 @@ from .base import patch_method, NotPatched, Patch
 
 class PatchBuiltins(Patch):
     def get_module(self):
-        module = globals()["__builtins__"]
-        return module
+        import builtins
+        return builtins
 
     @patch_method()
     def open(
@@ -20,7 +20,7 @@ class PatchBuiltins(Patch):
     ):
         try:
             return self.fs.open(
-                file,
+                self.from_cwd(file),
                 mode=mode,
                 buffering=buffering,
                 encoding=encoding,
