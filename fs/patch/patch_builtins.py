@@ -1,12 +1,14 @@
-from .base import patch_method, NotPatched, Patch
+from __future__ import unicode_literals
 
+from .base import NotPatched, Patch
+from .translate_errors import raise_os
 
 class PatchBuiltins(Patch):
     def get_module(self):
         import builtins
         return builtins
 
-    @patch_method()
+    @Patch.method()
     def open(
         self,
         file,

@@ -22,19 +22,19 @@ def original(method):
     return original
 
 
-def patch_method():
-    def deco(f):
-        f._fspatch = {}
-        return f
-    return deco
-
-
 class Patch(object):
 
     stack = []  # type: List[PatchContext]
 
     def get_module(self):
         raise NotImplementedError()
+
+    @classmethod
+    def method(cls):
+        def deco(f):
+            f._fspatch = {}
+            return f
+        return deco
 
     @classmethod
     def push(self, context):
