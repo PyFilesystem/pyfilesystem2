@@ -29,6 +29,12 @@ except ImportError:
     except ImportError:  # pragma: no cover
         scandir = None
 
+# NB: backport of https://bugs.python.org/issue33671 patch
+try:
+    import pyfastcopy
+except ImportError:  # pragma: no cover
+    pass
+
 from . import errors
 from .errors import FileExists
 from .base import FS
