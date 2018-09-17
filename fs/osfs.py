@@ -14,6 +14,7 @@ import itertools
 import logging
 import os
 import platform
+import shutil
 import stat
 import sys
 import typing
@@ -34,7 +35,7 @@ from .base import FS
 from .enums import ResourceType
 from ._fscompat import fsencode, fsdecode, fspath
 from .info import Info
-from .path import basename
+from .path import basename, dirname
 from .permissions import Permissions
 from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
@@ -366,6 +367,23 @@ class OSFS(FS):
         def opendir(self, path, factory=None):
             # type: (_O, Text, Optional[_OpendirFactory]) -> SubFS[_O]
             pass
+
+    def copy(self, src_path, dst_path, overwrite=False):
+        # type: (Text, Text, bool) -> None
+        _src_path = self.validatepath(src_path)
+        _dst_path = self.validatepath(dst_path)
+
+        with self._lock:
+            # check src_path exists and is a file
+            if self.gettype(src_path) is not ResourceType.file:
+                raise errors.FileExpected(src_path)
+            # check dst_path does not exist if we are not overwriting
+            if not overwrite and self.exists(_dst_path):
+                raise errors.DestinationExists(dst_path)
+            # check parent dir of _dst_path exists and is a directory
+            if self.gettype(dirname(dst_path)) is not ResourceType.directory:
+                raise errors.DirectoryExpected(dirname(dst_path))
+            shutil.copy2(self.getsyspath(_src_path), self.getsyspath(_dst_path))
 
     def getsyspath(self, path):
         # type: (Text) -> Text
