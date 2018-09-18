@@ -409,36 +409,30 @@ class OSFS(FS):
             errno.EOPNOTSUPP,
         })
 
-        @staticmethod
-        def _copy_shutil(src_path, dst_path):
-            return shutil.copy2(src_path, dst_path)
-
-        @classmethod
-        def _copy_sendfile(cls, src_path, dst_path):
-            sent = maxsize = 2**31 - 1
-            offset = 0
-            with io.open(src_path) as src:
-                with io.open(dst_path, 'w') as dst:
-                    fd_src, fd_dst = src.fileno(), dst.fileno()
-                    try:
-                        while sent > 0:
-                            sent = sendfile(fd_dst, fd_src, offset, maxsize)
-                            offset += sent
-                    except OSError as e:
-                        if e.errno not in cls._sendfile_error_codes:
-                            raise
-                        return False
-                    else:
-                        return True
-
         def copy(self, src_path, dst_path, overwrite=False):
             # type: (Text, Text, bool) -> None
             with self._lock:
+                # validate and canonicalise paths
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
-                _src_syspath = self.getsyspath(_src_path)
-                _dst_syspath = self.getsyspath(_dst_path)
-                if not self._copy_sendfile(_src_syspath, _dst_syspath):
-                    self._copy_shutil(_src_syspath, _dst_syspath)
+                _src_sys, _dst_sys = self.getsyspath(_src_path), self.getsyspath(_dst_path)
+                # attempt using sendfile
+                try:
+                    # initialise variables to pass to sendfile
+                    sent = maxsize = 2**31 - 1
+                    offset = 0
+                    # open files to obtain a file descriptor
+                    with io.open(_src_sys, 'r') as src:
+                        with io.open(_dst_sys, 'w') as dst:
+                            fd_src, fd_dst = src.fileno(), dst.fileno()
+                            while sent > 0:
+                                sent = sendfile(fd_dst, fd_src, offset, maxsize)
+                                offset += sent
+                except OSError as e:
+                    # the error is not a simple "sendfile not supported" error
+                    if e.errno not in self._sendfile_error_codes:
+                        raise
+                    # fallback using the shutil implementation
+                    shutil.copy2(_src_sys, _dst_sys)
 
     else:
 
