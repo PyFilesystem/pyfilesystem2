@@ -29,11 +29,13 @@ except ImportError:
     except ImportError:  # pragma: no cover
         scandir = None
 
-# NB: backport of https://bugs.python.org/issue33671 patch
 try:
-    import pyfastcopy
-except ImportError:  # pragma: no cover
-    pass
+    from os import sendfile
+except ImportError:
+    try:
+        from sendfile import sendfile
+    except ImportError:
+        sendfile = None
 
 from . import errors
 from .errors import FileExists
@@ -368,107 +370,85 @@ class OSFS(FS):
     # Optional Methods
     # --------------------------------------------------------
 
+    # --- Type hint for opendir ------------------------------
+
     if False:  # typing.TYPE_CHECKING
 
         def opendir(self, path, factory=None):
             # type: (_O, Text, Optional[_OpendirFactory]) -> SubFS[_O]
             pass
 
-    def copy(self, src_path, dst_path, overwrite=False):
-        # type: (Text, Text, bool) -> None
+
+    # --- Backport of os.sendfile for Python < 3.8 -----------
+
+    def _check_copy(self, src_path, dst_path, overwrite=False):
+        # validate individual paths
         _src_path = self.validatepath(src_path)
         _dst_path = self.validatepath(dst_path)
+        # check src_path exists and is a file
+        if self.gettype(src_path) is not ResourceType.file:
+            raise errors.FileExpected(src_path)
+        # check dst_path does not exist if we are not overwriting
+        if not overwrite and self.exists(_dst_path):
+            raise errors.DestinationExists(dst_path)
+        # check parent dir of _dst_path exists and is a directory
+        if self.gettype(dirname(dst_path)) is not ResourceType.directory:
+            raise errors.DirectoryExpected(dirname(dst_path))
+        return _src_path, _dst_path
 
-        with self._lock:
-            # check src_path exists and is a file
-            if self.gettype(src_path) is not ResourceType.file:
-                raise errors.FileExpected(src_path)
-            # check dst_path does not exist if we are not overwriting
-            if not overwrite and self.exists(_dst_path):
-                raise errors.DestinationExists(dst_path)
-            # check parent dir of _dst_path exists and is a directory
-            if self.gettype(dirname(dst_path)) is not ResourceType.directory:
-                raise errors.DirectoryExpected(dirname(dst_path))
-            shutil.copy2(self.getsyspath(_src_path), self.getsyspath(_dst_path))
 
-    def getsyspath(self, path):
-        # type: (Text) -> Text
-        sys_path = os.path.join(self._root_path, path.lstrip("/").replace("/", os.sep))
-        return sys_path
+    if sys.version_info[:2] < (3, 8) and sendfile is not None:
 
-    def geturl(self, path, purpose="download"):
-        # type: (Text, Text) -> Text
-        if purpose != "download":
-            raise NoURL(path, purpose)
-        return "file://" + self.getsyspath(path)
+        _sendfile_error_codes = frozenset({
+            errno.EIO,
+            errno.EINVAL,
+            errno.ENOSYS,
+            errno.ENOTSUP,
+            errno.EBADF,
+            errno.ENOTSOCK,
+            errno.EOPNOTSUPP,
+        })
 
-    def gettype(self, path):
-        # type: (Text) -> ResourceType
-        self.check()
-        sys_path = self._to_sys_path(path)
-        with convert_os_errors("gettype", path):
-            stat = os.stat(sys_path)
-        resource_type = self._get_type_from_stat(stat)
-        return resource_type
+        @staticmethod
+        def _copy_shutil(src_path, dst_path):
+            return shutil.copy2(src_path, dst_path)
 
-    def islink(self, path):
-        # type: (Text) -> bool
-        self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
-        if not self.exists(path):
-            raise errors.ResourceNotFound(path)
-        with convert_os_errors("islink", path):
-            return os.path.islink(sys_path)
+        @classmethod
+        def _copy_sendfile(cls, src_path, dst_path):
+            sent = maxsize = 2**31 - 1
+            offset = 0
+            with io.open(src_path) as src:
+                with io.open(dst_path, 'w') as dst:
+                    fd_src, fd_dst = src.fileno(), dst.fileno()
+                    try:
+                        while sent > 0:
+                            sent = sendfile(fd_dst, fd_src, offset, maxsize)
+                            offset += sent
+                    except OSError as e:
+                        if e.errno not in cls._sendfile_error_codes:
+                            raise
+                        return False
+                    else:
+                        return True
 
-    def open(
-        self,
-        path,  # type: Text
-        mode="r",  # type: Text
-        buffering=-1,  # type: int
-        encoding=None,  # type: Optional[Text]
-        errors=None,  # type: Optional[Text]
-        newline="",  # type: Text
-        line_buffering=False,  # type: bool
-        **options  # type: Any
-    ):
-        # type: (...) -> IO
-        _mode = Mode(mode)
-        validate_open_mode(mode)
-        self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
-        with convert_os_errors("open", path):
-            if six.PY2 and _mode.exclusive:
-                sys_path = os.open(sys_path, os.O_RDWR | os.O_CREAT | os.O_EXCL)
-            _encoding = encoding or "utf-8"
-            return io.open(
-                sys_path,
-                mode=_mode.to_platform(),
-                buffering=buffering,
-                encoding=None if _mode.binary else _encoding,
-                errors=errors,
-                newline=None if _mode.binary else newline,
-                **options
-            )
+        def copy(self, src_path, dst_path, overwrite=False):
+            # type: (Text, Text, bool) -> None
+            with self._lock:
+                _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
+                _src_syspath = self.getsyspath(_src_path)
+                _dst_syspath = self.getsyspath(_dst_path)
+                if not self._copy_sendfile(_src_syspath, _dst_syspath):
+                    self._copy_shutil(_src_syspath, _dst_syspath)
 
-    def setinfo(self, path, info):
-        # type: (Text, RawInfo) -> None
-        self.check()
-        _path = self.validatepath(path)
-        sys_path = self._to_sys_path(_path)
-        if not os.path.exists(sys_path):
-            raise errors.ResourceNotFound(path)
-        if "details" in info:
-            details = info["details"]
-            if "accessed" in details or "modified" in details:
-                _accessed = typing.cast(int, details.get("accessed"))
-                _modified = typing.cast(int, details.get("modified", _accessed))
-                accessed = int(_modified if _accessed is None else _accessed)
-                modified = int(_modified)
-                if accessed is not None or modified is not None:
-                    with convert_os_errors("setinfo", path):
-                        os.utime(sys_path, (accessed, modified))
+    else:
+
+        def copy(self, src_path, dst_path, overwrite=False):
+            # type: (Text, Text, bool) -> None
+            with self._lock:
+                _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
+                shutil.copy2(self.getsyspath(_src_path), self.getsyspath(_dst_path))
+
+    # --- Backport of os.scandir for Python < 3.5 ------------
 
     if scandir:
 
@@ -569,3 +549,84 @@ class OSFS(FS):
             start, end = page
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
+
+    # --- Miscellaneous --------------------------------------
+
+    def getsyspath(self, path):
+        # type: (Text) -> Text
+        sys_path = os.path.join(self._root_path, path.lstrip("/").replace("/", os.sep))
+        return sys_path
+
+    def geturl(self, path, purpose="download"):
+        # type: (Text, Text) -> Text
+        if purpose != "download":
+            raise NoURL(path, purpose)
+        return "file://" + self.getsyspath(path)
+
+    def gettype(self, path):
+        # type: (Text) -> ResourceType
+        self.check()
+        sys_path = self._to_sys_path(path)
+        with convert_os_errors("gettype", path):
+            stat = os.stat(sys_path)
+        resource_type = self._get_type_from_stat(stat)
+        return resource_type
+
+    def islink(self, path):
+        # type: (Text) -> bool
+        self.check()
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
+        if not self.exists(path):
+            raise errors.ResourceNotFound(path)
+        with convert_os_errors("islink", path):
+            return os.path.islink(sys_path)
+
+    def open(
+        self,
+        path,  # type: Text
+        mode="r",  # type: Text
+        buffering=-1,  # type: int
+        encoding=None,  # type: Optional[Text]
+        errors=None,  # type: Optional[Text]
+        newline="",  # type: Text
+        line_buffering=False,  # type: bool
+        **options  # type: Any
+    ):
+        # type: (...) -> IO
+        _mode = Mode(mode)
+        validate_open_mode(mode)
+        self.check()
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
+        with convert_os_errors("open", path):
+            if six.PY2 and _mode.exclusive:
+                sys_path = os.open(sys_path, os.O_RDWR | os.O_CREAT | os.O_EXCL)
+            _encoding = encoding or "utf-8"
+            return io.open(
+                sys_path,
+                mode=_mode.to_platform(),
+                buffering=buffering,
+                encoding=None if _mode.binary else _encoding,
+                errors=errors,
+                newline=None if _mode.binary else newline,
+                **options
+            )
+
+    def setinfo(self, path, info):
+        # type: (Text, RawInfo) -> None
+        self.check()
+        _path = self.validatepath(path)
+        sys_path = self._to_sys_path(_path)
+        if not os.path.exists(sys_path):
+            raise errors.ResourceNotFound(path)
+        if "details" in info:
+            details = info["details"]
+            if "accessed" in details or "modified" in details:
+                _accessed = typing.cast(int, details.get("accessed"))
+                _modified = typing.cast(int, details.get("modified", _accessed))
+                accessed = int(_modified if _accessed is None else _accessed)
+                modified = int(_modified)
+                if accessed is not None or modified is not None:
+                    with convert_os_errors("setinfo", path):
+                        os.utime(sys_path, (accessed, modified))
