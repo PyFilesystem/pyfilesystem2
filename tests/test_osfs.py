@@ -80,6 +80,11 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             sendfile.side_effect = OSError(errno.EWOULDBLOCK)
             with self.assertRaises(OSError):
                 self.fs.copy('foo', 'foo_copy')
+        # check parent exist and is dir
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.copy('foo', 'spam/eggs')
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.copy('foo', 'foo_copy/foo')
 
     def test_create(self):
         """Test create=True"""
