@@ -418,12 +418,12 @@ class OSFS(FS):
                 # attempt using sendfile
                 try:
                     # initialise variables to pass to sendfile
-                    sent = maxsize = 2**31 - 1
-                    offset = 0
                     # open files to obtain a file descriptor
                     with io.open(_src_sys, 'r') as src:
                         with io.open(_dst_sys, 'w') as dst:
                             fd_src, fd_dst = src.fileno(), dst.fileno()
+                            sent = maxsize = os.fstat(fd_src).st_size
+                            offset = 0
                             while sent > 0:
                                 sent = sendfile(fd_dst, fd_src, offset, maxsize)
                                 offset += sent
