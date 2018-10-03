@@ -58,6 +58,10 @@ setup(
     license="MIT",
     name='fs',
     packages=find_packages(exclude=("tests",)),
+    package_data = {
+        'fs': ['py.typed'],
+    },
+    zip_safe=False,
     platforms=['any'],
     test_suite="nose.collector",
     tests_require=['appdirs', 'mock', 'pytz', 'pyftpdlib'],

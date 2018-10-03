@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## [2.1.1] - 2018-10-03
+
+### Added
+
+- Added PEP 561 py.typed files
+- Use sendfile for faster copies @althonos
+- Atomic exclusive mode  in Py2.7 @sqwishy
+
+### Fixed
+
+- Fixed lstat @kamomil 
+
 ## [2.1.0] - 2018-08-12
 
 ### Added
