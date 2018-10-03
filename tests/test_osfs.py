@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 
+import errno
 import io
 import os
 import mock
@@ -13,7 +14,6 @@ from fs.path import relpath
 from fs import errors
 
 from fs.test import FSTestCases
-
 
 from six import text_type
 
@@ -67,6 +67,24 @@ class TestOSFS(FSTestCases, unittest.TestCase):
     def test_not_exists(self):
         with self.assertRaises(errors.CreateFailed):
             fs = osfs.OSFS("/does/not/exists/")
+
+    @unittest.skipIf(osfs.sendfile is None, 'sendfile not supported')
+    def test_copy_sendfile(self):
+        # try copying using sendfile
+        with mock.patch.object(osfs, 'sendfile') as sendfile:
+            sendfile.side_effect = OSError(errno.ENOTSUP, 'sendfile not supported')
+            self.test_copy()
+        # check other errors are transmitted
+        self.fs.touch('foo')
+        with mock.patch.object(osfs, 'sendfile') as sendfile:
+            sendfile.side_effect = OSError(errno.EWOULDBLOCK)
+            with self.assertRaises(OSError):
+                self.fs.copy('foo', 'foo_copy')
+        # check parent exist and is dir
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.copy('foo', 'spam/eggs')
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.copy('foo', 'foo_copy/foo')
 
     def test_create(self):
         """Test create=True"""
