@@ -38,8 +38,24 @@ re_linux = re.compile(
 )
 
 
+re_windowsnt = re.compile(
+    """
+    ^
+    (?P<modified>.*(AM|PM))
+    \s*
+    (?P<size>(<DIR>|\d*))
+    \s*
+    (?P<name>.*)
+    $
+    """,
+    re.VERBOSE)
+
+
 def get_decoders():
-    decoders = [(re_linux, decode_linux)]
+    decoders = [
+        (re_linux, decode_linux),
+        (re_windowsnt, decode_windowsnt),
+    ]
     return decoders
 
 
@@ -62,15 +78,16 @@ def parse_line(line):
     return None
 
 
-def _parse_time(t):
+def _parse_time(t, formats):
     t = " ".join(token.strip() for token in t.lower().split(" "))
-    try:
+
+    _t = None
+    for f in formats:
         try:
-            _t = time.strptime(t, "%b %d %Y")
+            _t = time.strptime(t, f)
         except ValueError:
-            _t = time.strptime(t, "%b %d %H:%M")
-    except ValueError:
-        # Unknown time format
+            continue
+    if not _t:
         return None
 
     year = _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year
@@ -94,7 +111,7 @@ def decode_linux(line, match):
         _link_name = _link_name.strip()
     permissions = Permissions.parse(perms[1:])
 
-    mtime_epoch = _parse_time(mtime)
+    mtime_epoch = _parse_time(mtime, formats=["%b %d %Y", "%b %d %H:%M"])
 
     name = unicodedata.normalize("NFC", name)
 
@@ -114,5 +131,29 @@ def decode_linux(line, match):
 
     access["user"] = uid
     access["group"] = gid
+
+    return raw_info
+
+
+def decode_windowsnt(line, match):
+    is_dir = match.group("size") == "<DIR>"
+
+    raw_info = {
+        "basic": {
+            "name": match.group("name"),
+            "is_dir": is_dir,
+        },
+        "details": {
+            "type": int(ResourceType.directory if is_dir else ResourceType.file),
+        },
+        "ftp": {"ls": line},
+    }
+
+    if not is_dir:
+        raw_info["details"]["size"] = int(match.group("size"))
+
+    modified = _parse_time(match.group("modified"), formats=["%d-%m-%y %I:%M%p"])
+    if modified is not None:
+        raw_info["details"]["modified"] = modified
 
     return raw_info
