@@ -4,18 +4,23 @@ language: python
 matrix:
   include:
   - python: "2.7"
-    env: SETUPTOOLS=setuptools
+    env: 
+      - SETUPTOOLS=setuptools PIP=pip
   - python: "3.3"
-    env: SETUPTOOLS=setuptools~=39.2
+    env:
+      - SETUPTOOLS=setuptools~=39.2 PIP="pip<=18.0"
   - python: "3.4"
-    env: SETUPTOOLS=setuptools
+    env:
+      - SETUPTOOLS=setuptools PIP=pip
   - python: "3.5"
-    env: SETUPTOOLS=setuptools
+    env:
+      - SETUPTOOLS=setuptools PIP=pip
   - python: "3.6"
-    env: SETUPTOOLS=setuptools
+    env: 
+      - SETUPTOOLS=setuptools PIP=pip
 
 before_install:
-  - pip install $SETUPTOOLS pip -U
+  - pip install $SETUPTOOLS $PIP -U
   - pip --version
   - pip install -r testrequirements.txt
   - pip freeze
