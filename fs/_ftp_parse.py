@@ -13,11 +13,11 @@ from .enums import ResourceType
 from .permissions import Permissions
 
 
-epoch_dt = datetime.datetime.fromtimestamp(0, UTC)
+EPOCH_DT = datetime.datetime.fromtimestamp(0, UTC)
 
 
-re_linux = re.compile(
-    """
+RE_LINUX = re.compile(
+    r"""
     ^
     ([ldrwx-]{10})
     \s+?
@@ -38,8 +38,27 @@ re_linux = re.compile(
 )
 
 
+RE_WINDOWSNT = re.compile(
+    r"""
+    ^
+    (?P<modified>.*(AM|PM))
+    \s*
+    (?P<size>(<DIR>|\d*))
+    \s*
+    (?P<name>.*)
+    $
+    """,
+    re.VERBOSE)
+
+
 def get_decoders():
-    decoders = [(re_linux, decode_linux)]
+    """
+    Returns all available FTP LIST line decoders with their matching regexes.
+    """
+    decoders = [
+        (RE_LINUX, decode_linux),
+        (RE_WINDOWSNT, decode_windowsnt),
+    ]
     return decoders
 
 
@@ -62,15 +81,16 @@ def parse_line(line):
     return None
 
 
-def _parse_time(t):
+def _parse_time(t, formats):
     t = " ".join(token.strip() for token in t.lower().split(" "))
-    try:
+
+    _t = None
+    for frmt in formats:
         try:
-            _t = time.strptime(t, "%b %d %Y")
+            _t = time.strptime(t, frmt)
         except ValueError:
-            _t = time.strptime(t, "%b %d %H:%M")
-    except ValueError:
-        # Unknown time format
+            continue
+    if not _t:
         return None
 
     year = _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year
@@ -80,7 +100,7 @@ def _parse_time(t):
     minutes = _t.tm_min
     dt = datetime.datetime(year, month, day, hour, minutes, tzinfo=UTC)
 
-    epoch_time = (dt - epoch_dt).total_seconds()
+    epoch_time = (dt - EPOCH_DT).total_seconds()
     return epoch_time
 
 
@@ -94,7 +114,7 @@ def decode_linux(line, match):
         _link_name = _link_name.strip()
     permissions = Permissions.parse(perms[1:])
 
-    mtime_epoch = _parse_time(mtime)
+    mtime_epoch = _parse_time(mtime, formats=["%b %d %Y", "%b %d %H:%M"])
 
     name = unicodedata.normalize("NFC", name)
 
@@ -114,5 +134,35 @@ def decode_linux(line, match):
 
     access["user"] = uid
     access["group"] = gid
+
+    return raw_info
+
+
+def decode_windowsnt(line, match):
+    """
+    Decodes a Windows NT FTP LIST line like these two:
+
+    `11-02-18  02:12PM       <DIR>          images`
+    `11-02-18  03:33PM                 9276 logo.gif`
+    """
+    is_dir = match.group("size") == "<DIR>"
+
+    raw_info = {
+        "basic": {
+            "name": match.group("name"),
+            "is_dir": is_dir,
+        },
+        "details": {
+            "type": int(ResourceType.directory if is_dir else ResourceType.file),
+        },
+        "ftp": {"ls": line},
+    }
+
+    if not is_dir:
+        raw_info["details"]["size"] = int(match.group("size"))
+
+    modified = _parse_time(match.group("modified"), formats=["%d-%m-%y %I:%M%p"])
+    if modified is not None:
+        raw_info["details"]["modified"] = modified
 
     return raw_info
