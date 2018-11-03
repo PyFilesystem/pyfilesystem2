@@ -13,11 +13,11 @@ from .enums import ResourceType
 from .permissions import Permissions
 
 
-epoch_dt = datetime.datetime.fromtimestamp(0, UTC)
+EPOCH_DT = datetime.datetime.fromtimestamp(0, UTC)
 
 
-re_linux = re.compile(
-    """
+RE_LINUX = re.compile(
+    r"""
     ^
     ([ldrwx-]{10})
     \s+?
@@ -38,8 +38,8 @@ re_linux = re.compile(
 )
 
 
-re_windowsnt = re.compile(
-    """
+RE_WINDOWSNT = re.compile(
+    r"""
     ^
     (?P<modified>.*(AM|PM))
     \s*
@@ -52,9 +52,12 @@ re_windowsnt = re.compile(
 
 
 def get_decoders():
+    """
+    Returns all available FTP LIST line decoders with their matching regexes.
+    """
     decoders = [
-        (re_linux, decode_linux),
-        (re_windowsnt, decode_windowsnt),
+        (RE_LINUX, decode_linux),
+        (RE_WINDOWSNT, decode_windowsnt),
     ]
     return decoders
 
@@ -82,9 +85,9 @@ def _parse_time(t, formats):
     t = " ".join(token.strip() for token in t.lower().split(" "))
 
     _t = None
-    for f in formats:
+    for frmt in formats:
         try:
-            _t = time.strptime(t, f)
+            _t = time.strptime(t, frmt)
         except ValueError:
             continue
     if not _t:
@@ -97,7 +100,7 @@ def _parse_time(t, formats):
     minutes = _t.tm_min
     dt = datetime.datetime(year, month, day, hour, minutes, tzinfo=UTC)
 
-    epoch_time = (dt - epoch_dt).total_seconds()
+    epoch_time = (dt - EPOCH_DT).total_seconds()
     return epoch_time
 
 
@@ -136,6 +139,12 @@ def decode_linux(line, match):
 
 
 def decode_windowsnt(line, match):
+    """
+    Decodes a Windows NT FTP LIST line like these two:
+
+    `11-02-18  02:12PM       <DIR>          images`
+    `11-02-18  03:33PM                 9276 logo.gif`
+    """
     is_dir = match.group("size") == "<DIR>"
 
     raw_info = {

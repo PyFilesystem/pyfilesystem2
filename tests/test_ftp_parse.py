@@ -1,6 +1,5 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
 import mock
 import time
 import unittest
@@ -13,12 +12,20 @@ time2017 = time.struct_time([2017, 11, 28, 1, 1, 1, 1, 332, 0])
 class TestFTPParse(unittest.TestCase):
     @mock.patch("time.localtime")
     def test_parse_time(self, mock_localtime):
-        self.assertEqual(ftp_parse._parse_time("JUL 05 1974"), 142214400.0)
+        self.assertEqual(
+            ftp_parse._parse_time("JUL 05 1974", formats=["%b %d %Y"]),
+            142214400.0)
 
         mock_localtime.return_value = time2017
-        self.assertEqual(ftp_parse._parse_time("JUL 05 02:00"), 1499220000.0)
+        self.assertEqual(
+            ftp_parse._parse_time("JUL 05 02:00", formats=["%b %d %H:%M"]),
+            1499220000.0)
 
-        self.assertEqual(ftp_parse._parse_time("notadate"), None)
+        self.assertEqual(
+            ftp_parse._parse_time("05-07-17  02:00AM", formats=["%d-%m-%y %I:%M%p"]),
+            1499220000.0)
+
+        self.assertEqual(ftp_parse._parse_time("notadate", formats=["%b %d %Y"]), None)
 
     def test_parse(self):
         self.assertEqual(ftp_parse.parse([""]), [])
@@ -142,6 +149,41 @@ drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485
                 "details": {"modified": 1483617540.0, "size": 0, "type": 1},
                 "ftp": {
                     "ls": "drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485"
+                },
+            },
+        ]
+
+        parsed = ftp_parse.parse(directory.splitlines())
+        self.assertEqual(parsed, expected)
+
+    @mock.patch("time.localtime")
+    def test_decode_windowsnt(self, mock_localtime):
+        mock_localtime.return_value = time2017
+        directory = """\
+11-02-17  02:00AM       <DIR>          docs
+11-02-17  02:12PM       <DIR>          images
+11-02-17  03:33PM                 9276 logo.gif
+"""
+        expected = [
+            {
+                "basic": {"is_dir": True, "name": "docs"},
+                "details": {"modified": 1486778400.0, "type": 1},
+                "ftp": {
+                    "ls": "11-02-17  02:00AM       <DIR>          docs"
+                },
+            },
+            {
+                "basic": {"is_dir": True, "name": "images"},
+                "details": {"modified": 1486822320.0, "type": 1},
+                "ftp": {
+                    "ls": "11-02-17  02:12PM       <DIR>          images"
+                },
+            },
+            {
+                "basic": {"is_dir": False, "name": "logo.gif"},
+                "details": {"modified": 1486827180.0, "size": 9276, "type": 2},
+                "ftp": {
+                    "ls": "11-02-17  03:33PM                 9276 logo.gif"
                 },
             },
         ]
