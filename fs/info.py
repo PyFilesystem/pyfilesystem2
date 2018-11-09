@@ -35,7 +35,7 @@ class Info(object):
 
          * `~fs.base.FS.getinfo`
          * `~fs.base.FS.scandir`
-         * `~fs.base.FS.filterfir`
+         * `~fs.base.FS.filterdir`
 
     Arguments:
         raw_info (dict): A dict containing resource info.
