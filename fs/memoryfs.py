@@ -414,6 +414,9 @@ class MemoryFS(FS):
         _path = self.validatepath(path)
         dir_path, file_name = split(_path)
 
+        if not file_name:
+            raise errors.FileExpected(path)
+
         with self._lock:
             parent_dir_entry = self._get_dir_entry(dir_path)
             if parent_dir_entry is None or not parent_dir_entry.is_dir:

@@ -329,6 +329,12 @@ class FSTestCases(object):
         self.assertEqual(data, contents)
         self.assertIsInstance(data, text_type)
 
+    def test_root_dir(self):
+        with self.assertRaises(errors.FileExpected):
+            self.fs.open("/")
+        with self.assertRaises(errors.FileExpected):
+            self.fs.openbin("/")
+
     def test_appendbytes(self):
         with self.assertRaises(TypeError):
             self.fs.appendbytes("foo", "bar")
