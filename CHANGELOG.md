@@ -5,6 +5,20 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [2.1.2] - 20180-11-10
+
+### Added
+
+- Support for Windows NT FTP servers @sspross
+
+
+### Fixed
+
+- Root dir of MemoryFS accesible as a file
+- Packaging issues @televi
+- Deprecation warning re collections.Mapping
+
+
 ## [2.1.1] - 2018-10-03
 
 ### Added
@@ -15,7 +29,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- Fixed lstat @kamomil 
+- Fixed lstat @kamomil
 
 ## [2.1.0] - 2018-08-12
 

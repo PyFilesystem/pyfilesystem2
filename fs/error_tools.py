@@ -11,13 +11,18 @@ import sys
 import typing
 from contextlib import contextmanager
 
-from six import reraise
+from six import reraise, PY3
 
 from . import errors
 
 if False:  # typing.TYPE_CHECKING
     from types import TracebackType
     from typing import Iterator, Optional, Mapping, Text, Type, Union
+
+if PY3:
+    from collections.abc import Mapping
+else:
+    from collections import Mapping
 
 
 _WINDOWS_PLATFORM = platform.system() == "Windows"
@@ -107,7 +112,7 @@ def unwrap_errors(path_replace):
         yield
     except errors.ResourceError as e:
         if hasattr(e, "path"):
-            if isinstance(path_replace, collections.Mapping):
+            if isinstance(path_replace, Mapping):
                 e.path = path_replace.get(e.path, e.path)
             else:
                 e.path = path_replace
