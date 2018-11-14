@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import typing
 
 from .base import Opener
+from .registry import registry
 from .errors import NotWriteable
 
 if False:  # typing.TYPE_CHECKING
@@ -17,6 +18,7 @@ if False:  # typing.TYPE_CHECKING
     from ..tarfs import TarFS
 
 
+@registry.install
 class TarOpener(Opener):
     """`TarFS` opener.
     """
