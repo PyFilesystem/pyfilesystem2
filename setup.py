@@ -39,22 +39,6 @@ setup(
         ":python_version < '3.6'": ['typing~=3.6'],
         ":python_version < '3.0'": ['backports.os~=0.1']
     },
-    entry_points={'fs.opener': [
-        'ftp  = fs.opener.ftpfs:FTPOpener',
-        'file = fs.opener.osfs:OSFSOpener',
-        'osfs = fs.opener.osfs:OSFSOpener',
-        'mem  = fs.opener.memoryfs:MemOpener',
-        'tar  = fs.opener.tarfs:TarOpener',
-        'temp = fs.opener.tempfs:TempOpener',
-        'zip  = fs.opener.zipfs:ZipOpener',
-
-        'userdata = fs.opener.appfs:AppFSOpener',
-        'userconf = fs.opener.appfs:AppFSOpener',
-        'sitedata = fs.opener.appfs:AppFSOpener',
-        'siteconf = fs.opener.appfs:AppFSOpener',
-        'usercache = fs.opener.appfs:AppFSOpener',
-        'userlog = fs.opener.appfs:AppFSOpener',
-    ]},
     license="MIT",
     name='fs',
     packages=find_packages(exclude=("tests",)),
