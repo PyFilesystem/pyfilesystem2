@@ -101,7 +101,6 @@ class TestParse(unittest.TestCase):
 
 
 class TestRegistry(unittest.TestCase):
-
     def test_registry_protocols(self):
         # Check registry.protocols list the names of all available extension
         extensions = [
@@ -109,10 +108,11 @@ class TestRegistry(unittest.TestCase):
             pkg_resources.EntryPoint("proto2", "mod2"),
         ]
         m = mock.MagicMock(return_value=extensions)
-        with mock.patch.object(sys.modules['pkg_resources'], 'iter_entry_points', new=m):
+        with mock.patch.object(
+            sys.modules["pkg_resources"], "iter_entry_points", new=m
+        ):
             self.assertIn("proto1", opener.registry.protocols)
             self.assertIn("proto2", opener.registry.protocols)
-
 
     def test_unknown_protocol(self):
         with self.assertRaises(errors.UnsupportedProtocol):

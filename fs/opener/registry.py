@@ -100,8 +100,9 @@ class Registry(object):
         protocol = protocol or self.default_opener
 
         if self.load_extern:
-            entry_point = next(pkg_resources.iter_entry_points(
-                "fs.opener", protocol), None)
+            entry_point = next(
+                pkg_resources.iter_entry_points("fs.opener", protocol), None
+            )
         else:
             entry_point = None
 
@@ -111,21 +112,27 @@ class Registry(object):
             if protocol in self._protocols:
                 opener_instance = self._protocols[protocol]
             else:
-                raise UnsupportedProtocol("protocol '{}' is not supported".format(protocol))
+                raise UnsupportedProtocol(
+                    "protocol '{}' is not supported".format(protocol)
+                )
 
         # If an entry point was found in an extension, attempt to load it
         else:
             try:
                 opener = entry_point.load()
             except Exception as exception:
-                raise EntryPointError("could not load entry point; {}".format(exception))
+                raise EntryPointError(
+                    "could not load entry point; {}".format(exception)
+                )
             if not issubclass(opener, Opener):
                 raise EntryPointError("entry point did not return an opener")
 
             try:
                 opener_instance = opener()
             except Exception as exception:
-                raise EntryPointError("could not instantiate opener; {}".format(exception))
+                raise EntryPointError(
+                    "could not instantiate opener; {}".format(exception)
+                )
 
         return opener_instance
 
@@ -255,8 +262,7 @@ class Registry(object):
         if isinstance(fs_url, FS):
             yield fs_url
         else:
-            _fs = self.open_fs(fs_url, create=create,
-                               writeable=writeable, cwd=cwd)
+            _fs = self.open_fs(fs_url, create=create, writeable=writeable, cwd=cwd)
             try:
                 yield _fs
             except:
