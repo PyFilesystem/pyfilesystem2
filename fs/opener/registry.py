@@ -27,7 +27,7 @@ class Registry(object):
     """
 
     def __init__(self, default_opener="osfs", load_extern=False):
-        # type: (Text) -> None
+        # type: (Text, bool) -> None
         """Create a registry object.
 
         Arguments:

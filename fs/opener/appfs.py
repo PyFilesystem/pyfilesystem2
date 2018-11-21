@@ -35,6 +35,7 @@ class AppFSOpener(Opener):
         create,  # type: bool
         cwd,  # type: Text
     ):
+        # type: (...) -> Union[_AppFS, SubFS[_AppFS]]
 
         from ..subfs import ClosingSubFS
         from .. import appfs
@@ -49,7 +50,6 @@ class AppFSOpener(Opener):
                 "userlog": appfs.UserLogFS,
             }
 
-        # type: (...) -> Union[_AppFS, SubFS[_AppFS]]
         fs_class = self._protocol_mapping[parse_result.protocol]
         resource, delim, path = parse_result.resource.partition("/")
         tokens = resource.split(":", 3)
