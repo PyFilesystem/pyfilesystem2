@@ -61,6 +61,8 @@ class AppFSOpener(Opener):
         app_fs = fs_class(appname, author=author, version=version, create=create)
 
         if delim:
+            if create:
+                app_fs.makedir(path, recreate=True)
             return app_fs.opendir(path, factory=ClosingSubFS)
 
         return app_fs
