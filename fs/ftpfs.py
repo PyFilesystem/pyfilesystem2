@@ -190,6 +190,7 @@ class FTPFile(io.RawIOBase):
                     if self._write_conn is not None:
                         self._write_conn.close()
                         self._write_conn = None
+                        self.ftp.voidresp()  # Ensure last write completed
                     if self._read_conn is not None:
                         self._read_conn.close()
                         self._read_conn = None
