@@ -177,7 +177,7 @@ class Registry(object):
 
     def open_fs(
         self,
-        fs_url,  # type: Text
+        fs_url,  # type: Union[FS, Text]
         writeable=False,  # type: bool
         create=False,  # type: bool
         cwd=".",  # type: Text
