@@ -1,6 +1,9 @@
 # -*- encoding: UTF-8
 from __future__ import unicode_literals
 
+import os
+import stat
+
 from six import text_type
 
 from fs.opener import open_fs
@@ -77,14 +80,24 @@ class ArchiveTestCases(object):
         top = self.fs.getinfo("top.txt", ["details", "access"])
         self.assertEqual(top.size, 12)
         self.assertFalse(top.is_dir)
-        if not isinstance(self.source_fs, MemoryFS):
-            self.assertEqual(top.permissions.mode, 0o644)
+
+        try:
+            source_syspath = self.source_fs.getsyspath("/top.txt")
+        except errors.NoSysPath:
+            pass
+        else:
+            self.assertEqual(
+                top.permissions.mode, stat.S_IMODE(os.stat(source_syspath).st_mode)
+            )
+
         self.assertEqual(top.get("details", "type"), ResourceType.file)
 
     def test_listdir(self):
         self.assertEqual(
             sorted(self.source_fs.listdir("/")), sorted(self.fs.listdir("/"))
         )
+        for name in self.fs.listdir("/"):
+            self.assertIsInstance(name, text_type)
         with self.assertRaises(errors.DirectoryExpected):
             self.fs.listdir("top.txt")
         with self.assertRaises(errors.ResourceNotFound):
@@ -123,11 +136,3 @@ class ArchiveTestCases(object):
     def test_implied_dir(self):
         self.fs.getinfo("foo/bar")
         self.fs.getinfo("foo")
-
-    def test_listdir(self):
-        for name in self.fs.listdir("/"):
-            self.assertIsInstance(name, text_type)
-        with self.assertRaises(errors.ResourceNotFound):
-            self.fs.listdir("nope")
-        with self.assertRaises(errors.DirectoryExpected):
-            self.fs.listdir("top.txt")
