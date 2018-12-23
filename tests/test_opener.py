@@ -101,6 +101,9 @@ class TestParse(unittest.TestCase):
 
 
 class TestRegistry(unittest.TestCase):
+    def test_protocols(self):
+        self.assertIsInstance(opener.registry.protocols, list)
+
     def test_registry_protocols(self):
         # Check registry.protocols list the names of all available extension
         extensions = [
