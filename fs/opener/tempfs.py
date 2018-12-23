@@ -9,6 +9,7 @@ from __future__ import unicode_literals
 import typing
 
 from .base import Opener
+from .registry import registry
 
 if False:  # typing.TYPE_CHECKING
     from typing import Text
@@ -16,6 +17,7 @@ if False:  # typing.TYPE_CHECKING
     from ..tempfs import TempFS
 
 
+@registry.install
 class TempOpener(Opener):
     """`TempFS` opener.
     """

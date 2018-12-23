@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 import os
 import mock
+import sys
 import tempfile
 import unittest
 import pkg_resources
@@ -101,14 +102,17 @@ class TestParse(unittest.TestCase):
 
 class TestRegistry(unittest.TestCase):
     def test_registry_protocols(self):
-        # Check registry.protocols list the names of all available entry points
-
-        protocols = [
-            entry_point.name
-            for entry_point in pkg_resources.iter_entry_points("fs.opener")
+        # Check registry.protocols list the names of all available extension
+        extensions = [
+            pkg_resources.EntryPoint("proto1", "mod1"),
+            pkg_resources.EntryPoint("proto2", "mod2"),
         ]
-
-        self.assertEqual(sorted(protocols), sorted(opener.registry.protocols))
+        m = mock.MagicMock(return_value=extensions)
+        with mock.patch.object(
+            sys.modules["pkg_resources"], "iter_entry_points", new=m
+        ):
+            self.assertIn("proto1", opener.registry.protocols)
+            self.assertIn("proto2", opener.registry.protocols)
 
     def test_unknown_protocol(self):
         with self.assertRaises(errors.UnsupportedProtocol):

@@ -9,9 +9,8 @@ from __future__ import unicode_literals
 import typing
 
 from .base import Opener
+from .registry import registry
 from .errors import OpenerError
-from ..subfs import ClosingSubFS
-from .. import appfs
 
 if False:  # typing.TYPE_CHECKING
     from typing import Text, Union
@@ -20,20 +19,13 @@ if False:  # typing.TYPE_CHECKING
     from ..subfs import SubFS
 
 
+@registry.install
 class AppFSOpener(Opener):
     """``AppFS`` opener.
     """
 
     protocols = ["userdata", "userconf", "sitedata", "siteconf", "usercache", "userlog"]
-
-    _protocol_mapping = {
-        "userdata": appfs.UserDataFS,
-        "userconf": appfs.UserConfigFS,
-        "sitedata": appfs.SiteDataFS,
-        "siteconf": appfs.SiteConfigFS,
-        "usercache": appfs.UserCacheFS,
-        "userlog": appfs.UserLogFS,
-    }
+    _protocol_mapping = None
 
     def open_fs(
         self,
@@ -44,6 +36,20 @@ class AppFSOpener(Opener):
         cwd,  # type: Text
     ):
         # type: (...) -> Union[_AppFS, SubFS[_AppFS]]
+
+        from ..subfs import ClosingSubFS
+        from .. import appfs
+
+        if self._protocol_mapping is None:
+            self._protocol_mapping = {
+                "userdata": appfs.UserDataFS,
+                "userconf": appfs.UserConfigFS,
+                "sitedata": appfs.SiteDataFS,
+                "siteconf": appfs.SiteConfigFS,
+                "usercache": appfs.UserCacheFS,
+                "userlog": appfs.UserLogFS,
+            }
+
         fs_class = self._protocol_mapping[parse_result.protocol]
         resource, delim, path = parse_result.resource.partition("/")
         tokens = resource.split(":", 3)

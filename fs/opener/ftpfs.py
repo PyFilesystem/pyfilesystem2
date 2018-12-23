@@ -11,6 +11,7 @@ import six
 import typing
 
 from .base import Opener
+from .registry import registry
 from ..errors import FSError, CreateFailed
 
 if False:  # typing.TYPE_CHECKING
@@ -20,6 +21,7 @@ if False:  # typing.TYPE_CHECKING
     from .parse import ParseResult
 
 
+@registry.install
 class FTPOpener(Opener):
     """`FTPFS` opener.
     """
