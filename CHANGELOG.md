@@ -1,21 +1,26 @@
 # Change Log
+
 All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.1.3] - 2018-12-24
 
 ### Fixed
 
-- Incomplete FTPFile.write when using `workers`  @geoffjukes
+- Incomplete FTPFile.write when using `workers` @geoffjukes
+- Fixed AppFS not creating directory
 
-## [2.1.2] - 20180-11-10
+### Added
+
+- Added load_extern switch to opener, fixes #228 @althanos
+
+## [2.1.2] - 2018-11-10
 
 ### Added
 
 - Support for Windows NT FTP servers @sspross
-
 
 ### Fixed
 
@@ -23,14 +28,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Packaging issues @televi
 - Deprecation warning re collections.Mapping
 
-
 ## [2.1.1] - 2018-10-03
 
 ### Added
 
 - Added PEP 561 py.typed files
 - Use sendfile for faster copies @althonos
-- Atomic exclusive mode  in Py2.7 @sqwishy
+- Atomic exclusive mode in Py2.7 @sqwishy
 
 ### Fixed
 
@@ -63,7 +67,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - workers parameter to fs.copy, fs.move, and fs.mirror for concurrent
-    copies
+  copies
 
 ## [2.0.24] - 2018-06-28
 
@@ -99,7 +103,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - Changed path.splitext so that 'leading periods on the basename are
-    ignored', which is the behaviour of os.path.splitext
+  ignored', which is the behaviour of os.path.splitext
 
 ## [2.0.20] - 2018-03-13
 
@@ -206,16 +210,19 @@ No changes, pushed wrong branch to PyPi.
 ## [2.0.7] - 2017-08-06
 
 ### Fixes
+
 - Fixed entry point breaking pip
 
 ## [2.0.6] - 2017-08-05
 
 ### Fixes
+
 - Opener refinements
 
 ## [2.0.5] - 2017-08-02
 
 ### Fixed
+
 - Fixed potential for deadlock in MemoryFS
 
 ### Added
@@ -242,15 +249,15 @@ No changes, pushed wrong branch to PyPi.
 ### Changed
 
 - More specific error when `validatepath` throws an error about the path
-    argument being the wrong type, and changed from a ValueError to a
-    TypeError.
+  argument being the wrong type, and changed from a ValueError to a
+  TypeError.
 - Deprecated `encoding` parameter in OSFS.
 
 ## [2.0.3] - 2017-04-22
 
 ### Added
 
-- New `copy_if_newer' functionality in `copy` module.
+- New `copy_if_newer' functionality in`copy` module.
 
 ### Fixed
 
@@ -259,12 +266,14 @@ No changes, pushed wrong branch to PyPi.
 ## [2.0.2] - 2017-03-12
 
 ### Changed
+
 - Improved FTP support for non-compliant servers
 - Fix for ZipFS implied directories
 
 ## [2.0.1] - 2017-03-11
 
 ### Added
+
 - TarFS contributed by Martin Larralde
 
 ### Fixed

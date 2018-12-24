@@ -33,7 +33,7 @@ try:
     from os import sendfile
 except ImportError:
     try:
-        from sendfile import sendfile
+        from sendfile import sendfile  # type: ignore
     except ImportError:
         sendfile = None
 
@@ -116,7 +116,7 @@ class OSFS(FS):
             root_path = fsdecode(root_path)
         self.root_path = root_path
         _drive, _root_path = os.path.splitdrive(fsdecode(fspath(root_path)))
-        _root_path = _drive + (_root_path or '/') if _drive else _root_path
+        _root_path = _drive + (_root_path or "/") if _drive else _root_path
         _root_path = os.path.expanduser(os.path.expandvars(_root_path))
         _root_path = os.path.normpath(os.path.abspath(_root_path))
         self._root_path = _root_path
@@ -378,7 +378,6 @@ class OSFS(FS):
             # type: (_O, Text, Optional[_OpendirFactory]) -> SubFS[_O]
             pass
 
-
     # --- Backport of os.sendfile for Python < 3.8 -----------
 
     def _check_copy(self, src_path, dst_path, overwrite=False):
@@ -396,31 +395,35 @@ class OSFS(FS):
             raise errors.DirectoryExpected(dirname(dst_path))
         return _src_path, _dst_path
 
-
     if sys.version_info[:2] < (3, 8) and sendfile is not None:
 
-        _sendfile_error_codes = frozenset({
-            errno.EIO,
-            errno.EINVAL,
-            errno.ENOSYS,
-            errno.ENOTSUP,
-            errno.EBADF,
-            errno.ENOTSOCK,
-            errno.EOPNOTSUPP,
-        })
+        _sendfile_error_codes = frozenset(
+            {
+                errno.EIO,
+                errno.EINVAL,
+                errno.ENOSYS,
+                errno.ENOTSUP,  # type: ignore
+                errno.EBADF,
+                errno.ENOTSOCK,
+                errno.EOPNOTSUPP,
+            }
+        )
 
         def copy(self, src_path, dst_path, overwrite=False):
             # type: (Text, Text, bool) -> None
             with self._lock:
                 # validate and canonicalise paths
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
-                _src_sys, _dst_sys = self.getsyspath(_src_path), self.getsyspath(_dst_path)
+                _src_sys, _dst_sys = (
+                    self.getsyspath(_src_path),
+                    self.getsyspath(_dst_path),
+                )
                 # attempt using sendfile
                 try:
                     # initialise variables to pass to sendfile
                     # open files to obtain a file descriptor
-                    with io.open(_src_sys, 'r') as src:
-                        with io.open(_dst_sys, 'w') as dst:
+                    with io.open(_src_sys, "r") as src:
+                        with io.open(_dst_sys, "w") as dst:
                             fd_src, fd_dst = src.fileno(), dst.fileno()
                             sent = maxsize = os.fstat(fd_src).st_size
                             offset = 0

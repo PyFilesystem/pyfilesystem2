@@ -18,7 +18,17 @@ from .errors import UnsupportedProtocol, EntryPointError
 from .parse import parse_fs_url
 
 if False:  # typing.TYPE_CHECKING
-    from typing import Iterator, List, Optional, Text, Tuple, Union
+    from typing import (
+        Callable,
+        Dict,
+        Iterator,
+        List,
+        Optional,
+        Text,
+        Type,
+        Tuple,
+        Union,
+    )
     from ..base import FS
 
 
@@ -35,12 +45,12 @@ class Registry(object):
                 is not supplied. The default is to use 'osfs', so that the
                 FS URL is treated as a system path if no protocol is given.
             load_extern (bool, optional): Set to `True` to load openers from
-                Pyfilesystem2 extensions. Defaults to `False`.
+                PyFilesystem2 extensions. Defaults to `False`.
 
         """
         self.default_opener = default_opener
         self.load_extern = load_extern
-        self._protocols = {}  # type: Mapping[Text, Opener]
+        self._protocols = {}  # type: Dict[Text, Opener]
 
     def __repr__(self):
         # type: () -> Text
@@ -63,6 +73,7 @@ class Registry(object):
         """
         if not isinstance(opener, Opener):
             opener = opener()
+        assert isinstance(opener, Opener), "Opener instance required"
         assert opener.protocols, "must list one or more protocols"
         for protocol in opener.protocols:
             self._protocols[protocol] = opener
@@ -72,12 +83,15 @@ class Registry(object):
         # type: () -> List[Text]
         """`list`: the list of supported protocols.
         """
-        # we use OrderedDict to build an ordered set of protocols
-        _protocols = collections.OrderedDict((k, None) for k in self._protocols)
+
+        _protocols = list(self._protocols)
         if self.load_extern:
-            for entry_point in pkg_resources.iter_entry_points("fs.opener"):
-                _protocols[entry_point.name] = None
-        return list(_protocols.keys())
+            _protocols.extend(
+                entry_point.name
+                for entry_point in pkg_resources.iter_entry_points("fs.opener")
+            )
+            _protocols = list(collections.OrderedDict.fromkeys(_protocols))
+        return _protocols
 
     def get_opener(self, protocol):
         # type: (Text) -> Opener
