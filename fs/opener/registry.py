@@ -83,17 +83,15 @@ class Registry(object):
         # type: () -> List[Text]
         """`list`: the list of supported protocols.
         """
-        # we use OrderedDict to build an ordered set of protocols
 
-        _protocols = list(self._protocols.keys())
+        _protocols = list(self._protocols)
         if self.load_extern:
-            _protocols += [
+            _protocols.extend(
                 entry_point.name
                 for entry_point in pkg_resources.iter_entry_points("fs.opener")
-            ]
-            return list(collections.OrderedDict.fromkeys(_protocols).keys())
-        else:
-            return _protocols
+            )
+            _protocols = list(collections.OrderedDict.fromkeys(_protocols))
+        return _protocols
 
     def get_opener(self, protocol):
         # type: (Text) -> Opener
