@@ -494,12 +494,14 @@ class FSTestCases(object):
 
         # Check that if the details namespace is present, times are
         # of valid types.
-        if 'details' in info.namespaces:
-            details = info.raw['details']
-            self.assertIsInstance(details.get('accessed'), (type(None), int, float))
-            self.assertIsInstance(details.get('modified'), (type(None), int, float))
-            self.assertIsInstance(details.get('created'), (type(None), int, float))
-            self.assertIsInstance(details.get('metadata_changed'), (type(None), int, float))
+        if "details" in info.namespaces:
+            details = info.raw["details"]
+            self.assertIsInstance(details.get("accessed"), (type(None), int, float))
+            self.assertIsInstance(details.get("modified"), (type(None), int, float))
+            self.assertIsInstance(details.get("created"), (type(None), int, float))
+            self.assertIsInstance(
+                details.get("metadata_changed"), (type(None), int, float)
+            )
 
     def test_exists(self):
         # Test exists method.
@@ -1739,6 +1741,7 @@ class FSTestCases(object):
         self.fs.movedir("foo/bar", "foo2")
         self.assert_text("foo2/foofoo.txt", "Hello")
         self.assert_isdir("foo2/baz/egg")
+        self.assert_not_exists("foo/bar")
         self.assert_not_exists("foo/bar/foofoo.txt")
         self.assert_not_exists("foo/bar/baz/egg")
 
@@ -1814,7 +1817,5 @@ class FSTestCases(object):
         self.assert_isfile("fOO")
 
     def test_glob(self):
-        self.assertIsInstance(
-            self.fs.glob,
-            glob.BoundGlobber
-        )
+        self.assertIsInstance(self.fs.glob, glob.BoundGlobber)
+

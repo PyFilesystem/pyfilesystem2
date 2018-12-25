@@ -27,7 +27,7 @@ except ImportError:
     try:
         from scandir import scandir  # type: ignore
     except ImportError:  # pragma: no cover
-        scandir = None
+        scandir = None  # pragma: no cover
 
 try:
     from os import sendfile
@@ -35,7 +35,7 @@ except ImportError:
     try:
         from sendfile import sendfile  # type: ignore
     except ImportError:
-        sendfile = None
+        sendfile = None  # pragma: no cover
 
 from . import errors
 from .errors import FileExists
