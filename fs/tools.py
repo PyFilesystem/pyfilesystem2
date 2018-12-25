@@ -69,7 +69,7 @@ def get_intermediate_dirs(fs, dir_path):
         list: A list of non-existing paths.
 
     Raises:
-        `fs.errors.DirectoryExpected`: If a path component
+        ~fs.errors.DirectoryExpected: If a path component
             references a file and not a directory.
 
     """

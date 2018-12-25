@@ -100,7 +100,7 @@ class Copier(object):
                 self.queue.put(None)
             for worker in self.workers:
                 worker.join()
-            # Free up references help by workers
+            # Free up references held by workers
             del self.workers[:]
             self.queue.join()
         self.running = False
