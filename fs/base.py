@@ -116,12 +116,8 @@ class FS(object):
     # ---------------------------------------------------------------- #
 
     @abc.abstractmethod
-    def getinfo(
-        self,
-        path,  # type: Text
-        namespaces=None,  # type: Optional[Collection[Text]]
-    ):
-        # type: (...) -> Info
+    def getinfo(self, path, namespaces=None):
+        # type: (Text, Optional[Collection[Text]]) -> Info
         """Get information about a resource on a filesystem.
 
         Arguments:
@@ -393,7 +389,7 @@ class FS(object):
             src_path (str): Path of source directory.
             dst_path (str): Path to destination directory.
             create (bool): If `True`, then ``dst_path`` will be created
-                if it doesn't exist alreadys (defaults to `False`).
+                if it doesn't exist already (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: If the ``dst_path``
@@ -980,7 +976,7 @@ class FS(object):
 
     def movedir(self, src_path, dst_path, create=False):
         # type: (Text, Text, bool) -> None
-        """Move contents of directory ``src_path`` to ``dst_path``.
+        """Move directory ``src_path`` to ``dst_path``.
 
         Parameters:
             src_path (str): Path of source directory on the filesystem.
