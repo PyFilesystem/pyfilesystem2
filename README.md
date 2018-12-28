@@ -1,5 +1,4 @@
-PyFilesystem2
-=============
+# PyFilesystem2
 
 Python's Filesystem abstraction layer.
 
@@ -7,29 +6,26 @@ Python's Filesystem abstraction layer.
 [![PyPI](https://img.shields.io/pypi/pyversions/fs.svg)](https://pypi.org/project/fs/)
 [![Build Status](https://travis-ci.org/PyFilesystem/pyfilesystem2.svg?branch=master)](https://travis-ci.org/PyFilesystem/pyfilesystem2)
 [![Coverage Status](https://coveralls.io/repos/github/PyFilesystem/pyfilesystem2/badge.svg)](https://coveralls.io/github/PyFilesystem/pyfilesystem2)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=PyFilesystem/pyfilesystem2&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&utm_medium=referral&utm_content=PyFilesystem/pyfilesystem2&utm_campaign=Badge_Grade)
 [![Code Health](https://landscape.io/github/PyFilesystem/pyfilesystem2/master/landscape.svg?style=flat)](https://landscape.io/github/PyFilesystem/pyfilesystem2/master)
 
-Documentation
--------------
+## Documentation
 
-* [Wiki](https://www.pyfilesystem.org)
-* [API Documentation](https://pyfilesystem2.readthedocs.io/en/latest/)
-* [GitHub Repository](https://github.com/PyFilesystem/pyfilesystem2)
-* [Blog](https://www.willmcgugan.com/tag/fs/)
+- [Wiki](https://www.pyfilesystem.org)
+- [API Documentation](https://pyfilesystem2.readthedocs.io/en/latest/)
+- [GitHub Repository](https://github.com/PyFilesystem/pyfilesystem2)
+- [Blog](https://www.willmcgugan.com/tag/fs/)
 
+## Introduction
 
-Introduction
-------------
-
-Think of PyFilesystem's ``FS`` objects as the next logical step to
-Python's ``file`` objects. In the same way that file objects abstract a
+Think of PyFilesystem's `FS` objects as the next logical step to
+Python's `file` objects. In the same way that file objects abstract a
 single file, FS objects abstract an entire filesystem.
 
 Let's look at a simple piece of code as an example. The following
 function uses the PyFilesystem API to count the number of non-blank
-lines of Python code in a directory. It works *recursively*, so it will
-find ``.py`` files in all sub-directories.
+lines of Python code in a directory. It works _recursively_, so it will
+find `.py` files in all sub-directories.
 
 ```python
 def count_python_loc(fs):
@@ -50,10 +46,10 @@ print(count_python_loc(projects_fs))
 ```
 
 The line `project_fs = open_fs('~/projects')` opens an FS object that
-maps to the ``projects`` directory in your home folder. That object is
+maps to the `projects` directory in your home folder. That object is
 used by `count_python_loc` when counting lines of code.
 
-To count the lines of Python code in a *zip file*, we can make the
+To count the lines of Python code in a _zip file_, we can make the
 following change:
 
 ```python
@@ -90,20 +86,27 @@ work with the OS filesystem. Any other filesystem would require an
 entirely different API, and you would likely have to re-implement the
 directory walking functionality of `os.walk`.
 
-Credits
--------
+## Credits
 
-* [Will McGugan](https://github.com/willmcgugan)
-* [Martin Larralde](https://github.com/althonos)
-* [Giampaolo](https://github.com/gpcimino) for `copy_if_newer` and ftp fixes.
-* [Geoff Jukes](https://github.com/geoffjukes) for ftp fixes.
+The following developers have contributed code and their time to this projects:
+
+- [Will McGugan](https://github.com/willmcgugan)
+- [Martin Larralde](https://github.com/althonos)
+- [Giampaolo](https://github.com/gpcimino)
+- [Geoff Jukes](https://github.com/geoffjukes)
+
+See CONTRIBUTORS.md for a full list of contributors.
 
 PyFilesystem2 owes a massive debt of gratitude to the following
 developers who contributed code and ideas to the original version.
 
-* Ryan Kelly
-* Andrew Scheller
-* Ben Timby
+- Ryan Kelly
+- Andrew Scheller
+- Ben Timby
 
 Apologies if I missed anyone, feel free to prompt me if your name is
 missing here.
+
+## Support
+
+If commercial support is required, please contact [Will McGugan](mailto:willmcgugan@gmail.com).

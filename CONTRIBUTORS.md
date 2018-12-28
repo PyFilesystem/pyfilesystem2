@@ -1,0 +1,8 @@
+# Contributors (sorted alphabetically)
+
+Many thanks to the following developers for contributing to this project:
+
+- [Geoff Jukes](https://github.com/geoffjukes)
+- [Giampaolo](https://github.com/gpcimino)
+- [Martin Larralde](https://github.com/althonos)
+- [Will McGugan](https://github.com/willmcgugan)
