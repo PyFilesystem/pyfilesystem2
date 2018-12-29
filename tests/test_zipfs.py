@@ -29,7 +29,7 @@ class TestWriteReadZipFS(unittest.TestCase):
     def test_unicode_paths(self):
         # https://github.com/PyFilesystem/pyfilesystem2/issues/135
         with zipfs.ZipFS(self._temp_path, write=True) as zip_fs:
-            zip_fs.settext("Файл", "some content")
+            zip_fs.writetext("Файл", "some content")
 
         with zipfs.ZipFS(self._temp_path) as zip_fs:
             paths = list(zip_fs.walk.files())

@@ -379,7 +379,7 @@ class FS(object):
                 raise errors.DestinationExists(dst_path)
             with closing(self.open(src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.setbinfile(dst_path, read_file)  # type: ignore
+                self.upload(dst_path, read_file)  # type: ignore
 
     def copydir(self, src_path, dst_path, create=False):
         # type: (Text, Text, bool) -> None
@@ -550,7 +550,7 @@ class FS(object):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def getbytes(self, path):
+    def readbytes(self, path):
         # type: (Text) -> bytes
         """Get the contents of a file as bytes.
 
@@ -568,7 +568,7 @@ class FS(object):
             contents = read_file.read()
         return contents
 
-    def getfile(self, path, file, chunk_size=None, **options):
+    def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
         """Copies a file from the filesystem to a file-like object.
 
@@ -598,7 +598,7 @@ class FS(object):
             with self.openbin(path, **options) as read_file:
                 tools.copy_file_data(read_file, file, chunk_size=chunk_size)
 
-    def gettext(
+    def readtext(
         self,
         path,  # type: Text
         encoding=None,  # type: Optional[Text]
@@ -1074,7 +1074,7 @@ class FS(object):
         with self._lock:
             with self.open(src_path, "rb") as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.setbinfile(dst_path, read_file)  # type: ignore
+                self.upload(dst_path, read_file)  # type: ignore
             self.remove(src_path)
 
     def open(
@@ -1226,7 +1226,7 @@ class FS(object):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def setbytes(self, path, contents):
+    def writebytes(self, path, contents):
         # type: (Text, bytes) -> None
         # FIXME(@althonos): accept bytearray and memoryview as well ?
         """Copy binary data to a file.
@@ -1244,7 +1244,7 @@ class FS(object):
         with closing(self.open(path, mode="wb")) as write_file:
             write_file.write(contents)
 
-    def setbinfile(self, path, file):
+    def upload(self, path, file):
         # type: (Text, BinaryIO) -> None
         """Set a file to the contents of a binary file object.
 
@@ -1270,7 +1270,7 @@ class FS(object):
             with self.open(path, "wb") as dst_file:
                 tools.copy_file_data(file, dst_file)
 
-    def setfile(
+    def writefile(
         self,
         path,  # type: Text
         file,  # type: IO
@@ -1340,7 +1340,7 @@ class FS(object):
 
         self.setinfo(path, raw_info)
 
-    def settext(
+    def writetext(
         self,
         path,  # type: Text
         contents,  # type: Text

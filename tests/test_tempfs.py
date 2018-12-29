@@ -27,5 +27,5 @@ class TestTempFS(TestOSFS):
         rmtree.side_effect = Exception("boom")
         with self.assertRaises(errors.OperationFailed):
             t = TempFS(ignore_clean_errors=False)
-            t.setbytes("foo", b"bar")
+            t.writebytes("foo", b"bar")
             t.close()
