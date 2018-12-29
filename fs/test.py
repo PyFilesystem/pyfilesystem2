@@ -311,7 +311,7 @@ class FSTestCases(object):
 
         """
         assert isinstance(contents, bytes)
-        data = self.fs.getbytes(path)
+        data = self.fs.readbytes(path)
         self.assertEqual(data, contents)
         self.assertIsInstance(data, bytes)
 
@@ -391,9 +391,9 @@ class FSTestCases(object):
             self.fs.islink("bar")
 
     def test_getsize(self):
-        self.fs.setbytes("empty", b"")
-        self.fs.setbytes("one", b"a")
-        self.fs.setbytes("onethousand", ("b" * 1000).encode("ascii"))
+        self.fs.writebytes("empty", b"")
+        self.fs.writebytes("one", b"a")
+        self.fs.writebytes("onethousand", ("b" * 1000).encode("ascii"))
         self.assertEqual(self.fs.getsize("empty"), 0)
         self.assertEqual(self.fs.getsize("one"), 1)
         self.assertEqual(self.fs.getsize("onethousand"), 1000)
@@ -453,7 +453,7 @@ class FSTestCases(object):
         self.assertTrue(root_info.is_dir)
 
         # Make a file of known size
-        self.fs.setbytes("foo", b"bar")
+        self.fs.writebytes("foo", b"bar")
         self.fs.makedir("dir")
 
         # Check basic namespace
@@ -517,7 +517,7 @@ class FSTestCases(object):
 
         # make some files and directories
         self.fs.makedirs("foo/bar")
-        self.fs.setbytes("foo/bar/baz", b"test")
+        self.fs.writebytes("foo/bar/baz", b"test")
 
         # Check files exists
         self.assertTrue(self.fs.exists("foo"))
@@ -552,12 +552,12 @@ class FSTestCases(object):
         self.assertEqual(self.fs.listdir("./"), [])
 
         # Make a few objects
-        self.fs.setbytes("foo", b"egg")
-        self.fs.setbytes("bar", b"egg")
+        self.fs.writebytes("foo", b"egg")
+        self.fs.writebytes("bar", b"egg")
         self.fs.makedir("baz")
 
         # This should not be listed
-        self.fs.setbytes("baz/egg", b"egg")
+        self.fs.writebytes("baz/egg", b"egg")
 
         # Check list works
         six.assertCountEqual(self, self.fs.listdir("/"), ["foo", "bar", "baz"])
@@ -575,8 +575,8 @@ class FSTestCases(object):
         self.assertEqual(self.fs.listdir("/dir"), [])
 
         # Write some files
-        self.fs.setbytes("dir/foofoo", b"egg")
-        self.fs.setbytes("dir/barbar", b"egg")
+        self.fs.writebytes("dir/foofoo", b"egg")
+        self.fs.writebytes("dir/barbar", b"egg")
 
         # Check listing subdirectory
         six.assertCountEqual(self, self.fs.listdir("dir"), ["foofoo", "barbar"])
@@ -590,7 +590,7 @@ class FSTestCases(object):
 
     def test_move(self):
         # Make a file
-        self.fs.setbytes("foo", b"egg")
+        self.fs.writebytes("foo", b"egg")
         self.assert_isfile("foo")
 
         # Move it
@@ -604,7 +604,7 @@ class FSTestCases(object):
         self.assert_bytes("bar", b"egg")
 
         # Check moving to existing file fails
-        self.fs.setbytes("foo2", b"eggegg")
+        self.fs.writebytes("foo2", b"eggegg")
         with self.assertRaises(errors.DestinationExists):
             self.fs.move("foo2", "bar")
 
@@ -622,7 +622,7 @@ class FSTestCases(object):
 
         # Check moving between different directories
         self.fs.makedir("baz")
-        self.fs.setbytes("baz/bazbaz", b"bazbaz")
+        self.fs.writebytes("baz/bazbaz", b"bazbaz")
         self.fs.makedir("baz2")
         self.fs.move("baz/bazbaz", "baz2/bazbaz")
         self.assert_not_exists("baz/bazbaz")
@@ -648,7 +648,7 @@ class FSTestCases(object):
         self.fs.makedir("foo")
         self.assert_isdir("foo")
         self.assertEqual(self.fs.gettype("foo"), ResourceType.directory)
-        self.fs.setbytes("foo/bar.txt", b"egg")
+        self.fs.writebytes("foo/bar.txt", b"egg")
         self.assert_bytes("foo/bar.txt", b"egg")
 
         # Directory exists
@@ -682,7 +682,7 @@ class FSTestCases(object):
 
         self.fs.makedirs("foo/bar/baz", recreate=True)
 
-        self.fs.setbytes("foo.bin", b"test")
+        self.fs.writebytes("foo.bin", b"test")
         with self.assertRaises(errors.DirectoryExpected):
             self.fs.makedirs("foo.bin/bar")
 
@@ -752,7 +752,7 @@ class FSTestCases(object):
 
         # Test text files are proper iterators over themselves
         lines = os.linesep.join(["Line 1", "Line 2", "Line 3"])
-        self.fs.settext("iter.txt", lines)
+        self.fs.writetext("iter.txt", lines)
         with self.fs.open("iter.txt") as f:
             for actual, expected in zip(f, lines.splitlines(1)):
                 self.assertEqual(actual, expected)
@@ -816,7 +816,7 @@ class FSTestCases(object):
 
         # Test binary files are proper iterators over themselves
         lines = b"\n".join([b"Line 1", b"Line 2", b"Line 3"])
-        self.fs.setbytes("iter.bin", lines)
+        self.fs.writebytes("iter.bin", lines)
         with self.fs.openbin("iter.bin") as f:
             for actual, expected in zip(f, lines.splitlines(1)):
                 self.assertEqual(actual, expected)
@@ -992,8 +992,8 @@ class FSTestCases(object):
     def test_opendir(self):
         # Make a simple directory structure
         self.fs.makedir("foo")
-        self.fs.setbytes("foo/bar", b"barbar")
-        self.fs.setbytes("foo/egg", b"eggegg")
+        self.fs.writebytes("foo/bar", b"barbar")
+        self.fs.writebytes("foo/egg", b"eggegg")
 
         # Open a sub directory
         with self.fs.opendir("foo") as foo_fs:
@@ -1002,8 +1002,8 @@ class FSTestCases(object):
             six.assertCountEqual(self, foo_fs.listdir("/"), ["bar", "egg"])
             self.assertTrue(foo_fs.isfile("bar"))
             self.assertTrue(foo_fs.isfile("egg"))
-            self.assertEqual(foo_fs.getbytes("bar"), b"barbar")
-            self.assertEqual(foo_fs.getbytes("egg"), b"eggegg")
+            self.assertEqual(foo_fs.readbytes("bar"), b"barbar")
+            self.assertEqual(foo_fs.readbytes("egg"), b"eggegg")
 
         self.assertFalse(self.fs.isclosed())
 
@@ -1024,16 +1024,16 @@ class FSTestCases(object):
             six.assertCountEqual(self, foo_fs.listdir("/"), ["bar", "egg"])
             self.assertTrue(foo_fs.isfile("bar"))
             self.assertTrue(foo_fs.isfile("egg"))
-            self.assertEqual(foo_fs.getbytes("bar"), b"barbar")
-            self.assertEqual(foo_fs.getbytes("egg"), b"eggegg")
+            self.assertEqual(foo_fs.readbytes("bar"), b"barbar")
+            self.assertEqual(foo_fs.readbytes("egg"), b"eggegg")
 
         self.assertTrue(self.fs.isclosed())
 
     def test_remove(self):
 
-        self.fs.setbytes("foo1", b"test1")
-        self.fs.setbytes("foo2", b"test2")
-        self.fs.setbytes("foo3", b"test3")
+        self.fs.writebytes("foo1", b"test1")
+        self.fs.writebytes("foo2", b"test2")
+        self.fs.writebytes("foo3", b"test3")
 
         self.assert_isfile("foo1")
         self.assert_isfile("foo2")
@@ -1075,7 +1075,7 @@ class FSTestCases(object):
 
         # Test force removal
         self.fs.makedirs("foo/bar/baz")
-        self.fs.setbytes("foo/egg", b"test")
+        self.fs.writebytes("foo/egg", b"test")
 
         with self.assertRaises(errors.DirectoryExpected):
             self.fs.removedir("foo/egg")
@@ -1153,12 +1153,12 @@ class FSTestCases(object):
 
     def test_copy(self):
         # Test copy to new path
-        self.fs.setbytes("foo", b"test")
+        self.fs.writebytes("foo", b"test")
         self.fs.copy("foo", "bar")
         self.assert_bytes("bar", b"test")
 
         # Test copy over existing path
-        self.fs.setbytes("baz", b"truncateme")
+        self.fs.writebytes("baz", b"truncateme")
         self.fs.copy("foo", "baz", overwrite=True)
         self.assert_bytes("foo", b"test")
 
@@ -1187,16 +1187,16 @@ class FSTestCases(object):
         data4 = b"egg" * 7 * 256 * 1024
 
         with open_fs("temp://") as src_fs:
-            src_fs.setbytes("foo", data1)
-            src_fs.setbytes("bar", data2)
-            src_fs.makedir("dir1").setbytes("baz", data3)
-            src_fs.makedirs("dir2/dir3").setbytes("egg", data4)
+            src_fs.writebytes("foo", data1)
+            src_fs.writebytes("bar", data2)
+            src_fs.makedir("dir1").writebytes("baz", data3)
+            src_fs.makedirs("dir2/dir3").writebytes("egg", data4)
             dst_fs = self.fs
             fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
-            self.assertEqual(dst_fs.getbytes("foo"), data1)
-            self.assertEqual(dst_fs.getbytes("bar"), data2)
-            self.assertEqual(dst_fs.getbytes("dir1/baz"), data3)
-            self.assertEqual(dst_fs.getbytes("dir2/dir3/egg"), data4)
+            self.assertEqual(dst_fs.readbytes("foo"), data1)
+            self.assertEqual(dst_fs.readbytes("bar"), data2)
+            self.assertEqual(dst_fs.readbytes("dir1/baz"), data3)
+            self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), data4)
 
     def test_upload_0(self):
         self._test_upload(0)
@@ -1218,15 +1218,15 @@ class FSTestCases(object):
         data4 = b"egg" * 7 * 256 * 1024
         src_fs = self.fs
         with open_fs("temp://") as dst_fs:
-            src_fs.setbytes("foo", data1)
-            src_fs.setbytes("bar", data2)
-            src_fs.makedir("dir1").setbytes("baz", data3)
-            src_fs.makedirs("dir2/dir3").setbytes("egg", data4)
+            src_fs.writebytes("foo", data1)
+            src_fs.writebytes("bar", data2)
+            src_fs.makedir("dir1").writebytes("baz", data3)
+            src_fs.makedirs("dir2/dir3").writebytes("egg", data4)
             fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
-            self.assertEqual(dst_fs.getbytes("foo"), data1)
-            self.assertEqual(dst_fs.getbytes("bar"), data2)
-            self.assertEqual(dst_fs.getbytes("dir1/baz"), data3)
-            self.assertEqual(dst_fs.getbytes("dir2/dir3/egg"), data4)
+            self.assertEqual(dst_fs.readbytes("foo"), data1)
+            self.assertEqual(dst_fs.readbytes("bar"), data2)
+            self.assertEqual(dst_fs.readbytes("dir1/baz"), data3)
+            self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), data4)
 
     def test_download_0(self):
         self._test_download(0)
@@ -1249,13 +1249,13 @@ class FSTestCases(object):
         self.assertEqual(self.fs.getsize("foo"), 0)
 
         # Test wipe existing file
-        self.fs.setbytes("foo", b"bar")
+        self.fs.writebytes("foo", b"bar")
         self.assertEqual(self.fs.getsize("foo"), 3)
         self.fs.create("foo", wipe=True)
         self.assertEqual(self.fs.getsize("foo"), 0)
 
         # Test create with existing file, and not wipe
-        self.fs.setbytes("foo", b"bar")
+        self.fs.writebytes("foo", b"bar")
         self.assertEqual(self.fs.getsize("foo"), 3)
         self.fs.create("foo", wipe=False)
         self.assertEqual(self.fs.getsize("foo"), 3)
@@ -1392,32 +1392,32 @@ class FSTestCases(object):
                 for info in self.fs.filterdir("/", exclude_files=["*"], dirs="*.py")
             ]
 
-    def test_getbytes(self):
-        # Test getbytes method.
+    def test_readbytes(self):
+        # Test readbytes method.
         all_bytes = b"".join(six.int2byte(n) for n in range(256))
         with self.fs.open("foo", "wb") as f:
             f.write(all_bytes)
-        self.assertEqual(self.fs.getbytes("foo"), all_bytes)
-        _all_bytes = self.fs.getbytes("foo")
+        self.assertEqual(self.fs.readbytes("foo"), all_bytes)
+        _all_bytes = self.fs.readbytes("foo")
         self.assertIsInstance(_all_bytes, bytes)
         self.assertEqual(_all_bytes, all_bytes)
 
         with self.assertRaises(errors.ResourceNotFound):
-            self.fs.getbytes("foo/bar")
+            self.fs.readbytes("foo/bar")
 
         self.fs.makedir("baz")
         with self.assertRaises(errors.FileExpected):
-            self.fs.getbytes("baz")
+            self.fs.readbytes("baz")
 
-    def test_getfile(self):
+    def test_download(self):
         test_bytes = b"Hello, World"
-        self.fs.setbytes("hello.bin", test_bytes)
+        self.fs.writebytes("hello.bin", test_bytes)
         write_file = io.BytesIO()
-        self.fs.getfile("hello.bin", write_file)
+        self.fs.download("hello.bin", write_file)
         self.assertEqual(write_file.getvalue(), test_bytes)
 
         with self.assertRaises(errors.ResourceNotFound):
-            self.fs.getfile("foo.bin", write_file)
+            self.fs.download("foo.bin", write_file)
 
     def test_isempty(self):
         self.assertTrue(self.fs.isempty("/"))
@@ -1429,35 +1429,35 @@ class FSTestCases(object):
         self.fs.remove("foo/bar.txt")
         self.assertTrue(self.fs.isempty("/foo"))
 
-    def test_setbytes(self):
+    def test_writebytes(self):
         all_bytes = b"".join(six.int2byte(n) for n in range(256))
-        self.fs.setbytes("foo", all_bytes)
+        self.fs.writebytes("foo", all_bytes)
         with self.fs.open("foo", "rb") as f:
             _bytes = f.read()
         self.assertIsInstance(_bytes, bytes)
         self.assertEqual(_bytes, all_bytes)
         self.assert_bytes("foo", all_bytes)
         with self.assertRaises(TypeError):
-            self.fs.setbytes("notbytes", "unicode")
+            self.fs.writebytes("notbytes", "unicode")
 
-    def test_gettext(self):
+    def test_readtext(self):
         self.fs.makedir("foo")
         with self.fs.open("foo/unicode.txt", "wt") as f:
             f.write(UNICODE_TEXT)
-        text = self.fs.gettext("foo/unicode.txt")
+        text = self.fs.readtext("foo/unicode.txt")
         self.assertIsInstance(text, text_type)
         self.assertEqual(text, UNICODE_TEXT)
         self.assert_text("foo/unicode.txt", UNICODE_TEXT)
 
-    def test_settext(self):
-        # Test settext method.
-        self.fs.settext("foo", "bar")
+    def test_writetext(self):
+        # Test writetext method.
+        self.fs.writetext("foo", "bar")
         with self.fs.open("foo", "rt") as f:
             foo = f.read()
         self.assertEqual(foo, "bar")
         self.assertIsInstance(foo, text_type)
         with self.assertRaises(TypeError):
-            self.fs.settext("nottext", b"bytes")
+            self.fs.writetext("nottext", b"bytes")
 
     def test_setfile(self):
         bytes_file = io.BytesIO(b"bar")
@@ -1466,9 +1466,9 @@ class FSTestCases(object):
             data = f.read()
         self.assertEqual(data, b"bar")
 
-    def test_setbinfile(self):
+    def test_upload(self):
         bytes_file = io.BytesIO(b"bar")
-        self.fs.setbinfile("foo", bytes_file)
+        self.fs.upload("foo", bytes_file)
         with self.fs.open("foo", "rb") as f:
             data = f.read()
         self.assertEqual(data, b"bar")
@@ -1574,14 +1574,14 @@ class FSTestCases(object):
     def test_copy_file(self):
         # Test fs.copy.copy_file
         bytes_test = b"Hello, World"
-        self.fs.setbytes("foo.txt", bytes_test)
+        self.fs.writebytes("foo.txt", bytes_test)
         fs.copy.copy_file(self.fs, "foo.txt", self.fs, "bar.txt")
         self.assert_bytes("bar.txt", bytes_test)
 
         mem_fs = open_fs("mem://")
 
         fs.copy.copy_file(self.fs, "foo.txt", mem_fs, "bar.txt")
-        self.assertEqual(mem_fs.getbytes("bar.txt"), bytes_test)
+        self.assertEqual(mem_fs.readbytes("bar.txt"), bytes_test)
 
     def test_copy_structure(self):
         mem_fs = open_fs("mem://")
@@ -1599,8 +1599,8 @@ class FSTestCases(object):
         other_fs = open_fs(protocol)
         self.fs.makedirs("foo/bar/baz")
         self.fs.makedir("egg")
-        self.fs.settext("top.txt", "Hello, World")
-        self.fs.settext("/foo/bar/baz/test.txt", "Goodbye, World")
+        self.fs.writetext("top.txt", "Hello, World")
+        self.fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
 
         fs.copy.copy_dir(self.fs, "/", other_fs, "/")
         expected = {"/egg", "/foo", "/foo/bar", "/foo/bar/baz"}
@@ -1633,8 +1633,8 @@ class FSTestCases(object):
         other_fs = open_fs(protocol)
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
-        other_fs.settext("top.txt", "Hello, World")
-        other_fs.settext("/foo/bar/baz/test.txt", "Goodbye, World")
+        other_fs.writetext("top.txt", "Hello, World")
+        other_fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
         fs.copy.copy_dir(other_fs, "/", self.fs, "/")
         expected = {"/egg", "/foo", "/foo/bar", "/foo/bar/baz"}
         self.assertEqual(set(walk.walk_dirs(self.fs)), expected)
@@ -1656,8 +1656,8 @@ class FSTestCases(object):
         other_fs = open_fs(protocol)
         other_fs.makedirs("foo/bar/baz")
         other_fs.makedir("egg")
-        other_fs.settext("top.txt", "Hello, World")
-        other_fs.settext("/foo/bar/baz/test.txt", "Goodbye, World")
+        other_fs.writetext("top.txt", "Hello, World")
+        other_fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
 
         fs.move.move_dir(other_fs, "/", self.fs, "/")
 
@@ -1676,8 +1676,8 @@ class FSTestCases(object):
     def test_move_same_fs(self):
         self.fs.makedirs("foo/bar/baz")
         self.fs.makedir("egg")
-        self.fs.settext("top.txt", "Hello, World")
-        self.fs.settext("/foo/bar/baz/test.txt", "Goodbye, World")
+        self.fs.writetext("top.txt", "Hello, World")
+        self.fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
 
         fs.move.move_dir(self.fs, "foo", self.fs, "foo2")
 
@@ -1688,7 +1688,7 @@ class FSTestCases(object):
 
     def test_move_file_same_fs(self):
         text = "Hello, World"
-        self.fs.makedir("foo").settext("test.txt", text)
+        self.fs.makedir("foo").writetext("test.txt", text)
         self.assert_text("foo/test.txt", text)
 
         fs.move.move_file(self.fs, "foo/test.txt", self.fs, "foo/test2.txt")
@@ -1699,7 +1699,7 @@ class FSTestCases(object):
         other_fs = open_fs(protocol)
 
         text = "Hello, World"
-        self.fs.makedir("foo").settext("test.txt", text)
+        self.fs.makedir("foo").writetext("test.txt", text)
         self.assert_text("foo/test.txt", text)
 
         with self.assertRaises(errors.ResourceNotFound):
@@ -1709,7 +1709,7 @@ class FSTestCases(object):
 
         fs.move.move_file(self.fs, "foo/test.txt", other_fs, "foo/test2.txt")
 
-        self.assertEqual(other_fs.gettext("foo/test2.txt"), text)
+        self.assertEqual(other_fs.readtext("foo/test2.txt"), text)
 
     def test_move_file_mem(self):
         self._test_move_file("mem://")
@@ -1719,7 +1719,7 @@ class FSTestCases(object):
 
     def test_copydir(self):
         self.fs.makedirs("foo/bar/baz/egg")
-        self.fs.settext("foo/bar/foofoo.txt", "Hello")
+        self.fs.writetext("foo/bar/foofoo.txt", "Hello")
         self.fs.makedir("foo2")
         self.fs.copydir("foo/bar", "foo2")
         self.assert_text("foo2/foofoo.txt", "Hello")
@@ -1736,7 +1736,7 @@ class FSTestCases(object):
 
     def test_movedir(self):
         self.fs.makedirs("foo/bar/baz/egg")
-        self.fs.settext("foo/bar/foofoo.txt", "Hello")
+        self.fs.writetext("foo/bar/foofoo.txt", "Hello")
         self.fs.makedir("foo2")
         self.fs.movedir("foo/bar", "foo2")
         self.assert_text("foo2/foofoo.txt", "Hello")
@@ -1778,8 +1778,8 @@ class FSTestCases(object):
             self.skipTest("the filesystem does not support unicode paths.")
 
         self.fs.makedir("földér")
-        self.fs.settext("☭.txt", "Smells like communism.")
-        self.fs.setbytes("földér/☣.txt", b"Smells like an old syringe.")
+        self.fs.writetext("☭.txt", "Smells like communism.")
+        self.fs.writebytes("földér/☣.txt", b"Smells like an old syringe.")
 
         self.assert_isdir("földér")
         self.assertEqual(["☣.txt"], self.fs.listdir("földér"))

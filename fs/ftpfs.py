@@ -552,9 +552,7 @@ class FTPFS(FS):
             raw_info["basic"] = {"name": name, "is_dir": is_dir}
             raw_info["ftp"] = facts  # type: ignore
             raw_info["details"] = {
-                "type": (
-                    int(ResourceType.directory if is_dir else ResourceType.file)
-                )
+                "type": (int(ResourceType.directory if is_dir else ResourceType.file))
             }
 
             details = raw_info["details"]
@@ -703,9 +701,7 @@ class FTPFS(FS):
                 raise  # pragma: no cover
 
     def _scandir(
-        self,
-        path,  # type: Text
-        namespaces=None   # type: Optional[Container[Text]]
+        self, path, namespaces=None  # type: Text  # type: Optional[Container[Text]]
     ):
         # type: (...) -> Iterator[Info]
         _path = self.validatepath(path)
@@ -745,7 +741,7 @@ class FTPFS(FS):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def setbinfile(self, path, file):
+    def upload(self, path, file):
         # type: (Text, BinaryIO) -> None
         _path = self.validatepath(path)
         with self._lock:
@@ -755,18 +751,18 @@ class FTPFS(FS):
                         str("STOR ") + _encode(_path, self.ftp.encoding), file
                     )
 
-    def setbytes(self, path, contents):
+    def writebytes(self, path, contents):
         # type: (Text, ByteString) -> None
         if not isinstance(contents, bytes):
             raise TypeError("contents must be bytes")
-        self.setbinfile(path, io.BytesIO(contents))
+        self.upload(path, io.BytesIO(contents))
 
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
 
-    def getbytes(self, path):
+    def readbytes(self, path):
         # type: (Text) -> bytes
         _path = self.validatepath(path)
         data = io.BytesIO()

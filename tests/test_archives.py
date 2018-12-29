@@ -21,12 +21,12 @@ class ArchiveTestCases(object):
     def build_source(self, fs):
         fs.makedirs("foo/bar/baz")
         fs.makedir("tmp")
-        fs.settext("Файл", "unicode filename")
-        fs.settext("top.txt", "Hello, World")
-        fs.settext("top2.txt", "Hello, World")
-        fs.settext("foo/bar/egg", "foofoo")
+        fs.writetext("Файл", "unicode filename")
+        fs.writetext("top.txt", "Hello, World")
+        fs.writetext("top2.txt", "Hello, World")
+        fs.writetext("foo/bar/egg", "foofoo")
         fs.makedir("unicode")
-        fs.settext("unicode/text.txt", UNICODE_TEXT)
+        fs.writetext("unicode/text.txt", UNICODE_TEXT)
 
     def compress(self, fs):
         pass
@@ -120,12 +120,12 @@ class ArchiveTestCases(object):
                 pass
 
     def test_gets(self):
-        self.assertEqual(self.fs.gettext("top.txt"), "Hello, World")
-        self.assertEqual(self.fs.gettext("foo/bar/egg"), "foofoo")
-        self.assertEqual(self.fs.getbytes("top.txt"), b"Hello, World")
-        self.assertEqual(self.fs.getbytes("foo/bar/egg"), b"foofoo")
+        self.assertEqual(self.fs.readtext("top.txt"), "Hello, World")
+        self.assertEqual(self.fs.readtext("foo/bar/egg"), "foofoo")
+        self.assertEqual(self.fs.readbytes("top.txt"), b"Hello, World")
+        self.assertEqual(self.fs.readbytes("foo/bar/egg"), b"foofoo")
         with self.assertRaises(errors.ResourceNotFound):
-            self.fs.getbytes("what.txt")
+            self.fs.readbytes("what.txt")
 
     def test_walk_files(self):
         source_files = sorted(walk.walk_files(self.source_fs))

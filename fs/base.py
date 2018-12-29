@@ -346,7 +346,7 @@ class FS(object):
 
         Example:
             >>> with OSFS('~/Desktop') as desktop_fs:
-            ...    desktop_fs.settext(
+            ...    desktop_fs.writetext(
             ...        'note.txt',
             ...        "Don't forget to tape Game of Thrones"
             ...    )
@@ -591,7 +591,7 @@ class FS(object):
 
         Example:
             >>> with open('starwars.mov', 'wb') as write_file:
-            ...     my_fs.getfile('/movies/starwars.mov', write_file)
+            ...     my_fs.download('/movies/starwars.mov', write_file)
 
         """
         with self._lock:
@@ -1263,7 +1263,7 @@ class FS(object):
 
         Example:
             >>> with open('myfile.bin') as read_file:
-            ...     my_fs.setbinfile('myfile.bin', read_file)
+            ...     my_fs.upload('myfile.bin', read_file)
 
         """
         with self._lock:

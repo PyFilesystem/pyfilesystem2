@@ -90,13 +90,13 @@ FS objects have a :meth:`~fs.base.FS.close` methd which will perform any require
 You can call ``close`` explicitly once you are finished using a filesystem. For example::
 
     >>> home_fs = open_fs('osfs://~/')
-    >>> home_fs.settext('reminder.txt', 'buy coffee')
+    >>> home_fs.writetext('reminder.txt', 'buy coffee')
     >>> home_fs.close()
 
 If you use FS objects as a context manager, ``close`` will be called automatically. The following is equivalent to the previous example::
 
     >>> with open_fs('osfs://~/') as home_fs:
-    ...    home_fs.settext('reminder.txt', 'buy coffee')
+    ...    home_fs.writetext('reminder.txt', 'buy coffee')
 
 Using FS objects as a context manager is recommended as it will ensure every FS is closed.
 
@@ -158,7 +158,7 @@ The :class:`~fs.base.FS.makedir` and :class:`~fs.base.FS.makedirs` methods also 
     >>> home_fs = open_fs('~/')
     >>> game_fs = home_fs.makedirs('projects/game')
     >>> game_fs.touch('__init__.py')
-    >>> game_fs.settext('README.md', "Tetris clone")
+    >>> game_fs.writetext('README.md', "Tetris clone")
     >>> game_fs.listdir('/')
     ['__init__.py', 'README.md']
 
@@ -178,7 +178,7 @@ In the case of a ``OSFS``, a standard file-like object will be returned. Other f
 
 PyFilesystem also offers a number of shortcuts for common file related operations. For instance, :meth:`~fs.base.FS.getbytes` will return the file contents as a bytes, and :meth:`~fs.base.FS.gettext` will read unicode text. These methods is generally preferable to explicitly opening files, as the FS object may have an optimized implementation.
 
-Other *shortcut* methods are :meth:`~fs.base.FS.setbin`, :meth:`~fs.base.FS.setbytes`, :meth:`~fs.base.FS.settext`.
+Other *shortcut* methods are :meth:`~fs.base.FS.setbin`, :meth:`~fs.base.FS.writebytes`, :meth:`~fs.base.FS.writetext`.
 
 Walking
 ~~~~~~~

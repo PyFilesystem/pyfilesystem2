@@ -134,7 +134,7 @@ class ZipFS(WrapFS):
     Here's how you might extract and print a readme from a zip file::
 
         with ZipFS('foo.zip') as zip_fs:
-            readme = zip_fs.gettext('readme.txt')
+            readme = zip_fs.readtext('readme.txt')
 
     If you open the ZipFS with ``write`` set to `True`, then the ZipFS
     will be a empty temporary filesystem. Any files / directories you
@@ -145,7 +145,7 @@ class ZipFS(WrapFS):
     file::
 
         with ZipFS('foo.zip', write=True) as new_zip:
-            new_zip.settext(
+            new_zip.writetext(
                 'readme.txt',
                 'This zip file was written by PyFilesystem'
             )
@@ -436,7 +436,7 @@ class ReadZipFS(FS):
         super(ReadZipFS, self).close()
         self._zip.close()
 
-    def getbytes(self, path):
+    def readbytes(self, path):
         # type: (Text) -> bytes
         self.check()
         if not self._directory.isfile(path):

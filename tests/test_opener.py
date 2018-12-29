@@ -214,10 +214,10 @@ class TestOpeners(unittest.TestCase):
         try:
             # Test creating zip
             with opener.open_fs("zip://" + zip_name, create=True) as make_zip:
-                make_zip.settext("foo.txt", "foofoo")
+                make_zip.writetext("foo.txt", "foofoo")
             # Test opening zip
             with opener.open_fs("zip://" + zip_name, writeable=False) as zip_fs:
-                self.assertEqual(zip_fs.gettext("foo.txt"), "foofoo")
+                self.assertEqual(zip_fs.readtext("foo.txt"), "foofoo")
         finally:
             os.remove(zip_name)
 
@@ -228,10 +228,10 @@ class TestOpeners(unittest.TestCase):
             # Test creating tar
             with opener.open_fs("tar://" + tar_name, create=True) as make_tar:
                 self.assertEqual(make_tar.compression, "gz")
-                make_tar.settext("foo.txt", "foofoo")
+                make_tar.writetext("foo.txt", "foofoo")
             # Test opening tar
             with opener.open_fs("tar://" + tar_name, writeable=False) as tar_fs:
-                self.assertEqual(tar_fs.gettext("foo.txt"), "foofoo")
+                self.assertEqual(tar_fs.readtext("foo.txt"), "foofoo")
         finally:
             os.remove(tar_name)
 
@@ -259,9 +259,9 @@ class TestOpeners(unittest.TestCase):
         user_data_fs = open_fs("userdata://fstest:willmcgugan:1.0")
         self.assertIsInstance(user_data_fs, UserDataFS)
         user_data_fs.makedir("foo", recreate=True)
-        user_data_fs.settext("foo/bar.txt", "baz")
+        user_data_fs.writetext("foo/bar.txt", "baz")
         user_data_fs_foo_dir = open_fs("userdata://fstest:willmcgugan:1.0/foo/")
-        self.assertEqual(user_data_fs_foo_dir.gettext("bar.txt"), "baz")
+        self.assertEqual(user_data_fs_foo_dir.readtext("bar.txt"), "baz")
 
     @mock.patch("fs.ftpfs.FTPFS")
     def test_open_ftp(self, mock_FTPFS):

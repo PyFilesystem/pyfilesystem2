@@ -93,7 +93,7 @@ In the general case, it is a good idea to look at how these methods are implemen
 * :meth:`~fs.base.FS.exists`
 * :meth:`~fs.base.FS.filterdir`
 * :meth:`~fs.base.FS.getbytes`
-* :meth:`~fs.base.FS.getfile`
+* :meth:`~fs.base.FS.download`
 * :meth:`~fs.base.FS.getmeta`
 * :meth:`~fs.base.FS.getsize`
 * :meth:`~fs.base.FS.getsyspath`
@@ -114,9 +114,9 @@ In the general case, it is a good idea to look at how these methods are implemen
 * :meth:`~fs.base.FS.removetree`
 * :meth:`~fs.base.FS.scandir`
 * :meth:`~fs.base.FS.setbin`
-* :meth:`~fs.base.FS.setbytes`
+* :meth:`~fs.base.FS.writebytes`
 * :meth:`~fs.base.FS.setfile`
-* :meth:`~fs.base.FS.settext`
+* :meth:`~fs.base.FS.writetext`
 * :meth:`~fs.base.FS.settimes`
 * :meth:`~fs.base.FS.touch`
 * :meth:`~fs.base.FS.validatepath`

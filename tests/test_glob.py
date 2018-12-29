@@ -9,13 +9,13 @@ from fs import open_fs
 class TestGlob(unittest.TestCase):
     def setUp(self):
         fs = self.fs = open_fs("mem://")
-        fs.settext("foo.py", "Hello, World")
+        fs.writetext("foo.py", "Hello, World")
         fs.touch("bar.py")
         fs.touch("baz.py")
         fs.makedirs("egg")
-        fs.settext("egg/foo.py", "from fs import open_fs")
+        fs.writetext("egg/foo.py", "from fs import open_fs")
         fs.touch("egg/foo.pyc")
-        fs.makedirs("a/b/c/").settext("foo.py", "import fs")
+        fs.makedirs("a/b/c/").writetext("foo.py", "import fs")
         repr(fs.glob)
 
     def test_match(self):

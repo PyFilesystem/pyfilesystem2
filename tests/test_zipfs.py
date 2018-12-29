@@ -77,7 +77,7 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
 
     def test_large(self):
         test_fs = open_fs("mem://")
-        test_fs.setbytes("test.bin", b"a" * 50000)
+        test_fs.writebytes("test.bin", b"a" * 50000)
         write_zip(test_fs, self._temp_path)
 
         self.fs = self.load_archive()

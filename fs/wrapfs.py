@@ -298,15 +298,15 @@ class WrapFS(FS, typing.Generic[_F]):
             for info in iter_files:
                 yield info
 
-    def getbytes(self, path):
+    def readbytes(self, path):
         # type: (Text) -> bytes
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            _bytes = _fs.getbytes(_path)
+            _bytes = _fs.readbytes(_path)
         return _bytes
 
-    def gettext(
+    def readtext(
         self,
         path,  # type: Text
         encoding=None,  # type: Optional[Text]
@@ -317,7 +317,7 @@ class WrapFS(FS, typing.Generic[_F]):
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            _text = _fs.gettext(
+            _text = _fs.readtext(
                 _path, encoding=encoding, errors=errors, newline=newline
             )
         return _text
@@ -452,19 +452,19 @@ class WrapFS(FS, typing.Generic[_F]):
         with unwrap_errors(path):
             return factory(self, path)
 
-    def setbytes(self, path, contents):
+    def writebytes(self, path, contents):
         # type: (Text, bytes) -> None
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            _fs.setbytes(_path, contents)
+            _fs.writebytes(_path, contents)
 
-    def setbinfile(self, path, file):
+    def upload(self, path, file):
         # type: (Text, BinaryIO) -> None
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            _fs.setbinfile(_path, file)
+            _fs.upload(_path, file)
 
     def setfile(
         self,

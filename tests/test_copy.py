@@ -54,17 +54,17 @@ class TestCopy(unittest.TestCase):
         data3 = b"baz" * 3 * 512 * 1024
         data4 = b"egg" * 7 * 512 * 1024
         with open_fs("temp://") as src_fs:
-            src_fs.setbytes("foo", data1)
-            src_fs.setbytes("bar", data2)
-            src_fs.makedir("dir1").setbytes("baz", data3)
-            src_fs.makedirs("dir2/dir3").setbytes("egg", data4)
+            src_fs.writebytes("foo", data1)
+            src_fs.writebytes("bar", data2)
+            src_fs.makedir("dir1").writebytes("baz", data3)
+            src_fs.makedirs("dir2/dir3").writebytes("egg", data4)
             for workers in (0, 1, 2, 4):
                 with open_fs("temp://") as dst_fs:
                     fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
-                    self.assertEqual(dst_fs.getbytes("foo"), data1)
-                    self.assertEqual(dst_fs.getbytes("bar"), data2)
-                    self.assertEqual(dst_fs.getbytes("dir1/baz"), data3)
-                    self.assertEqual(dst_fs.getbytes("dir2/dir3/egg"), data4)
+                    self.assertEqual(dst_fs.readbytes("foo"), data1)
+                    self.assertEqual(dst_fs.readbytes("bar"), data2)
+                    self.assertEqual(dst_fs.readbytes("dir1/baz"), data3)
+                    self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), data4)
 
     def test_copy_dir_on_copy(self):
         src_fs = open_fs("mem://")

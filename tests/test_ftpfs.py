@@ -190,12 +190,12 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
 
     def test_opener_path(self):
         self.fs.makedir("foo")
-        self.fs.settext("foo/bar", "baz")
+        self.fs.writetext("foo/bar", "baz")
         ftp_fs = open_fs(
             "ftp://user:1234@{}:{}/foo".format(self.server.host, self.server.port)
         )
         self.assertIsInstance(ftp_fs, SubFS)
-        self.assertEqual(ftp_fs.gettext("bar"), "baz")
+        self.assertEqual(ftp_fs.readtext("bar"), "baz")
         ftp_fs.close()
 
     def test_create(self):

@@ -29,7 +29,7 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         self.assertIs(self.fs.get_fs("mem"), self.mem_fs)
 
     def test_which(self):
-        self.fs.setbytes("foo", b"bar")
+        self.fs.writebytes("foo", b"bar")
         self.assertEqual(self.fs.which("foo"), ("mem", self.mem_fs))
         self.assertEqual(self.fs.which("bar", "w"), ("mem", self.mem_fs))
         self.assertEqual(self.fs.which("baz"), (None, None))
@@ -82,7 +82,7 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         multi_fs.add_fs("m1", m1)
         multi_fs.add_fs("m2", m2)
         multi_fs.add_fs("m3", m3)
-        self.assertEqual(multi_fs.getbytes("name"), b"m3")
+        self.assertEqual(multi_fs.readbytes("name"), b"m3")
 
         m1 = MemoryFS()
         m2 = MemoryFS()
@@ -94,7 +94,7 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         multi_fs.add_fs("m1", m1)
         multi_fs.add_fs("m2", m2, priority=10)
         multi_fs.add_fs("m3", m3)
-        self.assertEqual(multi_fs.getbytes("name"), b"m2")
+        self.assertEqual(multi_fs.readbytes("name"), b"m2")
 
         m1 = MemoryFS()
         m2 = MemoryFS()
@@ -106,7 +106,7 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         multi_fs.add_fs("m1", m1)
         multi_fs.add_fs("m2", m2, priority=10)
         multi_fs.add_fs("m3", m3, priority=10)
-        self.assertEqual(multi_fs.getbytes("name"), b"m3")
+        self.assertEqual(multi_fs.readbytes("name"), b"m3")
 
         m1 = MemoryFS()
         m2 = MemoryFS()
@@ -118,12 +118,12 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         multi_fs.add_fs("m1", m1, priority=11)
         multi_fs.add_fs("m2", m2, priority=10)
         multi_fs.add_fs("m3", m3, priority=10)
-        self.assertEqual(multi_fs.getbytes("name"), b"m1")
+        self.assertEqual(multi_fs.readbytes("name"), b"m1")
 
     def test_no_writable(self):
         fs = MultiFS()
         with self.assertRaises(errors.ResourceReadOnly):
-            fs.setbytes("foo", b"bar")
+            fs.writebytes("foo", b"bar")
 
     def test_validate_path(self):
         self.fs.write_fs = None
