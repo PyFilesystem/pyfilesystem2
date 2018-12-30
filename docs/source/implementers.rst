@@ -90,14 +90,12 @@ In the general case, it is a good idea to look at how these methods are implemen
 * :meth:`~fs.base.FS.copydir`
 * :meth:`~fs.base.FS.create`
 * :meth:`~fs.base.FS.desc`
+* :meth:`~fs.base.FS.download`
 * :meth:`~fs.base.FS.exists`
 * :meth:`~fs.base.FS.filterdir`
-* :meth:`~fs.base.FS.getbytes`
-* :meth:`~fs.base.FS.download`
 * :meth:`~fs.base.FS.getmeta`
 * :meth:`~fs.base.FS.getsize`
 * :meth:`~fs.base.FS.getsyspath`
-* :meth:`~fs.base.FS.gettext`
 * :meth:`~fs.base.FS.gettype`
 * :meth:`~fs.base.FS.geturl`
 * :meth:`~fs.base.FS.hassyspath`
@@ -111,15 +109,17 @@ In the general case, it is a good idea to look at how these methods are implemen
 * :meth:`~fs.base.FS.movedir`
 * :meth:`~fs.base.FS.open`
 * :meth:`~fs.base.FS.opendir`
+* :meth:`~fs.base.FS.readbytes`
+* :meth:`~fs.base.FS.readtext`
 * :meth:`~fs.base.FS.removetree`
 * :meth:`~fs.base.FS.scandir`
-* :meth:`~fs.base.FS.setbin`
-* :meth:`~fs.base.FS.writebytes`
 * :meth:`~fs.base.FS.setfile`
-* :meth:`~fs.base.FS.writetext`
 * :meth:`~fs.base.FS.settimes`
 * :meth:`~fs.base.FS.touch`
+* :meth:`~fs.base.FS.upload`
 * :meth:`~fs.base.FS.validatepath`
+* :meth:`~fs.base.FS.writebytes`
+* :meth:`~fs.base.FS.writetext`
 
 .. _helper-methods:
 
