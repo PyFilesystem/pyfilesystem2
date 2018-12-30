@@ -1459,9 +1459,9 @@ class FSTestCases(object):
         with self.assertRaises(TypeError):
             self.fs.writetext("nottext", b"bytes")
 
-    def test_setfile(self):
+    def test_writefile(self):
         bytes_file = io.BytesIO(b"bar")
-        self.fs.setfile("foo", bytes_file)
+        self.fs.writefile("foo", bytes_file)
         with self.fs.open("foo", "rb") as f:
             data = f.read()
         self.assertEqual(data, b"bar")

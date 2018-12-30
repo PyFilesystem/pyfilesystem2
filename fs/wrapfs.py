@@ -466,7 +466,7 @@ class WrapFS(FS, typing.Generic[_F]):
         with unwrap_errors(path):
             _fs.upload(_path, file)
 
-    def setfile(
+    def writefile(
         self,
         path,  # type: Text
         file,  # type: IO[AnyStr]
@@ -478,7 +478,9 @@ class WrapFS(FS, typing.Generic[_F]):
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            _fs.setfile(_path, file, encoding=encoding, errors=errors, newline=newline)
+            _fs.writefile(
+                _path, file, encoding=encoding, errors=errors, newline=newline
+            )
 
     def validatepath(self, path):
         # type: (Text) -> Text

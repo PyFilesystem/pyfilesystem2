@@ -64,7 +64,7 @@ class TestWrap(unittest.TestCase):
             fs.upload("foo", None)
 
         with self.assertRaises(errors.ResourceReadOnly):
-            fs.setfile("foo", None)
+            fs.writefile("foo", None)
 
         self.assertTrue(mem_fs.isempty("/"))
         mem_fs.writebytes("file", b"read me")

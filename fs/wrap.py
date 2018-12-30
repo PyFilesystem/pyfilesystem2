@@ -281,7 +281,7 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         self.check()
         raise ResourceReadOnly(path)
 
-    def setfile(
+    def writefile(
         self,
         path,  # type: Text
         file,  # type: IO
