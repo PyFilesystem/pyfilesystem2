@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.1.4] - Unreleased
 
-# Changed
-
 A few methods have been renamed for greater clarity (but functionality remains the same).
 
 The old methods are now aliases and will continue to work, but will
@@ -21,6 +19,10 @@ Please update your code accordingly.
 - `setbytes` -> `writebytes`
 - `setbinfile` -> `upload`
 - `settext` -> `writetext`
+
+### Changed
+
+- Changed default chunk size in `copy_file_data` to 1MB
 
 ## [2.1.3] - 2018-12-24
 

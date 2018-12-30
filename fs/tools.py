@@ -38,7 +38,7 @@ def remove_empty(fs, path):
         pass
 
 
-def copy_file_data(src_file, dst_file, chunk_size=None):
+def copy_file_data(src_file, dst_file, chunk_size=1024 * 1024):
     # type: (IO, IO, Optional[int]) -> None
     """Copy data from one file object to another.
 
@@ -49,11 +49,10 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
             a time (or `None` to use sensible default).
 
     """
-    _chunk_size = chunk_size or io.DEFAULT_BUFFER_SIZE
     read = src_file.read
     write = dst_file.write
     # The 'or None' is so that it works with binary and text files
-    for chunk in iter(lambda: read(_chunk_size) or None, None):
+    for chunk in iter(lambda: read(chunk_size) or None, None):
         write(chunk)
 
 
