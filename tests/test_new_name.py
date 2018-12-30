@@ -8,7 +8,7 @@ from fs.base import _new_name
 
 
 class TestNewNameDecorator(unittest.TestCase):
-    def double(n):
+    def double(self, n):
         return n * 2
 
     times_2 = _new_name(double, "times_2")
@@ -21,7 +21,7 @@ class TestNewNameDecorator(unittest.TestCase):
             self.assertEqual(len(w), 1)
             self.assertEqual(w[0].category, DeprecationWarning)
             self.assertEqual(
-                w[0].message,
-                "method 'times_two' has been deprecated, please renamed to 'double'",
+                str(w[0].message),
+                "method 'times_2' has been deprecated, please rename to 'double'",
             )
-        self.assertEqual(result, 2)
+        self.assertEqual(result, 4)
