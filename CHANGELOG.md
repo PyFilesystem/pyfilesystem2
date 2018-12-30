@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.4] - Unreleased
+
+# Added
+
+A few methods have been renamed for greater clarity (but functionality remains the same).
+
+The old methods are now aliases and will continue to work, but will
+issue a deprecation warning via the `warnings` module.
+Please update your code accordingly.
+
+- `getbytes` -> `readbytes`
+- `getfile` -> `download`
+- `gettext` -> `readtext`
+- `setbytes` -> `writebytes`
+- `setbinfile` -> `upload`
+- `settext` -> `writetext`
+
 ## [2.1.3] - 2018-12-24
 
 ### Fixed

@@ -15,7 +15,8 @@ import threading
 import time
 import typing
 from contextlib import closing
-from functools import partial
+from functools import partial, wraps
+import warnings
 
 import six
 
@@ -59,6 +60,22 @@ if False:  # typing.TYPE_CHECKING
 
 
 __all__ = ["FS"]
+
+
+def _new_name(method, old_name):
+    """Return a method with a deprecation warning."""
+    # Looks suspiciously like a decorator, but isn't!
+    @wraps(method)
+    def _method(*args, **kwargs):
+        warnings.warn(
+            "method '{}' has been deprecated, please rename to '{}'".format(
+                old_name, method.__name__
+            ),
+            DeprecationWarning,
+        )
+        return method(*args, **kwargs)
+
+    return _method
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -568,6 +585,8 @@ class FS(object):
             contents = read_file.read()
         return contents
 
+    getbytes = _new_name(readbytes, "getbytes")
+
     def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
         """Copies a file from the filesystem to a file-like object.
@@ -597,6 +616,8 @@ class FS(object):
         with self._lock:
             with self.openbin(path, **options) as read_file:
                 tools.copy_file_data(read_file, file, chunk_size=chunk_size)
+
+    getfile = _new_name(download, "getfile")
 
     def readtext(
         self,
@@ -629,6 +650,8 @@ class FS(object):
         ) as read_file:
             contents = read_file.read()
         return contents
+
+    gettext = _new_name(readtext, "gettext")
 
     def getmeta(self, namespace="standard"):
         # type: (Text) -> Mapping[Text, object]
@@ -1244,6 +1267,8 @@ class FS(object):
         with closing(self.open(path, mode="wb")) as write_file:
             write_file.write(contents)
 
+    setbytes = _new_name(writebytes, "setbytes")
+
     def upload(self, path, file):
         # type: (Text, BinaryIO) -> None
         """Set a file to the contents of a binary file object.
@@ -1269,6 +1294,8 @@ class FS(object):
         with self._lock:
             with self.open(path, "wb") as dst_file:
                 tools.copy_file_data(file, dst_file)
+
+    setbinfile = _new_name(upload, "setbinfile")
 
     def writefile(
         self,
@@ -1372,6 +1399,8 @@ class FS(object):
             )
         ) as write_file:
             write_file.write(contents)
+
+    settext = _new_name(writetext, "settext")
 
     def touch(self, path):
         # type: (Text) -> None
