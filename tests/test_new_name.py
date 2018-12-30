@@ -11,7 +11,7 @@ class TestNewNameDecorator(unittest.TestCase):
     def double(n):
         return n * 2
 
-    times_2 = _new_name(times_two, "times_2")
+    times_2 = _new_name(double, "times_2")
 
     def test_old_name(self):
         """Test _new_name method issues a warning"""
