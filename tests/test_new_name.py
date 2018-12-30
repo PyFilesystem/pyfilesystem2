@@ -8,10 +8,10 @@ from fs.base import _new_name
 
 
 class TestNewNameDecorator(unittest.TestCase):
-    def times_two(n):
+    def double(n):
         return n * 2
 
-    double = _new_name(times_two, "double")
+    times_2 = _new_name(times_two, "times_2")
 
     def test_old_name(self):
         """Test _new_name method issues a warning"""
