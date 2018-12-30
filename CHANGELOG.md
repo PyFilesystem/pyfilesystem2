@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.1.4] - Unreleased
 
-# Added
+# Changed
 
 A few methods have been renamed for greater clarity (but functionality remains the same).
 
