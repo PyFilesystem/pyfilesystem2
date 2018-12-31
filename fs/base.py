@@ -1311,8 +1311,7 @@ class FS(object):
         newline="",  # type: Text
     ):
         # type: (...) -> None
-        """Set a file to the contents of a file object. Similar to `~FS.upload`, this
-        method also supports creating a text file.
+        """Set a file to the contents of a file object.
 
         Arguments:
             path (str): A path on the filesystem.
@@ -1323,12 +1322,10 @@ class FS(object):
                 (same as `io.open`).
             newline (str): Newline parameter (same as `io.open`).
 
-        This method will read from a file-like object and write the
-        data to a file on the filesystem. If the destination
-        exists, it will first be truncated.
-
-        If ``encoding`` is supplied, the destination will be opened in
-        text mode.
+        This method is similar to `~FS.upload`, in that it copies data from a
+        file-like object to a resource on the filesystem, but unlike ``upload``,
+        this method also supports creating files in text-mode (if the ``encoding``
+        argument is supplied).
 
         Note that the file object ``file`` will *not* be closed by this
         method. Take care to close it after this method completes
