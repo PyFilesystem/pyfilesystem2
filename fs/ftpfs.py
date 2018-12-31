@@ -739,8 +739,8 @@ class FTPFS(FS):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def upload(self, path, file):
-        # type: (Text, BinaryIO) -> None
+    def upload(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         _path = self.validatepath(path)
         with self._lock:
             with self._manage_ftp() as ftp:

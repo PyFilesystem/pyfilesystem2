@@ -1419,6 +1419,13 @@ class FSTestCases(object):
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.download("foo.bin", write_file)
 
+    def test_download_chunk_size(self):
+        test_bytes = b"Hello, World" * 100
+        self.fs.writebytes("hello.bin", test_bytes)
+        write_file = io.BytesIO()
+        self.fs.download("hello.bin", write_file, chunk_size=8)
+        self.assertEqual(write_file.getvalue(), test_bytes)
+
     def test_isempty(self):
         self.assertTrue(self.fs.isempty("/"))
         self.fs.makedir("foo")
@@ -1472,6 +1479,14 @@ class FSTestCases(object):
         with self.fs.open("foo", "rb") as f:
             data = f.read()
         self.assertEqual(data, b"bar")
+
+    def test_upload_chunk_size(self):
+        test_data = b"bar" * 128
+        bytes_file = io.BytesIO(test_data)
+        self.fs.upload("foo", bytes_file, chunk_size=8)
+        with self.fs.open("foo", "rb") as f:
+            data = f.read()
+        self.assertEqual(data, test_data)
 
     def test_bin_files(self):
         # Check binary files.

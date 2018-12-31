@@ -300,11 +300,11 @@ class MountFS(FS):
             **options
         )
 
-    def upload(self, path, file):
-        # type: (Text, BinaryIO) -> None
+    def upload(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         self.check()
         fs, _path = self._delegate(path)
-        return fs.upload(_path, file)
+        return fs.upload(_path, file, chunk_size=chunk_size, **options)
 
     def writebytes(self, path, contents):
         # type: (Text, bytes) -> None

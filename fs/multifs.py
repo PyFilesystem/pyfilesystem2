@@ -400,9 +400,11 @@ class MultiFS(FS):
             **kwargs
         )
 
-    def upload(self, path, file):
-        # type: (Text, BinaryIO) -> None
-        self._writable_required(path).upload(path, file)
+    def upload(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
+        self._writable_required(path).upload(
+            path, file, chunk_size=chunk_size, **options
+        )
 
     def writebytes(self, path, contents):
         # type: (Text, bytes) -> None

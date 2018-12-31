@@ -1269,8 +1269,8 @@ class FS(object):
 
     setbytes = _new_name(writebytes, "setbytes")
 
-    def upload(self, path, file):
-        # type: (Text, BinaryIO) -> None
+    def upload(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         """Set a file to the contents of a binary file object.
 
         This method copies bytes from an open binary file to a file on
@@ -1281,6 +1281,11 @@ class FS(object):
             path (str): A path on the filesystem.
             file (io.IOBase): a file object open for reading in
                 binary mode.
+            chunk_size (int, optional): Number of bytes to read at a
+                time, if a simple copy is used, or `None` to use
+                sensible default.
+            **options: Implementation specific options required to open
+                the source file.
 
         Note that the file object ``file`` will *not* be closed by this
         method. Take care to close it after this method completes
@@ -1292,8 +1297,8 @@ class FS(object):
 
         """
         with self._lock:
-            with self.open(path, "wb") as dst_file:
-                tools.copy_file_data(file, dst_file)
+            with self.openbin(path, mode="wb", **options) as dst_file:
+                tools.copy_file_data(file, dst_file, chunk_size=chunk_size)
 
     setbinfile = _new_name(upload, "setbinfile")
 

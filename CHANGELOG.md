@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.1.4] - Unreleased
+## [2.2.0] - Unreleased
 
 A few methods have been renamed for greater clarity (but functionality remains the same).
 
@@ -23,6 +23,7 @@ Please update your code accordingly.
 ### Changed
 
 - Changed default chunk size in `copy_file_data` to 1MB
+- Added `chunk_size` and `options` to `FS.upload`
 
 ## [2.1.3] - 2018-12-24
 
