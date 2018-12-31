@@ -1311,7 +1311,8 @@ class FS(object):
         newline="",  # type: Text
     ):
         # type: (...) -> None
-        """Set a file to the contents of a file object.
+        """Set a file to the contents of a file object. Similar to `~FS.upload`, this
+        method also supports creating a text file.
 
         Arguments:
             path (str): A path on the filesystem.
@@ -1322,8 +1323,8 @@ class FS(object):
                 (same as `io.open`).
             newline (str): Newline parameter (same as `io.open`).
 
-        This method will read the contents of a supplied file object,
-        and write to a file on the filesystem. If the destination
+        This method will read from a file-like object and write the
+        data to a file on the filesystem. If the destination
         exists, it will first be truncated.
 
         If ``encoding`` is supplied, the destination will be opened in
