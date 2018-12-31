@@ -1335,8 +1335,8 @@ class FS(object):
         (ideally with a context manager).
 
         Example:
-            >>> with open('myfile.bin') as read_file:
-            ...     my_fs.writefile('myfile.bin', read_file)
+            >>> with open('myfile.txt') as read_file:
+            ...     my_fs.writefile('myfile.txt', read_file)
 
         """
         mode = "wb" if encoding is None else "wt"
