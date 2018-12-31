@@ -1292,8 +1292,8 @@ class FS(object):
         (ideally with a context manager).
 
         Example:
-            >>> with open('myfile.bin') as read_file:
-            ...     my_fs.upload('myfile.bin', read_file)
+            >>> with open('~/movies/starwars.mov', 'rb') as read_file:
+            ...     my_fs.upload('starwars.mov', read_file)
 
         """
         with self._lock:
