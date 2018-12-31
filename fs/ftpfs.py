@@ -700,10 +700,8 @@ class FTPFS(FS):
                         raise errors.DirectoryNotEmpty(path)
                 raise  # pragma: no cover
 
-    def _scandir(
-        self, path, namespaces=None  # type: Text  # type: Optional[Container[Text]]
-    ):
-        # type: (...) -> Iterator[Info]
+    def _scandir(self, path, namespaces=None):
+        # type: (Text, Optional[Container[Text]]) -> Iterator[Info]
         _path = self.validatepath(path)
         with self._lock:
             if self.supports_mlst:
