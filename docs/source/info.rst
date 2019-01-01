@@ -17,7 +17,7 @@ Here's an example of retrieving file information::
 
     >>> from fs.osfs import OSFS
     >>> fs = OSFS('.')
-    >>> fs.settext('example.txt', 'Hello, World!')
+    >>> fs.writetext('example.txt', 'Hello, World!')
     >>> info = fs.getinfo('example.txt', namespaces=['details'])
     >>> info.name
     'example.txt'

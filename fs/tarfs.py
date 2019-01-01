@@ -79,7 +79,7 @@ class TarFS(WrapFS):
     Here's how you might extract and print a readme from a tar file::
 
         with TarFS('foo.tar.gz') as tar_fs:
-            readme = tar_fs.gettext('readme.txt')
+            readme = tar_fs.readtext('readme.txt')
 
     If you open the TarFS with ``write`` set to `True`, then the TarFS
     will be a empty temporary filesystem. Any files / directories you
@@ -91,7 +91,7 @@ class TarFS(WrapFS):
     file::
 
         with TarFS('foo.tar.xz', write=True) as new_tar:
-            new_tar.settext(
+            new_tar.writetext(
                 'readme.txt',
                 'This tar file was written by PyFilesystem'
             )
@@ -451,13 +451,13 @@ if __name__ == "__main__":  # pragma: no cover
     with TarFS("tests.tar") as tar_fs:
         print(tar_fs.listdir("/"))
         print(tar_fs.listdir("/tests/"))
-        print(tar_fs.gettext("tests/ttt/settings.ini"))
+        print(tar_fs.readtext("tests/ttt/settings.ini"))
         render(tar_fs)
         print(tar_fs)
         print(repr(tar_fs))
 
     with TarFS("TarFS.tar", write=True) as tar_fs:
         tar_fs.makedirs("foo/bar")
-        tar_fs.settext("foo/bar/baz.txt", "Hello, World")
+        tar_fs.writetext("foo/bar/baz.txt", "Hello, World")
         print(tar_fs)
         print(repr(tar_fs))

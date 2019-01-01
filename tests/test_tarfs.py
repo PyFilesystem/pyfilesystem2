@@ -33,7 +33,7 @@ class TestWriteReadTarFS(unittest.TestCase):
     def test_unicode_paths(self):
         # https://github.com/PyFilesystem/pyfilesystem2/issues/135
         with tarfs.TarFS(self._temp_path, write=True) as tar_fs:
-            tar_fs.settext("Файл", "some content")
+            tar_fs.writetext("Файл", "some content")
 
         with tarfs.TarFS(self._temp_path) as tar_fs:
             paths = list(tar_fs.walk.files())

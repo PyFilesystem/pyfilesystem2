@@ -49,7 +49,7 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
             a time (or `None` to use sensible default).
 
     """
-    _chunk_size = chunk_size or io.DEFAULT_BUFFER_SIZE
+    _chunk_size = 1024 * 1024 if chunk_size is None else chunk_size
     read = src_file.read
     write = dst_file.write
     # The 'or None' is so that it works with binary and text files

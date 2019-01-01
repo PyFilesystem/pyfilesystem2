@@ -242,10 +242,10 @@ class TestWalk(unittest.TestCase):
             walker_class = CustomWalker
 
         base_fs = CustomizedMemoryFS()
-        base_fs.settext("a", "a")
+        base_fs.writetext("a", "a")
         base_fs.makedirs("b")
-        base_fs.settext("b/c", "c")
-        base_fs.settext("b/d", "d")
+        base_fs.writetext("b/c", "c")
+        base_fs.writetext("b/d", "d")
         base_walker = base_fs.walk
         self.assertEqual(base_walker.walker_class, CustomWalker)
         six.assertCountEqual(self, ["/a", "/b/c", "/b/d"], base_walker.files())

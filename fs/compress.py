@@ -98,7 +98,7 @@ def write_zip(
                     sys_path = src_fs.getsyspath(path)
                 except NoSysPath:
                     # Write from bytes
-                    _zip.writestr(zip_info, src_fs.getbytes(path))
+                    _zip.writestr(zip_info, src_fs.readbytes(path))
                 else:
                     # Write from a file which is (presumably)
                     # more memory efficient

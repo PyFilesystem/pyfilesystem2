@@ -552,9 +552,7 @@ class FTPFS(FS):
             raw_info["basic"] = {"name": name, "is_dir": is_dir}
             raw_info["ftp"] = facts  # type: ignore
             raw_info["details"] = {
-                "type": (
-                    int(ResourceType.directory if is_dir else ResourceType.file)
-                )
+                "type": (int(ResourceType.directory if is_dir else ResourceType.file))
             }
 
             details = raw_info["details"]
@@ -702,12 +700,8 @@ class FTPFS(FS):
                         raise errors.DirectoryNotEmpty(path)
                 raise  # pragma: no cover
 
-    def _scandir(
-        self,
-        path,  # type: Text
-        namespaces=None   # type: Optional[Container[Text]]
-    ):
-        # type: (...) -> Iterator[Info]
+    def _scandir(self, path, namespaces=None):
+        # type: (Text, Optional[Container[Text]]) -> Iterator[Info]
         _path = self.validatepath(path)
         with self._lock:
             if self.supports_mlst:
@@ -745,8 +739,8 @@ class FTPFS(FS):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def setbinfile(self, path, file):
-        # type: (Text, BinaryIO) -> None
+    def upload(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         _path = self.validatepath(path)
         with self._lock:
             with self._manage_ftp() as ftp:
@@ -755,18 +749,18 @@ class FTPFS(FS):
                         str("STOR ") + _encode(_path, self.ftp.encoding), file
                     )
 
-    def setbytes(self, path, contents):
+    def writebytes(self, path, contents):
         # type: (Text, ByteString) -> None
         if not isinstance(contents, bytes):
             raise TypeError("contents must be bytes")
-        self.setbinfile(path, io.BytesIO(contents))
+        self.upload(path, io.BytesIO(contents))
 
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
 
-    def getbytes(self, path):
+    def readbytes(self, path):
         # type: (Text) -> bytes
         _path = self.validatepath(path)
         data = io.BytesIO()

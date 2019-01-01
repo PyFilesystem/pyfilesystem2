@@ -49,10 +49,10 @@ class TestWrap(unittest.TestCase):
             fs.create("foo")
 
         with self.assertRaises(errors.ResourceReadOnly):
-            fs.settext("foo", "bar")
+            fs.writetext("foo", "bar")
 
         with self.assertRaises(errors.ResourceReadOnly):
-            fs.setbytes("foo", b"bar")
+            fs.writebytes("foo", b"bar")
 
         with self.assertRaises(errors.ResourceReadOnly):
             fs.makedirs("foo/bar")
@@ -61,13 +61,13 @@ class TestWrap(unittest.TestCase):
             fs.touch("foo")
 
         with self.assertRaises(errors.ResourceReadOnly):
-            fs.setbinfile("foo", None)
+            fs.upload("foo", None)
 
         with self.assertRaises(errors.ResourceReadOnly):
-            fs.setfile("foo", None)
+            fs.writefile("foo", None)
 
         self.assertTrue(mem_fs.isempty("/"))
-        mem_fs.setbytes("file", b"read me")
+        mem_fs.writebytes("file", b"read me")
         with fs.openbin("file") as read_file:
             self.assertEqual(read_file.read(), b"read me")
 

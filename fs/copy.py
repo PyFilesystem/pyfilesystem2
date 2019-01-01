@@ -138,10 +138,10 @@ def copy_file(
                 with _src_fs.lock(), _dst_fs.lock():
                     if _dst_fs.hassyspath(dst_path):
                         with _dst_fs.openbin(dst_path, "w") as write_file:
-                            _src_fs.getfile(src_path, write_file)
+                            _src_fs.download(src_path, write_file)
                     else:
                         with _src_fs.openbin(src_path) as read_file:
-                            _dst_fs.setbinfile(dst_path, read_file)
+                            _dst_fs.upload(dst_path, read_file)
 
 
 def copy_file_internal(
@@ -171,10 +171,10 @@ def copy_file_internal(
         src_fs.copy(src_path, dst_path, overwrite=True)
     elif dst_fs.hassyspath(dst_path):
         with dst_fs.openbin(dst_path, "w") as write_file:
-            src_fs.getfile(src_path, write_file)
+            src_fs.download(src_path, write_file)
     else:
         with src_fs.openbin(src_path) as read_file:
-            dst_fs.setbinfile(dst_path, read_file)
+            dst_fs.upload(dst_path, read_file)
 
 
 def copy_file_if_newer(

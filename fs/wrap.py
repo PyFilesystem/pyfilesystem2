@@ -208,7 +208,7 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         self.check()
         raise ResourceReadOnly(path)
 
-    def settext(
+    def writetext(
         self,
         path,  # type: Text
         contents,  # type: Text
@@ -271,17 +271,17 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
             **options
         )
 
-    def setbytes(self, path, contents):
+    def writebytes(self, path, contents):
         # type: (Text, bytes) -> None
         self.check()
         raise ResourceReadOnly(path)
 
-    def setbinfile(self, path, file):
-        # type: (Text, BinaryIO) -> None
+    def upload(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         self.check()
         raise ResourceReadOnly(path)
 
-    def setfile(
+    def writefile(
         self,
         path,  # type: Text
         file,  # type: IO

@@ -15,7 +15,8 @@ import threading
 import time
 import typing
 from contextlib import closing
-from functools import partial
+from functools import partial, wraps
+import warnings
 
 import six
 
@@ -59,6 +60,22 @@ if False:  # typing.TYPE_CHECKING
 
 
 __all__ = ["FS"]
+
+
+def _new_name(method, old_name):
+    """Return a method with a deprecation warning."""
+    # Looks suspiciously like a decorator, but isn't!
+    @wraps(method)
+    def _method(*args, **kwargs):
+        warnings.warn(
+            "method '{}' has been deprecated, please rename to '{}'".format(
+                old_name, method.__name__
+            ),
+            DeprecationWarning,
+        )
+        return method(*args, **kwargs)
+
+    return _method
 
 
 @six.add_metaclass(abc.ABCMeta)
@@ -346,7 +363,7 @@ class FS(object):
 
         Example:
             >>> with OSFS('~/Desktop') as desktop_fs:
-            ...    desktop_fs.settext(
+            ...    desktop_fs.writetext(
             ...        'note.txt',
             ...        "Don't forget to tape Game of Thrones"
             ...    )
@@ -379,7 +396,7 @@ class FS(object):
                 raise errors.DestinationExists(dst_path)
             with closing(self.open(src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.setbinfile(dst_path, read_file)  # type: ignore
+                self.upload(dst_path, read_file)  # type: ignore
 
     def copydir(self, src_path, dst_path, create=False):
         # type: (Text, Text, bool) -> None
@@ -550,7 +567,7 @@ class FS(object):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def getbytes(self, path):
+    def readbytes(self, path):
         # type: (Text) -> bytes
         """Get the contents of a file as bytes.
 
@@ -568,7 +585,9 @@ class FS(object):
             contents = read_file.read()
         return contents
 
-    def getfile(self, path, file, chunk_size=None, **options):
+    getbytes = _new_name(readbytes, "getbytes")
+
+    def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
         """Copies a file from the filesystem to a file-like object.
 
@@ -591,14 +610,16 @@ class FS(object):
 
         Example:
             >>> with open('starwars.mov', 'wb') as write_file:
-            ...     my_fs.getfile('/movies/starwars.mov', write_file)
+            ...     my_fs.download('/movies/starwars.mov', write_file)
 
         """
         with self._lock:
             with self.openbin(path, **options) as read_file:
                 tools.copy_file_data(read_file, file, chunk_size=chunk_size)
 
-    def gettext(
+    getfile = _new_name(download, "getfile")
+
+    def readtext(
         self,
         path,  # type: Text
         encoding=None,  # type: Optional[Text]
@@ -629,6 +650,8 @@ class FS(object):
         ) as read_file:
             contents = read_file.read()
         return contents
+
+    gettext = _new_name(readtext, "gettext")
 
     def getmeta(self, namespace="standard"):
         # type: (Text) -> Mapping[Text, object]
@@ -1074,7 +1097,7 @@ class FS(object):
         with self._lock:
             with self.open(src_path, "rb") as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.setbinfile(dst_path, read_file)  # type: ignore
+                self.upload(dst_path, read_file)  # type: ignore
             self.remove(src_path)
 
     def open(
@@ -1226,7 +1249,7 @@ class FS(object):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def setbytes(self, path, contents):
+    def writebytes(self, path, contents):
         # type: (Text, bytes) -> None
         # FIXME(@althonos): accept bytearray and memoryview as well ?
         """Copy binary data to a file.
@@ -1244,8 +1267,10 @@ class FS(object):
         with closing(self.open(path, mode="wb")) as write_file:
             write_file.write(contents)
 
-    def setbinfile(self, path, file):
-        # type: (Text, BinaryIO) -> None
+    setbytes = _new_name(writebytes, "setbytes")
+
+    def upload(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         """Set a file to the contents of a binary file object.
 
         This method copies bytes from an open binary file to a file on
@@ -1256,21 +1281,28 @@ class FS(object):
             path (str): A path on the filesystem.
             file (io.IOBase): a file object open for reading in
                 binary mode.
+            chunk_size (int, optional): Number of bytes to read at a
+                time, if a simple copy is used, or `None` to use
+                sensible default.
+            **options: Implementation specific options required to open
+                the source file.
 
         Note that the file object ``file`` will *not* be closed by this
         method. Take care to close it after this method completes
         (ideally with a context manager).
 
         Example:
-            >>> with open('myfile.bin') as read_file:
-            ...     my_fs.setbinfile('myfile.bin', read_file)
+            >>> with open('~/movies/starwars.mov', 'rb') as read_file:
+            ...     my_fs.upload('starwars.mov', read_file)
 
         """
         with self._lock:
-            with self.open(path, "wb") as dst_file:
-                tools.copy_file_data(file, dst_file)
+            with self.openbin(path, mode="wb", **options) as dst_file:
+                tools.copy_file_data(file, dst_file, chunk_size=chunk_size)
 
-    def setfile(
+    setbinfile = _new_name(upload, "setbinfile")
+
+    def writefile(
         self,
         path,  # type: Text
         file,  # type: IO
@@ -1290,20 +1322,18 @@ class FS(object):
                 (same as `io.open`).
             newline (str): Newline parameter (same as `io.open`).
 
-        This method will read the contents of a supplied file object,
-        and write to a file on the filesystem. If the destination
-        exists, it will first be truncated.
-
-        If ``encoding`` is supplied, the destination will be opened in
-        text mode.
+        This method is similar to `~FS.upload`, in that it copies data from a
+        file-like object to a resource on the filesystem, but unlike ``upload``,
+        this method also supports creating files in text-mode (if the ``encoding``
+        argument is supplied).
 
         Note that the file object ``file`` will *not* be closed by this
         method. Take care to close it after this method completes
         (ideally with a context manager).
 
         Example:
-            >>> with open('myfile.bin') as read_file:
-            ...     my_fs.setfile('myfile.bin', read_file)
+            >>> with open('myfile.txt') as read_file:
+            ...     my_fs.writefile('myfile.txt', read_file)
 
         """
         mode = "wb" if encoding is None else "wt"
@@ -1340,7 +1370,7 @@ class FS(object):
 
         self.setinfo(path, raw_info)
 
-    def settext(
+    def writetext(
         self,
         path,  # type: Text
         contents,  # type: Text
@@ -1372,6 +1402,8 @@ class FS(object):
             )
         ) as write_file:
             write_file.write(contents)
+
+    settext = _new_name(writetext, "settext")
 
     def touch(self, path):
         # type: (Text) -> None

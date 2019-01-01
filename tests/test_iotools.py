@@ -22,7 +22,7 @@ class TestIOTools(unittest.TestCase):
     def test_make_stream(self):
         """Test make_stream"""
 
-        self.fs.setbytes("foo.bin", b"foofoo")
+        self.fs.writebytes("foo.bin", b"foofoo")
 
         with self.fs.openbin("foo.bin") as f:
             data = f.read()
@@ -39,7 +39,7 @@ class TestIOTools(unittest.TestCase):
 
     def test_readinto(self):
 
-        self.fs.setbytes("bytes.bin", b"foofoobarbar")
+        self.fs.writebytes("bytes.bin", b"foofoobarbar")
 
         with self.fs.openbin("bytes.bin") as bin_file:
             with iotools.make_stream("bytes.bin", bin_file, "rb") as f:
@@ -63,7 +63,7 @@ class TestIOTools(unittest.TestCase):
 
     def test_readinto1(self):
 
-        self.fs.setbytes("bytes.bin", b"foofoobarbar")
+        self.fs.writebytes("bytes.bin", b"foofoobarbar")
 
         with self.fs.openbin("bytes.bin") as bin_file:
             with iotools.make_stream("bytes.bin", bin_file, "rb") as f:
@@ -91,7 +91,7 @@ class TestIOTools(unittest.TestCase):
                 self.assertFalse(f1.isatty())
 
     def test_readlines(self):
-        self.fs.setbytes("foo", b"barbar\nline1\nline2")
+        self.fs.writebytes("foo", b"barbar\nline1\nline2")
         with self.fs.open("foo", "rb") as f:
             f = iotools.make_stream("foo", f, "rb")
             self.assertEqual(list(f), [b"barbar\n", b"line1\n", b"line2"])
@@ -100,7 +100,7 @@ class TestIOTools(unittest.TestCase):
             self.assertEqual(f.readlines(), ["barbar\n", "line1\n", "line2"])
 
     def test_readall(self):
-        self.fs.setbytes("foo", b"foobar")
+        self.fs.writebytes("foo", b"foobar")
         with self.fs.open("foo", "rt") as f:
             self.assertEqual(f.read(), "foobar")
 
@@ -108,7 +108,7 @@ class TestIOTools(unittest.TestCase):
         with self.fs.open("foo", "wb") as f:
             f = iotools.make_stream("foo", f, "rb")
             f.writelines([b"foo", b"bar", b"baz"])
-        self.assertEqual(self.fs.getbytes("foo"), b"foobarbaz")
+        self.assertEqual(self.fs.readbytes("foo"), b"foobarbaz")
 
     def test_seekable(self):
 

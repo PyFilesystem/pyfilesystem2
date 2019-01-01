@@ -37,7 +37,7 @@ class TestEncoding(unittest.TestCase):
             self.assertFalse(test_fs.isdir(self.TEST_FILENAME_UNICODE))
             with test_fs.open(self.TEST_FILENAME_UNICODE, "rb") as f:
                 self.assertEqual(f.read(), b"baz")
-            self.assertEqual(test_fs.gettext(self.TEST_FILENAME_UNICODE), "baz")
+            self.assertEqual(test_fs.readtext(self.TEST_FILENAME_UNICODE), "baz")
             test_fs.remove(self.TEST_FILENAME_UNICODE)
             self.assertFalse(test_fs.exists(self.TEST_FILENAME_UNICODE))
 
@@ -45,7 +45,7 @@ class TestEncoding(unittest.TestCase):
         with OSFS(self.dir_path) as test_fs:
             dirlist = test_fs.listdir("/")
             self.assertEqual(dirlist, [self.TEST_FILENAME_UNICODE])
-            self.assertEqual(test_fs.gettext(dirlist[0]), "baz")
+            self.assertEqual(test_fs.readtext(dirlist[0]), "baz")
 
     def test_scandir(self):
         with OSFS(self.dir_path) as test_fs:

@@ -186,18 +186,18 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.removedir(_path)
 
-    def getbytes(self, path):
+    def readbytes(self, path):
         # type: (Text) -> bytes
         self.check()
         fs, _path = self._delegate(path)
-        return fs.getbytes(_path)
+        return fs.readbytes(_path)
 
-    def getfile(self, path, file, chunk_size=None, **options):
+    def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
         fs, _path = self._delegate(path)
-        return fs.getfile(_path, file, chunk_size=chunk_size, **options)
+        return fs.download(_path, file, chunk_size=chunk_size, **options)
 
-    def gettext(
+    def readtext(
         self,
         path,  # type: Text
         encoding=None,  # type: Optional[Text]
@@ -207,7 +207,7 @@ class MountFS(FS):
         # type: (...) -> Text
         self.check()
         fs, _path = self._delegate(path)
-        return fs.gettext(_path, encoding=encoding, errors=errors, newline=newline)
+        return fs.readtext(_path, encoding=encoding, errors=errors, newline=newline)
 
     def getsize(self, path):
         # type: (Text) -> int
@@ -300,19 +300,19 @@ class MountFS(FS):
             **options
         )
 
-    def setbinfile(self, path, file):
-        # type: (Text, BinaryIO) -> None
+    def upload(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
         self.check()
         fs, _path = self._delegate(path)
-        return fs.setbinfile(_path, file)
+        return fs.upload(_path, file, chunk_size=chunk_size, **options)
 
-    def setbytes(self, path, contents):
+    def writebytes(self, path, contents):
         # type: (Text, bytes) -> None
         self.check()
         fs, _path = self._delegate(path)
-        return fs.setbytes(_path, contents)
+        return fs.writebytes(_path, contents)
 
-    def settext(
+    def writetext(
         self,
         path,  # type: Text
         contents,  # type: Text
@@ -322,6 +322,6 @@ class MountFS(FS):
     ):
         # type: (...) -> None
         fs, _path = self._delegate(path)
-        return fs.settext(
+        return fs.writetext(
             _path, contents, encoding=encoding, errors=errors, newline=newline
         )
