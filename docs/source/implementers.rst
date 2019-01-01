@@ -113,12 +113,12 @@ In the general case, it is a good idea to look at how these methods are implemen
 * :meth:`~fs.base.FS.readtext`
 * :meth:`~fs.base.FS.removetree`
 * :meth:`~fs.base.FS.scandir`
-* :meth:`~fs.base.FS.setfile`
 * :meth:`~fs.base.FS.settimes`
 * :meth:`~fs.base.FS.touch`
 * :meth:`~fs.base.FS.upload`
 * :meth:`~fs.base.FS.validatepath`
 * :meth:`~fs.base.FS.writebytes`
+* :meth:`~fs.base.FS.writefile`
 * :meth:`~fs.base.FS.writetext`
 
 .. _helper-methods:

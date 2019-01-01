@@ -13,6 +13,7 @@ Contents:
 
    introduction.rst
    guide.rst
+
    concepts.rst
    info.rst
    openers.rst
@@ -22,6 +23,7 @@ Contents:
    implementers.rst
    extension.rst
    external.rst
+   interface.rst
    reference.rst
 
 

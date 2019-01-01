@@ -8,7 +8,7 @@ Why use PyFilesystem?
 
 If you are comfortable using the Python standard library, you may be wondering; *why learn another API for working with files?*
 
-The PyFilesystem API is generally simpler than the ``os`` and ``io`` modules -- there are fewer edge cases and less ways to shoot yourself in the foot. This may be reason alone to use it, but there are other compelling reasons you should use ``import fs`` for even straightforward filesystem code.
+The :ref:`interface` is generally simpler than the ``os`` and ``io`` modules -- there are fewer edge cases and less ways to shoot yourself in the foot. This may be reason alone to use it, but there are other compelling reasons you should use ``import fs`` for even straightforward filesystem code.
 
 The abstraction offered by FS objects means that you can write code that is agnostic to where your files are physically located. For instance, if you wrote a function that searches a directory for duplicates files, it will work unaltered with a directory on your hard-drive, or in a zip file, on an FTP server, on Amazon S3, etc.
 
