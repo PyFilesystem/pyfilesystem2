@@ -71,12 +71,12 @@ class Registry(object):
                 class ArchiveOpener(Opener):
                     protocols = ['zip', 'tar']
         """
-        if not isinstance(opener, Opener):
-            opener = opener()
-        assert isinstance(opener, Opener), "Opener instance required"
-        assert opener.protocols, "must list one or more protocols"
-        for protocol in opener.protocols:
-            self._protocols[protocol] = opener
+        _opener = opener if isinstance(opener, Opener) else opener()
+        assert isinstance(_opener, Opener), "Opener instance required"
+        assert _opener.protocols, "must list one or more protocols"
+        for protocol in _opener.protocols:
+            self._protocols[protocol] = _opener
+        return opener
 
     @property
     def protocols(self):
