@@ -15,6 +15,7 @@ from fs.opener import registry, errors
 from fs.memoryfs import MemoryFS
 from fs.appfs import UserDataFS
 from fs.opener.parse import ParseResult
+from fs.opener.registry import Registry
 
 
 class TestParse(unittest.TestCase):
@@ -166,6 +167,21 @@ class TestRegistry(unittest.TestCase):
             self.assertEqual(
                 "could not instantiate opener; some creation error", str(ctx.exception)
             )
+
+    def test_install(self):
+        """Test Registry.install works as a decorator."""
+        registry = Registry()
+        self.assertNotIn("foo", registry.protocols)
+        self.assertTrue(callable(registry.install))
+
+        @registry.install
+        class FooOpener(opener.Opener):
+            protocols = ["foo"]
+
+            def open_fs(self, *args, **kwargs):
+                pass
+
+        self.assertIn("foo", registry.protocols)
 
 
 class TestManageFS(unittest.TestCase):
