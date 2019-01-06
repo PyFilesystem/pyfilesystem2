@@ -1,7 +1,3 @@
-# PyFilesystem Pull Request
-
-Thank you for your pull request!
-
 ## Type of changes
 
 - [ ] Bug fix

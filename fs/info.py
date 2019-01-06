@@ -31,7 +31,7 @@ if False:  # typing.TYPE_CHECKING
 class Info(object):
     """Container for :ref:`info`.
 
-    Resource informations are returned by the following methods:
+    Resource information is returned by the following methods:
 
          * `~fs.base.FS.getinfo`
          * `~fs.base.FS.scandir`
