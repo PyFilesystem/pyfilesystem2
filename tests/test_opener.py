@@ -172,7 +172,6 @@ class TestRegistry(unittest.TestCase):
         """Test Registry.install works as a decorator."""
         registry = Registry()
         self.assertNotIn("foo", registry.protocols)
-        self.assertTrue(callable(registry.install))
 
         @registry.install
         class FooOpener(opener.Opener):
