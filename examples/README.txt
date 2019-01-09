@@ -1,3 +1,3 @@
-This directory contains a number of example command line apps.
+This directory contains a number of example command line apps using PyFilesystem.
 
-They are intentionally to be a learning aid and not exactly a finished product, but all these examples are completely functional.
+They are intended to be a learning aid and not exactly finished products, but all these examples are completely functional.

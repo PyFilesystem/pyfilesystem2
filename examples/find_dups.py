@@ -1,5 +1,5 @@
 """
-Find an print paths to files with identical contents.
+Find paths to files with identical contents.
 
 Usage:
 
@@ -34,7 +34,7 @@ with open_fs(sys.argv[1]) as fs:
 
 for paths in hashes.values():
     if len(paths) > 1:
-        for path in paths[1:]:
+        for path in paths:
             print(f" {path}")
         print()
 
