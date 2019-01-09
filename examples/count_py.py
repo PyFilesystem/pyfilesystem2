@@ -2,7 +2,7 @@
 Display how much storage is used in your Python files.
 
 Usage:
-    python -m fs.examples.count_py <PATH or FS URL>
+    python count_py.py <PATH or FS URL>
 
 """
 

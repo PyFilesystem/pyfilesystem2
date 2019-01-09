@@ -3,11 +3,11 @@ Upload a file to a server (or other filesystem)
 
 Usage:
 
-    python -m fs.examples.upload FILENAME <FS URL>
+    python upload.py FILENAME <FS URL>
 
 example:
 
-    python -m fs.examples.upload foo.txt ftp://example.org/uploads/
+    python upload.py foo.txt ftp://example.org/uploads/
 
 
 """

@@ -3,7 +3,7 @@ Remove all pyc files in a directory.
 
 Usage:
 
-    python -m fs.examples.rm_pyc <PATH or FS URL>
+    python rm_pyc.py <PATH or FS URL>
 
 """
 

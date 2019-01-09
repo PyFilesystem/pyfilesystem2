@@ -3,7 +3,7 @@ Find an print paths to files with identical contents.
 
 Usage:
 
-    python -m fs.examples.find_dups <PATH or FS URL>
+    python find_dups.py <PATH or FS URL>
 
 """
 
