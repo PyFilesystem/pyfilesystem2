@@ -34,3 +34,9 @@ after_success:
 # command to run tests
 script:
   - nosetests -v --with-coverage --cover-package=fs tests
+
+os:
+  - windows
+  - linux
+  - osx
+
