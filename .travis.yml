@@ -21,6 +21,9 @@ matrix:
     - python: "3.7"
       env:
         - SETUPTOOLS=setuptools PIP=pip
+    - python: "3.7"
+      env:
+        - SETUPTOOLS=setuptools PIP=pip
 
 before_install:
   - pip install $SETUPTOOLS $PIP -U
