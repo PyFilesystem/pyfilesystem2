@@ -66,7 +66,7 @@ def normpath(path):
         >>> normpath("foo/../../bar")
         Traceback (most recent call last)
             ...
-        IllegalBackReference: Too many backrefs in 'foo/../../bar'
+        IllegalBackReference: path 'foo/../../bar' contains back-references outside of filesystem"
 
     """
     if path in "/":
@@ -86,7 +86,7 @@ def normpath(path):
             else:
                 components.append(component)
     except IndexError:
-        raise IllegalBackReference("Too many backrefs in '{}'".format(path))
+        raise IllegalBackReference(path)
     return prefix + "/".join(components)
 
 
