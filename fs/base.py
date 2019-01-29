@@ -1615,6 +1615,9 @@ class FS(object):
         Returns:
             str: The hex digest of the hash.
 
+        Raises:
+            fs.errors.UnsupportedHash: If the requested hash is not supported.
+
         """
         _path = self.validatepath(path)
         try:
