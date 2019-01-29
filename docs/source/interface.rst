@@ -25,6 +25,7 @@ The following is a complete list of methods on PyFilesystem objects.
 * :meth:`~fs.base.FS.gettype` Get the type of a resource.
 * :meth:`~fs.base.FS.geturl` Get a URL to a resource, if one exists.
 * :meth:`~fs.base.FS.hassyspath` Check if a resource maps to the OS filesystem.
+* :meth:`~fs.base.FS.hash` Get the hash of a file's contents.
 * :meth:`~fs.base.FS.hasurl` Check if a resource has a URL.
 * :meth:`~fs.base.FS.isclosed` Check if the filesystem is closed.
 * :meth:`~fs.base.FS.isempty` Check if a directory is empty.

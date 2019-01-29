@@ -130,8 +130,9 @@ These methods SHOULD NOT be implemented.
 
 Implementing these is highly unlikely to be worthwhile.
 
+* :meth:`~fs.base.FS.check`
 * :meth:`~fs.base.FS.getbasic`
 * :meth:`~fs.base.FS.getdetails`
-* :meth:`~fs.base.FS.check`
+* :meth:`~fs.base.FS.hash`
 * :meth:`~fs.base.FS.match`
 * :meth:`~fs.base.FS.tree`
