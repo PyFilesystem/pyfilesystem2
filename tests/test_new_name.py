@@ -9,6 +9,7 @@ from fs.base import _new_name
 
 class TestNewNameDecorator(unittest.TestCase):
     def double(self, n):
+        "Double a number"
         return n * 2
 
     times_2 = _new_name(double, "times_2")
