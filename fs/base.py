@@ -9,6 +9,7 @@ can work with any of the supported filesystems.
 from __future__ import absolute_import, print_function, unicode_literals
 
 import abc
+import hashlib
 import itertools
 import os
 import threading
@@ -1593,3 +1594,28 @@ class FS(object):
         from .tree import render
 
         render(self, **kwargs)
+
+    def hash(self, path, name="md5"):
+        # type: (Text, Text) -> Text
+        """Get the hash of a file's contents.
+
+        Arguments:
+            path(str): A path on the filesystem.
+            name(str): One of the algorithms supported by the hashlib module, defaults to `"md5"`
+
+        Returns:
+            str: The hex digest of the hash.
+
+        """
+        _path = self.validatepath(path)
+        try:
+            hash_object = hashlib.new(name)
+        except ValueError:
+            raise errors.UnsupportedHash("hash '{}' is not supported".format(name))
+        with self.openbin(path) as binary_file:
+            while True:
+                chunk = binary_file.read(1024 * 1024)
+                if not chunk:
+                    break
+                hash_object.update(chunk)
+        return hash_object.hexdigest()

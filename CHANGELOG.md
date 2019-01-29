@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - IllegalBackReference had mangled error message
 
+### Added
+
+- FS.hash method
+
 ## [2.2.1] - 2018-01-06
 
 ### Fixed

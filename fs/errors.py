@@ -364,3 +364,12 @@ class IllegalBackReference(ValueError):
 
     def __reduce__(self):
         return type(self), (self.path,)
+
+
+class UnsupportedHash(ValueError):
+    """The requested hash algorithm is not supported.
+
+    This exception will be thrown if a hash algorithm is requested that is
+    not supported by hashlib.
+
+    """
