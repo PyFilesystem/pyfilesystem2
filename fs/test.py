@@ -1839,5 +1839,6 @@ class FSTestCases(object):
         self.assertEqual(
             self.fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
         )
+        self.assertEqual(self.fs.hash("hashme.txt"), "9fff4bb103ab8ce4619064109c54cb9c")
         with self.assertRaises(errors.UnsupportedHash):
             self.fs.hash("hashme.txt", "nohash")
