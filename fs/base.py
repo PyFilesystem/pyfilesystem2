@@ -66,6 +66,7 @@ __all__ = ["FS"]
 def _new_name(method, old_name):
     """Return a method with a deprecation warning."""
     # Looks suspiciously like a decorator, but isn't!
+
     @wraps(method)
     def _method(*args, **kwargs):
         warnings.warn(
@@ -75,6 +76,14 @@ def _new_name(method, old_name):
             DeprecationWarning,
         )
         return method(*args, **kwargs)
+
+    _method.__doc__ += """
+        Note:
+            .. deprecated:: 2.2.0
+                Please use `~{}`
+""".format(
+        method.__name__
+    )
 
     return _method
 
