@@ -1837,7 +1837,7 @@ class FSTestCases(object):
     def test_hash(self):
         self.fs.writebytes("hashme.txt", b"foobar" * 1024)
         self.assertEqual(
-            self.fs.hash("md5", "hashme.txt"), "9fff4bb103ab8ce4619064109c54cb9c"
+            self.fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
         )
         with self.assertRaises(errors.UnsupportedHash):
-            self.fs.hash("nohash", "hashme.txt")
+            self.fs.hash("hashme.txt", "nohash")
