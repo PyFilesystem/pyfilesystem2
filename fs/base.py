@@ -1604,13 +1604,13 @@ class FS(object):
 
         render(self, **kwargs)
 
-    def hash(self, path, name="md5"):
+    def hash(self, path, name):
         # type: (Text, Text) -> Text
         """Get the hash of a file's contents.
 
         Arguments:
             path(str): A path on the filesystem.
-            name(str): One of the algorithms supported by the hashlib module, defaults to `"md5"`
+            name(str): One of the algorithms supported by the hashlib module, e.g. `"md5"`
 
         Returns:
             str: The hex digest of the hash.
