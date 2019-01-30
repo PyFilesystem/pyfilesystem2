@@ -5,11 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.2.2] - Unreleased
+## [2.3.0] - 2018-01-30
 
 ### Fixed
 
 - IllegalBackReference had mangled error message
+
+### Added
+
+- FS.hash method
 
 ## [2.2.1] - 2018-01-06
 

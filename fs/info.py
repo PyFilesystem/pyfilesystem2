@@ -45,6 +45,8 @@ class Info(object):
 
     """
 
+    __slots__ = ["raw", "_to_datetime", "namespaces"]
+
     def __init__(self, raw_info, to_datetime=epoch_to_datetime):
         # type: (RawInfo, ToDatetime) -> None
         """Create a resource info object from a raw info dict.
