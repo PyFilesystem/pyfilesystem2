@@ -636,7 +636,7 @@ class OSFS(FS):
         except UnicodeEncodeError as error:
             raise errors.InvalidCharsInPath(
                 path,
-                msg="path '{path}' could not be encoded for the filesystem; {error}".format(
+                msg="path '{path}' could not be encoded for the filesystem (check LANG env var); {error}".format(
                     path=path, error=error
                 ),
             )
