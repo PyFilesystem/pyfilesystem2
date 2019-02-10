@@ -627,3 +627,17 @@ class OSFS(FS):
                 if accessed is not None or modified is not None:
                     with convert_os_errors("setinfo", path):
                         os.utime(sys_path, (accessed, modified))
+
+    def validatepath(self, path):
+        # type: (Text) -> Text
+        """Check path may be encoded, in addition to usual checks."""
+        try:
+            fsencode(path)
+        except UnicodeEncodeError as error:
+            raise errors.InvalidCharsInPath(
+                path,
+                msg="path '{path}' could not be encoded for the filesystem; {error}".format(
+                    path=path, error=error
+                ),
+            )
+        return super(OSFS, self).validatepath(path)
