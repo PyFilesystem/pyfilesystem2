@@ -5,7 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.3.0] - 2018-01-30
+## [2.3.1] - 2019-02-10
+
+### Fixed
+
+- Add encoding check in OSFS.validatepath
+
+## [2.3.0] - 2019-01-30
 
 ### Fixed
 
@@ -15,13 +21,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - FS.hash method
 
-## [2.2.1] - 2018-01-06
+## [2.2.1] - 2019-01-06
 
 ### Fixed
 
 - `Registry.install` returns its argument.
 
-## [2.2.0] - 2018-01-01
+## [2.2.0] - 2019-01-01
 
 A few methods have been renamed for greater clarity (but functionality remains the same).
 

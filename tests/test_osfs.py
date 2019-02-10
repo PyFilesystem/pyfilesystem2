@@ -1,3 +1,4 @@
+# coding: utf-8
 from __future__ import unicode_literals
 
 import errno
@@ -68,23 +69,23 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         with self.assertRaises(errors.CreateFailed):
             fs = osfs.OSFS("/does/not/exists/")
 
-    @unittest.skipIf(osfs.sendfile is None, 'sendfile not supported')
+    @unittest.skipIf(osfs.sendfile is None, "sendfile not supported")
     def test_copy_sendfile(self):
         # try copying using sendfile
-        with mock.patch.object(osfs, 'sendfile') as sendfile:
-            sendfile.side_effect = OSError(errno.ENOTSUP, 'sendfile not supported')
+        with mock.patch.object(osfs, "sendfile") as sendfile:
+            sendfile.side_effect = OSError(errno.ENOTSUP, "sendfile not supported")
             self.test_copy()
         # check other errors are transmitted
-        self.fs.touch('foo')
-        with mock.patch.object(osfs, 'sendfile') as sendfile:
+        self.fs.touch("foo")
+        with mock.patch.object(osfs, "sendfile") as sendfile:
             sendfile.side_effect = OSError(errno.EWOULDBLOCK)
             with self.assertRaises(OSError):
-                self.fs.copy('foo', 'foo_copy')
+                self.fs.copy("foo", "foo_copy")
         # check parent exist and is dir
         with self.assertRaises(errors.ResourceNotFound):
-            self.fs.copy('foo', 'spam/eggs')
+            self.fs.copy("foo", "spam/eggs")
         with self.assertRaises(errors.DirectoryExpected):
-            self.fs.copy('foo', 'foo_copy/foo')
+            self.fs.copy("foo", "foo_copy/foo")
 
     def test_create(self):
         """Test create=True"""
@@ -131,3 +132,12 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         bar_info = self.fs.getinfo("bar", namespaces=["link", "lstat"])
         self.assertIn("link", bar_info.raw)
         self.assertIn("lstat", bar_info.raw)
+
+    def test_validatepath(self):
+        """Check validatepath detects bad encodings."""
+
+        with mock.patch("fs.osfs.fsencode") as fsencode:
+            fsencode.side_effect = lambda error: "–".encode("ascii")
+            with self.assertRaises(errors.InvalidCharsInPath):
+                with self.fs.open("13 – Marked Register.pdf", "wb") as fh:
+                    fh.write(b"foo")
