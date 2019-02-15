@@ -63,6 +63,22 @@ class TestWalk(unittest.TestCase):
         ]
         self.assertEqual(_walk, expected)
 
+    def test_walk_filter_dirs(self):
+        _walk = []
+        for step in self.fs.walk(filter_dirs=["foo*"]):
+            self.assertIsInstance(step, walk.Step)
+            path, dirs, files = step
+            _walk.append(
+                (path, [info.name for info in dirs], [info.name for info in files])
+            )
+        expected = [
+            ("/", ["foo1", "foo2", "foo3"], []),
+            ("/foo1", [], ["top1.txt", "top2.txt"]),
+            ("/foo2", [], ["top3.bin"]),
+            ("/foo3", [], []),
+        ]
+        self.assertEqual(_walk, expected)
+
     def test_walk_depth(self):
         _walk = []
         for step in self.fs.walk(search="depth"):
@@ -192,6 +208,15 @@ class TestWalk(unittest.TestCase):
         files = list(self.fs.walk.files(filter=["*.nope"]))
 
         self.assertEqual(files, [])
+
+    def test_walk_files_exclude(self):
+        # Test exclude argument works
+        files = list(self.fs.walk.files(exclude=["*.txt"]))
+        self.assertEqual(files, ["/foo2/top3.bin"])
+
+        # Test exclude doesn't break filter
+        files = list(self.fs.walk.files(filter=["*.bin"], exclude=["*.txt"]))
+        self.assertEqual(files, ["/foo2/top3.bin"])
 
     def test_walk_info(self):
         walk = []
