@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.0] - 2019-02-15
+
+### Added
+
+- Added `exclude` and `filter_dirs` arguments to walk
+- Micro-optimizations to walk
+
 ## [2.3.1] - 2019-02-10
 
 ### Fixed

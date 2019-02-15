@@ -35,7 +35,7 @@ def copy_fs(
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only want
             to consider a sub-set of the resources in ``src_fs``.
-        on_copy (callable):A function callback called after a single file copy
+        on_copy (callable): A function callback called after a single file copy
             is executed. Expected signature is ``(src_fs, src_path, dst_fs,
             dst_path)``.
         workers (int): Use `worker` threads to copy data, or ``0`` (default) for
