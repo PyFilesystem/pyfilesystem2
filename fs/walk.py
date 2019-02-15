@@ -68,6 +68,12 @@ class Walker(object):
             a list of filename patterns, e.g. ``['*.py']``. Files will
             only be returned if the final component matches one of the
             patterns.
+        exclude (list, optional): If supplied, this parameter should be
+            a list of filename patterns, e.g. ``['~*']``. Files matching
+            any of these patterns will be removed from the walk.
+        filter_dirs (list, optional): A list of patterns that will be used
+            to match directories paths. The walk will only open directories
+            that match at least one of these patterns.
         exclude_dirs (list, optional): A list of patterns that will be
             used to filter out directories from the walk. e.g.
             ``['*.svn', '*.git']``.
@@ -81,6 +87,8 @@ class Walker(object):
         on_error=None,  # type: Optional[OnError]
         search="breadth",  # type: Text
         filter=None,  # type: Optional[List[Text]]
+        exclude=None,  # type: Optional[List[Text]]
+        filter_dirs=None,  # type: Optional[List[Text]]
         exclude_dirs=None,  # type: Optional[List[Text]]
         max_depth=None,  # type: Optional[int]
     ):
@@ -99,6 +107,8 @@ class Walker(object):
         self.on_error = on_error
         self.search = search
         self.filter = filter
+        self.exclude = exclude
+        self.filter_dirs = filter_dirs
         self.exclude_dirs = exclude_dirs
         self.max_depth = max_depth
         super(Walker, self).__init__()
@@ -169,6 +179,8 @@ class Walker(object):
             on_error=(self.on_error, None),
             search=(self.search, "breadth"),
             filter=(self.filter, None),
+            exclude=(self.exclude, None),
+            filter_dirs=(self.filter_dirs, None),
             exclude_dirs=(self.exclude_dirs, None),
             max_depth=(self.max_depth, None),
         )
@@ -191,6 +203,8 @@ class Walker(object):
         """Check if a directory should be considered in the walk.
         """
         if self.exclude_dirs is not None and fs.match(self.exclude_dirs, info.name):
+            return False
+        if self.filter_dirs is not None and not fs.match(self.filter_dirs, info.name):
             return False
         return self.check_open_dir(fs, path, info)
 
@@ -251,6 +265,9 @@ class Walker(object):
             bool: `True` if the file should be included.
 
         """
+
+        if self.exclude is not None and fs.match(self.exclude, info.name):
+            return False
         return fs.match(self.filter, info.name)
 
     def _scan(
@@ -522,9 +539,12 @@ class BoundWalker(typing.Generic[_F]):
             search (str): If ``'breadth'`` then the directory will be
                 walked *top down*. Set to ``'depth'`` to walk *bottom up*.
             filter (list): If supplied, this parameter should be a list
-                of file name patterns, e.g. ``['*.py']``. Files will only be
+                of file name patterns, e.g. ``['~*', '.*']``. Files will only be
                 returned if the final component matches one of the
                 patterns.
+            filter_dirs (list, optional): A list of patterns that will be used
+                to match directories paths. The walk will only open directories
+                that match at least one of these patterns.
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
@@ -574,6 +594,12 @@ class BoundWalker(typing.Generic[_F]):
                 of file name patterns, e.g. ``['*.py']``. Files will only be
                 returned if the final component matches one of the
                 patterns.
+            exclude (list, optional): If supplied, this parameter should be
+                a list of filename patterns, e.g. ``['~*', '.*']``. Files matching
+                any of these patterns will be removed from the walk.
+            filter_dirs (list, optional): A list of patterns that will be used
+                to match directories paths. The walk will only open directories
+                that match at least one of these patterns.
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
@@ -606,6 +632,9 @@ class BoundWalker(typing.Generic[_F]):
                 `False` to re-raise it.
             search (str): If ``'breadth'`` then the directory will be
                 walked *top down*. Set to ``'depth'`` to walk *bottom up*.
+            filter_dirs (list, optional): A list of patterns that will be used
+                to match directories paths. The walk will only open directories
+                that match at least one of these patterns.
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
@@ -650,6 +679,12 @@ class BoundWalker(typing.Generic[_F]):
                 of file name patterns, e.g. ``['*.py']``. Files will only be
                 returned if the final component matches one of the
                 patterns.
+            exclude (list, optional): If supplied, this parameter should be
+                a list of filename patterns, e.g. ``['~*', '.*']``. Files matching
+                any of these patterns will be removed from the walk.
+            filter_dirs (list, optional): A list of patterns that will be used
+                to match directories paths. The walk will only open directories
+                that match at least one of these patterns.
             exclude_dirs (list): A list of patterns that will be used
                 to filter out directories from the walk, e.g. ``['*.svn',
                 '*.git']``.
