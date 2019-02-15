@@ -17,6 +17,7 @@ import six
 from ._repr import make_repr
 from .errors import FSError
 from .path import abspath
+from .path import combine
 from .path import join
 from .path import normpath
 
@@ -416,6 +417,7 @@ class Walker(object):
         push = queue.appendleft
         pop = queue.pop
 
+        _combine = combine
         _scan = self._scan
         _calculate_depth = self._calculate_depth
         _check_open_dir = self._check_open_dir
@@ -432,7 +434,7 @@ class Walker(object):
                     if _check_open_dir(fs, dir_path, info):
                         yield dir_path, info  # Opened a directory
                         if _check_scan_dir(fs, dir_path, info, _depth):
-                            push(join(dir_path, info.name))
+                            push(_combine(dir_path, info.name))
                 else:
                     if _check_file(fs, info):
                         yield dir_path, info  # Found a file
@@ -449,6 +451,7 @@ class Walker(object):
         """
         # No recursion!
 
+        _combine = combine
         _scan = self._scan
         _calculate_depth = self._calculate_depth
         _check_open_dir = self._check_open_dir
@@ -474,7 +477,7 @@ class Walker(object):
                 _depth = _calculate_depth(dir_path) - depth + 1
                 if _check_open_dir(fs, dir_path, info):
                     if _check_scan_dir(fs, dir_path, info, _depth):
-                        _path = join(dir_path, info.name)
+                        _path = _combine(dir_path, info.name)
                         push(
                             (
                                 _path,
