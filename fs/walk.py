@@ -539,7 +539,7 @@ class BoundWalker(typing.Generic[_F]):
             search (str): If ``'breadth'`` then the directory will be
                 walked *top down*. Set to ``'depth'`` to walk *bottom up*.
             filter (list): If supplied, this parameter should be a list
-                of file name patterns, e.g. ``['*.py]``. Files will only be
+                of file name patterns, e.g. ``['*.py']``. Files will only be
                 returned if the final component matches one of the
                 patterns.
             exclude (list, optional): If supplied, this parameter should be
