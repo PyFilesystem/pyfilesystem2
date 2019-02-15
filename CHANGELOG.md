@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Added `exclude` and `filter_dirs` arguments to walk
+- Micro-optimizations to walk
 
 ## [2.3.1] - 2019-02-10
 

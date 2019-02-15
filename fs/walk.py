@@ -18,7 +18,6 @@ from ._repr import make_repr
 from .errors import FSError
 from .path import abspath
 from .path import combine
-from .path import join
 from .path import normpath
 
 if False:  # typing.TYPE_CHECKING
@@ -359,9 +358,10 @@ class Walker(object):
             recursively within the given directory.
 
         """
+        _combine = combine
         for _path, info in self._iter_walk(fs, path=path):
             if info is not None and not info.is_dir:
-                yield join(_path, info.name)
+                yield _combine(_path, info.name)
 
     def dirs(self, fs, path="/"):
         # type: (FS, Text) -> Iterator[Text]
@@ -376,9 +376,10 @@ class Walker(object):
             recursively within the given directory.
 
         """
+        _combine = combine
         for _path, info in self._iter_walk(fs, path=path):
             if info is not None and info.is_dir:
-                yield join(_path, info.name)
+                yield _combine(_path, info.name)
 
     def info(
         self,
@@ -399,10 +400,11 @@ class Walker(object):
             (str, Info): a tuple of ``(<absolute path>, <resource info>)``.
 
         """
+        _combine = combine
         _walk = self._iter_walk(fs, path=path, namespaces=namespaces)
         for _path, info in _walk:
             if info is not None:
-                yield join(_path, info.name), info
+                yield _combine(_path, info.name), info
 
     def _walk_breadth(
         self,
