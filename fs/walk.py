@@ -449,22 +449,18 @@ class Walker(object):
         """
         # No recursion!
 
-        def scan(path, _scan=self._scan):
-            # type: (Text) -> Iterator[Info]
-            """Perform scan."""
-            return _scan(fs, path, namespaces=namespaces)
-
-        stack = [
-            (path, scan(path), None)
-        ]  # type: List[Tuple[Text, Iterator[Info], Optional[Tuple[Text, Info]]]]
-
-        push = stack.append
-
+        _scan = self._scan
         _calculate_depth = self._calculate_depth
         _check_open_dir = self._check_open_dir
         _check_scan_dir = self._check_scan_dir
         _check_file = self.check_file
         depth = _calculate_depth(path)
+
+        stack = [
+            (path, _scan(fs, path, namespaces=namespaces), None)
+        ]  # type: List[Tuple[Text, Iterator[Info], Optional[Tuple[Text, Info]]]]
+
+        push = stack.append
 
         while stack:
             dir_path, iter_files, parent = stack[-1]
@@ -479,7 +475,13 @@ class Walker(object):
                 if _check_open_dir(fs, dir_path, info):
                     if _check_scan_dir(fs, dir_path, info, _depth):
                         _path = join(dir_path, info.name)
-                        push((_path, scan(_path), (dir_path, info)))
+                        push(
+                            (
+                                _path,
+                                _scan(fs, _path, namespaces=namespaces),
+                                (dir_path, info),
+                            )
+                        )
                     else:
                         yield dir_path, info
             else:
