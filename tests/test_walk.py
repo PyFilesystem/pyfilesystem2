@@ -218,6 +218,10 @@ class TestWalk(unittest.TestCase):
         files = list(self.fs.walk.files(filter=["*.bin"], exclude=["*.txt"]))
         self.assertEqual(files, ["/foo2/top3.bin"])
 
+        # Test excluding everything
+        files = list(self.fs.walk.files(exclude=["*"]))
+        self.assertEqual(files, [])
+
     def test_walk_info(self):
         walk = []
         for path, info in self.fs.walk.info():
