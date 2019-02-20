@@ -1835,9 +1835,15 @@ class FSTestCases(object):
         self.assertIsInstance(self.fs.glob, glob.BoundGlobber)
 
     def test_hash(self):
-        self.fs.writebytes("hashme.txt", b"foobar" * 1024)
+        self.fs.makedir("foo").writebytes("hashme.txt", b"foobar" * 1024)
         self.assertEqual(
-            self.fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
+            self.fs.hash("foo/hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
         )
         with self.assertRaises(errors.UnsupportedHash):
-            self.fs.hash("hashme.txt", "nohash")
+            self.fs.hash("foo/hashme.txt", "nohash")
+
+        with self.fs.opendir("foo") as foo_fs:
+            self.assertEqual(
+                foo_fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
+            )
+
