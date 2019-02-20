@@ -491,6 +491,13 @@ class WrapFS(FS, typing.Generic[_F]):
         path = abspath(normpath(path))
         return path
 
+    def hash(self, path, name):
+        # type: (Text, Text) -> Text
+        self.check()
+        _fs, _path = self.delegate_path(path)
+        with unwrap_errors(path):
+            return _fs.hash(_path, name)
+
     @property
     def walk(self):
         # type: () -> BoundWalker
