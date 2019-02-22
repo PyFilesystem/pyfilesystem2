@@ -134,7 +134,7 @@ class OSFS(FS):
                 raise errors.CreateFailed("root path does not exist")
 
         _meta = self._meta = {
-            "case_insensitive": os.path.normcase("Aa") != "aa",
+            "case_insensitive": os.path.normcase("Aa") == "aa",
             "network": False,
             "read_only": False,
             "supports_rename": True,
