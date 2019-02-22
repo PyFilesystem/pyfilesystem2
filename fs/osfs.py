@@ -456,7 +456,12 @@ class OSFS(FS):
             self.check()
             namespaces = namespaces or ()
             _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path)
+            if _WINDOWS_PLATFORM:
+                sys_path = os.path.join(
+                    self._root_path, path.lstrip("/").replace("/", os.sep)
+                )
+            else:
+                sys_path = self._to_sys_path(_path)
             with convert_os_errors("scandir", path, directory=True):
                 for dir_entry in scandir(sys_path):
                     info = {
