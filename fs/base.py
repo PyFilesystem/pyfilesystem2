@@ -77,13 +77,15 @@ def _new_name(method, old_name):
         )
         return method(*args, **kwargs)
 
-    _method.__doc__ += """
+    deprecated_msg = """
         Note:
             .. deprecated:: 2.2.0
                 Please use `~{}`
 """.format(
         method.__name__
     )
+    if getattr(_method, "__doc__"):
+        _method.__doc__ += deprecated_msg
 
     return _method
 
