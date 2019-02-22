@@ -84,8 +84,8 @@ def _new_name(method, old_name):
 """.format(
         method.__name__
     )
-    if getattr(method, "__doc__"):
-        method.__doc__ += deprecated_msg
+    if getattr(_method, "__doc__"):
+        _method.__doc__ += deprecated_msg
 
     return _method
 
