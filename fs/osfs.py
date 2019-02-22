@@ -47,7 +47,7 @@ from .path import basename, dirname
 from .permissions import Permissions
 from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
-from .errors import NoURL
+from .errors import FileExpected, NoURL
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
@@ -608,7 +608,7 @@ class OSFS(FS):
         self.check()
         _path = self.validatepath(path)
         if _path == "/":
-            raise errors.FileExpected(path)
+            raise FileExpected(path)
         sys_path = self._to_sys_path(_path)
         with convert_os_errors("open", path):
             if six.PY2 and _mode.exclusive:
