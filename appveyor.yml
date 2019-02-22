@@ -25,4 +25,4 @@ install:
 build: off
 
 test_script:
-  - "%PYTHON%\\python.exe -m nosetests tests"
+  - "%PYTHON%\\python.exe -m nose tests"
