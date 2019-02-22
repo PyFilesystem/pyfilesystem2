@@ -245,12 +245,14 @@ class OSFS(FS):
 
     def _gettarget(self, sys_path):
         # type: (Text) -> Optional[Text]
-        try:
-            target = os.readlink(fsencode(sys_path))
-        except OSError:
-            return None
-        else:
-            return target
+        if hasattr(os, "readlink"):
+            try:
+                target = os.readlink(fsencode(sys_path))
+            except OSError:
+                pass
+            else:
+                return target
+        return None
 
     def _make_link_info(self, sys_path):
         # type: (Text) -> Dict[Text, object]
@@ -282,7 +284,7 @@ class OSFS(FS):
             info["lstat"] = {
                 k: getattr(_lstat, k) for k in dir(_lstat) if k.startswith("st_")
             }
-        if "link" in namespaces and hasattr(os, "readlink"):
+        if "link" in namespaces:
             info["link"] = self._make_link_info(sys_path)
         if "access" in namespaces:
             info["access"] = self._make_access_from_stat(_stat)
