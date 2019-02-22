@@ -115,7 +115,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         finally:
             shutil.rmtree(dir_path)
 
-    @unittest.skipif(not hasattr(os, "symlink"), "No symlink support")
+    @unittest.skipIf(not hasattr(os, "symlink"), "No symlink support")
     def test_symlinks(self):
         with open(self._get_real_path("foo"), "wb") as f:
             f.write(b"foobar")
