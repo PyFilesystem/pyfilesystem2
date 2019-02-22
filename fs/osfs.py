@@ -282,7 +282,7 @@ class OSFS(FS):
             info["lstat"] = {
                 k: getattr(_lstat, k) for k in dir(_lstat) if k.startswith("st_")
             }
-        if "link" in namespaces:
+        if "link" in namespaces and hasattr(os, "readlink"):
             info["link"] = self._make_link_info(sys_path)
         if "access" in namespaces:
             info["access"] = self._make_access_from_stat(_stat)
