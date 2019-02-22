@@ -247,7 +247,10 @@ class OSFS(FS):
         # type: (Text) -> Optional[Text]
         if hasattr(os, "readlink"):
             try:
-                target = os.readlink(fsencode(sys_path))
+                if _WINDOWS_PLATFORM:  # pragma: no cover
+                    target = os.readlink(sys_path)
+                else:
+                    target = os.readlink(fsencode(sys_path))
             except OSError:
                 pass
             else:
