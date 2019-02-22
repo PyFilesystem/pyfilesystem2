@@ -606,7 +606,7 @@ class OSFS(FS):
         self.check()
         _path = self.validatepath(path)
         if _path == "/":
-            raise FileExpected(path)
+            raise error.FileExpected(path)
         sys_path = self._to_sys_path(_path)
         with convert_os_errors("open", path):
             if six.PY2 and _mode.exclusive:
@@ -627,7 +627,7 @@ class OSFS(FS):
         self.check()
         _path = self.validatepath(path)
         if _path == "/":
-            raise FileExpected(path)
+            raise errors.FileExpected(path)
         sys_path = self._to_sys_path(_path)
         if not os.path.exists(sys_path):
             raise errors.ResourceNotFound(path)
