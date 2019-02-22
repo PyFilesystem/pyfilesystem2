@@ -81,7 +81,6 @@ class _ConvertOSErrors(object):
         traceback,  # type: Optional[TracebackType]
     ):
         # type: (...) -> None
-        print(exc_value)
         os_errors = self.DIR_ERRORS if self._directory else self.FILE_ERRORS
         if exc_type and isinstance(exc_value, EnvironmentError):
             _errno = exc_value.errno
