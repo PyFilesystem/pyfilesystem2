@@ -6,7 +6,7 @@ matrix:
     - python: "2.7"
       env:
         - SETUPTOOLS=setuptools PIP=pip
-    - python: "3.6"
+    - python: "2.7"
       env:
         - SETUPTOOLS=setuptools PIP=pip
       os: osx
