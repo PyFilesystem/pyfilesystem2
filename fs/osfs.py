@@ -151,9 +151,13 @@ class OSFS(FS):
             _meta["invalid_path_chars"] = "\0"
 
             if "PC_PATH_MAX" in os.pathconf_names:
-                _meta["max_sys_path_length"] = os.pathconf(
-                    fsencode(_root_path), os.pathconf_names["PC_PATH_MAX"]
-                )
+                try:
+                    _meta["max_sys_path_length"] = os.pathconf(
+                        fsencode(_root_path), os.pathconf_names["PC_PATH_MAX"]
+                    )
+                except OSError:  # pragma: no cover
+                    # The above fails with nfs mounts on OSX. Go figure.
+                    pass
 
     def __repr__(self):
         # type: () -> str
