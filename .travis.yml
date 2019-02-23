@@ -6,11 +6,6 @@ matrix:
     - python: "2.7"
       env:
         - SETUPTOOLS=setuptools PIP=pip
-    - env:
-        - SETUPTOOLS=setuptools PIP=pip
-      os: osx
-      osx_image: xcode8.3
-      sudo: true
     - python: "3.7"
       env:
         - SETUPTOOLS=setuptools PIP=pip
