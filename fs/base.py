@@ -1484,7 +1484,7 @@ class FS(object):
                 pass
             else:
                 if len(sys_path) > max_sys_path_length:
-                    _msg = "path too long " "(max {max_chars} characters in sys path)"
+                    _msg = "path too long (max {max_chars} characters in sys path)"
                     msg = _msg.format(max_chars=max_sys_path_length)
                     raise errors.InvalidPath(path, msg=msg)
         path = abspath(normpath(path))

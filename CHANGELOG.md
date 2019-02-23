@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.4] - 2019-02-23
+
+### Fixed
+
+- OSFS fail in nfs mounts
+
 ## [2.4.3] - 2019-02-23
 
 ### Fixed
