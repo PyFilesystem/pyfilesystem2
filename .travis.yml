@@ -9,6 +9,7 @@ matrix:
     - env:
         - SETUPTOOLS=setuptools PIP=pip
       os: osx
+      osx_image: xcode8.3
       sudo: true
     - python: "3.7"
       env:
