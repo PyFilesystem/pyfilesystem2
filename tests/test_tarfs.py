@@ -9,7 +9,6 @@ import tarfile
 import getpass
 import tarfile
 import tempfile
-import time
 import unittest
 import uuid
 
