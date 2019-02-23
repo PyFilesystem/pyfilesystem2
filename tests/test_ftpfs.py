@@ -25,6 +25,7 @@ from pyftpdlib.authorizers import DummyAuthorizer
 from fs import errors
 from fs.opener import open_fs
 from fs.ftpfs import FTPFS, ftp_errors
+from fs.path import join
 from fs.subfs import SubFS
 from fs.test import FSTestCases
 
@@ -200,7 +201,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
 
     def test_create(self):
 
-        directory = os.path.join("home", self.user, "test", "directory")
+        directory = join("home", self.user, "test", "directory")
         base = "ftp://user:1234@{}:{}/foo".format(self.server.host, self.server.port)
         url = "{}/{}".format(base, directory)
 
@@ -215,7 +216,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         # Open the base filesystem and check the subdirectory exists
         with open_fs(base) as ftp_fs:
             self.assertTrue(ftp_fs.isdir(directory))
-            self.assertTrue(ftp_fs.isfile(os.path.join(directory, "foo")))
+            self.assertTrue(ftp_fs.isfile(join(directory, "foo")))
 
         # Open without `create` and check the file exists
         with open_fs(url) as ftp_fs:

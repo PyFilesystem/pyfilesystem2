@@ -47,7 +47,7 @@ from .path import basename, dirname
 from .permissions import Permissions
 from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
-from .errors import NoURL
+from .errors import FileExpected, NoURL
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
@@ -134,7 +134,7 @@ class OSFS(FS):
                 raise errors.CreateFailed("root path does not exist")
 
         _meta = self._meta = {
-            "case_insensitive": os.path.normcase("Aa") != "aa",
+            "case_insensitive": os.path.normcase("Aa") == "aa",
             "network": False,
             "read_only": False,
             "supports_rename": True,
@@ -245,12 +245,17 @@ class OSFS(FS):
 
     def _gettarget(self, sys_path):
         # type: (Text) -> Optional[Text]
-        try:
-            target = os.readlink(fsencode(sys_path))
-        except OSError:
-            return None
-        else:
-            return target
+        if hasattr(os, "readlink"):
+            try:
+                if _WINDOWS_PLATFORM:  # pragma: no cover
+                    target = os.readlink(sys_path)
+                else:
+                    target = os.readlink(fsencode(sys_path))
+            except OSError:
+                pass
+            else:
+                return target
+        return None
 
     def _make_link_info(self, sys_path):
         # type: (Text) -> Dict[Text, object]
@@ -328,6 +333,8 @@ class OSFS(FS):
         _mode.validate_bin()
         self.check()
         _path = self.validatepath(path)
+        if _path == "/":
+            raise errors.FileExpected(path)
         sys_path = self._to_sys_path(_path)
         with convert_os_errors("openbin", path):
             if six.PY2 and _mode.exclusive:
@@ -454,7 +461,12 @@ class OSFS(FS):
             self.check()
             namespaces = namespaces or ()
             _path = self.validatepath(path)
-            sys_path = self._to_sys_path(_path)
+            if _WINDOWS_PLATFORM:
+                sys_path = os.path.join(
+                    self._root_path, path.lstrip("/").replace("/", os.sep)
+                )
+            else:
+                sys_path = self._to_sys_path(_path)
             with convert_os_errors("scandir", path, directory=True):
                 for dir_entry in scandir(sys_path):
                     info = {
@@ -595,6 +607,8 @@ class OSFS(FS):
         validate_open_mode(mode)
         self.check()
         _path = self.validatepath(path)
+        if _path == "/":
+            raise FileExpected(path)
         sys_path = self._to_sys_path(_path)
         with convert_os_errors("open", path):
             if six.PY2 and _mode.exclusive:

@@ -86,9 +86,10 @@ class ArchiveTestCases(object):
         except errors.NoSysPath:
             pass
         else:
-            self.assertEqual(
-                top.permissions.mode, stat.S_IMODE(os.stat(source_syspath).st_mode)
-            )
+            if top.has_namespace("access"):
+                self.assertEqual(
+                    top.permissions.mode, stat.S_IMODE(os.stat(source_syspath).st_mode)
+                )
 
         self.assertEqual(top.get("details", "type"), ResourceType.file)
 

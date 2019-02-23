@@ -26,6 +26,7 @@ from .test_archives import ArchiveTestCases
 class TestWriteReadTarFS(unittest.TestCase):
     def setUp(self):
         fh, self._temp_path = tempfile.mkstemp()
+        os.close(fh)
 
     def tearDown(self):
         os.remove(self._temp_path)
