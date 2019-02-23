@@ -13,6 +13,7 @@ from fs.osfs import OSFS
 
 
 @unittest.skipIf(platform.system() == "Darwin", "Bad unicode not possible on OSX")
+@unittest.skipIf(platform.system() == "Windows", "Strict encoding on Windows")
 class TestEncoding(unittest.TestCase):
 
     TEST_FILENAME = b"foo\xb1bar"
