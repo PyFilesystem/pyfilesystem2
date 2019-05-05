@@ -144,7 +144,8 @@ class OSFS(FS):
         }
 
         if platform.system() == "Darwin":
-            # Test doesn't work on OSX
+            # Standard test doesn't work on OSX.
+            # Best we can say is we don't know.
             del _meta["case_insensitive"]
 
         if _WINDOWS_PLATFORM:  # pragma: no cover
