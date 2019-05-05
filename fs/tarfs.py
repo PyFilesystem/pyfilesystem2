@@ -279,10 +279,9 @@ class ReadTarFS(FS):
         """Lazy directory cache."""
         if self._directory_cache is None:
             _decode = self._decode
+            _directory = ((_decode(info.name).strip("/"), info) for info in self._tar)
             self._directory_cache = OrderedDict(
-                (_decode(info.name).strip("/"), info)
-                for info in self._tar
-                if normpath(info.name)
+                (name, info) for name, info in _directory if normpath(name)
             )
         return self._directory_cache
 

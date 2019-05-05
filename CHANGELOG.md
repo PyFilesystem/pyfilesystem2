@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Restored deprecated `setfile` method with deprecation warning to change to `writefile`
 - Fixed exception when a tarfile contains a path called '.' https://github.com/PyFilesystem/pyfilesystem2/issues/275
+- Made TarFS directory loading lazy
 
 ## [2.4.4] - 2019-02-23
 
