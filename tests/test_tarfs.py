@@ -188,6 +188,30 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         self.assertTrue(top.get("tar", "is_file"))
 
 
+class TestBrokenDir(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpfs = open_fs("temp://tarfstest")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmpfs.close()
+
+    def setUp(self):
+        self.tempfile = self.tmpfs.open("test.tar", "wb+")
+        with tarfile.open(mode="w", fileobj=self.tempfile) as tf:
+            tf.addfile(tarfile.TarInfo("."), io.StringIO)
+        self.tempfile.seek(0)
+        self.fs = tarfs.TarFS(self.tempfile)
+
+    def tearDown(self):
+        self.fs.close()
+        self.tempfile.close()
+
+    def test_listdir(self):
+        self.assertEqual(self.fs.listdir("/"), [])
+
+
 class TestImplicitDirectories(unittest.TestCase):
     """Regression tests for #160.
     """
