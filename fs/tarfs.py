@@ -20,7 +20,7 @@ from .enums import ResourceType
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
-from .path import dirname, relpath, basename, isbase, parts, frombase
+from .path import dirname, relpath, basename, isbase, normpath, parts, frombase
 from .wrapfs import WrapFS
 from .permissions import Permissions
 
@@ -272,9 +272,18 @@ class ReadTarFS(FS):
         else:
             self._tar = tarfile.open(fileobj=file, mode="r")
 
-        self._directory = OrderedDict(
-            (relpath(self._decode(info.name)).rstrip("/"), info) for info in self._tar
-        )
+        self._directory_cache = None
+
+    @property
+    def _directory(self):
+        """Lazy directory cache."""
+        if self._directory_cache is None:
+            _decode = self._decode
+            _directory = ((_decode(info.name).strip("/"), info) for info in self._tar)
+            self._directory_cache = OrderedDict(
+                (name, info) for name, info in _directory if normpath(name)
+            )
+        return self._directory_cache
 
     def __repr__(self):
         # type: () -> Text

@@ -143,6 +143,11 @@ class OSFS(FS):
             "virtual": False,
         }
 
+        if platform.system() == "Darwin":
+            # Standard test doesn't work on OSX.
+            # Best we can say is we don't know.
+            del _meta["case_insensitive"]
+
         if _WINDOWS_PLATFORM:  # pragma: no cover
             _meta["invalid_path_chars"] = (
                 "".join(six.unichr(n) for n in range(31)) + '\\:*?"<>|'

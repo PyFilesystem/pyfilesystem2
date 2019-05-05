@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Restored deprecated `setfile` method with deprecation warning to change to `writefile`
+- Fixed exception when a tarfile contains a path called '.' https://github.com/PyFilesystem/pyfilesystem2/issues/275
+- Made TarFS directory loading lazy
+
+### Changed
+
+- Removed case_insensitive meta value from OSFS meta on OSX. normcase check doesn't work on OSX (https://stackoverflow.com/questions/7870041/check-if-file-system-is-case-insensitive-in-python)
 
 ## [2.4.4] - 2019-02-23
 
