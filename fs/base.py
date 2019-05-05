@@ -1356,6 +1356,8 @@ class FS(object):
             ) as dst_file:
                 tools.copy_file_data(file, dst_file)
 
+    setfile = _new_name(writefile, "setfile")
+
     def settimes(self, path, accessed=None, modified=None):
         # type: (Text, Optional[datetime], Optional[datetime]) -> None
         """Set the accessed and modified time on a resource.
