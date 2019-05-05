@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [2.4.5] - 2019-05-05
 
 ### Fixed
 
@@ -15,7 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-- Removed case_insensitive meta value from OSFS meta on OSX. normcase check doesn't work on OSX (https://stackoverflow.com/questions/7870041/check-if-file-system-is-case-insensitive-in-python)
+- Detect case insensitivity using by writing temp file
 
 ## [2.4.4] - 2019-02-23
 
