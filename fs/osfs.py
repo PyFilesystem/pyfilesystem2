@@ -17,6 +17,7 @@ import platform
 import shutil
 import stat
 import sys
+import tempfile
 import typing
 
 import six
@@ -134,7 +135,6 @@ class OSFS(FS):
                 raise errors.CreateFailed("root path does not exist")
 
         _meta = self._meta = {
-            "case_insensitive": os.path.normcase("Aa") == "aa",
             "network": False,
             "read_only": False,
             "supports_rename": True,
@@ -143,10 +143,14 @@ class OSFS(FS):
             "virtual": False,
         }
 
-        if platform.system() == "Darwin":
-            # Standard test doesn't work on OSX.
-            # Best we can say is we don't know.
-            del _meta["case_insensitive"]
+        try:
+            # https://stackoverflow.com/questions/7870041/check-if-file-system-is-case-insensitive-in-python
+            # I don't know of a better way of detecting case insensitivity of a filesystem
+            with tempfile.NamedTemporaryFile(prefix="TmP") as _tmp_file:
+                _meta["case_insensitive"] = os.path.exists(_tmp_file.name.lower())
+        except Exception:
+            if platform.system() != "Darwin":
+                _meta["case_insensitive"] = os.path.normcase("Aa") == "aa"
 
         if _WINDOWS_PLATFORM:  # pragma: no cover
             _meta["invalid_path_chars"] = (
