@@ -6,7 +6,8 @@ import os
 import unittest
 import tempfile
 import shutil
-import datetime
+import calendar
+
 from six import PY2
 
 import fs.copy
@@ -116,14 +117,10 @@ class TestCopy(unittest.TestCase):
             f.write("1" * write_chars)
         return filepath
 
-    def _delay_file_utime(self, filepath, delta_sec=None):
-        import calendar
-        from datetime import datetime
-
-        file_access_mod_time = (
-            int(calendar.timegm(datetime.now().timetuple())) + delta_sec
-        )
-        times = (file_access_mod_time, file_access_mod_time)
+    def _delay_file_utime(self, filepath, delta_sec):
+        utcnow = datetime.datetime.utcnow()
+        unix_timestamp = calendar.timegm(utcnow.timetuple())
+        times = unix_timestamp + delta_sec, unix_timestamp + delta_sec
         os.utime(filepath, times)
 
     def test_copy_file_if_newer_same_fs(self):
