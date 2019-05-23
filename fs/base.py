@@ -281,7 +281,7 @@ class FS(object):
         # type: (Text, RawInfo) -> None
         """Set info on a resource.
 
-        This method is the compliment to `~fs.base.FS.getinfo`
+        This method is the complement to `~fs.base.FS.getinfo`
         and is used to set info values on a resource.
 
         Arguments:
