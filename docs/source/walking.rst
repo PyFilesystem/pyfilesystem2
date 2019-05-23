@@ -41,7 +41,7 @@ The ``walk`` attribute may appear to be a method, but is in fact a callable obje
     for path in home_fs.walk.files(filter=['*.py']):
         print('Python file: {}'.format(path))
 
-The compliment to ``files`` is :meth:`~fs.walk.BoundWalker.dirs` which returns paths to just the directories (and ignoring the files). Here's an example::
+The complement to ``files`` is :meth:`~fs.walk.BoundWalker.dirs` which returns paths to just the directories (and ignoring the files). Here's an example::
 
     for dir_path in home_fs.walk.dirs():
         print("{!r} contains sub-directory {}".format(home_fs, dir_path))
