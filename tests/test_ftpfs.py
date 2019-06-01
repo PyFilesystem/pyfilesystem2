@@ -167,6 +167,14 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
 
     def test_ftp_url(self):
         self.assertTrue(self.fs.ftp_url.startswith("ftp://127.0.0.1"))
+        
+    def test_geturl(self):
+        self.fs.makedir("foo")
+        self.fs.create("bar")
+        self.fs.create("foo/bar")
+        self.assertTrue(self.fs.geturl('foo') == "ftp://127.0.0.1:{}/foo".format(self.server.port))
+        self.assertTrue(self.fs.geturl('bar') == "ftp://127.0.0.1:{}/bar".format(self.server.port))
+        self.assertTrue(self.fs.geturl('foo/bar') == "ftp://127.0.0.1:{}/foo/bar".format(self.server.port))
 
     def test_host(self):
         self.assertEqual(self.fs.host, self.server.host)
