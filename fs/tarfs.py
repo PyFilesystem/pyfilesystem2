@@ -17,6 +17,7 @@ from . import errors
 from .base import FS
 from .compress import write_tar
 from .enums import ResourceType
+from .errors import IllegalBackReference
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
@@ -280,9 +281,19 @@ class ReadTarFS(FS):
         if self._directory_cache is None:
             _decode = self._decode
             _directory = ((_decode(info.name).strip("/"), info) for info in self._tar)
-            self._directory_cache = OrderedDict(
-                (name, info) for name, info in _directory if normpath(name)
-            )
+
+            def _list_tar():
+                for name, info in _directory:
+                    try:
+                        _name = normpath(name)
+                    except IllegalBackReference:
+                        # Back references outside root, must be up to no good.
+                        pass
+                    else:
+                        if _name:
+                            yield _name, info
+
+            self._directory_cache = OrderedDict(_list_tar())
         return self._directory_cache
 
     def __repr__(self):
