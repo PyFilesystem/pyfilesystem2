@@ -2,7 +2,6 @@ appdirs~=1.4.0
 coverage
 mock
 pyftpdlib==1.5.2
-PyYAML<4.1          ;   python_version == '3.3'
 python-coveralls
 pytz==2016.7
 nose
