@@ -20,9 +20,6 @@ matrix:
     - python: "3.4"
       env:
         - SETUPTOOLS=setuptools PIP=pip
-    - python: "3.3"
-      env:
-        - SETUPTOOLS=setuptools~=39.2 PIP="pip<=18.0"
 
 before_install:
   - pip install $SETUPTOOLS $PIP -U
