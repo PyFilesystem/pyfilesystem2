@@ -338,7 +338,7 @@ class ReadTarFS(FS):
         else:
             try:
                 implicit = False
-                member = self._tar.getmember(self._encode(_path))
+                member = self._directory[_path]
             except KeyError:
                 if not self.isdir(_path):
                     raise errors.ResourceNotFound(path)
@@ -426,7 +426,7 @@ class ReadTarFS(FS):
             raise errors.ResourceReadOnly(path)
 
         try:
-            member = self._tar.getmember(self._encode(_path))
+            member = self._directory[_path]
         except KeyError:
             six.raise_from(errors.ResourceNotFound(path), None)
 
