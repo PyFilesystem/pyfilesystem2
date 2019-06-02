@@ -453,13 +453,14 @@ class FTPFS(FS):
         """~ftplib.FTP: the underlying FTP client.
         """
         return self._get_ftp()
-    
+
     def geturl(self, path, purpose="download"):
         # type: (str, str) -> Text
         """Get FTP url for resource."""
+        _path = self.validatepath(path)
         if purpose != "download":
-            raise errors.NoURL(path, purpose, "No such purpose")
-        return "{}/{}".format(self.ftp_url, path)
+            raise errors.NoURL(_path, purpose)
+        return "{}{}".format(self.ftp_url, _path)
 
     def _get_ftp(self):
         # type: () -> FTP
