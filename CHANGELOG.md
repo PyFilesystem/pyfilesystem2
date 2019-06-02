@@ -9,7 +9,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
-- Implemented geturl in FTPFS zmej-serow
+- Implemented geturl in FTPFS @zmej-serow
+
+### Fixed
+
+- Fixed FTP test suite when time is not UTC-0 @mrg0029
 
 ## [2.4.5] - 2019-05-05
 
