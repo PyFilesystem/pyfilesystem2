@@ -91,6 +91,8 @@ class OSFS(FS):
         create_mode (int): The permissions that will be used to create
             the directory if ``create`` is `True` and the path doesn't
             exist, defaults to ``0o777``.
+        expand_vars(bool): If `True` (the default) environment variables of
+            the form $name or ${name} will be expanded.
 
     Raises:
         `fs.errors.CreateFailed`: If ``root_path`` does not
@@ -108,6 +110,7 @@ class OSFS(FS):
         root_path,  # type: Text
         create=False,  # type: bool
         create_mode=0o777,  # type: SupportsInt
+        expand_vars=True,  # type: bool
     ):
         # type: (...) -> None
         """Create an OSFS instance.
@@ -118,7 +121,9 @@ class OSFS(FS):
         self.root_path = root_path
         _drive, _root_path = os.path.splitdrive(fsdecode(fspath(root_path)))
         _root_path = _drive + (_root_path or "/") if _drive else _root_path
-        _root_path = os.path.expanduser(os.path.expandvars(_root_path))
+        _root_path = os.path.expanduser(
+            os.path.expandvars(_root_path) if expand_vars else _root_path
+        )
         _root_path = os.path.normpath(os.path.abspath(_root_path))
         self._root_path = _root_path
 

@@ -69,6 +69,16 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         with self.assertRaises(errors.CreateFailed):
             fs = osfs.OSFS("/does/not/exists/")
 
+    def test_expand_vars(self):
+        self.fs.makedir("TYRIONLANISTER")
+        self.fs.makedir("$FOO")
+        path = self.fs.getsyspath("$FOO")
+        os.environ["FOO"] = "TYRIONLANISTER"
+        fs1 = osfs.OSFS(path)
+        fs2 = osfs.OSFS(path, expand_vars=False)
+        self.assertIn("TYRIONLANISTER", fs1.getsyspath("/"))
+        self.assertNotIn("TYRIONLANISTER", fs2.getsyspath("/"))
+
     @unittest.skipIf(osfs.sendfile is None, "sendfile not supported")
     def test_copy_sendfile(self):
         # try copying using sendfile
