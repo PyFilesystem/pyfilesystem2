@@ -276,14 +276,16 @@ class ReadTarFS(FS):
         self._directory_cache = None
 
     @property
-    def _directory(self):
+    def _directory_entries(self):
         """Lazy directory cache."""
         if self._directory_cache is None:
             _decode = self._decode
-            _directory = ((_decode(info.name).strip("/"), info) for info in self._tar)
+            _directory_entries = (
+                (_decode(info.name).strip("/"), info) for info in self._tar
+            )
 
             def _list_tar():
-                for name, info in _directory:
+                for name, info in _directory_entries:
                     try:
                         _name = normpath(name)
                     except IllegalBackReference:
@@ -338,7 +340,7 @@ class ReadTarFS(FS):
         else:
             try:
                 implicit = False
-                member = self._directory[_path]
+                member = self._directory_entries[_path]
             except KeyError:
                 if not self.isdir(_path):
                     raise errors.ResourceNotFound(path)
@@ -381,14 +383,14 @@ class ReadTarFS(FS):
     def isdir(self, path):
         _path = relpath(self.validatepath(path))
         try:
-            return self._directory[_path].isdir()
+            return self._directory_entries[_path].isdir()
         except KeyError:
-            return any(isbase(_path, name) for name in self._directory)
+            return any(isbase(_path, name) for name in self._directory_entries)
 
     def isfile(self, path):
         _path = relpath(self.validatepath(path))
         try:
-            return self._directory[_path].isfile()
+            return self._directory_entries[_path].isfile()
         except KeyError:
             return False
 
@@ -404,7 +406,9 @@ class ReadTarFS(FS):
         if not self.gettype(path) is ResourceType.directory:
             raise errors.DirectoryExpected(path)
 
-        children = (frombase(_path, n) for n in self._directory if isbase(_path, n))
+        children = (
+            frombase(_path, n) for n in self._directory_entries if isbase(_path, n)
+        )
         content = (parts(child)[1] for child in children if relpath(child))
         return list(OrderedDict.fromkeys(content))
 
@@ -426,7 +430,7 @@ class ReadTarFS(FS):
             raise errors.ResourceReadOnly(path)
 
         try:
-            member = self._directory[_path]
+            member = self._directory_entries[_path]
         except KeyError:
             six.raise_from(errors.ResourceNotFound(path), None)
 
