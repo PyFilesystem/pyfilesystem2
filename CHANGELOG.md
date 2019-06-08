@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.7] - Unreleased
+
+### Added
+
+- Flag to OSFS to disable env var expansion
+
 ## [2.4.6] - 2019-06-08
 
 ### Added
