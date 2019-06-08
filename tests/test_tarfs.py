@@ -188,7 +188,7 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         self.assertTrue(top.get("tar", "is_file"))
 
 
-class TestBrokenDir(unittest.TestCase):
+class TestBrokenPaths(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.tmpfs = open_fs("temp://tarfstest")
@@ -200,7 +200,8 @@ class TestBrokenDir(unittest.TestCase):
     def setUp(self):
         self.tempfile = self.tmpfs.open("test.tar", "wb+")
         with tarfile.open(mode="w", fileobj=self.tempfile) as tf:
-            tf.addfile(tarfile.TarInfo("."), io.StringIO)
+            tf.addfile(tarfile.TarInfo("."), io.StringIO())
+            tf.addfile(tarfile.TarInfo("../foo.txt"), io.StringIO())
         self.tempfile.seek(0)
         self.fs = tarfs.TarFS(self.tempfile)
 
@@ -228,8 +229,8 @@ class TestImplicitDirectories(unittest.TestCase):
         self.tempfile = self.tmpfs.open("test.tar", "wb+")
         with tarfile.open(mode="w", fileobj=self.tempfile) as tf:
             tf.addfile(tarfile.TarInfo("foo/bar/baz/spam.txt"), io.StringIO())
-            tf.addfile(tarfile.TarInfo("foo/eggs.bin"), io.StringIO())
-            tf.addfile(tarfile.TarInfo("foo/yolk/beans.txt"), io.StringIO())
+            tf.addfile(tarfile.TarInfo("./foo/eggs.bin"), io.StringIO())
+            tf.addfile(tarfile.TarInfo("./foo/yolk/beans.txt"), io.StringIO())
             info = tarfile.TarInfo("foo/yolk")
             info.type = tarfile.DIRTYPE
             tf.addfile(info, io.BytesIO())

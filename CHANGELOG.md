@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.5.6] - Unreleased
+## [2.5.6] - 2019-06-08
 
 ### Added
 
@@ -14,6 +14,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fixed FTP test suite when time is not UTC-0 @mrg0029
+- Fixed issues with paths in tarfs https://github.com/PyFilesystem/pyfilesystem2/issues/284
+
+### Changed
+
+- Dropped Python3.3 support
 
 ## [2.4.5] - 2019-05-05
 
