@@ -165,23 +165,22 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         os.mkdir(self._temp_path)
         super(TestFTPFS, self).tearDown()
 
-    @property
-    def _get_url_start(self):
-        if self.user == "anonymous":
-            return "ftp://127.0.0.1"
-        else:
-            return "ftp://{}:{}@127.0.0.1".format(self.user, self.pasw)
-
     def test_ftp_url(self):
-        self.assertTrue(self.fs.ftp_url.startswith(self._get_url_start))
+        self.assertTrue(self.fs.ftp_url.startswith("ftp://{}:{}@127.0.0.1".format(self.user, self.pasw)))
         
     def test_geturl(self):
         self.fs.makedir("foo")
         self.fs.create("bar")
         self.fs.create("foo/bar")
-        self.assertTrue(self.fs.geturl('foo') == "{}:{}/foo".format(self._get_url_start, self.server.port))
-        self.assertTrue(self.fs.geturl('bar') == "{}:{}/bar".format(self._get_url_start, self.server.port))
-        self.assertTrue(self.fs.geturl('foo/bar') == "{}:{}/foo/bar".format(self._get_url_start, self.server.port))
+        self.assertTrue(
+            self.fs.geturl('foo') == "ftp://{}:{}@127.0.0.1:{}/foo".format(self.user, self.pasw, self.server.port)
+        )
+        self.assertTrue(
+            self.fs.geturl('bar') == "ftp://{}:{}@127.0.0.1:{}/bar".format(self.user, self.pasw, self.server.port)
+        )
+        self.assertTrue(
+            self.fs.geturl('foo/bar') == "ftp://{}:{}@127.0.0.1:{}/foo/bar".format(self.user, self.pasw, self.server.port)
+        )
 
     def test_host(self):
         self.assertEqual(self.fs.host, self.server.host)
@@ -251,3 +250,62 @@ class TestFTPFSNoMLSD(TestFTPFS):
 
     def test_features(self):
         pass
+
+    
+@attr("slow")
+class TestAnonFTPFS(FSTestCases, unittest.TestCase):
+
+    user = "anonymous"
+    pasw = ""
+
+    @classmethod
+    def setUpClass(cls):
+        from pyftpdlib.test import ThreadedTestFTPd
+
+        super(TestAnonFTPFS, cls).setUpClass()
+
+        cls._temp_dir = tempfile.mkdtemp("ftpfs2tests")
+        cls._temp_path = os.path.join(cls._temp_dir, text_type(uuid.uuid4()))
+        os.mkdir(cls._temp_path)
+
+        cls.server = ThreadedTestFTPd()
+        cls.server.shutdown_after = -1
+        cls.server.handler.authorizer = DummyAuthorizer()
+        cls.server.handler.authorizer.add_anonymous(cls._temp_path, perm="elradfmw")
+        cls.server.start()
+
+        # Don't know why this is necessary on Windows
+        if platform.system() == "Windows":
+            time.sleep(0.1)
+        # Poll until a connection can be made
+        if not cls.server.is_alive():
+            raise RuntimeError("could not start FTP server.")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.server.stop()
+        shutil.rmtree(cls._temp_dir)
+        super(TestAnonFTPFS, cls).tearDownClass()
+
+    def make_fs(self):
+        return open_fs(
+            "ftp://{}:{}".format(
+                self.server.host, self.server.port
+            )
+        )
+
+    def tearDown(self):
+        shutil.rmtree(self._temp_path)
+        os.mkdir(self._temp_path)
+        super(TestAnonFTPFS, self).tearDown()
+
+    def test_ftp_url(self):
+        self.assertTrue(self.fs.ftp_url.startswith("ftp://127.0.0.1"))
+
+    def test_geturl(self):
+        self.fs.makedir("foo")
+        self.fs.create("bar")
+        self.fs.create("foo/bar")
+        self.assertTrue(self.fs.geturl('foo') == "ftp://127.0.0.1:{}/foo".format(self.server.port))
+        self.assertTrue(self.fs.geturl('bar') == "ftp://127.0.0.1:{}/bar".format(self.server.port))
+        self.assertTrue(self.fs.geturl('foo/bar') == "ftp://127.0.0.1:{}/foo/bar".format(self.server.port))
