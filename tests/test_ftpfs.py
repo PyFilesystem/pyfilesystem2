@@ -165,16 +165,23 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         os.mkdir(self._temp_path)
         super(TestFTPFS, self).tearDown()
 
+    @property
+    def _get_url_start(self):
+        if self.user == "anonymous":
+            return "ftp://127.0.0.1"
+        else:
+            return "ftp://{}:{}@127.0.0.1".format(self.user, self.pasw)
+
     def test_ftp_url(self):
-        self.assertTrue(self.fs.ftp_url.startswith("ftp://127.0.0.1"))
+        self.assertTrue(self.fs.ftp_url.startswith(self._get_url_start))
         
     def test_geturl(self):
         self.fs.makedir("foo")
         self.fs.create("bar")
         self.fs.create("foo/bar")
-        self.assertTrue(self.fs.geturl('foo') == "ftp://127.0.0.1:{}/foo".format(self.server.port))
-        self.assertTrue(self.fs.geturl('bar') == "ftp://127.0.0.1:{}/bar".format(self.server.port))
-        self.assertTrue(self.fs.geturl('foo/bar') == "ftp://127.0.0.1:{}/foo/bar".format(self.server.port))
+        self.assertTrue(self.fs.geturl('foo') == "{}:{}/foo".format(self._get_url_start, self.server.port))
+        self.assertTrue(self.fs.geturl('bar') == "{}:{}/bar".format(self._get_url_start, self.server.port))
+        self.assertTrue(self.fs.geturl('foo/bar') == "{}:{}/foo/bar".format(self._get_url_start, self.server.port))
 
     def test_host(self):
         self.assertEqual(self.fs.host, self.server.host)
