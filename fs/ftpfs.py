@@ -441,7 +441,7 @@ class FTPFS(FS):
         # type: () -> Text
         """Get the FTP url this filesystem will open."""
         _host_part = self.host if self.port == 21 else "{}:{}".format(self.host, self.port)
-        _user_part = None if self.user == 'anonymous' else "{}:{}@".format(self.user, self.passwd)
+        _user_part = "" if self.user == "anonymous" else "{}:{}@".format(self.user, self.passwd)
         url = "ftp://{}{}".format(_user_part, _host_part)
         return url
 
