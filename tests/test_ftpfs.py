@@ -172,14 +172,14 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         self.fs.makedir("foo")
         self.fs.create("bar")
         self.fs.create("foo/bar")
-        self.assertTrue(
-            self.fs.geturl('foo') == "ftp://{}:{}@{}:{}/foo".format(self.user, self.pasw, self.server.host, self.server.port)
+        self.assertEqual(
+            self.fs.geturl('foo'), "ftp://{}:{}@{}:{}/foo".format(self.user, self.pasw, self.server.host, self.server.port)
         )
-        self.assertTrue(
-            self.fs.geturl('bar') == "ftp://{}:{}@{}:{}/bar".format(self.user, self.pasw, self.server.host, self.server.port)
+        self.assertEqual(
+            self.fs.geturl('bar'), "ftp://{}:{}@{}:{}/bar".format(self.user, self.pasw, self.server.host, self.server.port)
         )
-        self.assertTrue(
-            self.fs.geturl('foo/bar') == "ftp://{}:{}@{}:{}/foo/bar".format(self.user, self.pasw, self.server.host, self.server.port)
+        self.assertEqual(
+            self.fs.geturl('foo/bar'), "ftp://{}:{}@{}:{}/foo/bar".format(self.user, self.pasw, self.server.host, self.server.port)
         )
 
     def test_host(self):
@@ -306,6 +306,6 @@ class TestAnonFTPFS(FSTestCases, unittest.TestCase):
         self.fs.makedir("foo")
         self.fs.create("bar")
         self.fs.create("foo/bar")
-        self.assertTrue(self.fs.geturl('foo') == "ftp://{}:{}/foo".format(self.server.host, self.server.port))
-        self.assertTrue(self.fs.geturl('bar') == "ftp://{}:{}/bar".format(self.server.host, self.server.port))
-        self.assertTrue(self.fs.geturl('foo/bar') == "ftp://{}:{}/foo/bar".format(self.server.host, self.server.port))
+        self.assertEqual(self.fs.geturl('foo'), "ftp://{}:{}/foo".format(self.server.host, self.server.port))
+        self.assertEqual(self.fs.geturl('bar'), "ftp://{}:{}/bar".format(self.server.host, self.server.port))
+        self.assertEqual(self.fs.geturl('foo/bar'), "ftp://{}:{}/foo/bar".format(self.server.host, self.server.port))
