@@ -166,7 +166,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         super(TestFTPFS, self).tearDown()
 
     def test_ftp_url(self):
-        self.assertTrue(self.fs.ftp_url.startswith("ftp://{}:{}@{}".format(self.user, self.pasw, self.server.host)))
+        self.assertEqual(self.fs.ftp_url, "ftp://{}:{}@{}:{}".format(self.user, self.pasw, self.server.host, self.server.port))
         
     def test_geturl(self):
         self.fs.makedir("foo")
@@ -300,7 +300,7 @@ class TestAnonFTPFS(FSTestCases, unittest.TestCase):
         super(TestAnonFTPFS, self).tearDown()
 
     def test_ftp_url(self):
-        self.assertTrue(self.fs.ftp_url.startswith("ftp://{}".format(self.server.host)))
+        self.assertEqual(self.fs.ftp_url, "ftp://{}:{}".format(self.server.host, self.server.port))
 
     def test_geturl(self):
         self.fs.makedir("foo")
