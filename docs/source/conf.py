@@ -14,7 +14,6 @@
 
 import sys
 import os
-from fs import __version__
 
 
 import sphinx_rtd_theme
@@ -26,7 +25,7 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
+sys.path.insert(0, os.path.abspath('../..'))
 
 # -- General configuration ------------------------------------------------
 
@@ -71,6 +70,7 @@ author = u'Will McGugan'
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
+from fs import __version__
 # The short X.Y version.
 version = '.'.join(__version__.split('.')[:2])
 # The full version, including alpha/beta/rc tags.
