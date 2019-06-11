@@ -166,20 +166,20 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         super(TestFTPFS, self).tearDown()
 
     def test_ftp_url(self):
-        self.assertTrue(self.fs.ftp_url.startswith("ftp://{}:{}@127.0.0.1".format(self.user, self.pasw)))
+        self.assertTrue(self.fs.ftp_url.startswith("ftp://{}:{}@{}".format(self.user, self.pasw, self.server.host)))
         
     def test_geturl(self):
         self.fs.makedir("foo")
         self.fs.create("bar")
         self.fs.create("foo/bar")
         self.assertTrue(
-            self.fs.geturl('foo') == "ftp://{}:{}@127.0.0.1:{}/foo".format(self.user, self.pasw, self.server.port)
+            self.fs.geturl('foo') == "ftp://{}:{}@{}:{}/foo".format(self.user, self.pasw, self.server.host, self.server.port)
         )
         self.assertTrue(
-            self.fs.geturl('bar') == "ftp://{}:{}@127.0.0.1:{}/bar".format(self.user, self.pasw, self.server.port)
+            self.fs.geturl('bar') == "ftp://{}:{}@{}:{}/bar".format(self.user, self.pasw, self.server.host, self.server.port)
         )
         self.assertTrue(
-            self.fs.geturl('foo/bar') == "ftp://{}:{}@127.0.0.1:{}/foo/bar".format(self.user, self.pasw, self.server.port)
+            self.fs.geturl('foo/bar') == "ftp://{}:{}@{}:{}/foo/bar".format(self.user, self.pasw, self.server.host, self.server.port)
         )
 
     def test_host(self):
@@ -300,12 +300,12 @@ class TestAnonFTPFS(FSTestCases, unittest.TestCase):
         super(TestAnonFTPFS, self).tearDown()
 
     def test_ftp_url(self):
-        self.assertTrue(self.fs.ftp_url.startswith("ftp://127.0.0.1"))
+        self.assertTrue(self.fs.ftp_url.startswith("ftp://{}".format(self.server.host)))
 
     def test_geturl(self):
         self.fs.makedir("foo")
         self.fs.create("bar")
         self.fs.create("foo/bar")
-        self.assertTrue(self.fs.geturl('foo') == "ftp://127.0.0.1:{}/foo".format(self.server.port))
-        self.assertTrue(self.fs.geturl('bar') == "ftp://127.0.0.1:{}/bar".format(self.server.port))
-        self.assertTrue(self.fs.geturl('foo/bar') == "ftp://127.0.0.1:{}/foo/bar".format(self.server.port))
+        self.assertTrue(self.fs.geturl('foo') == "ftp://{}:{}/foo".format(self.server.host, self.server.port))
+        self.assertTrue(self.fs.geturl('bar') == "ftp://{}:{}/bar".format(self.server.host, self.server.port))
+        self.assertTrue(self.fs.geturl('foo/bar') == "ftp://{}:{}/foo/bar".format(self.server.host, self.server.port))
