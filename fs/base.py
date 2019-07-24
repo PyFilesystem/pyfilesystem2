@@ -101,6 +101,9 @@ class FS(object):
     # most FS will use default walking algorithms
     walker_class = Walker
 
+    # default to SubFS
+    subfs_class = None
+
     def __init__(self):
         # type: (...) -> None
         """Create a filesystem. See help(type(self)) for accurate signature.
@@ -1192,7 +1195,7 @@ class FS(object):
         """
         from .subfs import SubFS
 
-        _factory = factory or SubFS
+        _factory = factory or self.subfs_class or SubFS
 
         if not self.getbasic(path).is_dir:
             raise errors.DirectoryExpected(path=path)
