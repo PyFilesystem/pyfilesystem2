@@ -7,3 +7,4 @@ Many thanks to the following developers for contributing to this project:
 - [Martin Larralde](https://github.com/althonos)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Zmej Serow](https://github.com/zmej-serow)
+- [Diego Argueta](https://github.com/dargueta)
