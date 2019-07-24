@@ -207,6 +207,44 @@ class _DirEntry(object):
         if not self.is_dir:
             self._bytes_file = io.BytesIO()
 
+    def clean_up(self, force=False):
+        # type: (bool) -> None
+        """Release resources held by this directory entry.
+
+        Arguments:
+            force (bool):
+                Force remaining open files to close and delete subdirectory entries.
+
+        Raises:
+            fs.errors.ResourceLocked:
+                This directory entry has remaining open files and ``force`` is `False`.
+            fs.errors.DirectoryNotEmpty:
+                This directory has remaining entries and ``force`` is `False`.
+        """
+        with self.lock:
+            if self._open_files and not force:
+                raise errors.ResourceLocked(
+                    path=self.name,
+                    msg="Can't release resources for %r: %d open file(s) remain(s)."
+                    % (self.name, len(self._open_files))
+                )
+            if self._dir and not force:
+                raise errors.DirectoryNotEmpty(
+                    path=self.name,
+                    msg="Can't release resources for %r: directory isn't empty." % self.name
+                )
+
+            if self._bytes_file is not None:
+                self._bytes_file.close()
+
+            if force:
+                for fdesc in self._open_files:
+                    fdesc.close()
+
+                for entry in six.itervalues(self._dir):
+                    entry.clean_up(force=force)
+                self._dir.clear()
+
     @property
     def bytes_file(self):
         # type: () -> Optional[io.BytesIO]
@@ -254,7 +292,8 @@ class _DirEntry(object):
 
     def remove_entry(self, name):
         # type: (Text) -> None
-        del self._dir[name]
+        dirent = self._dir.pop(name)
+        dirent.clean_up()
 
     def __contains__(self, name):
         # type: (object) -> bool
@@ -339,6 +378,11 @@ class MemoryFS(FS):
                     return None
                 current_entry = current_entry.get_entry(path_component)
             return current_entry
+
+    def close(self):
+        # type: () -> None
+        self.root.clean_up(force=True)
+        return super(MemoryFS, self).close()
 
     def getinfo(self, path, namespaces=None):
         # type: (Text, Optional[Collection[Text]]) -> Info

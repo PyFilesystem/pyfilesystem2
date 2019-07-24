@@ -1,9 +1,18 @@
 from __future__ import unicode_literals
 
+import posixpath
 import unittest
 
+from fs import errors
 from fs import memoryfs
 from fs.test import FSTestCases
+from fs.test import UNICODE_TEXT
+
+try:
+    # Only supported on Python 3.4+
+    import tracemalloc
+except ImportError:
+    tracemalloc = None
 
 
 class TestMemoryFS(FSTestCases, unittest.TestCase):
@@ -11,3 +20,74 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
 
     def make_fs(self):
         return memoryfs.MemoryFS()
+
+    def _create_many_files(self):
+        for parent_dir in {"/", "/one", "/one/two", "/one/other-two/three"}:
+            self.fs.makedirs(parent_dir, recreate=True)
+            for file_id in range(50):
+                self.fs.writetext(
+                    posixpath.join(parent_dir, str(file_id)), UNICODE_TEXT
+                )
+
+    @unittest.skipIf(
+        not tracemalloc, "`tracemalloc` isn't supported on this Python version."
+    )
+    def test_close_mem_free(self):
+        """Ensure all file memory is freed when calling close().
+
+        Prevents regression against issue #308.
+        """
+        trace_filters = [tracemalloc.Filter(True, "*/memoryfs.py")]
+        tracemalloc.start()
+
+        before = tracemalloc.take_snapshot().filter_traces(trace_filters)
+        self._create_many_files()
+        after_create = tracemalloc.take_snapshot().filter_traces(trace_filters)
+
+        self.fs.close()
+        after_close = tracemalloc.take_snapshot().filter_traces(trace_filters)
+        tracemalloc.stop()
+
+        [diff_create] = after_create.compare_to(
+            before, key_type="filename", cumulative=True
+        )
+        self.assertGreater(
+            diff_create.size_diff,
+            0,
+            "Memory usage didn't increase after creating files; diff is %0.2f KiB."
+            % (diff_create.size_diff / 1024.0),
+        )
+
+        [diff_close] = after_close.compare_to(
+            after_create, key_type="filename", cumulative=True
+        )
+        self.assertLess(
+            diff_close.size_diff,
+            0,
+            "Memory usage increased after closing the file system; diff is %0.2f KiB."
+            % (diff_close.size_diff / 1024.0),
+        )
+
+    def test_dirent_clean_up__open_file_crashes(self):
+        """clean_up() crashes if files are open and force=False"""
+        self._create_many_files()
+
+        for path in {"/one/other-two/three/0", "/one/two/2", "/2"}:
+            fdesc = self.fs.open(path, "r")
+
+            with self.subTest(to_drop=path):
+                dirent = self.fs._get_dir_entry(path)
+                self.assertIsNotNone(dirent, "Couldn't find %s" % path)
+                with self.assertRaises(errors.ResourceLocked):
+                    dirent.clean_up()
+
+    def test_dirent_clean_up__subentries_crashes(self):
+        """clean_up() crashes if the dirent has entries and force=False"""
+        self._create_many_files()
+
+        for path in {"/one/other-two/three", "/one/two"}:
+            with self.subTest(to_drop=path):
+                dirent = self.fs._get_dir_entry(path)
+                self.assertIsNotNone(dirent, "Couldn't find %s" % path)
+                with self.assertRaises(errors.DirectoryNotEmpty):
+                    dirent.clean_up()
