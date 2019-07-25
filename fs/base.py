@@ -101,7 +101,7 @@ class FS(object):
     # most FS will use default walking algorithms
     walker_class = Walker
 
-    # default to SubFS
+    # default to SubFS, used by opendir and should be returned by makedir(s)
     subfs_class = None
 
     def __init__(self):
