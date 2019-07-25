@@ -1183,7 +1183,7 @@ class FS(object):
             factory (callable, optional): A callable that when invoked
                 with an FS instance and ``path`` will return a new FS object
                 representing the sub-directory contents. If no ``factory``
-                is supplied then `~fs.subfs.SubFS` will be used.
+                is supplied then `~fs.subfs_class` will be used.
 
         Returns:
             ~fs.subfs.SubFS: A filesystem representing a sub-directory.
