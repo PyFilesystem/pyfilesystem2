@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import posixpath
 import unittest
 
-from fs import errors
 from fs import memoryfs
 from fs.test import FSTestCases
 from fs.test import UNICODE_TEXT
@@ -67,27 +66,3 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
             "Memory usage increased after closing the file system; diff is %0.2f KiB."
             % (diff_close.size_diff / 1024.0),
         )
-
-    def test_dirent_clean_up__open_file_crashes(self):
-        """clean_up() crashes if files are open and force=False"""
-        self._create_many_files()
-
-        for path in {"/one/other-two/three/0", "/one/two/2", "/2"}:
-            fdesc = self.fs.open(path, "r")
-
-            with self.subTest(to_drop=path):
-                dirent = self.fs._get_dir_entry(path)
-                self.assertIsNotNone(dirent, "Couldn't find %s" % path)
-                with self.assertRaises(errors.ResourceLocked):
-                    dirent.clean_up()
-
-    def test_dirent_clean_up__subentries_crashes(self):
-        """clean_up() crashes if the dirent has entries and force=False"""
-        self._create_many_files()
-
-        for path in {"/one/other-two/three", "/one/two"}:
-            with self.subTest(to_drop=path):
-                dirent = self.fs._get_dir_entry(path)
-                self.assertIsNotNone(dirent, "Couldn't find %s" % path)
-                with self.assertRaises(errors.DirectoryNotEmpty):
-                    dirent.clean_up()

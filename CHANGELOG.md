@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Changed
 
 - `MemFS` now immediately releases all memory it holds when `close()` is called,
-  rather than when it gets garbage collected. Closes [issue #308](https://github.com/PyFilesystem/pyfilesystem2/issues/).
+  rather than when it gets garbage collected. Closes [issue #308](https://github.com/PyFilesystem/pyfilesystem2/issues/308).
 
 ## [2.4.8] - 2019-06-12
 
