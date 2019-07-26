@@ -30,14 +30,18 @@ class TestSubFS(TestOSFS):
         _path = os.path.join(self.temp_dir, "__subdir__", relpath(path))
         return _path
 
+
 class CustomSubFS(SubFS):
     """Just a custom class to change the type"""
+
     def custom_function(self, custom_path):
         fs, delegate_path = self.delegate_path(custom_path)
         fs.custom_function(delegate_path)
 
+
 class CustomSubFS2(SubFS):
     """Just a custom class to change the type"""
+
 
 class CustomFS(MemoryFS):
     subfs_class = CustomSubFS
@@ -48,6 +52,7 @@ class CustomFS(MemoryFS):
 
     def custom_function(self, custom_path):
         self.custom_path = custom_path
+
 
 class TestCustomSubFS(unittest.TestCase):
     """Test customization of the SubFS returned from opendir etc"""
