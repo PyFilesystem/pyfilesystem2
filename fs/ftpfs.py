@@ -77,6 +77,8 @@ def ftp_errors(fs, path=None):
         raise errors.RemoteConnectionError(
             msg="unable to connect to {}".format(fs.host)
         )
+    except EOFError:
+        raise errors.RemoteConnectionError(msg="lost connection to {}".format(fs.host))
     except error_temp as error:
         if path is not None:
             raise errors.ResourceError(
