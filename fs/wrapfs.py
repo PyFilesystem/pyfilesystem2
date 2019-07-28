@@ -219,11 +219,11 @@ class WrapFS(FS, typing.Generic[_F]):
     def removetree(self, dir_path):
         # type: (Text) -> None
         self.check()
-        _path = abspath(normpath(path))
+        _path = abspath(normpath(dir_path))
         if _path == "/":
             raise errors.RemoveRootError()
-        _fs, _path = self.delegate_path(path)
-        with unwrap_errors(path):
+        _fs, _path = self.delegate_path(dir_path)
+        with unwrap_errors(dir_path):
             _fs.removetree(_path)
 
     def scandir(
