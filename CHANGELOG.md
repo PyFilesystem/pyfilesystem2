@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.4.9] - (Unreleased)
 
+### Fixed
+
+- Restored fs.path import
+
 ### Changed
 
 - `MemFS` now immediately releases all memory it holds when `close()` is called,
