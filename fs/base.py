@@ -112,6 +112,10 @@ class FS(object):
         self._lock = threading.RLock()
         super(FS, self).__init__()
 
+    def __del__(self):
+        """Auto-close the filesystem on exit."""
+        self.close()
+
     def __enter__(self):
         # type: (...) -> FS
         """Allow use of filesystem as a context manager.
