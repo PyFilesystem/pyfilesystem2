@@ -1067,10 +1067,13 @@ class FS(object):
         with self._lock:
             dir_paths = tools.get_intermediate_dirs(self, path)
             for dir_path in dir_paths:
-                self.makedir(dir_path, permissions=permissions)
-
+                try:
+                    self.makedir(dir_path, permissions=permissions)
+                except errors.DirectoryExists:
+                    if not recreate:
+                        raise
             try:
-                self.makedir(path)
+                self.makedir(path, permissions=permissions)
             except errors.DirectoryExists:
                 if not recreate:
                     raise

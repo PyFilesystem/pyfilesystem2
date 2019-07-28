@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Restored fs.path import
+- Fixed potential race condition in makedirs. Fixes [#310](https://github.com/PyFilesystem/pyfilesystem2/issues/310)
 
 ### Changed
 
