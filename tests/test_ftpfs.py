@@ -4,7 +4,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import socket
-import ftplib
 import os
 import platform
 import shutil
@@ -114,6 +113,20 @@ class TestFTPErrors(unittest.TestCase):
             with ftp_errors(mem_fs):
                 raise error_perm("999 foo")
 
+    def test_manager_with_host(self):
+        mem_fs = open_fs("mem://")
+        mem_fs.host = "ftp.example.com"
+
+        with self.assertRaises(errors.RemoteConnectionError) as err_info:
+            with ftp_errors(mem_fs):
+                raise EOFError
+        self.assertEqual(str(err_info.exception), "lost connection to ftp.example.com")
+
+        with self.assertRaises(errors.RemoteConnectionError) as err_info:
+            with ftp_errors(mem_fs):
+                raise socket.error
+        self.assertEqual(str(err_info.exception), "unable to connect to ftp.example.com")
+
 
 @attr("slow")
 class TestFTPFS(FSTestCases, unittest.TestCase):
@@ -167,7 +180,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
 
     def test_ftp_url(self):
         self.assertEqual(self.fs.ftp_url, "ftp://{}:{}@{}:{}".format(self.user, self.pasw, self.server.host, self.server.port))
-        
+
     def test_geturl(self):
         self.fs.makedir("foo")
         self.fs.create("bar")
@@ -251,7 +264,7 @@ class TestFTPFSNoMLSD(TestFTPFS):
     def test_features(self):
         pass
 
-    
+
 @attr("slow")
 class TestAnonFTPFS(FSTestCases, unittest.TestCase):
 
