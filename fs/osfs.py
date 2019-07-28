@@ -588,7 +588,8 @@ class OSFS(FS):
         # type: (Text, Text) -> Text
         if purpose != "download":
             raise NoURL(path, purpose)
-        return "file://" + self.getsyspath(path)
+        # file://D:\a\1\s\tests\fixtures\template can be not used by osfs itself.
+        return "file://" + self.getsyspath(path).replace('\\', '/')
 
     def gettype(self, path):
         # type: (Text) -> ResourceType
