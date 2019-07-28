@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.4.9] - (Unreleased)
 
+### Changed
+
+- `MemFS` now immediately releases all memory it holds when `close()` is called,
+  rather than when it gets garbage collected. Closes [issue #308](https://github.com/PyFilesystem/pyfilesystem2/issues/308).
 - `FTPFS` now translates `EOFError` into `RemoteConnectionError`. Closes [#292](https://github.com/PyFilesystem/pyfilesystem2/issues/292)
 
 ## [2.4.8] - 2019-06-12

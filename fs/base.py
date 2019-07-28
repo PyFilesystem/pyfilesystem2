@@ -101,6 +101,9 @@ class FS(object):
     # most FS will use default walking algorithms
     walker_class = Walker
 
+    # default to SubFS, used by opendir and should be returned by makedir(s)
+    subfs_class = None
+
     def __init__(self):
         # type: (...) -> None
         """Create a filesystem. See help(type(self)) for accurate signature.
@@ -1180,7 +1183,7 @@ class FS(object):
             factory (callable, optional): A callable that when invoked
                 with an FS instance and ``path`` will return a new FS object
                 representing the sub-directory contents. If no ``factory``
-                is supplied then `~fs.subfs.SubFS` will be used.
+                is supplied then `~fs.subfs_class` will be used.
 
         Returns:
             ~fs.subfs.SubFS: A filesystem representing a sub-directory.
@@ -1192,7 +1195,7 @@ class FS(object):
         """
         from .subfs import SubFS
 
-        _factory = factory or SubFS
+        _factory = factory or self.subfs_class or SubFS
 
         if not self.getbasic(path).is_dir:
             raise errors.DirectoryExpected(path=path)
