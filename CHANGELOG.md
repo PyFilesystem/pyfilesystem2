@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Restored fs.path import
 - Fixed potential race condition in makedirs. Fixes [#310](https://github.com/PyFilesystem/pyfilesystem2/issues/310)
+- Added missing methods to WrapFS. Fixed [#294](https://github.com/PyFilesystem/pyfilesystem2/issues/294)
 
 ### Changed
 
