@@ -175,7 +175,7 @@ class FS(object):
 
         This method will return a list of the resources in a directory.
         A *resource* is a file, directory, or one of the other types
-        defined in `~fs.ResourceType`.
+        defined in `~fs.enums.ResourceType`.
 
         Arguments:
             path (str): A path to a directory on the filesystem
@@ -823,11 +823,11 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            ~fs.ResourceType: the type of the resource.
+            ~fs.enums.ResourceType: the type of the resource.
 
         A type of a resource is an integer that identifies the what
         the resource references. The standard type integers may be one
-        of the values in the `~fs.ResourceType` enumerations.
+        of the values in the `~fs.enums.ResourceType` enumerations.
 
         The most common resource types, supported by virtually all
         filesystems are ``directory`` (1) and ``file`` (2), but the

@@ -260,7 +260,7 @@ class Info(object):
     @property
     def type(self):
         # type: () -> ResourceType
-        """`~fs.ResourceType`: the type of the resource.
+        """`~fs.enums.ResourceType`: the type of the resource.
 
         Requires the ``"details"`` namespace.
 
