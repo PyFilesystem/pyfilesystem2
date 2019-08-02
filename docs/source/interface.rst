@@ -20,6 +20,7 @@ The following is a complete list of methods on PyFilesystem objects.
 * :meth:`~fs.base.FS.getdetails` Get details info namespace for a resource.
 * :meth:`~fs.base.FS.getinfo` Get info regarding a file or directory.
 * :meth:`~fs.base.FS.getmeta` Get meta information for a resource.
+* :meth:`~fs.base.FS.getospath` Get path with encoding expected by the OS.
 * :meth:`~fs.base.FS.getsize` Get the size of a file.
 * :meth:`~fs.base.FS.getsyspath` Get the system path of a resource, if one exists.
 * :meth:`~fs.base.FS.gettype` Get the type of a resource.
@@ -29,7 +30,9 @@ The following is a complete list of methods on PyFilesystem objects.
 * :meth:`~fs.base.FS.hasurl` Check if a resource has a URL.
 * :meth:`~fs.base.FS.isclosed` Check if the filesystem is closed.
 * :meth:`~fs.base.FS.isempty` Check if a directory is empty.
+* :meth:`~fs.base.FS.isdir` Check if path maps to a directory.
 * :meth:`~fs.base.FS.isfile` Check if path maps to a file.
+* :meth:`~fs.base.FS.islink` Check if path is a link.
 * :meth:`~fs.base.FS.listdir` Get a list of resources in a directory.
 * :meth:`~fs.base.FS.lock` Get a thread lock context manager.
 * :meth:`~fs.base.FS.makedir` Make a directory.

@@ -101,6 +101,9 @@ class FS(object):
     # most FS will use default walking algorithms
     walker_class = Walker
 
+    # default to SubFS, used by opendir and should be returned by makedir(s)
+    subfs_class = None
+
     def __init__(self):
         # type: (...) -> None
         """Create a filesystem. See help(type(self)) for accurate signature.
@@ -108,6 +111,10 @@ class FS(object):
         self._closed = False
         self._lock = threading.RLock()
         super(FS, self).__init__()
+
+    def __del__(self):
+        """Auto-close the filesystem on exit."""
+        self.close()
 
     def __enter__(self):
         # type: (...) -> FS
@@ -168,7 +175,7 @@ class FS(object):
 
         This method will return a list of the resources in a directory.
         A *resource* is a file, directory, or one of the other types
-        defined in `~fs.ResourceType`.
+        defined in `~fs.enums.ResourceType`.
 
         Arguments:
             path (str): A path to a directory on the filesystem
@@ -816,11 +823,11 @@ class FS(object):
             path (str): A path on the filesystem.
 
         Returns:
-            ~fs.ResourceType: the type of the resource.
+            ~fs.enums.ResourceType: the type of the resource.
 
         A type of a resource is an integer that identifies the what
         the resource references. The standard type integers may be one
-        of the values in the `~fs.ResourceType` enumerations.
+        of the values in the `~fs.enums.ResourceType` enumerations.
 
         The most common resource types, supported by virtually all
         filesystems are ``directory`` (1) and ``file`` (2), but the
@@ -1060,10 +1067,13 @@ class FS(object):
         with self._lock:
             dir_paths = tools.get_intermediate_dirs(self, path)
             for dir_path in dir_paths:
-                self.makedir(dir_path, permissions=permissions)
-
+                try:
+                    self.makedir(dir_path, permissions=permissions)
+                except errors.DirectoryExists:
+                    if not recreate:
+                        raise
             try:
-                self.makedir(path)
+                self.makedir(path, permissions=permissions)
             except errors.DirectoryExists:
                 if not recreate:
                     raise
@@ -1180,7 +1190,7 @@ class FS(object):
             factory (callable, optional): A callable that when invoked
                 with an FS instance and ``path`` will return a new FS object
                 representing the sub-directory contents. If no ``factory``
-                is supplied then `~fs.subfs.SubFS` will be used.
+                is supplied then `~fs.subfs_class` will be used.
 
         Returns:
             ~fs.subfs.SubFS: A filesystem representing a sub-directory.
@@ -1192,7 +1202,7 @@ class FS(object):
         """
         from .subfs import SubFS
 
-        _factory = factory or SubFS
+        _factory = factory or self.subfs_class or SubFS
 
         if not self.getbasic(path).is_dir:
             raise errors.DirectoryExpected(path=path)

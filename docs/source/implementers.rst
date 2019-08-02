@@ -94,6 +94,7 @@ In the general case, it is a good idea to look at how these methods are implemen
 * :meth:`~fs.base.FS.exists`
 * :meth:`~fs.base.FS.filterdir`
 * :meth:`~fs.base.FS.getmeta`
+* :meth:`~fs.base.FS.getospath`
 * :meth:`~fs.base.FS.getsize`
 * :meth:`~fs.base.FS.getsyspath`
 * :meth:`~fs.base.FS.gettype`
@@ -102,7 +103,9 @@ In the general case, it is a good idea to look at how these methods are implemen
 * :meth:`~fs.base.FS.hasurl`
 * :meth:`~fs.base.FS.isclosed`
 * :meth:`~fs.base.FS.isempty`
+* :meth:`~fs.base.FS.isdir`
 * :meth:`~fs.base.FS.isfile`
+* :meth:`~fs.base.FS.islink`
 * :meth:`~fs.base.FS.lock`
 * :meth:`~fs.base.FS.makedirs`
 * :meth:`~fs.base.FS.move`

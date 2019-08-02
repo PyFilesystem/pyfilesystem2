@@ -10,9 +10,9 @@ import six
 
 from . import errors
 from .base import FS
-from .copy import copy_file
+from .copy import copy_file, copy_dir
 from .info import Info
-from .move import move_file
+from .move import move_file, move_dir
 from .path import abspath, normpath
 from .error_tools import unwrap_errors
 
@@ -180,6 +180,17 @@ class WrapFS(FS, typing.Generic[_F]):
                 raise errors.DestinationExists(_dst_path)
             move_file(src_fs, _src_path, dst_fs, _dst_path)
 
+    def movedir(self, src_path, dst_path, create=False):
+        # type: (Text, Text, bool) -> None
+        src_fs, _src_path = self.delegate_path(src_path)
+        dst_fs, _dst_path = self.delegate_path(dst_path)
+        with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
+            if not create and not dst_fs.exists(_dst_path):
+                raise errors.ResourceNotFound(dst_path)
+            if not src_fs.getinfo(_src_path).is_dir:
+                raise errors.DirectoryExpected(src_path)
+            move_dir(src_fs, _src_path, dst_fs, _dst_path)
+
     def openbin(self, path, mode="r", buffering=-1, **options):
         # type: (Text, Text, int, **Any) -> BinaryIO
         self.check()
@@ -204,6 +215,16 @@ class WrapFS(FS, typing.Generic[_F]):
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
             _fs.removedir(_path)
+
+    def removetree(self, dir_path):
+        # type: (Text) -> None
+        self.check()
+        _path = abspath(normpath(dir_path))
+        if _path == "/":
+            raise errors.RemoveRootError()
+        _fs, _path = self.delegate_path(dir_path)
+        with unwrap_errors(dir_path):
+            _fs.removetree(_path)
 
     def scandir(
         self,
@@ -247,6 +268,17 @@ class WrapFS(FS, typing.Generic[_F]):
                 raise errors.DestinationExists(_dst_path)
             copy_file(src_fs, _src_path, dst_fs, _dst_path)
 
+    def copydir(self, src_path, dst_path, create=False):
+        # type: (Text, Text, bool) -> None
+        src_fs, _src_path = self.delegate_path(src_path)
+        dst_fs, _dst_path = self.delegate_path(dst_path)
+        with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
+            if not create and not dst_fs.exists(_dst_path):
+                raise errors.ResourceNotFound(dst_path)
+            if not src_fs.getinfo(_src_path).is_dir:
+                raise errors.DirectoryExpected(src_path)
+            copy_dir(src_fs, _src_path, dst_fs, _dst_path)
+
     def create(self, path, wipe=False):
         # type: (Text, bool) -> bool
         self.check()
@@ -261,6 +293,13 @@ class WrapFS(FS, typing.Generic[_F]):
         with unwrap_errors(path):
             desc = _fs.desc(_path)
         return desc
+
+    def download(self, path, file, chunk_size=None, **options):
+        # type: (Text, BinaryIO, Optional[int], **Any) -> None
+        self.check()
+        _fs, _path = self.delegate_path(path)
+        with unwrap_errors(path):
+            _fs.download(_path, file, chunk_size=chunk_size, **options)
 
     def exists(self, path):
         # type: (Text) -> bool

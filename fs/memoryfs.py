@@ -340,6 +340,11 @@ class MemoryFS(FS):
                 current_entry = current_entry.get_entry(path_component)
             return current_entry
 
+    def close(self):
+        # type: () -> None
+        self.root = None
+        return super(MemoryFS, self).close()
+
     def getinfo(self, path, namespaces=None):
         # type: (Text, Optional[Collection[Text]]) -> Info
         namespaces = namespaces or ()

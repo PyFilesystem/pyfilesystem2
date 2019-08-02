@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.10] - 2019-07-29
+
+### Fixed
+
+- Fixed broken WrapFS.movedir [#322](https://github.com/PyFilesystem/pyfilesystem2/issues/322)
+
+## [2.4.9] - 2019-07-28
+
+### Fixed
+
+- Restored fs.path import
+- Fixed potential race condition in makedirs. Fixes [#310](https://github.com/PyFilesystem/pyfilesystem2/issues/310)
+- Added missing methods to WrapFS. Fixed [#294](https://github.com/PyFilesystem/pyfilesystem2/issues/294)
+
+### Changed
+
+- `MemFS` now immediately releases all memory it holds when `close()` is called,
+  rather than when it gets garbage collected. Closes [issue #308](https://github.com/PyFilesystem/pyfilesystem2/issues/308).
+- `FTPFS` now translates `EOFError` into `RemoteConnectionError`. Closes [#292](https://github.com/PyFilesystem/pyfilesystem2/issues/292)
+- Added automatic close for filesystems that go out of scope. Fixes [#298](https://github.com/PyFilesystem/pyfilesystem2/issues/298)
+
 ## [2.4.8] - 2019-06-12
 
 ### Changed
