@@ -4,7 +4,6 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import copy
 import os
 import tarfile
 import typing
@@ -21,7 +20,7 @@ from .errors import IllegalBackReference
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
-from .path import dirname, relpath, basename, isbase, normpath, parts, frombase
+from .path import relpath, basename, isbase, normpath, parts, frombase
 from .wrapfs import WrapFS
 from .permissions import Permissions
 
@@ -468,6 +467,7 @@ class ReadTarFS(FS):
         return self._tar.closed  # type: ignore
 
     def geturl(self, path, purpose="download"):
+        # type: (Text, Text) -> Text
         return "tar://%s/%s" % (self._file, path)
 
 
