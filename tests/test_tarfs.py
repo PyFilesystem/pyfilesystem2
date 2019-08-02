@@ -89,15 +89,6 @@ class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
         fs.close()
         del fs._tar_file
 
-    def assert_is_bzip(self):
-        try:
-            tarfile.open(fs._tar_file, "r:gz")
-        except tarfile.ReadError:
-            self.fail("{} is not a valid gz archive".format(fs._tar_file))
-        for other_comps in ["xz", "bz2", ""]:
-            with self.assertRaises(tarfile.ReadError):
-                tarfile.open(fs._tar_file, "r:{}".format(other_comps))
-
 
 @unittest.skipIf(six.PY2, "Python2 does not support LZMA")
 class TestWriteXZippedTarFS(FSTestCases, unittest.TestCase):
