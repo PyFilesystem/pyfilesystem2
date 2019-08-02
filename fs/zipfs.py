@@ -445,5 +445,5 @@ class ReadZipFS(FS):
         zip_bytes = self._zip.read(zip_name)
         return zip_bytes
 
-    def geturl(self, path, purpose='download'):
+    def geturl(self, path, purpose="download"):
         return "zip://%s/%s" % (self._file, path)

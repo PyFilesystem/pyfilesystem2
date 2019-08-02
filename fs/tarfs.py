@@ -467,7 +467,7 @@ class ReadTarFS(FS):
         # type: () -> bool
         return self._tar.closed  # type: ignore
 
-    def geturl(self, path, purpose='download'):
+    def geturl(self, path, purpose="download"):
         return "tar://%s/%s" % (self._file, path)
 
 

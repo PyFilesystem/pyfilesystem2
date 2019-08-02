@@ -138,9 +138,8 @@ class ArchiveTestCases(object):
         self.fs.getinfo("foo")
 
     def test_geturl(self):
-        test_file = 'foo/bar/egg/foofoo'
-        expected = 'zip://{zip_file_path}/{file_inside_zip}'.format(
-            zip_file_path=self._temp_path,
-            file_inside_zip=test_file
+        test_file = "foo/bar/egg/foofoo"
+        expected = "zip://{zip_file_path}/{file_inside_zip}".format(
+            zip_file_path=self._temp_path, file_inside_zip=test_file
         )
         self.assertEqual(self.fs.geturl(test_file), expected)
