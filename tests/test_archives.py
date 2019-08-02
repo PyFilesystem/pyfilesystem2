@@ -10,6 +10,7 @@ from fs.opener import open_fs
 from fs.enums import ResourceType
 from fs import walk
 from fs import errors
+from fs.memoryfs import MemoryFS
 from fs.test import UNICODE_TEXT
 
 
