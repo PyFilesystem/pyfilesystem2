@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.4.10] - 2019-07-29
 
+### Added
+
+- Added geturl for TarFS and ZipFS
+
+### Fixed
+
+- Fixed broken FSURL in windows [#329](https://github.com/PyFilesystem/pyfilesystem2/issues/329)
+
+
+## [2.4.10] - 2019-07-29
+
 ### Fixed
 
 - Fixed broken WrapFS.movedir [#322](https://github.com/PyFilesystem/pyfilesystem2/issues/322)
