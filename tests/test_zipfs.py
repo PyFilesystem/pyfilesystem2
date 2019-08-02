@@ -168,6 +168,13 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
             self.assertEqual(f.seek(-5, Seek.end), 7)
             self.assertEqual(f.read(), b"World")
 
+    def test_geturl(self):
+        test_file = "foo/bar/egg/foofoo"
+        expected = "zip://{zip_file_path}/{file_inside_zip}".format(
+            zip_file_path=self._temp_path, file_inside_zip=test_file
+        )
+        self.assertEqual(self.fs.geturl(test_file), expected)
+
 
 class TestReadZipFSMem(TestReadZipFS):
     def make_source_fs(self):
@@ -184,8 +191,8 @@ class TestDirsZipFS(unittest.TestCase):
                 z.writestr("foo/bar/baz/egg", b"hello")
             with zipfs.ReadZipFS(path) as zip_fs:
                 foo = zip_fs.getinfo("foo", ["details"])
-                bar = zip_fs.getinfo("foo/bar")
-                baz = zip_fs.getinfo("foo/bar/baz")
+                zip_fs.getinfo("foo/bar")
+                zip_fs.getinfo("foo/bar/baz")
                 self.assertTrue(foo.is_dir)
                 self.assertTrue(zip_fs.isfile("foo/bar/baz/egg"))
         finally:

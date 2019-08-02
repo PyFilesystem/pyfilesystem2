@@ -4,16 +4,11 @@ from __future__ import unicode_literals
 import io
 import os
 import six
-import gzip
-import tarfile
-import getpass
 import tarfile
 import tempfile
 import unittest
-import uuid
 
 from fs import tarfs
-from fs import errors
 from fs.enums import ResourceType
 from fs.compress import write_tar
 from fs.opener import open_fs
@@ -186,6 +181,13 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         super(TestReadTarFS, self).test_getinfo()
         top = self.fs.getinfo("top.txt", ["tar"])
         self.assertTrue(top.get("tar", "is_file"))
+
+    def test_geturl(self):
+        test_file = "foo/bar/egg/foofoo"
+        expected = "zip://{zip_file_path}/{file_inside_zip}".format(
+            zip_file_path=self._temp_path, file_inside_zip=test_file
+        )
+        self.assertEqual(self.fs.geturl(test_file), expected)
 
 
 class TestBrokenPaths(unittest.TestCase):
