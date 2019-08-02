@@ -14,7 +14,7 @@ from fs.compress import write_zip
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
 from fs.test import FSTestCases
-from fs.enums import Seek, ResourceType
+from fs.enums import Seek
 
 from .test_archives import ArchiveTestCases
 

@@ -9,9 +9,8 @@ import shutil
 import tempfile
 import unittest
 
-from fs import osfs
-from fs import fsencode, fsdecode
-from fs.path import relpath
+from fs import osfs, open_fs
+from fs.path import relpath, dirname
 from fs import errors
 
 from fs.test import FSTestCases
@@ -67,7 +66,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
 
     def test_not_exists(self):
         with self.assertRaises(errors.CreateFailed):
-            fs = osfs.OSFS("/does/not/exists/")
+            osfs.OSFS("/does/not/exists/")
 
     def test_expand_vars(self):
         self.fs.makedir("TYRIONLANISTER")
@@ -152,3 +151,16 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             with self.assertRaises(errors.InvalidCharsInPath):
                 with self.fs.open("13 – Marked Register.pdf", "wb") as fh:
                     fh.write(b"foo")
+
+    def test_consume_geturl(self):
+        self.fs.create("foo")
+        try:
+            url = self.fs.geturl("foo")
+        except errors.NoURL:
+            self.assertFalse(self.fs.hasurl("foo"))
+        else:
+            self.assertTrue(self.fs.hasurl("foo"))
+
+        # Should not throw an error
+        base_dir = dirname(url)
+        open_fs(base_dir)
