@@ -14,7 +14,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fixed broken FSURL in windows [#329](https://github.com/PyFilesystem/pyfilesystem2/issues/329)
-
+- Fixed hidden exception at fs.close() when opening an absent zip/tar file URL [#33](https://github.com/PyFilesystem/pyfilesystem2/issues/333)
 
 ## [2.4.10] - 2019-07-29
 

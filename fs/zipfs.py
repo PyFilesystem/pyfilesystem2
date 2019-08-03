@@ -434,7 +434,8 @@ class ReadZipFS(FS):
     def close(self):
         # type: () -> None
         super(ReadZipFS, self).close()
-        self._zip.close()
+        if hasattr(self, '_zip'):
+            self._zip.close()
 
     def readbytes(self, path):
         # type: (Text) -> bytes

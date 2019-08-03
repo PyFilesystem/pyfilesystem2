@@ -460,7 +460,8 @@ class ReadTarFS(FS):
     def close(self):
         # type: () -> None
         super(ReadTarFS, self).close()
-        self._tar.close()
+        if hasattr(self, '_tar'):
+            self._tar.close()
 
     def isclosed(self):
         # type: () -> bool

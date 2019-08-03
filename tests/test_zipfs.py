@@ -175,6 +175,17 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
         )
         self.assertEqual(self.fs.geturl(test_file), expected)
 
+    def test_read_non_existent_file(self):
+        fs = zipfs.ZipFS(open(self._temp_path, "rb"))
+        # it has been very difficult to catch exception in __del__()
+        del fs._zip
+        try:
+            fs.close()
+        except AttributeError:
+            self.fail("Could not close tar fs properly")
+        except Exception:
+            self.fail("Strage exception in closing fs")
+
 
 class TestReadZipFSMem(TestReadZipFS):
     def make_source_fs(self):

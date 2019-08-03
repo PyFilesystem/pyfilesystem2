@@ -168,6 +168,17 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         except:
             self.fail("Couldn't open tarfs from filename")
 
+    def test_read_non_existent_file(self):
+        fs = tarfs.TarFS(open(self._temp_path, "rb"))
+        # it has been very difficult to catch exception in __del__()
+        del fs._tar
+        try:
+            fs.close()
+        except AttributeError:
+            self.fail("Could not close tar fs properly")
+        except Exception:
+            self.fail("Strage exception in closing fs")
+
     def test_getinfo(self):
         super(TestReadTarFS, self).test_getinfo()
         top = self.fs.getinfo("top.txt", ["tar"])
