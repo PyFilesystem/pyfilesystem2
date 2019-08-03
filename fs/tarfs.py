@@ -16,7 +16,7 @@ from . import errors
 from .base import FS
 from .compress import write_tar
 from .enums import ResourceType
-from .errors import IllegalBackReference
+from .errors import IllegalBackReference, NoURL
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
@@ -460,7 +460,7 @@ class ReadTarFS(FS):
     def close(self):
         # type: () -> None
         super(ReadTarFS, self).close()
-        if hasattr(self, '_tar'):
+        if hasattr(self, "_tar"):
             self._tar.close()
 
     def isclosed(self):
@@ -469,7 +469,10 @@ class ReadTarFS(FS):
 
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
-        return "tar://%s/%s" % (self._file, path)
+        if purpose == "fs":
+            return "tar://%s!/%s" % (self._file, path)
+        else:
+            raise NoURL(path, purpose)
 
 
 if __name__ == "__main__":  # pragma: no cover

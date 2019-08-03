@@ -13,6 +13,7 @@ from fs.enums import ResourceType
 from fs.compress import write_tar
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
+from fs.errors import NoURL
 from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases
@@ -186,10 +187,15 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
 
     def test_geturl(self):
         test_file = "foo/bar/egg/foofoo"
-        expected = "tar://{zip_file_path}/{file_inside_zip}".format(
-            zip_file_path=self._temp_path, file_inside_zip=test_file
+        expected = "tar://{tar_file_path}!/{file_inside_tar}".format(
+            tar_file_path=self._temp_path, file_inside_tar=test_file
         )
-        self.assertEqual(self.fs.geturl(test_file), expected)
+        self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
+
+    def test_geturl_for_download(self):
+        test_file = "foo/bar/egg/foofoo"
+        with self.assertRaises(NoURL):
+            self.fs.geturl(test_file)
 
 
 class TestBrokenPaths(unittest.TestCase):

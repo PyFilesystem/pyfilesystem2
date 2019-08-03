@@ -13,6 +13,7 @@ from fs import zipfs
 from fs.compress import write_zip
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
+from fs.errors import NoURL
 from fs.test import FSTestCases
 from fs.enums import Seek
 
@@ -170,10 +171,15 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
 
     def test_geturl(self):
         test_file = "foo/bar/egg/foofoo"
-        expected = "zip://{zip_file_path}/{file_inside_zip}".format(
+        expected = "zip://{zip_file_path}!/{file_inside_zip}".format(
             zip_file_path=self._temp_path, file_inside_zip=test_file
         )
-        self.assertEqual(self.fs.geturl(test_file), expected)
+        self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
+
+    def test_geturl_for_download(self):
+        test_file = "foo/bar/egg/foofoo"
+        with self.assertRaises(NoURL):
+            self.fs.geturl(test_file)
 
     def test_read_non_existent_file(self):
         fs = zipfs.ZipFS(open(self._temp_path, "rb"))

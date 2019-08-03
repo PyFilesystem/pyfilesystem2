@@ -434,7 +434,7 @@ class ReadZipFS(FS):
     def close(self):
         # type: () -> None
         super(ReadZipFS, self).close()
-        if hasattr(self, '_zip'):
+        if hasattr(self, "_zip"):
             self._zip.close()
 
     def readbytes(self, path):
@@ -448,4 +448,7 @@ class ReadZipFS(FS):
 
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
-        return "zip://%s/%s" % (self._file, path)
+        if purpose == "fs":
+            return "zip://%s!/%s" % (self._file, path)
+        else:
+            raise errors.NoURL(path, purpose)
