@@ -588,7 +588,7 @@ class OSFS(FS):
         # type: (Text, Text) -> Text
         if purpose != "download":
             raise NoURL(path, purpose)
-        return "file://" + self.getsyspath(path).replace('\\', '/')
+        return "file://" + self.getsyspath(path).replace("\\", "/")
 
     def gettype(self, path):
         # type: (Text) -> ResourceType
