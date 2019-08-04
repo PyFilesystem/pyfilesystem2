@@ -28,7 +28,7 @@ except ImportError:
     try:
         from scandir import scandir  # type: ignore
     except ImportError:  # pragma: no cover
-        scandir = None  # pragma: no cover
+        scandir = None  # type: ignore  # pragma: no cover
 
 try:
     from os import sendfile
@@ -36,7 +36,7 @@ except ImportError:
     try:
         from sendfile import sendfile  # type: ignore
     except ImportError:
-        sendfile = None  # pragma: no cover
+        sendfile = None  # type: ignore  # pragma: no cover
 
 from . import errors
 from .errors import FileExists
@@ -186,7 +186,7 @@ class OSFS(FS):
         return fmt.format(_class_name.lower(), self.root_path)
 
     def _to_sys_path(self, path):
-        # type: (Text) -> Text
+        # type: (Text) -> bytes
         """Convert a FS path to a path on the OS.
         """
         sys_path = fsencode(
@@ -266,13 +266,11 @@ class OSFS(FS):
         if hasattr(os, "readlink"):
             try:
                 if _WINDOWS_PLATFORM:  # pragma: no cover
-                    target = os.readlink(sys_path)
+                    return os.readlink(sys_path)
                 else:
-                    target = os.readlink(fsencode(sys_path))
+                    return fsdecode(os.readlink(fsencode(sys_path)))
             except OSError:
                 pass
-            else:
-                return target
         return None
 
     def _make_link_info(self, sys_path):
@@ -484,7 +482,7 @@ class OSFS(FS):
                     self._root_path, path.lstrip("/").replace("/", os.sep)
                 )
             else:
-                sys_path = self._to_sys_path(_path)
+                sys_path = self._to_sys_path(_path)  # type: ignore
             with convert_os_errors("scandir", path, directory=True):
                 for dir_entry in scandir(sys_path):
                     info = {

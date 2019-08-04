@@ -11,7 +11,7 @@ try:
     from os import fspath
 except ImportError:
 
-    def fspath(path):
+    def fspath(path):  # type: ignore
         """Return the path representation of a path-like object.
 
         If str or bytes is passed in, it is returned unchanged. Otherwise the

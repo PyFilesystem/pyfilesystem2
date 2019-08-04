@@ -57,7 +57,7 @@ class Registry(object):
         return "<fs-registry {!r}>".format(self.protocols)
 
     def install(self, opener):
-        # type: (Union[Type[Opener], Opener, Callable[[], Opener]]) -> None
+        # type: (Union[Type[Opener], Opener, Callable[[], Opener]]) -> Opener
         """Install an opener.
 
         Arguments:
@@ -76,7 +76,7 @@ class Registry(object):
         assert _opener.protocols, "must list one or more protocols"
         for protocol in _opener.protocols:
             self._protocols[protocol] = _opener
-        return opener
+        return _opener
 
     @property
     def protocols(self):

@@ -5,14 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
-## [2.4.11] - tba
+## [2.4.11] - Unreleased
 
 ### Added
 
-- Added geturl for TarFS and ZipFS
+- Added geturl for TarFS and ZipFS for 'fs' purpose. NoURL for 'download' purpose.
 
 ### Fixed
 
+- Fixed tests leaving tmp files
+- Fixed typing issues
+- Fixed link namespace returning bytes
 - Fixed broken FSURL in windows [#329](https://github.com/PyFilesystem/pyfilesystem2/issues/329)
 - Fixed hidden exception at fs.close() when opening an absent zip/tar file URL [#33](https://github.com/PyFilesystem/pyfilesystem2/issues/333)
 

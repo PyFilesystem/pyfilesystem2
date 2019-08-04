@@ -86,6 +86,7 @@ class TempFS(OSFS):
         except Exception as error:
             if not self._ignore_clean_errors:
                 raise errors.OperationFailed(
-                    msg="failed to remove temporary directory", exc=error
+                    msg="failed to remove temporary directory; {}".format(error),
+                    exc=error,
                 )
         self._cleaned = True

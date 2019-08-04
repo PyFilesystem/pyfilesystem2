@@ -56,6 +56,7 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
 
     def destroy_fs(self, fs):
         fs.close()
+        os.remove(fs._tar_file)
         del fs._tar_file
 
 
@@ -88,6 +89,7 @@ class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
 
     def destroy_fs(self, fs):
         fs.close()
+        os.remove(fs._tar_file)
         del fs._tar_file
 
 
