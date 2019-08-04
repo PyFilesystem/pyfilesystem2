@@ -30,6 +30,7 @@ before_install:
 
 install:
   - pip install -e .
+  - make typecheck
 
 after_success:
   - coveralls
