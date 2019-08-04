@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fixed tests leaving tmp files
 - Fixed typing issues
+- Fixed link namespace returning bytes
 
 ## [2.4.10] - 2019-07-29
 
