@@ -1,6 +1,7 @@
 appdirs~=1.4.0
 coverage
 mock
+mypy==0.720
 pyftpdlib==1.5.2
 python-coveralls
 pytz==2016.7
