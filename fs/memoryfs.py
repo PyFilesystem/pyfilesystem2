@@ -342,7 +342,8 @@ class MemoryFS(FS):
 
     def close(self):
         # type: () -> None
-        self.root = None
+        if not self._closed:
+            del self.root
         return super(MemoryFS, self).close()
 
     def getinfo(self, path, namespaces=None):

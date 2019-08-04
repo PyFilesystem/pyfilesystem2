@@ -10,18 +10,19 @@ from .path import iteratepath
 from . import wildcard
 
 
-_PATTERN_CACHE = LRUCache(
-    1000
-)  # type: LRUCache[Tuple[Text, bool], Tuple[int, bool, Pattern]]
-
-GlobMatch = namedtuple('GlobMatch', ["path", "info"])
+GlobMatch = namedtuple("GlobMatch", ["path", "info"])
 Counts = namedtuple("Counts", ["files", "directories", "data"])
 LineCounts = namedtuple("LineCounts", ["lines", "non_blank"])
 
 if False:  # typing.TYPE_CHECKING
-    from typing import Iterator, List, Optional, Tuple
+    from typing import Iterator, List, Optional, Pattern, Text, Tuple
     from .base import FS
     from .info import Info
+
+
+_PATTERN_CACHE = LRUCache(
+    1000
+)  # type: LRUCache[Tuple[Text, bool], Tuple[int, bool, Pattern]]
 
 
 def _translate_glob(pattern, case_sensitive=True):

@@ -67,6 +67,7 @@ class Mode(typing.Container[Text]):
         # type: (object) -> bool
         """Check if a mode contains a given character.
         """
+        assert isinstance(character, Text)
         return character in self._mode
 
     def to_platform(self):

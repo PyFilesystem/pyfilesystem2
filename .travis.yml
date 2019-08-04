@@ -11,7 +11,13 @@ matrix:
         - SETUPTOOLS=setuptools PIP=pip
       dist: xenial
       sudo: true
+      install:
+        - pip install mypy
+        - make typecheck
     - python: "3.6"
+      install:
+        - pip install mypy
+        - make typecheck
       env:
         - SETUPTOOLS=setuptools PIP=pip
     - python: "3.5"
