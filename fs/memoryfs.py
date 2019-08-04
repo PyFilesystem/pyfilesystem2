@@ -342,7 +342,7 @@ class MemoryFS(FS):
 
     def close(self):
         # type: () -> None
-        self.root = self._make_dir_entry(ResourceType.directory, "")
+        del self.root
         return super(MemoryFS, self).close()
 
     def getinfo(self, path, namespaces=None):
