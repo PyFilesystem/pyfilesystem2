@@ -26,7 +26,7 @@ before_install:
   - pip --version
   - pip install -r testrequirements.txt
   - pip freeze
-  - python3.6 -m pip install mypy
+  - python3 -m pip install mypy
 
 install:
   - pip install -e .
