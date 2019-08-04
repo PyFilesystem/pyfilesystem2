@@ -28,6 +28,11 @@ class TestOSFS(FSTestCases, unittest.TestCase):
 
     def destroy_fs(self, fs):
         self.fs.close()
+        try:
+            shutil.rmtree(fs.getsyspath("/"))
+        except OSError:
+            # Already deleted
+            pass
 
     def _get_real_path(self, path):
         _path = os.path.join(self.fs.root_path, relpath(path))
