@@ -4,19 +4,22 @@ from __future__ import unicode_literals
 import errno
 import io
 import os
-import mock
 import shutil
 import tempfile
 import unittest
 
 from fs import osfs
-from fs import fsencode, fsdecode
 from fs.path import relpath
 from fs import errors
 
 from fs.test import FSTestCases
 
 from six import text_type
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestOSFS(FSTestCases, unittest.TestCase):

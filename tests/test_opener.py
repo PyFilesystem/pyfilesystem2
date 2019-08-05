@@ -1,13 +1,10 @@
 from __future__ import unicode_literals
 
 import os
-import mock
 import sys
 import tempfile
 import unittest
 import pkg_resources
-
-import six
 
 from fs import open_fs, opener
 from fs.osfs import OSFS
@@ -16,6 +13,11 @@ from fs.memoryfs import MemoryFS
 from fs.appfs import UserDataFS
 from fs.opener.parse import ParseResult
 from fs.opener.registry import Registry
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestParse(unittest.TestCase):

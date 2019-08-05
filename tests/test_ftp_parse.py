@@ -1,10 +1,14 @@
 from __future__ import unicode_literals
 
-import mock
 import time
 import unittest
 
 from fs import _ftp_parse as ftp_parse
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 time2017 = time.struct_time([2017, 11, 28, 1, 1, 1, 1, 332, 0])
 
