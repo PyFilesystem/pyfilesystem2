@@ -137,7 +137,7 @@ class OSFS(FS):
                 )
         else:
             if not os.path.isdir(_root_path):
-                raise errors.CreateFailed("root path does not exist")
+                raise errors.CreateFailed("{} does not exist".format(_root_path))
 
         _meta = self._meta = {
             "network": False,
