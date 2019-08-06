@@ -169,7 +169,7 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
             self.assertEqual(f.seek(-5, Seek.end), 7)
             self.assertEqual(f.read(), b"World")
 
-    def test_geturl(self):
+    def test_geturl_for_fs(self):
         test_file = "foo/bar/egg/foofoo"
         expected = "zip://{zip_file_path}!/{file_inside_zip}".format(
             zip_file_path=self._temp_path, file_inside_zip=test_file
@@ -190,7 +190,7 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
         except AttributeError:
             self.fail("Could not close tar fs properly")
         except Exception:
-            self.fail("Strage exception in closing fs")
+            self.fail("Strange exception in closing fs")
 
 
 class TestReadZipFSMem(TestReadZipFS):

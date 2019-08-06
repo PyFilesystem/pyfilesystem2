@@ -414,13 +414,30 @@ class FSTestCases(object):
         self.fs.hassyspath("a/b/c/foo/bar")
 
     def test_geturl(self):
+        self.fs.makedirs("foo/bar ha")
+        test_fixtures = [
+            # raw file, expected url path
+            ["foo", "foo"],
+            ["foo-bar", "foo-bar"],
+            ["foo_bar", "foo_bar"],
+            ["foo/bar ha/barz", "foo/bar%20ha/barz"],
+            ["example b.txt", "example%20b.txt"],
+        ]
+        for test_file, expected_suffix in test_fixtures:
+            self.fs.create(test_file)
+            expected = "file://" + self.fs._root_path.replace("\\", "/")
+            expected = expected + "/" + expected_suffix
+            try:
+                actual = self.fs.geturl(test_file)
+            except errors.NoURL:
+                self.assertFalse(self.fs.hasurl(test_file))
+            else:
+                self.assertTrue(self.fs.hasurl(test_file))
+
+            self.assertEqual(actual, expected)
+
+    def test_hasurl(self):
         self.fs.create("foo")
-        try:
-            self.fs.geturl("foo")
-        except errors.NoURL:
-            self.assertFalse(self.fs.hasurl("foo"))
-        else:
-            self.assertTrue(self.fs.hasurl("foo"))
         # Should not throw an error
         self.fs.hasurl("a/b/c/foo/bar")
 
@@ -1846,4 +1863,3 @@ class FSTestCases(object):
             self.assertEqual(
                 foo_fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
             )
-

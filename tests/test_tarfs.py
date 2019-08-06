@@ -180,14 +180,14 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         except AttributeError:
             self.fail("Could not close tar fs properly")
         except Exception:
-            self.fail("Strage exception in closing fs")
+            self.fail("Strange exception in closing fs")
 
     def test_getinfo(self):
         super(TestReadTarFS, self).test_getinfo()
         top = self.fs.getinfo("top.txt", ["tar"])
         self.assertTrue(top.get("tar", "is_file"))
 
-    def test_geturl(self):
+    def test_geturl_for_fs(self):
         test_file = "foo/bar/egg/foofoo"
         expected = "tar://{tar_file_path}!/{file_inside_tar}".format(
             tar_file_path=self._temp_path, file_inside_tar=test_file

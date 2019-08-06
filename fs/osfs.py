@@ -526,7 +526,6 @@ class OSFS(FS):
             namespaces = namespaces or ()
             _path = self.validatepath(path)
             sys_path = self.getsyspath(_path)
-            _sys_path = fsencode(sys_path)
             with convert_os_errors("scandir", path, directory=True):
                 for entry_name in os.listdir(sys_path):
                     _entry_name = fsdecode(entry_name)
@@ -586,7 +585,9 @@ class OSFS(FS):
         # type: (Text, Text) -> Text
         if purpose != "download":
             raise NoURL(path, purpose)
-        return "file://" + self.getsyspath(path).replace("\\", "/")
+        sys_path = self.getsyspath(path).replace("\\", "/")
+        url_path = six.moves.urllib.parse.quote(sys_path)
+        return "file://" + url_path
 
     def gettype(self, path):
         # type: (Text) -> ResourceType
