@@ -17,6 +17,8 @@ import math
 import os
 import time
 
+import pytest
+
 import fs.copy
 import fs.move
 from fs import ResourceType, Seek
@@ -1790,7 +1792,7 @@ class FSTestCases(object):
 
     def test_unicode_path(self):
         if not self.fs.getmeta().get("unicode_paths", False):
-            self.skipTest("the filesystem does not support unicode paths.")
+            return pytest.skip("the filesystem does not support unicode paths.")
 
         self.fs.makedir("földér")
         self.fs.writetext("☭.txt", "Smells like communism.")
@@ -1813,10 +1815,10 @@ class FSTestCases(object):
     def test_case_sensitive(self):
         meta = self.fs.getmeta()
         if "case_insensitive" not in meta:
-            self.skipTest("case sensitivity not known")
+            return pytest.skip("case sensitivity not known")
 
         if meta.get("case_insensitive", False):
-            self.skipTest("the filesystem is not case sensitive.")
+            return pytest.skip("the filesystem is not case sensitive.")
 
         self.fs.makedir("foo")
         self.fs.makedir("Foo")
