@@ -6,6 +6,8 @@ import tempfile
 import unittest
 import pkg_resources
 
+import pytest
+
 from fs import open_fs, opener
 from fs.osfs import OSFS
 from fs.opener import registry, errors
@@ -206,6 +208,7 @@ class TestManageFS(unittest.TestCase):
         self.assertTrue(mem_fs.isclosed())
 
 
+@pytest.mark.usefixtures("mock_appdir_directories")
 class TestOpeners(unittest.TestCase):
     def test_repr(self):
         # Check __repr__ works
