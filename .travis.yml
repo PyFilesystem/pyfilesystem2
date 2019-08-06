@@ -27,9 +27,11 @@ matrix:
       env:
         - SETUPTOOLS=setuptools PIP=pip
     - python: "pypy"
+      sudo: true
       env:
         - SETUPTOOLS=setuptools PIP=pip
     - python: "pypy3.5"
+      sudo: true
       env:
         - SETUPTOOLS=setuptools PIP=pip
 
