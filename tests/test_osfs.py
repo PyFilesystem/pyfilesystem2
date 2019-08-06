@@ -169,3 +169,25 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         # Should not throw an error
         base_dir = dirname(url)
         open_fs(base_dir)
+
+    def test_complex_geturl(self):
+        self.fs.makedirs("foo/bar ha")
+        test_fixtures = [
+            # raw file, expected url path
+            ["foo", "foo"],
+            ["foo-bar", "foo-bar"],
+            ["foo_bar", "foo_bar"],
+            ["foo/bar ha/barz", "foo/bar%20ha/barz"],
+            ["example b.txt", "example%20b.txt"],
+        ]
+        for test_file, expected_suffix in test_fixtures:
+            self.fs.create(test_file)
+            expected = "file://" + self.fs.getsyspath(expected_suffix).replace("\\", "/")
+            try:
+                actual = self.fs.geturl(test_file)
+            except errors.NoURL:
+                self.assertFalse(self.fs.hasurl(test_file))
+            else:
+                self.assertTrue(self.fs.hasurl(test_file))
+
+            self.assertEqual(actual, expected)
