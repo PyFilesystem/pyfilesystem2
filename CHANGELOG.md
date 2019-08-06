@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed tests leaving tmp files
 - Fixed typing issues
 - Fixed link namespace returning bytes
+- Fixed missing `errno.ENOTSUP` on PyPy. Closes [#338](https://github.com/PyFilesystem/pyfilesystem2/issues/338).
 
 ## [2.4.10] - 2019-07-29
 
