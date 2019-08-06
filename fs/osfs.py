@@ -39,7 +39,6 @@ except ImportError:
         sendfile = None  # type: ignore  # pragma: no cover
 
 from . import errors
-from .errors import FileExists
 from .base import FS
 from .enums import ResourceType
 from ._fscompat import fsencode, fsdecode, fspath
@@ -585,8 +584,16 @@ class OSFS(FS):
         # type: (Text, Text) -> Text
         if purpose != "download":
             raise NoURL(path, purpose)
-        sys_path = self.getsyspath(path).replace("\\", "/")
-        url_path = six.moves.urllib.parse.quote(sys_path)
+
+        sys_path = self.getsyspath(path)
+        if _WINDOWS_PLATFORM and ':' in sys_path:
+            drive_letter, path = sys_path.split(':', 1)
+            path = path.replace("\\", "/")
+            path = six.moves.urllib.parse.quote(path)
+            url_path = "{}:{}".format(drive_letter, path)
+        else:
+            sys_path = sys_path.replace("\\", "/")
+            url_path = six.moves.urllib.parse.quote(sys_path)
         return "file://" + url_path
 
     def gettype(self, path):

@@ -421,7 +421,6 @@ class FSTestCases(object):
             self.assertFalse(self.fs.hasurl("foo"))
         else:
             self.assertTrue(self.fs.hasurl("foo"))
-
         # Should not throw an error
         self.fs.hasurl("a/b/c/foo/bar")
 
@@ -1847,3 +1846,4 @@ class FSTestCases(object):
             self.assertEqual(
                 foo_fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
             )
+
