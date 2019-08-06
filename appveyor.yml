@@ -20,10 +20,10 @@ environment:
 
 install:
   # We need wheel installed to build wheels
-  - "%PYTHON%\\python.exe -m pip install nose psutil pyftpdlib mock"
+  - "%PYTHON%\\python.exe -m pip install pytest pytest-randomly pytest-cov psutil pyftpdlib mock"
   - "%PYTHON%\\python.exe setup.py install"
 
 build: off
 
 test_script:
-  - "%PYTHON%\\python.exe -m nose tests -v"
+  - "%PYTHON%\\python.exe -m pytest -v tests"

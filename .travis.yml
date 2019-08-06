@@ -31,5 +31,4 @@ after_success:
   - coveralls
 
 # command to run tests
-script:
-  - tox
+script: tox
