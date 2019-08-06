@@ -8,7 +8,6 @@ All Filesystems should be able to pass these.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import collections
 from datetime import datetime
 import io
 import itertools
@@ -31,6 +30,11 @@ from fs.subfs import ClosingSubFS, SubFS
 import pytz
 import six
 from six import text_type
+
+if six.PY2:
+    import collections as collections_abc
+else:
+    import collections.abc as collections_abc
 
 
 UNICODE_TEXT = """
@@ -1287,7 +1291,7 @@ class FSTestCases(object):
 
         # Check scandir returns an iterable
         iter_scandir = self.fs.scandir("/")
-        self.assertTrue(isinstance(iter_scandir, collections.Iterable))
+        self.assertTrue(isinstance(iter_scandir, collections_abc.Iterable))
         self.assertEqual(list(iter_scandir), [])
 
         # Check scanning
@@ -1300,7 +1304,7 @@ class FSTestCases(object):
         self.fs.create("bar")
         self.fs.makedir("dir")
         iter_scandir = self.fs.scandir("/")
-        self.assertTrue(isinstance(iter_scandir, collections.Iterable))
+        self.assertTrue(isinstance(iter_scandir, collections_abc.Iterable))
 
         scandir = sorted(
             [r.raw for r in iter_scandir], key=lambda info: info["basic"]["name"]
@@ -1848,4 +1852,3 @@ class FSTestCases(object):
             self.assertEqual(
                 foo_fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
             )
-
