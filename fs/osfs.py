@@ -582,7 +582,7 @@ class OSFS(FS):
 
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
-        if purpose != "download":
+        if purpose not in ["download", "fs"]:
             raise NoURL(path, purpose)
 
         sys_path = self.getsyspath(path)
