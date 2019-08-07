@@ -60,7 +60,6 @@ if False:  # typing.TYPE_CHECKING
         IO,
         List,
         Optional,
-        MutableSet,
         SupportsInt,
         Text,
         Tuple,
@@ -427,7 +426,7 @@ class OSFS(FS):
             errno.EBADF,
             errno.ENOTSOCK,
             errno.EOPNOTSUPP,
-        }  # type: MutableSet[int]
+        }
 
         # PyPy doesn't define ENOTSUP so we have to add it conditionally.
         if hasattr(errno, "ENOTSUP"):
