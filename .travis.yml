@@ -30,7 +30,7 @@ matrix:
       sudo: true
       env:
         - SETUPTOOLS=setuptools PIP=pip
-    - python: "pypy3.5"
+    - python: "pypy3.5-7.0"
       sudo: true
       env:
         - SETUPTOOLS=setuptools PIP=pip
