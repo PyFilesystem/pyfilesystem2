@@ -16,9 +16,6 @@ except ImportError:
     tracemalloc = None
 
 
-@pytest.mark.skipif(
-    not tracemalloc, reason="`tracemalloc` isn't supported on this Python version."
-)
 class TestMemoryFS(FSTestCases, unittest.TestCase):
     """Test OSFS implementation."""
 
@@ -33,6 +30,9 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
                     posixpath.join(parent_dir, str(file_id)), UNICODE_TEXT
                 )
 
+    @pytest.mark.skipif(
+        not tracemalloc, reason="`tracemalloc` isn't supported on this Python version."
+    )
     def test_close_mem_free(self):
         """Ensure all file memory is freed when calling close().
 

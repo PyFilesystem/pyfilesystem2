@@ -8,13 +8,13 @@ python:
   - '3.5'
   - '3.6'
   - '3.7'
-# TODO (dargueta): Enable these once we figure out SFTP timing issues in PyPy tests
+# TODO (dargueta): Enable these once we figure out FTP timing issues in PyPy tests
 #  - 'pypy'
-#  - 'pypy3.5'
+#  - 'pypy3.5-7.0'
 
 matrix:
   include:
-    - name: "Type checking"
+    - name: 'Type checking'
       python: '3.7'
       env: TOXENV=typecheck
 
