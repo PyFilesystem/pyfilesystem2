@@ -79,7 +79,6 @@ class TestBase(unittest.TestCase):
             ["foo/bar ha/barz", "foo/bar%20ha/barz"],
             ["example b.txt", "example%20b.txt"],
             ["exampleㄓ.txt", "example%E3%84%93.txt"],
-            ["test/colon:tmp", "test/colon%3Atmp"],
             ["test/forward\\slash", "test/forward%5Cslash"],
         ]
         if platform.system() == "Windows":
@@ -88,6 +87,11 @@ class TestBase(unittest.TestCase):
                     ["C:\\My Documents\\test.txt", "C:/My%20Documents/test.txt"],
                     ["C:/My Documents/test.txt", "C:/My%20Documents/test.txt"],
                 ]
+            )
+        else:
+            test_fixtures.append(
+                # colon:tmp is bad path under Windows
+                ["test/colon:tmp", "test/colon%3Atmp"]
             )
         for test_snippet, expected in test_fixtures:
             self.assertEqual(FS.quote(test_snippet), expected)
