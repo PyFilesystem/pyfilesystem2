@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed typing issues
 - Fixed link namespace returning bytes
 
+### Changed
+
+Entire test suite has been migrated to [pytest](https://docs.pytest.org/en/latest/).
+Closes [#327](https://github.com/PyFilesystem/pyfilesystem2/issues/327).
+
 ## [2.4.10] - 2019-07-29
 
 ### Fixed
