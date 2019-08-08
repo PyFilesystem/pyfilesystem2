@@ -188,11 +188,16 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         self.assertTrue(top.get("tar", "is_file"))
 
     def test_geturl_for_fs(self):
-        test_file = "foo/bar/egg/foofoo"
-        expected = "tar://{tar_file_path}!/{file_inside_tar}".format(
-            tar_file_path=self._temp_path, file_inside_tar=test_file
-        )
-        self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
+        test_fixtures = [
+            # test_file, expected
+            ["foo/bar/egg/foofoo", "foo/bar/egg/foofoo"],
+            ["foo/bar egg/foo foo", "foo/bar%20egg/foo%20foo"],
+        ]
+        for test_file, expected_file in test_fixtures:
+            expected = "tar://{tar_file_path}!/{file_inside_tar}".format(
+                tar_file_path=self._temp_path, file_inside_tar=expected_file
+            )
+            self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
 
     def test_geturl_for_download(self):
         test_file = "foo/bar/egg/foofoo"

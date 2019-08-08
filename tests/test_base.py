@@ -69,3 +69,14 @@ class TestBase(unittest.TestCase):
 
         with self.assertRaises(errors.InvalidPath):
             self.fs.validatepath("0123456789A")
+
+    def test_quote(self):
+        test_fixtures = [
+            # test_snippet, expected
+            ["foo/bar/egg/foofoo", "foo/bar/egg/foofoo"],
+            ["foo/bar ha/barz", "foo/bar%20ha/barz"],
+            ["example b.txt", "example%20b.txt"],
+            ["exampleㄓ.txt", "example%E3%84%93.txt"],
+        ]
+        for test_snippet, expected in test_fixtures:
+            self.assertEqual(FS.quote(test_snippet), expected)

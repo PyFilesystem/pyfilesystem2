@@ -589,15 +589,11 @@ class OSFS(FS):
             if _WINDOWS_PLATFORM and ":" in sys_path:
                 drive_letter, path = sys_path.split(":", 1)
                 path = path.replace("\\", "/")
-                if six.PY2:
-                    path = path.encode("utf-8")
-                path = six.moves.urllib.parse.quote(path)
+                path = FS.quote(path)
                 url_path = "{}:{}".format(drive_letter, path)
             else:
                 sys_path = sys_path.replace("\\", "/")
-                if six.PY2:
-                    sys_path = sys_path.encode("utf-8")
-                url_path = six.moves.urllib.parse.quote(sys_path)
+                url_path = FS.quote(sys_path)
 
             return "osfs://" + url_path
         else:

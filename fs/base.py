@@ -310,6 +310,12 @@ class FS(object):
 
         """
 
+    @staticmethod
+    def quote(path_snippet):
+        if six.PY2:
+            path_snippet = path_snippet.encode("utf-8")
+        return six.moves.urllib.parse.quote(path_snippet)
+
     # ---------------------------------------------------------------- #
     # Optional methods                                                 #
     # Filesystems *may* implement these methods.                       #

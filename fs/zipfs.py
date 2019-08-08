@@ -449,6 +449,8 @@ class ReadZipFS(FS):
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
         if purpose == "fs":
-            return "zip://%s!/%s" % (self._file, path)
+            quoted_file = FS.quote(self._file)
+            quoted_path = FS.quote(path)
+            return "zip://{}!/{}".format(quoted_file, quoted_path)
         else:
             raise errors.NoURL(path, purpose)

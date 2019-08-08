@@ -470,14 +470,15 @@ class ReadTarFS(FS):
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
         if purpose == "fs":
-            return "tar://%s!/%s" % (self._file, path)
+            quoted_file = FS.quote(self._file)
+            quoted_path = FS.quote(path)
+            return "tar://{}!/{}".format(quoted_file, quoted_path)
         else:
             raise NoURL(path, purpose)
 
 
 if __name__ == "__main__":  # pragma: no cover
     from fs.tree import render
-    from fs.opener import open_fs
 
     with TarFS("tests.tar") as tar_fs:
         print(tar_fs.listdir("/"))
