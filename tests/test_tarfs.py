@@ -195,7 +195,8 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         ]
         for test_file, expected_file in test_fixtures:
             expected = "tar://{tar_file_path}!/{file_inside_tar}".format(
-                tar_file_path=self._temp_path, file_inside_tar=expected_file
+                tar_file_path=self._temp_path.replace('\\', '/'),
+                file_inside_tar=expected_file
             )
             self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
 

@@ -586,15 +586,7 @@ class OSFS(FS):
         if purpose == "download":
             return "file://" + self.getsyspath(path)
         elif purpose == "fs":
-            if _WINDOWS_PLATFORM and ":" in sys_path:
-                drive_letter, path = sys_path.split(":", 1)
-                path = path.replace("\\", "/")
-                path = FS.quote(path)
-                url_path = "{}:{}".format(drive_letter, path)
-            else:
-                sys_path = sys_path.replace("\\", "/")
-                url_path = FS.quote(sys_path)
-
+            url_path = FS.quote(sys_path)
             return "osfs://" + url_path
         else:
             raise NoURL(path, purpose)

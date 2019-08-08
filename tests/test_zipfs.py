@@ -172,7 +172,8 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
     def test_geturl_for_fs(self):
         test_file = "foo/bar/egg/foofoo"
         expected = "zip://{zip_file_path}!/{file_inside_zip}".format(
-            zip_file_path=self._temp_path, file_inside_zip=test_file
+            zip_file_path=self._temp_path.replace('\\', '/'),
+            file_inside_zip=test_file
         )
         self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
 

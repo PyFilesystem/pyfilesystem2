@@ -15,6 +15,7 @@ import os
 import threading
 import time
 import typing
+import platform
 from contextlib import closing
 from functools import partial, wraps
 import warnings
@@ -61,6 +62,7 @@ if False:  # typing.TYPE_CHECKING
 
 
 __all__ = ["FS"]
+_WINDOWS_PLATFORM = platform.system() == "Windows"
 
 
 def _new_name(method, old_name):
@@ -312,9 +314,19 @@ class FS(object):
 
     @staticmethod
     def quote(path_snippet):
-        if six.PY2:
-            path_snippet = path_snippet.encode("utf-8")
-        return six.moves.urllib.parse.quote(path_snippet)
+        if _WINDOWS_PLATFORM and ":" in path_snippet:
+            drive_letter, path = path_snippet.split(":", 1)
+            path = path.replace("\\", "/")
+            if six.PY2:
+                path = path.encode("utf-8")
+            path = six.moves.urllib.parse.quote(path)
+            path_snippet = "{}:{}".format(drive_letter, path)
+        else:
+            path_snippet = path_snippet.replace("\\", "/")
+            if six.PY2:
+                path_snippet = path_snippet.encode("utf-8")
+            path_snippet = six.moves.urllib.parse.quote(path_snippet)
+        return path_snippet
 
     # ---------------------------------------------------------------- #
     # Optional methods                                                 #
