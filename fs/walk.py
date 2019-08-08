@@ -12,8 +12,6 @@ from collections import defaultdict
 from collections import deque
 from collections import namedtuple
 
-import six
-
 from ._repr import make_repr
 from .errors import FSError
 from .path import abspath
@@ -295,7 +293,7 @@ class Walker(object):
                 yield info
         except FSError as error:
             if not self.on_error(dir_path, error):
-                six.reraise(type(error), error)
+                raise
 
     def walk(
         self,
