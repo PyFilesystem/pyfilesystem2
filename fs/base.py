@@ -1668,4 +1668,4 @@ class FS(object):
 
 def has_drive_letter(path_snippet):
     windows_drive_pattern = ".:[/\\\\].*$"
-    return re.match(windows_drive_pattern, directory) is not None
+    return re.match(windows_drive_pattern, path_snippet) is not None
