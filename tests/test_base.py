@@ -83,9 +83,11 @@ class TestBase(unittest.TestCase):
             ["test/forward\\slash", "test/forward%5Cslash"],
         ]
         if platform.system() == "Windows":
-            test_fixtures.append(
-                ["C:\\My Documents\\test.txt", "C:/My%20Documents/test.txt"],
-                ["C:/My Documents/test.txt", "C:/My%20Documents/test.txt"],
+            test_fixtures.extend(
+                [
+                    ["C:\\My Documents\\test.txt", "C:/My%20Documents/test.txt"],
+                    ["C:/My Documents/test.txt", "C:/My%20Documents/test.txt"],
+                ]
             )
         for test_snippet, expected in test_fixtures:
             self.assertEqual(FS.quote(test_snippet), expected)
