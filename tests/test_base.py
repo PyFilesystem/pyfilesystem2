@@ -90,11 +90,13 @@ class TestBase(unittest.TestCase):
                 ]
             )
         else:
-            test_fixtures.extend([
-                # colon:tmp is bad path under Windows
-                ["test/colon:tmp", "test/colon%3Atmp"]
-                # Unix treat \ as %5C                
-                ["test/forward\\slash", "test/forward%5Cslash"],
-            ])
+            test_fixtures.extend(
+                [
+                    # colon:tmp is bad path under Windows
+                    ["test/colon:tmp", "test/colon%3Atmp"],
+                    # Unix treat \ as %5C
+                    ["test/forward\\slash", "test/forward%5Cslash"],
+                ]
+            )
         for test_snippet, expected in test_fixtures:
             self.assertEqual(FS.quote(test_snippet), expected)
