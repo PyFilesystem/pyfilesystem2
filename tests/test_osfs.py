@@ -8,6 +8,7 @@ import mock
 import shutil
 import tempfile
 import unittest
+import platform
 
 from fs import osfs, open_fs
 from fs.path import relpath, dirname
@@ -180,9 +181,14 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             ["foo/bar ha/barz", "foo/bar%20ha/barz"],
             ["example b.txt", "example%20b.txt"],
         ]
+        if platform.system() == "Windows":
+            test_fixtures.append(["exampleㄓ.txt", "exampleㄓ.txt"])
+        else:
+            test_fixtures.append(["exampleㄓ.txt", "example%20b.txt"])
         for test_file, expected_suffix in test_fixtures:
             self.fs.create(test_file)
-            expected = "file://" + self.fs.getsyspath(expected_suffix).replace("\\", "/")
+            expected = "file:///" + self.fs.getsyspath(
+                expected_suffix).replace("\\", "/")
             try:
                 actual = self.fs.geturl(test_file)
             except errors.NoURL:
