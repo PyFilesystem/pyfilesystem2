@@ -161,7 +161,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
     def test_consume_geturl(self):
         self.fs.create("foo")
         try:
-            url = self.fs.geturl("foo")
+            url = self.fs.geturl("foo", purpose="fs")
         except errors.NoURL:
             self.assertFalse(self.fs.hasurl("foo"))
         else:
@@ -180,19 +180,16 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             ["foo_bar", "foo_bar"],
             ["foo/bar ha/barz", "foo/bar%20ha/barz"],
             ["example b.txt", "example%20b.txt"],
+            ["exampleㄓ.txt", "example%E3%84%93.txt"],
         ]
-        if platform.system() == "Windows":
-            test_fixtures.append(["exampleㄓ.txt", "exampleㄓ.txt"])
-            file_uri_prefix = "file:///"
-        else:
-            test_fixtures.append(["exampleㄓ.txt", "example%20b.txt"])
-            file_uri_prefix = "file://"
+        file_uri_prefix = "osfs://"
         for test_file, expected_suffix in test_fixtures:
             self.fs.create(test_file)
-            expected = (file_uri_prefix +
-                        self.fs.getsyspath(expected_suffix).replace("\\", "/"))
+            expected = file_uri_prefix + self.fs.getsyspath(expected_suffix).replace(
+                "\\", "/"
+            )
             try:
-                actual = self.fs.geturl(test_file)
+                actual = self.fs.geturl(test_file, purpose="fs")
             except errors.NoURL:
                 self.assertFalse(self.fs.hasurl(test_file))
             else:

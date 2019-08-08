@@ -582,14 +582,22 @@ class OSFS(FS):
 
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
-        if purpose not in ["download", "fs"]:
-            raise NoURL(path, purpose)
-
         sys_path = self.getsyspath(path)
-        url_path = six.moves.urllib.parse.urljoin(
-            'file:',
-            six.moves.urllib.request.pathname2url(sys_path))
-        return url_path
+        if purpose == "download":
+            return "file://" + self.getsyspath(path)
+        elif purpose == "fs":
+            if _WINDOWS_PLATFORM and ":" in sys_path:
+                drive_letter, path = sys_path.split(":", 1)
+                path = path.replace("\\", "/")
+                path = six.moves.urllib.parse.quote(path)
+                url_path = "{}:{}".format(drive_letter, path)
+            else:
+                sys_path = sys_path.replace("\\", "/")
+                url_path = six.moves.urllib.parse.quote(sys_path)
+
+            return "osfs://" + url_path
+        else:
+            raise NoURL(path, purpose)
 
     def gettype(self, path):
         # type: (Text) -> ResourceType
