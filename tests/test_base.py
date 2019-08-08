@@ -80,11 +80,12 @@ class TestBase(unittest.TestCase):
             ["example b.txt", "example%20b.txt"],
             ["exampleㄓ.txt", "example%E3%84%93.txt"],
             ["test/colon:tmp", "test/colon%3Atmp"],
-            ["test/forward\\slash", "test/forward/slash"],
+            ["test/forward\\slash", "test/forward%5Cslash"],
         ]
         if platform.system() == "Windows":
             test_fixtures.append(
-                ["C:\\My Documents\\test.txt", "C:/My%20Documents/test.txt"]
+                ["C:\\My Documents\\test.txt", "C:/My%20Documents/test.txt"],
+                ["C:/My Documents/test.txt", "C:/My%20Documents/test.txt"],
             )
         for test_snippet, expected in test_fixtures:
             self.assertEqual(FS.quote(test_snippet), expected)

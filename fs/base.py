@@ -317,16 +317,14 @@ class FS(object):
     def quote(path_snippet):
         if _WINDOWS_PLATFORM and has_drive_letter(path_snippet):
             drive_letter, path = path_snippet.split(":", 1)
-            path = path.replace("\\", "/")
             if six.PY2:
                 path = path.encode("utf-8")
-            path = six.moves.urllib.parse.quote(path)
+            path = six.moves.urllib.request.pathname2url(path)
             path_snippet = "{}:{}".format(drive_letter, path)
         else:
-            path_snippet = path_snippet.replace("\\", "/")
             if six.PY2:
                 path_snippet = path_snippet.encode("utf-8")
-            path_snippet = six.moves.urllib.parse.quote(path_snippet)
+            path_snippet = six.moves.urllib.request.pathname2url(path_snippet)
         return path_snippet
 
     # ---------------------------------------------------------------- #
