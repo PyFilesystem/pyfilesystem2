@@ -183,12 +183,14 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         ]
         if platform.system() == "Windows":
             test_fixtures.append(["exampleㄓ.txt", "exampleㄓ.txt"])
+            file_uri_prefix = "file:///"
         else:
             test_fixtures.append(["exampleㄓ.txt", "example%20b.txt"])
+            file_uri_prefix = "file://"
         for test_file, expected_suffix in test_fixtures:
             self.fs.create(test_file)
-            expected = "file:///" + self.fs.getsyspath(
-                expected_suffix).replace("\\", "/")
+            expected = (file_uri_prefix +
+                        self.fs.getsyspath(expected_suffix).replace("\\", "/"))
             try:
                 actual = self.fs.geturl(test_file)
             except errors.NoURL:
