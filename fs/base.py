@@ -8,6 +8,7 @@ can work with any of the supported filesystems.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import re
 import abc
 import hashlib
 import itertools
@@ -314,7 +315,7 @@ class FS(object):
 
     @staticmethod
     def quote(path_snippet):
-        if _WINDOWS_PLATFORM and ":" in path_snippet:
+        if _WINDOWS_PLATFORM and has_drive_letter(path_snippet):
             drive_letter, path = path_snippet.split(":", 1)
             path = path.replace("\\", "/")
             if six.PY2:
@@ -1663,3 +1664,8 @@ class FS(object):
                     break
                 hash_object.update(chunk)
         return hash_object.hexdigest()
+
+
+def has_drive_letter(path_snippet):
+    windows_drive_pattern = ".:[/\\\\].*$"
+    return re.match(windows_drive_pattern, directory) is not None

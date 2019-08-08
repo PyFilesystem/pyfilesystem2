@@ -193,10 +193,10 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
             ["foo/bar/egg/foofoo", "foo/bar/egg/foofoo"],
             ["foo/bar egg/foo foo", "foo/bar%20egg/foo%20foo"],
         ]
+        tar_file_path = self._temp_path.replace("\\", "/")
         for test_file, expected_file in test_fixtures:
             expected = "tar://{tar_file_path}!/{file_inside_tar}".format(
-                tar_file_path=self._temp_path.replace('\\', '/'),
-                file_inside_tar=expected_file
+                tar_file_path=tar_file_path, file_inside_tar=expected_file
             )
             self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
 

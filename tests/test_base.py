@@ -79,6 +79,8 @@ class TestBase(unittest.TestCase):
             ["foo/bar ha/barz", "foo/bar%20ha/barz"],
             ["example b.txt", "example%20b.txt"],
             ["exampleㄓ.txt", "example%E3%84%93.txt"],
+            ["test/colon:tmp", "test/colon%3Atmp"],
+            ["test/forward\\slash", "test/forward/slash"],
         ]
         if platform.system() == "Windows":
             test_fixtures.append(
