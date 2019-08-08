@@ -276,7 +276,7 @@ class TestOpeners(unittest.TestCase):
         self.assertEqual(app_fs.app_dirs.version, None)
 
     def test_user_data_opener(self):
-        user_data_fs = open_fs("userdata://fstest:willmcgugan:1.0")
+        user_data_fs = open_fs("userdata://fstest:willmcgugan:1.0", create=True)
         self.assertIsInstance(user_data_fs, UserDataFS)
         user_data_fs.makedir("foo", recreate=True)
         user_data_fs.writetext("foo/bar.txt", "baz")
