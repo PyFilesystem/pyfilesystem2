@@ -8,7 +8,6 @@ import mock
 import shutil
 import tempfile
 import unittest
-import platform
 
 from fs import osfs, open_fs
 from fs.path import relpath, dirname
