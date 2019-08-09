@@ -12,6 +12,7 @@ import time
 import unittest
 import uuid
 
+import pytest
 from six import text_type
 
 from ftplib import error_perm
@@ -126,6 +127,7 @@ class TestFTPErrors(unittest.TestCase):
         self.assertEqual(str(err_info.exception), "unable to connect to ftp.example.com")
 
 
+@pytest.mark.slow
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     user = "user"
@@ -261,6 +263,7 @@ class TestFTPFSNoMLSD(TestFTPFS):
         pass
 
 
+@pytest.mark.slow
 class TestAnonFTPFS(FSTestCases, unittest.TestCase):
 
     user = "anonymous"
