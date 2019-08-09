@@ -48,6 +48,7 @@ from .permissions import Permissions
 from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
 from .errors import FileExpected, NoURL
+from ._url_tools import url_quote
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
@@ -136,7 +137,8 @@ class OSFS(FS):
                 )
         else:
             if not os.path.isdir(_root_path):
-                raise errors.CreateFailed("'{}' does not exist".format(_root_path))
+                message = "root path '{}' does not exist".format(_root_path)
+                raise errors.CreateFailed(message)
 
         _meta = self._meta = {
             "network": False,
@@ -586,7 +588,7 @@ class OSFS(FS):
         if purpose == "download":
             return "file://" + self.getsyspath(path)
         elif purpose == "fs":
-            url_path = FS.quote(sys_path)
+            url_path = url_quote(sys_path)
             return "osfs://" + url_path
         else:
             raise NoURL(path, purpose)

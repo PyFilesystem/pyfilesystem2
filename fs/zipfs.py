@@ -22,6 +22,7 @@ from .opener import open_fs
 from .path import dirname, forcedir, normpath, relpath
 from .time import datetime_to_epoch
 from .wrapfs import WrapFS
+from ._url_tools import url_quote
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
@@ -449,8 +450,8 @@ class ReadZipFS(FS):
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
         if purpose == "fs":
-            quoted_file = FS.quote(self._file)
-            quoted_path = FS.quote(path)
+            quoted_file = url_quote(self._file)
+            quoted_path = url_quote(path)
             return "zip://{}!/{}".format(quoted_file, quoted_path)
         else:
             raise errors.NoURL(path, purpose)

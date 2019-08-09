@@ -23,7 +23,7 @@ from .opener import open_fs
 from .path import relpath, basename, isbase, normpath, parts, frombase
 from .wrapfs import WrapFS
 from .permissions import Permissions
-
+from ._url_tools import url_quote
 
 if False:  # typing.TYPE_CHECKING
     from tarfile import TarInfo
@@ -470,8 +470,8 @@ class ReadTarFS(FS):
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
         if purpose == "fs":
-            quoted_file = FS.quote(self._file)
-            quoted_path = FS.quote(path)
+            quoted_file = url_quote(self._file)
+            quoted_path = url_quote(path)
             return "tar://{}!/{}".format(quoted_file, quoted_path)
         else:
             raise NoURL(path, purpose)
