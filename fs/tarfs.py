@@ -469,7 +469,7 @@ class ReadTarFS(FS):
 
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
-        if purpose == "fs":
+        if purpose == "fs" and isinstance(self._file, six.string_types):
             quoted_file = url_quote(self._file)
             quoted_path = url_quote(path)
             return "tar://{}!/{}".format(quoted_file, quoted_path)

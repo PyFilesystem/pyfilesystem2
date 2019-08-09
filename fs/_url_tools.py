@@ -2,11 +2,14 @@ import re
 import six
 import platform
 
+if False:  # typing.TYPE_CHECKING
+    from typing import Text, Union, BinaryIO
 
 _WINDOWS_PLATFORM = platform.system() == "Windows"
 
 
 def url_quote(path_snippet):
+    # type: (Text) -> Text
     """
     On Windows, it will separate drive letter and quote windows
     path alone. No magic on Unix-alie path, just pythonic
@@ -15,7 +18,6 @@ def url_quote(path_snippet):
     Arguments:
        path_snippet: a file path, relative or absolute.
     """
-    # type: (Text) -> Text
     if _WINDOWS_PLATFORM and _has_drive_letter(path_snippet):
         drive_letter, path = path_snippet.split(":", 1)
         if six.PY2:
@@ -30,6 +32,7 @@ def url_quote(path_snippet):
 
 
 def _has_drive_letter(path_snippet):
+    # type: (Text) -> bool
     """
     The following path will get True
     D:/Data
@@ -42,6 +45,5 @@ def _has_drive_letter(path_snippet):
     Arguments:
        path_snippet: a file path, relative or absolute.
     """
-    # type: (Text) -> Text
     windows_drive_pattern = ".:[/\\\\].*$"
     return re.match(windows_drive_pattern, path_snippet) is not None

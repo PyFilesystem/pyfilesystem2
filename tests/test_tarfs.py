@@ -200,6 +200,10 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
             )
             self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
 
+    def test_geturl_for_fs_but_file_is_binaryio(self):
+        self.fs._file = six.BytesIO()
+        self.assertRaises(NoURL, self.fs.geturl, "test", "fs")
+
     def test_geturl_for_download(self):
         test_file = "foo/bar/egg/foofoo"
         with self.assertRaises(NoURL):

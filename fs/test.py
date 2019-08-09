@@ -1846,3 +1846,4 @@ class FSTestCases(object):
             self.assertEqual(
                 foo_fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
             )
+

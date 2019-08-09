@@ -1,3 +1,7 @@
+# coding: utf-8
+"""Test url tools. """
+from __future__ import unicode_literals
+
 import platform
 import unittest
 
