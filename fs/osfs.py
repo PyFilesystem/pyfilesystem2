@@ -586,7 +586,7 @@ class OSFS(FS):
         # type: (Text, Text) -> Text
         sys_path = self.getsyspath(path)
         if purpose == "download":
-            return "file://" + self.getsyspath(path)
+            return "file://" + sys_path
         elif purpose == "fs":
             url_path = url_quote(sys_path)
             return "osfs://" + url_path
