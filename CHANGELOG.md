@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed tests leaving tmp files
 - Fixed typing issues
 - Fixed link namespace returning bytes
+- Fixed imports and improper namespacing that broke packages using `fs` as a namespace,
+  such as `fs.dropboxfs`. Closes [#345](https://github.com/PyFilesystem/pyfilesystem2/issues/345).
 
 ## [2.4.10] - 2019-07-29
 
