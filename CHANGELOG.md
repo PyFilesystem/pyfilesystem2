@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed tests leaving tmp files
 - Fixed typing issues
 - Fixed link namespace returning bytes
+- Fixed abstract class import from `collections` which would break on Python 3.8
+- Fixed incorrect imports of `mock` on Python 3
+- Removed some unused imports and unused `requirements.txt` file
+- Added mypy checks to Travis
 
 ### Changed
 
