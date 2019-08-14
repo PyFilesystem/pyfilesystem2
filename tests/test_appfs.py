@@ -5,11 +5,6 @@ import six
 
 from fs import appfs
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
 
 @pytest.fixture
 def fs(mock_appdir_directories):

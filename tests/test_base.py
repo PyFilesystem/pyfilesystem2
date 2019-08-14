@@ -4,12 +4,6 @@ from __future__ import unicode_literals
 
 import unittest
 
-try:
-    from unittest import mock
-except ImportError:
-    import mock
-
-
 from fs.base import FS
 from fs import errors
 
