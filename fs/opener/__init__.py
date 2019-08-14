@@ -2,9 +2,6 @@
 """Open filesystems from a URL.
 """
 
-# Declare fs.opener as a namespace package
-__import__("pkg_resources").declare_namespace(__name__)
-
 # Import objects into fs.opener namespace
 from .base import Opener
 from .parse import parse_fs_url as parse
