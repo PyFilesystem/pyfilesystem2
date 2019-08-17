@@ -138,3 +138,8 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         multi_fs.add_fs("m1", m1)
         multi_fs.add_fs("m2", m2)
         self.assertEqual(multi_fs.listdir("/"), ["foo"])
+
+    def test_consistent_behavior_of_is_file(self):
+        fs = MultiFS()
+        status = fs.isfile('pypi://pypi-mobans-pkg/resources/templates/_version.py.jj2')
+        self.assertFalse(status)
