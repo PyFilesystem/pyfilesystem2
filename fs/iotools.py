@@ -10,11 +10,10 @@ from io import SEEK_SET, SEEK_CUR
 
 from .mode import Mode
 
-if False:  # typing.TYPE_CHECKING
-    from io import RawIOBase, IOBase
+if typing.TYPE_CHECKING:
+    from io import RawIOBase
     from typing import (
         Any,
-        BinaryIO,
         Iterable,
         Iterator,
         IO,

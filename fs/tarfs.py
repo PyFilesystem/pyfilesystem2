@@ -20,16 +20,14 @@ from .errors import IllegalBackReference, NoURL
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
+from ._url_tools import url_quote
 from .path import relpath, basename, isbase, normpath, parts, frombase
 from .wrapfs import WrapFS
-from .permissions import Permissions
-from ._url_tools import url_quote
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from tarfile import TarInfo
     from typing import (
         Any,
-        AnyStr,
         BinaryIO,
         Collection,
         Dict,
@@ -39,7 +37,7 @@ if False:  # typing.TYPE_CHECKING
         Tuple,
         Union,
     )
-    from .info import Info, RawInfo
+    from .info import RawInfo
     from .permissions import Permissions
     from .subfs import SubFS
 
@@ -143,7 +141,7 @@ class TarFS(WrapFS):
         else:
             return ReadTarFS(file, encoding=encoding)
 
-    if False:  # typing.TYPE_CHECKING
+    if typing.TYPE_CHECKING:
 
         def __init__(
             self,

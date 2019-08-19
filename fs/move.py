@@ -10,7 +10,7 @@ from .copy import copy_dir
 from .copy import copy_file
 from .opener import manage_fs
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from .base import FS
     from typing import Text, Union
 

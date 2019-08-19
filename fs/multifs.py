@@ -17,7 +17,7 @@ from .mode import check_writable
 from .opener import open_fs
 from .path import abspath, normpath
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import (
         Any,
         BinaryIO,

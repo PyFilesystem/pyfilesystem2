@@ -485,7 +485,7 @@ class FSTestCases(object):
         # Raw info should be serializable
         try:
             json.dumps(info)
-        except:
+        except ValueError:
             assert False, "info should be JSON serializable"
 
         # Non existant namespace is not an error

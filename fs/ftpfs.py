@@ -5,7 +5,6 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import calendar
-import ftplib
 import io
 import itertools
 import socket
@@ -36,7 +35,7 @@ from .path import normpath
 from .path import split
 from . import _ftp_parse as ftp_parse
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     import ftplib
     from typing import (
         Any,
@@ -45,7 +44,6 @@ if False:  # typing.TYPE_CHECKING
         ContextManager,
         Iterable,
         Iterator,
-        Collection,
         Container,
         Dict,
         List,
@@ -103,7 +101,7 @@ def manage_ftp(ftp):
     finally:
         try:
             ftp.quit()
-        except:  # pragma: no cover
+        except Exception:  # pragma: no cover
             pass
 
 
@@ -442,8 +440,15 @@ class FTPFS(FS):
     def ftp_url(self):
         # type: () -> Text
         """Get the FTP url this filesystem will open."""
-        _host_part = self.host if self.port == 21 else "{}:{}".format(self.host, self.port)
-        _user_part = "" if self.user == "anonymous" or self.user is None else "{}:{}@".format(self.user, self.passwd)
+        if self.port == 21:
+            _host_part = self.host
+        else:
+            _host_part = "{}:{}".format(self.host, self.port)
+
+        if self.user == "anonymous" or self.user is None:
+            _user_part = ""
+        else:
+            _user_part = "{}:{}@".format(self.user, self.passwd)
         url = "ftp://{}{}".format(_user_part, _host_part)
         return url
 
@@ -575,7 +580,7 @@ class FTPFS(FS):
                 details["created"] = cls._parse_ftp_time(facts["create"])
             yield raw_info
 
-    if False:  # typing.TYPE_CHECKING
+    if typing.TYPE_CHECKING:
 
         def opendir(self, path, factory=None):
             # type: (_F, Text, Optional[_OpendirFactory]) -> SubFS[_F]

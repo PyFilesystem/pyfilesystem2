@@ -24,7 +24,7 @@ from .errors import ResourceReadOnly, ResourceNotFound
 from .info import Info
 from .mode import check_writable
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from datetime import datetime
     from typing import (
         Any,

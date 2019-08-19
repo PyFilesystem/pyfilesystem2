@@ -5,14 +5,14 @@ from __future__ import print_function
 from __future__ import unicode_literals
 
 import typing
-from typing import Container, Iterable
+from typing import Iterable
 
 import six
 
 from ._typing import Text
 
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Iterator, List, Optional, Tuple, Type, Union
 
 

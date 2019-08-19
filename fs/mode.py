@@ -15,8 +15,8 @@ import six
 from ._typing import Text
 
 
-if False:  # typing.TYPE_CHECKING
-    from typing import Container, FrozenSet, Set, Union
+if typing.TYPE_CHECKING:
+    from typing import FrozenSet, Set, Union
 
 
 __all__ = ["Mode", "check_readable", "check_writable", "validate_openbin_mode"]

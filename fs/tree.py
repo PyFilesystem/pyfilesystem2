@@ -12,7 +12,7 @@ import typing
 
 from fs.path import abspath, join, normpath
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import List, Optional, Text, TextIO, Tuple
     from .base import FS
     from .info import Info

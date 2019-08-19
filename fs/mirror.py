@@ -19,7 +19,6 @@ the expense of potentially copying extra files.
 from __future__ import print_function
 from __future__ import unicode_literals
 
-from contextlib import contextmanager
 import typing
 
 from ._bulk import Copier
@@ -29,7 +28,7 @@ from .opener import manage_fs
 from .tools import is_thread_safe
 from .walk import Walker
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Callable, Optional, Text, Union
     from .base import FS
     from .info import Info

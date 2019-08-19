@@ -11,10 +11,9 @@ from .path import abspath, combine, frombase, normpath
 from .tools import is_thread_safe
 from .walk import Walker
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Callable, Optional, Text, Union
     from .base import FS
-    from .walk import Walker
 
     _OnCopy = Callable[[FS, Text, FS, Text], object]
 

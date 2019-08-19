@@ -4,23 +4,22 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import collections
 import errno
 import platform
 import sys
 from contextlib import contextmanager
 
-from six import reraise, PY3
+from six import reraise
 
 from . import errors
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from types import TracebackType
     from typing import Iterator, Optional, Mapping, Text, Type, Union
 
-if PY3:
+try:
     from collections.abc import Mapping
-else:
+except ImportError:
     from collections import Mapping
 
 

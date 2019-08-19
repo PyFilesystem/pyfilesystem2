@@ -18,7 +18,7 @@ from .permissions import Permissions
 from .time import epoch_to_datetime
 from ._typing import overload, Text
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from datetime import datetime
     from typing import Any, Callable, List, Mapping, Optional, Union
 

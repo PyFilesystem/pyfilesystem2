@@ -18,7 +18,7 @@ from .path import abspath
 from .path import combine
 from .path import normpath
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import (
         Any,
         Callable,

@@ -12,7 +12,7 @@ from .base import Opener
 from .registry import registry
 from .errors import NotWriteable
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Text
     from .parse import ParseResult
     from ..zipfs import ZipFS

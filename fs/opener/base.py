@@ -7,8 +7,8 @@ import typing
 
 import six
 
-if False:  # typing.TYPE_CHECKING
-    from typing import List, Text, Union
+if typing.TYPE_CHECKING:
+    from typing import List, Text
     from ..base import FS
     from .parse import ParseResult
 

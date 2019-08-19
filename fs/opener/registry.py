@@ -10,20 +10,18 @@ import collections
 import contextlib
 import typing
 
-import six
 import pkg_resources
 
 from .base import Opener
 from .errors import UnsupportedProtocol, EntryPointError
 from .parse import parse_fs_url
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import (
         Callable,
         Dict,
         Iterator,
         List,
-        Optional,
         Text,
         Type,
         Tuple,
@@ -279,8 +277,6 @@ class Registry(object):
             _fs = self.open_fs(fs_url, create=create, writeable=writeable, cwd=cwd)
             try:
                 yield _fs
-            except:
-                raise
             finally:
                 _fs.close()
 

@@ -28,7 +28,7 @@ from .path import abspath, join, normpath
 from .time import datetime_to_epoch
 from .walk import Walker
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from datetime import datetime
     from threading import RLock
     from typing import (

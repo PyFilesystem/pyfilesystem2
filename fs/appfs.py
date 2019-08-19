@@ -15,7 +15,7 @@ from .osfs import OSFS
 from ._repr import make_repr
 from appdirs import AppDirs
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Optional, Text
 
 
