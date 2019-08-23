@@ -4,7 +4,6 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import copy
 import os
 import tarfile
 import typing
@@ -17,14 +16,14 @@ from . import errors
 from .base import FS
 from .compress import write_tar
 from .enums import ResourceType
-from .errors import IllegalBackReference
+from .errors import IllegalBackReference, NoURL
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
-from .path import dirname, relpath, basename, isbase, normpath, parts, frombase
+from .path import relpath, basename, isbase, normpath, parts, frombase
 from .wrapfs import WrapFS
 from .permissions import Permissions
-
+from ._url_tools import url_quote
 
 if False:  # typing.TYPE_CHECKING
     from tarfile import TarInfo
@@ -461,16 +460,25 @@ class ReadTarFS(FS):
     def close(self):
         # type: () -> None
         super(ReadTarFS, self).close()
-        self._tar.close()
+        if hasattr(self, "_tar"):
+            self._tar.close()
 
     def isclosed(self):
         # type: () -> bool
         return self._tar.closed  # type: ignore
 
+    def geturl(self, path, purpose="download"):
+        # type: (Text, Text) -> Text
+        if purpose == "fs" and isinstance(self._file, six.string_types):
+            quoted_file = url_quote(self._file)
+            quoted_path = url_quote(path)
+            return "tar://{}!/{}".format(quoted_file, quoted_path)
+        else:
+            raise NoURL(path, purpose)
+
 
 if __name__ == "__main__":  # pragma: no cover
     from fs.tree import render
-    from fs.opener import open_fs
 
     with TarFS("tests.tar") as tar_fs:
         print(tar_fs.listdir("/"))

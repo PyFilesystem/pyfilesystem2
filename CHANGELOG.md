@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.4.11] - Unreleased
 
+### Added
+
+- Added geturl for TarFS and ZipFS for 'fs' purpose. NoURL for 'download' purpose.
+- Added helpful root path in CreateFailed exception [#340](https://github.com/PyFilesystem/pyfilesystem2/issues/340)
+
 ### Fixed
 
 - Fixed tests leaving tmp files
 - Fixed typing issues
 - Fixed link namespace returning bytes
+- Fixed broken FSURL in windows [#329](https://github.com/PyFilesystem/pyfilesystem2/issues/329)
+- Fixed hidden exception at fs.close() when opening an absent zip/tar file URL [#333](https://github.com/PyFilesystem/pyfilesystem2/issues/333)
 - Fixed abstract class import from `collections` which would break on Python 3.8
 - Fixed incorrect imports of `mock` on Python 3
 - Removed some unused imports and unused `requirements.txt` file
@@ -19,8 +26,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Changed
 
-Entire test suite has been migrated to [pytest](https://docs.pytest.org/en/latest/).
-Closes [#327](https://github.com/PyFilesystem/pyfilesystem2/issues/327).
+- Entire test suite has been migrated to [pytest](https://docs.pytest.org/en/latest/). Closes [#327](https://github.com/PyFilesystem/pyfilesystem2/issues/327).
 
 ## [2.4.10] - 2019-07-29
 

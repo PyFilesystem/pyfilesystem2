@@ -7,13 +7,11 @@ import os
 import shutil
 import tempfile
 import unittest
-
 import pytest
 
-from fs import osfs
-from fs.path import relpath
+from fs import osfs, open_fs
+from fs.path import relpath, dirname
 from fs import errors
-
 from fs.test import FSTestCases
 
 from six import text_type
@@ -77,7 +75,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
 
     def test_not_exists(self):
         with self.assertRaises(errors.CreateFailed):
-            fs = osfs.OSFS("/does/not/exists/")
+            osfs.OSFS("/does/not/exists/")
 
     def test_expand_vars(self):
         self.fs.makedir("TYRIONLANISTER")
@@ -162,3 +160,40 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             with self.assertRaises(errors.InvalidCharsInPath):
                 with self.fs.open("13 – Marked Register.pdf", "wb") as fh:
                     fh.write(b"foo")
+
+    def test_consume_geturl(self):
+        self.fs.create("foo")
+        try:
+            url = self.fs.geturl("foo", purpose="fs")
+        except errors.NoURL:
+            self.assertFalse(self.fs.hasurl("foo"))
+        else:
+            self.assertTrue(self.fs.hasurl("foo"))
+
+        # Should not throw an error
+        base_dir = dirname(url)
+        open_fs(base_dir)
+
+    def test_complex_geturl(self):
+        self.fs.makedirs("foo/bar ha")
+        test_fixtures = [
+            # test file, expected url path
+            ["foo", "foo"],
+            ["foo-bar", "foo-bar"],
+            ["foo_bar", "foo_bar"],
+            ["foo/bar ha/barz", "foo/bar%20ha/barz"],
+            ["example b.txt", "example%20b.txt"],
+            ["exampleㄓ.txt", "example%E3%84%93.txt"],
+        ]
+        file_uri_prefix = "osfs://"
+        for test_file, relative_url_path in test_fixtures:
+            self.fs.create(test_file)
+            expected = file_uri_prefix + self.fs.getsyspath(relative_url_path).replace(
+                "\\", "/"
+            )
+            actual = self.fs.geturl(test_file, purpose="fs")
+
+            self.assertEqual(actual, expected)
+
+    def test_geturl_return_no_url(self):
+        self.assertRaises(errors.NoURL, self.fs.geturl, "test/path", "upload")

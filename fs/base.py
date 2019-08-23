@@ -1633,7 +1633,7 @@ class FS(object):
             fs.errors.UnsupportedHash: If the requested hash is not supported.
 
         """
-        _path = self.validatepath(path)
+        self.validatepath(path)
         try:
             hash_object = hashlib.new(name)
         except ValueError:

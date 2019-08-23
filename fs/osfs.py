@@ -39,7 +39,6 @@ except ImportError:
         sendfile = None  # type: ignore  # pragma: no cover
 
 from . import errors
-from .errors import FileExists
 from .base import FS
 from .enums import ResourceType
 from ._fscompat import fsencode, fsdecode, fspath
@@ -49,6 +48,7 @@ from .permissions import Permissions
 from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
 from .errors import FileExpected, NoURL
+from ._url_tools import url_quote
 
 if False:  # typing.TYPE_CHECKING
     from typing import (
@@ -137,7 +137,8 @@ class OSFS(FS):
                 )
         else:
             if not os.path.isdir(_root_path):
-                raise errors.CreateFailed("root path does not exist")
+                message = "root path '{}' does not exist".format(_root_path)
+                raise errors.CreateFailed(message)
 
         _meta = self._meta = {
             "network": False,
@@ -526,7 +527,6 @@ class OSFS(FS):
             namespaces = namespaces or ()
             _path = self.validatepath(path)
             sys_path = self.getsyspath(_path)
-            _sys_path = fsencode(sys_path)
             with convert_os_errors("scandir", path, directory=True):
                 for entry_name in os.listdir(sys_path):
                     _entry_name = fsdecode(entry_name)
@@ -584,9 +584,14 @@ class OSFS(FS):
 
     def geturl(self, path, purpose="download"):
         # type: (Text, Text) -> Text
-        if purpose != "download":
+        sys_path = self.getsyspath(path)
+        if purpose == "download":
+            return "file://" + sys_path
+        elif purpose == "fs":
+            url_path = url_quote(sys_path)
+            return "osfs://" + url_path
+        else:
             raise NoURL(path, purpose)
-        return "file://" + self.getsyspath(path)
 
     def gettype(self, path):
         # type: (Text) -> ResourceType

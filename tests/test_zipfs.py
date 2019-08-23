@@ -13,8 +13,9 @@ from fs import zipfs
 from fs.compress import write_zip
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
+from fs.errors import NoURL
 from fs.test import FSTestCases
-from fs.enums import Seek, ResourceType
+from fs.enums import Seek
 
 from .test_archives import ArchiveTestCases
 
@@ -168,6 +169,33 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
             self.assertEqual(f.seek(-5, Seek.end), 7)
             self.assertEqual(f.read(), b"World")
 
+    def test_geturl_for_fs(self):
+        test_file = "foo/bar/egg/foofoo"
+        expected = "zip://{zip_file_path}!/{file_inside_zip}".format(
+            zip_file_path=self._temp_path.replace("\\", "/"), file_inside_zip=test_file
+        )
+        self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
+
+    def test_geturl_for_fs_but_file_is_binaryio(self):
+        self.fs._file = six.BytesIO()
+        self.assertRaises(NoURL, self.fs.geturl, "test", "fs")
+
+    def test_geturl_for_download(self):
+        test_file = "foo/bar/egg/foofoo"
+        with self.assertRaises(NoURL):
+            self.fs.geturl(test_file)
+
+    def test_read_non_existent_file(self):
+        fs = zipfs.ZipFS(open(self._temp_path, "rb"))
+        # it has been very difficult to catch exception in __del__()
+        del fs._zip
+        try:
+            fs.close()
+        except AttributeError:
+            self.fail("Could not close tar fs properly")
+        except Exception:
+            self.fail("Strange exception in closing fs")
+
 
 class TestReadZipFSMem(TestReadZipFS):
     def make_source_fs(self):
@@ -184,8 +212,8 @@ class TestDirsZipFS(unittest.TestCase):
                 z.writestr("foo/bar/baz/egg", b"hello")
             with zipfs.ReadZipFS(path) as zip_fs:
                 foo = zip_fs.getinfo("foo", ["details"])
-                bar = zip_fs.getinfo("foo/bar")
-                baz = zip_fs.getinfo("foo/bar/baz")
+                self.assertEqual(zip_fs.getinfo("foo/bar").name, "bar")
+                self.assertEqual(zip_fs.getinfo("foo/bar/baz").name, "baz")
                 self.assertTrue(foo.is_dir)
                 self.assertTrue(zip_fs.isfile("foo/bar/baz/egg"))
         finally:

@@ -7,7 +7,6 @@ import six
 import tarfile
 import tempfile
 import unittest
-
 import pytest
 
 from fs import tarfs
@@ -15,6 +14,7 @@ from fs.enums import ResourceType
 from fs.compress import write_tar
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
+from fs.errors import NoURL
 from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases
@@ -92,15 +92,6 @@ class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
         fs.close()
         os.remove(fs._tar_file)
         del fs._tar_file
-
-    def assert_is_bzip(self):
-        try:
-            tarfile.open(fs._tar_file, "r:gz")
-        except tarfile.ReadError:
-            self.fail("{} is not a valid gz archive".format(fs._tar_file))
-        for other_comps in ["xz", "bz2", ""]:
-            with self.assertRaises(tarfile.ReadError):
-                tarfile.open(fs._tar_file, "r:{}".format(other_comps))
 
 
 @pytest.mark.skipif(six.PY2, reason="Python2 does not support LZMA")
@@ -181,10 +172,43 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         except:
             self.fail("Couldn't open tarfs from filename")
 
+    def test_read_non_existent_file(self):
+        fs = tarfs.TarFS(open(self._temp_path, "rb"))
+        # it has been very difficult to catch exception in __del__()
+        del fs._tar
+        try:
+            fs.close()
+        except AttributeError:
+            self.fail("Could not close tar fs properly")
+        except Exception:
+            self.fail("Strange exception in closing fs")
+
     def test_getinfo(self):
         super(TestReadTarFS, self).test_getinfo()
         top = self.fs.getinfo("top.txt", ["tar"])
         self.assertTrue(top.get("tar", "is_file"))
+
+    def test_geturl_for_fs(self):
+        test_fixtures = [
+            # test_file, expected
+            ["foo/bar/egg/foofoo", "foo/bar/egg/foofoo"],
+            ["foo/bar egg/foo foo", "foo/bar%20egg/foo%20foo"],
+        ]
+        tar_file_path = self._temp_path.replace("\\", "/")
+        for test_file, expected_file in test_fixtures:
+            expected = "tar://{tar_file_path}!/{file_inside_tar}".format(
+                tar_file_path=tar_file_path, file_inside_tar=expected_file
+            )
+            self.assertEqual(self.fs.geturl(test_file, purpose="fs"), expected)
+
+    def test_geturl_for_fs_but_file_is_binaryio(self):
+        self.fs._file = six.BytesIO()
+        self.assertRaises(NoURL, self.fs.geturl, "test", "fs")
+
+    def test_geturl_for_download(self):
+        test_file = "foo/bar/egg/foofoo"
+        with self.assertRaises(NoURL):
+            self.fs.geturl(test_file)
 
 
 class TestBrokenPaths(unittest.TestCase):
