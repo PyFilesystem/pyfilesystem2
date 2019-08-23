@@ -4,9 +4,13 @@ import os
 
 from fs.tempfs import TempFS
 from fs import errors
-import mock
 
 from .test_osfs import TestOSFS
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestTempFS(TestOSFS):

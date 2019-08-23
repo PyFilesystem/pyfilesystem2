@@ -1,13 +1,12 @@
 from __future__ import unicode_literals
 
 import os
-import mock
 import sys
 import tempfile
 import unittest
 import pkg_resources
 
-import six
+import pytest
 
 from fs import open_fs, opener
 from fs.osfs import OSFS
@@ -16,6 +15,11 @@ from fs.memoryfs import MemoryFS
 from fs.appfs import UserDataFS
 from fs.opener.parse import ParseResult
 from fs.opener.registry import Registry
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestParse(unittest.TestCase):
@@ -204,6 +208,7 @@ class TestManageFS(unittest.TestCase):
         self.assertTrue(mem_fs.isclosed())
 
 
+@pytest.mark.usefixtures("mock_appdir_directories")
 class TestOpeners(unittest.TestCase):
     def test_repr(self):
         # Check __repr__ works
@@ -271,7 +276,7 @@ class TestOpeners(unittest.TestCase):
         self.assertEqual(app_fs.app_dirs.version, None)
 
     def test_user_data_opener(self):
-        user_data_fs = open_fs("userdata://fstest:willmcgugan:1.0")
+        user_data_fs = open_fs("userdata://fstest:willmcgugan:1.0", create=True)
         self.assertIsInstance(user_data_fs, UserDataFS)
         user_data_fs.makedir("foo", recreate=True)
         user_data_fs.writetext("foo/bar.txt", "baz")

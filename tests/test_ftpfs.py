@@ -12,8 +12,7 @@ import time
 import unittest
 import uuid
 
-from nose.plugins.attrib import attr
-
+import pytest
 from six import text_type
 
 from ftplib import error_perm
@@ -128,7 +127,7 @@ class TestFTPErrors(unittest.TestCase):
         self.assertEqual(str(err_info.exception), "unable to connect to ftp.example.com")
 
 
-@attr("slow")
+@pytest.mark.slow
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     user = "user"
@@ -198,7 +197,6 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
     def test_host(self):
         self.assertEqual(self.fs.host, self.server.host)
 
-    # @attr('slow')
     def test_connection_error(self):
         fs = FTPFS("ftp.not.a.chance", timeout=1)
         with self.assertRaises(errors.RemoteConnectionError):
@@ -265,7 +263,7 @@ class TestFTPFSNoMLSD(TestFTPFS):
         pass
 
 
-@attr("slow")
+@pytest.mark.slow
 class TestAnonFTPFS(FSTestCases, unittest.TestCase):
 
     user = "anonymous"

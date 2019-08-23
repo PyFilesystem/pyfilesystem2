@@ -1,34 +1,25 @@
+dist: xenial
 sudo: false
 language: python
 
+python:
+  - '2.7'
+  - '3.4'
+  - '3.5'
+  - '3.6'
+  - '3.7'
+# TODO (dargueta): Enable these once we figure out FTP timing issues in PyPy tests
+#  - 'pypy'
+#  - 'pypy3.5-7.0'
+
 matrix:
   include:
-    - python: "2.7"
-      env:
-        - SETUPTOOLS=setuptools PIP=pip
-    - python: "3.7"
-      env:
-        - SETUPTOOLS=setuptools PIP=pip
-      dist: xenial
-      sudo: true
-      install:
-        - pip install mypy
-        - make typecheck
-    - python: "3.6"
-      install:
-        - pip install mypy
-        - make typecheck
-      env:
-        - SETUPTOOLS=setuptools PIP=pip
-    - python: "3.5"
-      env:
-        - SETUPTOOLS=setuptools PIP=pip
-    - python: "3.4"
-      env:
-        - SETUPTOOLS=setuptools PIP=pip
+    - name: 'Type checking'
+      python: '3.7'
+      env: TOXENV=typecheck
 
 before_install:
-  - pip install $SETUPTOOLS $PIP -U
+  - pip install -U tox tox-travis
   - pip --version
   - pip install -r testrequirements.txt
   - pip freeze
@@ -40,5 +31,4 @@ after_success:
   - coveralls
 
 # command to run tests
-script:
-  - nosetests -v --with-coverage --cover-package=fs tests
+script: tox

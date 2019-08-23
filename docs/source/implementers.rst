@@ -54,6 +54,13 @@ You may also want to override some of the methods in the test suite for more tar
 .. autoclass:: fs.test.FSTestCases
     :members:
 
+.. note::
+
+    As of version 2.4.11 this project uses `pytest <https://pytest.org/en/latest/>`_ to run its tests.
+    While it's completely compatible with ``unittest``-style tests, it's much more powerful and
+    feature-rich. We suggest you take advantage of it and its plugins in new tests you write, rather
+    than sticking to strict ``unittest`` features. For benefits and limitations, see `here <https://pytest.org/en/latest/unittest.html>`_.
+
 
 .. _essential-methods:
 
