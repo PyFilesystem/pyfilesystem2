@@ -4,16 +4,13 @@ from __future__ import unicode_literals
 import io
 import os
 import six
-import gzip
-import tarfile
-import getpass
 import tarfile
 import tempfile
 import unittest
-import uuid
+
+import pytest
 
 from fs import tarfs
-from fs import errors
 from fs.enums import ResourceType
 from fs.compress import write_tar
 from fs.opener import open_fs
@@ -106,7 +103,7 @@ class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
                 tarfile.open(fs._tar_file, "r:{}".format(other_comps))
 
 
-@unittest.skipIf(six.PY2, "Python2 does not support LZMA")
+@pytest.mark.skipif(six.PY2, reason="Python2 does not support LZMA")
 class TestWriteXZippedTarFS(FSTestCases, unittest.TestCase):
     def make_fs(self):
         fh, _tar_file = tempfile.mkstemp()

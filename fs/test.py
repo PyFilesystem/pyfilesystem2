@@ -8,7 +8,6 @@ All Filesystems should be able to pass these.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import collections
 from datetime import datetime
 import io
 import itertools
@@ -16,6 +15,8 @@ import json
 import math
 import os
 import time
+
+import pytest
 
 import fs.copy
 import fs.move
@@ -29,6 +30,11 @@ from fs.subfs import ClosingSubFS, SubFS
 import pytz
 import six
 from six import text_type
+
+if six.PY2:
+    import collections as collections_abc
+else:
+    import collections.abc as collections_abc
 
 
 UNICODE_TEXT = """
@@ -1285,7 +1291,7 @@ class FSTestCases(object):
 
         # Check scandir returns an iterable
         iter_scandir = self.fs.scandir("/")
-        self.assertTrue(isinstance(iter_scandir, collections.Iterable))
+        self.assertTrue(isinstance(iter_scandir, collections_abc.Iterable))
         self.assertEqual(list(iter_scandir), [])
 
         # Check scanning
@@ -1298,7 +1304,7 @@ class FSTestCases(object):
         self.fs.create("bar")
         self.fs.makedir("dir")
         iter_scandir = self.fs.scandir("/")
-        self.assertTrue(isinstance(iter_scandir, collections.Iterable))
+        self.assertTrue(isinstance(iter_scandir, collections_abc.Iterable))
 
         scandir = sorted(
             [r.raw for r in iter_scandir], key=lambda info: info["basic"]["name"]
@@ -1790,7 +1796,7 @@ class FSTestCases(object):
 
     def test_unicode_path(self):
         if not self.fs.getmeta().get("unicode_paths", False):
-            self.skipTest("the filesystem does not support unicode paths.")
+            return pytest.skip("the filesystem does not support unicode paths.")
 
         self.fs.makedir("földér")
         self.fs.writetext("☭.txt", "Smells like communism.")
@@ -1813,10 +1819,10 @@ class FSTestCases(object):
     def test_case_sensitive(self):
         meta = self.fs.getmeta()
         if "case_insensitive" not in meta:
-            self.skipTest("case sensitivity not known")
+            return pytest.skip("case sensitivity not known")
 
         if meta.get("case_insensitive", False):
-            self.skipTest("the filesystem is not case sensitive.")
+            return pytest.skip("the filesystem is not case sensitive.")
 
         self.fs.makedir("foo")
         self.fs.makedir("Foo")
@@ -1846,4 +1852,3 @@ class FSTestCases(object):
             self.assertEqual(
                 foo_fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
             )
-

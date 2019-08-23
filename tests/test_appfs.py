@@ -1,26 +1,24 @@
 from __future__ import unicode_literals
 
-import unittest
-
+import pytest
 import six
 
-from fs.appfs import UserDataFS
+from fs import appfs
 
 
-class TestAppFS(unittest.TestCase):
-    """Test Application FS."""
+@pytest.fixture
+def fs(mock_appdir_directories):
+    """Create a UserDataFS but strictly using a temporary directory."""
+    return appfs.UserDataFS("fstest", "willmcgugan", "1.0")
 
-    def test_user_data(self):
-        """Test UserDataFS."""
-        user_data_fs = UserDataFS("fstest", "willmcgugan", "1.0")
-        if six.PY2:
-            self.assertEqual(
-                repr(user_data_fs),
-                "UserDataFS(u'fstest', author=u'willmcgugan', version=u'1.0')",
-            )
-        else:
-            self.assertEqual(
-                repr(user_data_fs),
-                "UserDataFS('fstest', author='willmcgugan', version='1.0')",
-            )
-        self.assertEqual(str(user_data_fs), "<userdatafs 'fstest'>")
+
+@pytest.mark.skipif(six.PY2, reason="Test requires Python 3 repr")
+def test_user_data_repr_py3(fs):
+    assert repr(fs) == "UserDataFS('fstest', author='willmcgugan', version='1.0')"
+    assert str(fs) == "<userdatafs 'fstest'>"
+
+
+@pytest.mark.skipif(not six.PY2, reason="Test requires Python 2 repr")
+def test_user_data_repr_py2(fs):
+    assert repr(fs) == "UserDataFS(u'fstest', author=u'willmcgugan', version=u'1.0')"
+    assert str(fs) == "<userdatafs 'fstest'>"

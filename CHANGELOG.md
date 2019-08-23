@@ -12,7 +12,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed tests leaving tmp files
 - Fixed typing issues
 - Fixed link namespace returning bytes
+- Fixed abstract class import from `collections` which would break on Python 3.8
+- Fixed incorrect imports of `mock` on Python 3
+- Removed some unused imports and unused `requirements.txt` file
+- Added mypy checks to Travis
 - Fixed missing `errno.ENOTSUP` on PyPy. Closes [#338](https://github.com/PyFilesystem/pyfilesystem2/issues/338).
+
+### Changed
+
+Entire test suite has been migrated to [pytest](https://docs.pytest.org/en/latest/).
+Closes [#327](https://github.com/PyFilesystem/pyfilesystem2/issues/327).
 
 ## [2.4.10] - 2019-07-29
 
