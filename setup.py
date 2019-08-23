@@ -39,8 +39,6 @@ setup(
     package_data={"fs": ["py.typed"]},
     zip_safe=False,
     platforms=["any"],
-    test_suite="nose.collector",
-    tests_require=["appdirs", "mock", "pytz", "pyftpdlib"],
     url="https://github.com/PyFilesystem/pyfilesystem2",
     version=__version__,
 )

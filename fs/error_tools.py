@@ -8,7 +8,6 @@ import collections
 import errno
 import platform
 import sys
-import typing
 from contextlib import contextmanager
 
 from six import reraise, PY3
@@ -116,4 +115,4 @@ def unwrap_errors(path_replace):
                 e.path = path_replace.get(e.path, e.path)
             else:
                 e.path = path_replace
-        reraise(type(e), e)
+        raise

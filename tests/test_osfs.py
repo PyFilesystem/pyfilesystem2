@@ -4,18 +4,22 @@ from __future__ import unicode_literals
 import errno
 import io
 import os
-import mock
 import shutil
 import tempfile
 import unittest
+import pytest
 
 from fs import osfs, open_fs
 from fs.path import relpath, dirname
 from fs import errors
-
 from fs.test import FSTestCases
 
 from six import text_type
+
+try:
+    from unittest import mock
+except ImportError:
+    import mock
 
 
 class TestOSFS(FSTestCases, unittest.TestCase):
@@ -83,7 +87,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         self.assertIn("TYRIONLANISTER", fs1.getsyspath("/"))
         self.assertNotIn("TYRIONLANISTER", fs2.getsyspath("/"))
 
-    @unittest.skipIf(osfs.sendfile is None, "sendfile not supported")
+    @pytest.mark.skipif(osfs.sendfile is None, reason="sendfile not supported")
     def test_copy_sendfile(self):
         # try copying using sendfile
         with mock.patch.object(osfs, "sendfile") as sendfile:
@@ -129,7 +133,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         finally:
             shutil.rmtree(dir_path)
 
-    @unittest.skipIf(not hasattr(os, "symlink"), "No symlink support")
+    @pytest.mark.skipif(not hasattr(os, "symlink"), reason="No symlink support")
     def test_symlinks(self):
         with open(self._get_real_path("foo"), "wb") as f:
             f.write(b"foobar")

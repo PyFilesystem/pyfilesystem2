@@ -19,6 +19,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed link namespace returning bytes
 - Fixed broken FSURL in windows [#329](https://github.com/PyFilesystem/pyfilesystem2/issues/329)
 - Fixed hidden exception at fs.close() when opening an absent zip/tar file URL [#333](https://github.com/PyFilesystem/pyfilesystem2/issues/333)
+- Fixed abstract class import from `collections` which would break on Python 3.8
+- Fixed incorrect imports of `mock` on Python 3
+- Removed some unused imports and unused `requirements.txt` file
+- Added mypy checks to Travis
+
+### Changed
+
+- Entire test suite has been migrated to [pytest](https://docs.pytest.org/en/latest/). Closes [#327](https://github.com/PyFilesystem/pyfilesystem2/issues/327).
 
 ## [2.4.10] - 2019-07-29
 

@@ -1,7 +1,11 @@
-appdirs~=1.4.0
-coverage
-mock
-pyftpdlib==1.5.2
-python-coveralls
-pytz==2016.7
-nose
+pytest==4.6.5
+pytest-cov==2.7.1
+pytest-randomly==1.2.3  ; python_version<"3.5"
+pytest-randomly==3.0.0  ; python_version>="3.5"
+mock==3.0.5  ; python_version<"3.3"
+pyftpdlib==1.5.5
+
+# Not directly required. `pyftpdlib` appears to need these but doesn't list them
+# as requirements.
+psutil
+pysendfile
