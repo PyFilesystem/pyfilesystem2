@@ -17,6 +17,9 @@ matrix:
     - name: 'Type checking'
       python: '3.7'
       env: TOXENV=typecheck
+    - name: 'Lint'
+      python: '3.7'
+      env: TOXENV=lint
 
 before_install:
   - pip install -U tox tox-travis
