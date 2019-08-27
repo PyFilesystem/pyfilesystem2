@@ -23,7 +23,7 @@ from .errors import NoSysPath, MissingInfoNamespace
 from .walk import Walker
 
 if typing.TYPE_CHECKING:
-    from typing import BinaryIO, Optional, Text, Tuple, Type, Union
+    from typing import BinaryIO, Optional, Text, Tuple, Union
     from .base import FS
 
     ZipTime = Tuple[int, int, int, int, int, int]

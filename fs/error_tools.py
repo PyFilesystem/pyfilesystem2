@@ -7,6 +7,7 @@ from __future__ import unicode_literals
 import errno
 import platform
 import sys
+import typing
 from contextlib import contextmanager
 
 from six import reraise

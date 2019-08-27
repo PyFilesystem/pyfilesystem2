@@ -15,7 +15,6 @@ from .path import normpath
 from .path import recursepath
 
 if typing.TYPE_CHECKING:
-    import io
     from typing import IO, List, Optional, Text
     from .base import FS
 

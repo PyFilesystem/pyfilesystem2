@@ -29,7 +29,7 @@ class TestParse(unittest.TestCase):
 
     def test_parse_not_url(self):
         with self.assertRaises(errors.ParseError):
-            parsed = opener.parse("foo/bar")
+            opener.parse("foo/bar")
 
     def test_parse_simple(self):
         parsed = opener.parse("osfs://foo/bar")

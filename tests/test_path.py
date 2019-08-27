@@ -1,4 +1,4 @@
-from __future__ import unicode_literals, print_function
+from __future__ import absolute_import, unicode_literals, print_function
 
 """
   fstests.test_path:  testcases for the fs path functions
@@ -8,7 +8,29 @@ from __future__ import unicode_literals, print_function
 
 import unittest
 
-from fs.path import *
+from fs.path import (
+    abspath,
+    basename,
+    combine,
+    dirname,
+    forcedir,
+    frombase,
+    isabs,
+    isbase,
+    isdotfile,
+    isparent,
+    issamedir,
+    iswildcard,
+    iteratepath,
+    join,
+    normpath,
+    parts,
+    recursepath,
+    relativefrom,
+    relpath,
+    split,
+    splitext,
+)
 
 
 class TestPathFunctions(unittest.TestCase):

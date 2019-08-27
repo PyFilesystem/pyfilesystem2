@@ -8,8 +8,6 @@ import tempfile
 import shutil
 import calendar
 
-from six import PY2
-
 import fs.copy
 from fs import open_fs
 
