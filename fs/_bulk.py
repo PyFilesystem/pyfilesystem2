@@ -97,7 +97,7 @@ class Copier(object):
     def stop(self):
         """Stop the workers (will block until they are finished)."""
         if self.running and self.num_workers:
-            for worker in self.workers:
+            for _worker in self.workers:
                 self.queue.put(None)
             for worker in self.workers:
                 worker.join()

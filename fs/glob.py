@@ -179,7 +179,7 @@ class Globber(object):
         directories = 0
         files = 0
         data = 0
-        for path, info in self._make_iter(namespaces=["details"]):
+        for _path, info in self._make_iter(namespaces=["details"]):
             if info.is_dir:
                 directories += 1
             else:

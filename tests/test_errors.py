@@ -56,7 +56,7 @@ class TestCreateFailed(unittest.TestCase):
         def test(x):
             raise errors[x]
 
-        for index, exc in enumerate(errors):
+        for index, _exc in enumerate(errors):
             try:
                 test(index)
             except Exception as e:

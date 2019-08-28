@@ -34,7 +34,8 @@ def _to_str(size, suffixes, base):
     elif size < base:
         return "{:,} bytes".format(size)
 
-    for i, suffix in enumerate(suffixes, 2):
+    # TODO (dargueta): Don't rely on unit or suffix being defined in the loop.
+    for i, suffix in enumerate(suffixes, 2):  # noqa: B007
         unit = base ** i
         if size < unit:
             break
