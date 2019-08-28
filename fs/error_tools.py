@@ -16,12 +16,12 @@ from . import errors
 
 if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Iterator, Optional, Mapping, Text, Type, Union
+    from typing import Iterator, Optional, Text, Type, Union
 
 try:
     from collections.abc import Mapping
 except ImportError:
-    from collections import Mapping
+    from collections import Mapping  # noqa: E811
 
 
 _WINDOWS_PLATFORM = platform.system() == "Windows"

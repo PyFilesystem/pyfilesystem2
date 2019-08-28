@@ -15,7 +15,7 @@ from .errors import NotWriteable
 if typing.TYPE_CHECKING:
     from typing import Text
     from .parse import ParseResult
-    from ..tarfs import TarFS
+    from ..tarfs import TarFS  # noqa: F401
 
 
 @registry.install

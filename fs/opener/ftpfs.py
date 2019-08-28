@@ -14,7 +14,7 @@ from ..errors import CreateFailed
 
 if typing.TYPE_CHECKING:
     from typing import Text, Union
-    from ..ftpfs import FTPFS
+    from ..ftpfs import FTPFS  # noqa: F401
     from ..subfs import SubFS
     from .parse import ParseResult
 

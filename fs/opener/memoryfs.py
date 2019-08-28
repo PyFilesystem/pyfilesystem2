@@ -14,7 +14,7 @@ from .registry import registry
 if typing.TYPE_CHECKING:
     from typing import Text
     from .parse import ParseResult
-    from ..memoryfs import MemoryFS
+    from ..memoryfs import MemoryFS  # noqa: F401
 
 
 @registry.install

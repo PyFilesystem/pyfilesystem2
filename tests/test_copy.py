@@ -354,7 +354,7 @@ class TestCopy(unittest.TestCase):
             src_file1 = self._touch(src_dir, "src" + os.sep + "file1.txt")
             self._write_file(src_file1)
 
-            dst_dir = self._create_sandbox_dir(home=src_dir)
+            self._create_sandbox_dir(home=src_dir)
 
             src_fs = open_fs("osfs://" + src_dir)
 

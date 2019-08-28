@@ -12,7 +12,7 @@ from .wrapfs import WrapFS
 from .path import abspath, join, normpath, relpath
 
 if typing.TYPE_CHECKING:
-    from .base import FS  # noqa: E401
+    from .base import FS  # noqa: F401
     from typing import Text, Tuple
 
 

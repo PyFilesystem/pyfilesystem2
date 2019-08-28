@@ -69,16 +69,16 @@ class Info(object):
         return self.raw == getattr(other, "raw", None)
 
     @overload
-    def _make_datetime(self, t):  # pragma: no cover
+    def _make_datetime(self, t):
         # type: (None) -> None
         pass
 
-    @overload
-    def _make_datetime(self, t):  # pragma: no cover
+    @overload  # noqa: F811
+    def _make_datetime(self, t):
         # type: (int) -> datetime
         pass
 
-    def _make_datetime(self, t):
+    def _make_datetime(self, t):  # noqa: F811
         # type: (Optional[int]) -> Optional[datetime]
         if t is not None:
             return self._to_datetime(t)
@@ -86,16 +86,16 @@ class Info(object):
             return None
 
     @overload
-    def get(self, namespace, key):  # pragma: no cover
+    def get(self, namespace, key):
         # type: (Text, Text) -> Any
         pass
 
-    @overload
-    def get(self, namespace, key, default):  # pragma: no cover
+    @overload  # noqa: F811
+    def get(self, namespace, key, default):
         # type: (Text, Text, T) -> Union[Any, T]
         pass
 
-    def get(self, namespace, key, default=None):
+    def get(self, namespace, key, default=None):  # noqa: F811
         # type: (Text, Text, Optional[Any]) -> Optional[Any]
         """Get a raw info value.
 

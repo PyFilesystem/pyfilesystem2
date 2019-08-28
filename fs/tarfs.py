@@ -20,6 +20,7 @@ from .errors import IllegalBackReference, NoURL
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
+from .permissions import Permissions
 from ._url_tools import url_quote
 from .path import relpath, basename, isbase, normpath, parts, frombase
 from .wrapfs import WrapFS
@@ -38,7 +39,6 @@ if typing.TYPE_CHECKING:
         Union,
     )
     from .info import RawInfo
-    from .permissions import Permissions
     from .subfs import SubFS
 
     T = typing.TypeVar("T", bound="ReadTarFS")

@@ -37,8 +37,8 @@ if typing.TYPE_CHECKING:
         Text,
         Tuple,
     )
-    from .base import FS
-    from .info import Info, RawInfo
+    from .base import FS  # noqa: F401
+    from .info import RawInfo
     from .subfs import SubFS
     from .permissions import Permissions
 

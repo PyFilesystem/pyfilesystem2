@@ -1624,7 +1624,8 @@ class FS(object):
 
         Arguments:
             path(str): A path on the filesystem.
-            name(str): One of the algorithms supported by the hashlib module, e.g. `"md5"`
+            name(str):
+                One of the algorithms supported by the hashlib module, e.g. `"md5"`
 
         Returns:
             str: The hex digest of the hash.

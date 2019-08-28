@@ -68,7 +68,7 @@ def normpath(path):
             ...
         IllegalBackReference: path 'foo/../../bar' contains back-references outside of filesystem"
 
-    """
+    """  # noqa: E501
     if path in "/":
         return path
 

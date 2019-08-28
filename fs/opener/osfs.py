@@ -14,7 +14,7 @@ from .registry import registry
 if typing.TYPE_CHECKING:
     from typing import Text
     from .parse import ParseResult
-    from ..osfs import OSFS
+    from ..osfs import OSFS  # noqa: F401
 
 
 @registry.install
