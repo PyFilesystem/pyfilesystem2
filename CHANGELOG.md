@@ -22,11 +22,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed abstract class import from `collections` which would break on Python 3.8
 - Fixed incorrect imports of `mock` on Python 3
 - Removed some unused imports and unused `requirements.txt` file
-- Added mypy checks to Travis
+- Added mypy checks to Travis. Closes [#332](https://github.com/PyFilesystem/pyfilesystem2/issues/332).
+- Fixed bug in a decorator that would trigger an `AttributeError` when a class
+  was created that implemented a deprecated method and had no docstring of its
+  own.
 
 ### Changed
 
 - Entire test suite has been migrated to [pytest](https://docs.pytest.org/en/latest/). Closes [#327](https://github.com/PyFilesystem/pyfilesystem2/issues/327).
+- Style checking is now enforced using `flake8`; this involved some code cleanup
+  such as removing unused imports.
 
 ## [2.4.10] - 2019-07-29
 
