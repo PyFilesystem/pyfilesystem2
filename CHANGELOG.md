@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed incorrect imports of `mock` on Python 3
 - Removed some unused imports and unused `requirements.txt` file
 - Added mypy checks to Travis
+- Fixed missing `errno.ENOTSUP` on PyPy. Closes [#338](https://github.com/PyFilesystem/pyfilesystem2/issues/338).
 
 ### Changed
 
