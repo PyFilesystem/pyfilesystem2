@@ -733,9 +733,8 @@ class FTPFS(FS):
                     for raw_info in self._parse_mlsx(lines):
                         yield Info(raw_info)
                     return
-            with self._lock:
-                for info in self._read_dir(_path).values():
-                    yield info
+            for info in self._read_dir(_path).values():
+                yield info
 
     def scandir(
         self,

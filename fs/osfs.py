@@ -421,17 +421,18 @@ class OSFS(FS):
 
     if sys.version_info[:2] < (3, 8) and sendfile is not None:
 
-        _sendfile_error_codes = frozenset(
-            {
-                errno.EIO,
-                errno.EINVAL,
-                errno.ENOSYS,
-                errno.ENOTSUP,  # type: ignore
-                errno.EBADF,
-                errno.ENOTSOCK,
-                errno.EOPNOTSUPP,
-            }
-        )
+        _sendfile_error_codes = {
+            errno.EIO,
+            errno.EINVAL,
+            errno.ENOSYS,
+            errno.EBADF,
+            errno.ENOTSOCK,
+            errno.EOPNOTSUPP,
+        }
+
+        # PyPy doesn't define ENOTSUP so we have to add it conditionally.
+        if hasattr(errno, "ENOTSUP"):
+            _sendfile_error_codes.add(errno.ENOTSUP)
 
         def copy(self, src_path, dst_path, overwrite=False):
             # type: (Text, Text, bool) -> None

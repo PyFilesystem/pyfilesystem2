@@ -91,7 +91,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
     def test_copy_sendfile(self):
         # try copying using sendfile
         with mock.patch.object(osfs, "sendfile") as sendfile:
-            sendfile.side_effect = OSError(errno.ENOTSUP, "sendfile not supported")
+            sendfile.side_effect = OSError(errno.ENOSYS, "sendfile not supported")
             self.test_copy()
         # check other errors are transmitted
         self.fs.touch("foo")
