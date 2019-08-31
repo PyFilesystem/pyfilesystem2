@@ -419,7 +419,7 @@ class OSFS(FS):
             raise errors.DirectoryExpected(dirname(dst_path))
         return _src_path, _dst_path
 
-    if sys.version_info[:2] < (3, 8) and sendfile is not None:
+    if sys.version_info[:2] <= (3, 8) and sendfile is not None:
 
         _sendfile_error_codes = {
             errno.EIO,
