@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Added geturl for TarFS and ZipFS for 'fs' purpose. NoURL for 'download' purpose.
 - Added helpful root path in CreateFailed exception [#340](https://github.com/PyFilesystem/pyfilesystem2/issues/340)
+- Added Python 3.8 support
 
 ### Fixed
 
