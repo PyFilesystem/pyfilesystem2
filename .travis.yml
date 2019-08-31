@@ -3,19 +3,20 @@ sudo: false
 language: python
 
 python:
-  - '2.7'
-  - '3.4'
-  - '3.5'
-  - '3.6'
-  - '3.7'
+  - "2.7"
+  - "3.4"
+  - "3.5"
+  - "3.6"
+  - "3.7"
+  - "3.8-dev"
 # TODO (dargueta): Enable these once we figure out FTP timing issues in PyPy tests
 #  - 'pypy'
 #  - 'pypy3.5-7.0'
 
 matrix:
   include:
-    - name: 'Type checking'
-      python: '3.7'
+    - name: "Type checking"
+      python: "3.7"
       env: TOXENV=typecheck
 
 before_install:
