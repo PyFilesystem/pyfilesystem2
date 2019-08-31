@@ -3,8 +3,8 @@
 Python's Filesystem abstraction layer.
 
 [![PyPI version](https://badge.fury.io/py/fs.svg)](https://badge.fury.io/py/fs)
-[![Downloads](https://pepy.tech/badge/fs/month)](https://pepy.tech/project/fs/month)
 [![PyPI](https://img.shields.io/pypi/pyversions/fs.svg)](https://pypi.org/project/fs/)
+[![Downloads](https://pepy.tech/badge/fs/month)](https://pepy.tech/project/fs/month)
 
 
 [![Build Status](https://travis-ci.org/PyFilesystem/pyfilesystem2.svg?branch=master)](https://travis-ci.org/PyFilesystem/pyfilesystem2)
