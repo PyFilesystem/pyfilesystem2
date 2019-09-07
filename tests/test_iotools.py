@@ -26,7 +26,7 @@ class TestIOTools(unittest.TestCase):
 
         with self.fs.openbin("foo.bin") as f:
             data = f.read()
-            self.assert_(isinstance(data, bytes))
+            self.assertTrue(isinstance(data, bytes))
 
         with self.fs.openbin("text.txt", "wb") as f:
             f.write(UNICODE_TEXT.encode("utf-8"))

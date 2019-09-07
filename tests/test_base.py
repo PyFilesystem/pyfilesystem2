@@ -8,7 +8,7 @@ from fs.base import FS
 from fs import errors
 
 
-class TestFS(FS):
+class DummyFS(FS):
     def getinfo(self, path, namespaces=None):
         pass
 
@@ -33,7 +33,7 @@ class TestFS(FS):
 
 class TestBase(unittest.TestCase):
     def setUp(self):
-        self.fs = TestFS()
+        self.fs = DummyFS()
 
     def test_validatepath(self):
         """Test validatepath method."""

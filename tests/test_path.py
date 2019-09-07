@@ -152,14 +152,14 @@ class TestPathFunctions(unittest.TestCase):
         self.assertEqual(splitext(".foo"), (".foo", ""))
 
     def test_recursepath(self):
-        self.assertEquals(recursepath("/"), ["/"])
-        self.assertEquals(recursepath("hello"), ["/", "/hello"])
-        self.assertEquals(recursepath("/hello/world/"), ["/", "/hello", "/hello/world"])
-        self.assertEquals(
+        self.assertEqual(recursepath("/"), ["/"])
+        self.assertEqual(recursepath("hello"), ["/", "/hello"])
+        self.assertEqual(recursepath("/hello/world/"), ["/", "/hello", "/hello/world"])
+        self.assertEqual(
             recursepath("/hello/world/", reverse=True), ["/hello/world", "/hello", "/"]
         )
-        self.assertEquals(recursepath("hello", reverse=True), ["/hello", "/"])
-        self.assertEquals(recursepath("", reverse=True), ["/"])
+        self.assertEqual(recursepath("hello", reverse=True), ["/hello", "/"])
+        self.assertEqual(recursepath("", reverse=True), ["/"])
 
     def test_isbase(self):
         self.assertTrue(isbase("foo", "foo/bar"))
@@ -178,7 +178,7 @@ class TestPathFunctions(unittest.TestCase):
 
     def test_isdotfile(self):
         for path in [".foo", ".svn", "foo/.svn", "foo/bar/.svn", "/foo/.bar"]:
-            self.assert_(isdotfile(path))
+            self.assertTrue(isdotfile(path))
 
         for path in ["asfoo", "df.svn", "foo/er.svn", "foo/bar/test.txt", "/foo/bar"]:
             self.assertFalse(isdotfile(path))
@@ -201,10 +201,10 @@ class TestPathFunctions(unittest.TestCase):
             self.assertEqual(basename(path), test_basename)
 
     def test_iswildcard(self):
-        self.assert_(iswildcard("*"))
-        self.assert_(iswildcard("*.jpg"))
-        self.assert_(iswildcard("foo/*"))
-        self.assert_(iswildcard("foo/{}"))
+        self.assertTrue(iswildcard("*"))
+        self.assertTrue(iswildcard("*.jpg"))
+        self.assertTrue(iswildcard("foo/*"))
+        self.assertTrue(iswildcard("foo/{}"))
         self.assertFalse(iswildcard("foo"))
         self.assertFalse(iswildcard("img.jpg"))
         self.assertFalse(iswildcard("foo/bar"))

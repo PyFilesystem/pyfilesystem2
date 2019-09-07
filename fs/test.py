@@ -1061,7 +1061,7 @@ class FSTestCases(object):
         self.fs.makedirs("foo/bar/baz/")
 
         error_msg = "resource 'foo/bar/egg/test.txt' not found"
-        with self.assertRaisesRegexp(errors.ResourceNotFound, error_msg):
+        with self.assertRaisesRegex(errors.ResourceNotFound, error_msg):
             self.fs.remove("foo/bar/egg/test.txt")
 
     def test_removedir(self):
