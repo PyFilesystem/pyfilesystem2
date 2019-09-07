@@ -4,7 +4,6 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import io
 import typing
 
 from . import errors
@@ -15,7 +14,7 @@ from .path import dirname
 from .path import normpath
 from .path import recursepath
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import IO, List, Optional, Text
     from .base import FS
 

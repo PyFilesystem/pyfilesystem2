@@ -4,24 +4,24 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import collections
 import errno
 import platform
 import sys
+import typing
 from contextlib import contextmanager
 
-from six import reraise, PY3
+from six import reraise
 
 from . import errors
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from types import TracebackType
-    from typing import Iterator, Optional, Mapping, Text, Type, Union
+    from typing import Iterator, Optional, Text, Type, Union
 
-if PY3:
+try:
     from collections.abc import Mapping
-else:
-    from collections import Mapping
+except ImportError:
+    from collections import Mapping  # noqa: E811
 
 
 _WINDOWS_PLATFORM = platform.system() == "Windows"

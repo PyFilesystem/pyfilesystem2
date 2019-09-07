@@ -163,13 +163,13 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
     def test_read_from_fileobject(self):
         try:
             tarfs.TarFS(open(self._temp_path, "rb"))
-        except:
+        except Exception:
             self.fail("Couldn't open tarfs from fileobject")
 
     def test_read_from_filename(self):
         try:
             tarfs.TarFS(self._temp_path)
-        except:
+        except Exception:
             self.fail("Couldn't open tarfs from filename")
 
     def test_read_non_existent_file(self):

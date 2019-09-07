@@ -23,7 +23,7 @@ from .path import normpath
 from .path import split
 from ._typing import overload
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import (
         Any,
         BinaryIO,
@@ -228,22 +228,22 @@ class _DirEntry(object):
                 _bytes_file.seek(0, os.SEEK_END)
                 return _bytes_file.tell()
 
-    @overload
-    def get_entry(self, name, default):  # pragma: no cover
+    @overload  # noqa: F811
+    def get_entry(self, name, default):
         # type: (Text, _DirEntry) -> _DirEntry
         pass
 
-    @overload
-    def get_entry(self, name):  # pragma: no cover
+    @overload  # noqa: F811
+    def get_entry(self, name):
         # type: (Text) -> Optional[_DirEntry]
         pass
 
-    @overload
-    def get_entry(self, name, default):  # pragma: no cover
+    @overload  # noqa: F811
+    def get_entry(self, name, default):
         # type: (Text, None) -> Optional[_DirEntry]
         pass
 
-    def get_entry(self, name, default=None):
+    def get_entry(self, name, default=None):  # noqa: F811
         # type: (Text, Optional[_DirEntry]) -> Optional[_DirEntry]
         assert self.is_dir, "must be a directory"
         return self._dir.get(name, default)
@@ -377,7 +377,7 @@ class MemoryFS(FS):
                 raise errors.DirectoryExpected(path)
             return dir_entry.list()
 
-    if False:  # typing.TYPE_CHECKING
+    if typing.TYPE_CHECKING:
 
         def opendir(self, path, factory=None):
             # type: (_M, Text, Optional[_OpendirFactory]) -> SubFS[_M]

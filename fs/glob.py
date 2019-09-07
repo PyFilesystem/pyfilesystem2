@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
 from collections import namedtuple
-from typing import Iterator, List
 import re
+import typing
 
 from .lrucache import LRUCache
 from ._repr import make_repr
@@ -14,10 +14,9 @@ GlobMatch = namedtuple("GlobMatch", ["path", "info"])
 Counts = namedtuple("Counts", ["files", "directories", "data"])
 LineCounts = namedtuple("LineCounts", ["lines", "non_blank"])
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Iterator, List, Optional, Pattern, Text, Tuple
     from .base import FS
-    from .info import Info
 
 
 _PATTERN_CACHE = LRUCache(
@@ -180,7 +179,7 @@ class Globber(object):
         directories = 0
         files = 0
         data = 0
-        for path, info in self._make_iter(namespaces=["details"]):
+        for _path, info in self._make_iter(namespaces=["details"]):
             if info.is_dir:
                 directories += 1
             else:

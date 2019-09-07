@@ -7,6 +7,7 @@ Implements a thread pool for parallel copying of files.
 from __future__ import unicode_literals
 
 import threading
+import typing
 
 from six.moves.queue import Queue
 
@@ -14,10 +15,10 @@ from .copy import copy_file_internal
 from .errors import BulkCopyFailed
 from .tools import copy_file_data
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from .base import FS
     from types import TracebackType
-    from typing import IO, Iterator, List, Optional, Mapping, Text, Type, Union
+    from typing import IO, List, Optional, Text, Type
 
 
 class _Worker(threading.Thread):
@@ -96,7 +97,7 @@ class Copier(object):
     def stop(self):
         """Stop the workers (will block until they are finished)."""
         if self.running and self.num_workers:
-            for worker in self.workers:
+            for _worker in self.workers:
                 self.queue.put(None)
             for worker in self.workers:
                 worker.join()

@@ -28,7 +28,7 @@ from .path import abspath, join, normpath
 from .time import datetime_to_epoch
 from .walk import Walker
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from datetime import datetime
     from threading import RLock
     from typing import (
@@ -84,7 +84,7 @@ def _new_name(method, old_name):
 """.format(
         method.__name__
     )
-    if getattr(_method, "__doc__"):
+    if hasattr(_method, "__doc__"):
         _method.__doc__ += deprecated_msg
 
     return _method
@@ -1624,7 +1624,8 @@ class FS(object):
 
         Arguments:
             path(str): A path on the filesystem.
-            name(str): One of the algorithms supported by the hashlib module, e.g. `"md5"`
+            name(str):
+                One of the algorithms supported by the hashlib module, e.g. `"md5"`
 
         Returns:
             str: The hex digest of the hash.

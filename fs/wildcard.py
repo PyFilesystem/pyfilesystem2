@@ -9,10 +9,9 @@ import typing
 from functools import partial
 
 from .lrucache import LRUCache
-from . import path
 
-if False:  # typing.TYPE_CHECKING
-    from typing import Callable, Iterable, MutableMapping, Text, Tuple, Pattern
+if typing.TYPE_CHECKING:
+    from typing import Callable, Iterable, Text, Tuple, Pattern
 
 
 _PATTERN_CACHE = LRUCache(1000)  # type: LRUCache[Tuple[Text, bool], Pattern]

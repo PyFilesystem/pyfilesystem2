@@ -485,8 +485,8 @@ class FSTestCases(object):
         # Raw info should be serializable
         try:
             json.dumps(info)
-        except:
-            assert False, "info should be JSON serializable"
+        except (TypeError, ValueError):
+            raise AssertionError("info should be JSON serializable")
 
         # Non existant namespace is not an error
         no_info = self.fs.getinfo("foo", "__nosuchnamespace__").raw
@@ -1286,7 +1286,7 @@ class FSTestCases(object):
     def test_scandir(self):
         # Check exception for scanning dir that doesn't exist
         with self.assertRaises(errors.ResourceNotFound):
-            for info in self.fs.scandir("/foobar"):
+            for _info in self.fs.scandir("/foobar"):
                 pass
 
         # Check scandir returns an iterable
@@ -1307,7 +1307,7 @@ class FSTestCases(object):
         self.assertTrue(isinstance(iter_scandir, collections_abc.Iterable))
 
         scandir = sorted(
-            [r.raw for r in iter_scandir], key=lambda info: info["basic"]["name"]
+            (r.raw for r in iter_scandir), key=lambda info: info["basic"]["name"]
         )
 
         # Filesystems may send us more than we ask for
@@ -1337,7 +1337,7 @@ class FSTestCases(object):
         self.assertEqual(len(page2), 1)
         page3 = list(self.fs.scandir("/", page=(4, 6)))
         self.assertEqual(len(page3), 0)
-        paged = set(r.name for r in itertools.chain(page1, page2))
+        paged = {r.name for r in itertools.chain(page1, page2)}
         self.assertEqual(paged, {"foo", "bar", "dir"})
 
     def test_filterdir(self):

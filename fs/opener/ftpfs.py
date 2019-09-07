@@ -6,17 +6,15 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import six
-
 import typing
 
 from .base import Opener
 from .registry import registry
-from ..errors import FSError, CreateFailed
+from ..errors import CreateFailed
 
-if False:  # typing.TYPE_CHECKING
-    from typing import List, Text, Union
-    from ..ftpfs import FTPFS
+if typing.TYPE_CHECKING:
+    from typing import Text, Union
+    from ..ftpfs import FTPFS  # noqa: F401
     from ..subfs import SubFS
     from .parse import ParseResult
 

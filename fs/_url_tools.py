@@ -1,9 +1,10 @@
 import re
 import six
 import platform
+import typing
 
-if False:  # typing.TYPE_CHECKING
-    from typing import Text, Union, BinaryIO
+if typing.TYPE_CHECKING:
+    from typing import Text
 
 _WINDOWS_PLATFORM = platform.system() == "Windows"
 

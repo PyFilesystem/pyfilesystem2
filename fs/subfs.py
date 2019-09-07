@@ -11,9 +11,9 @@ import six
 from .wrapfs import WrapFS
 from .path import abspath, join, normpath, relpath
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
+    from .base import FS  # noqa: F401
     from typing import Text, Tuple
-    from .base import FS
 
 
 _F = typing.TypeVar("_F", bound="FS", covariant=True)

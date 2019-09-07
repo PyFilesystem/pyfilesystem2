@@ -11,10 +11,10 @@ import typing
 from .base import Opener
 from .registry import registry
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Text
     from .parse import ParseResult
-    from ..osfs import OSFS
+    from ..osfs import OSFS  # noqa: F401
 
 
 @registry.install

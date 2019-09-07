@@ -18,7 +18,7 @@ from .path import normpath
 from .mode import validate_open_mode
 from .mode import validate_openbin_mode
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import (
         Any,
         BinaryIO,

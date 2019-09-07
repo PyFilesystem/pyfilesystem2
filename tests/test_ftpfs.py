@@ -124,7 +124,9 @@ class TestFTPErrors(unittest.TestCase):
         with self.assertRaises(errors.RemoteConnectionError) as err_info:
             with ftp_errors(mem_fs):
                 raise socket.error
-        self.assertEqual(str(err_info.exception), "unable to connect to ftp.example.com")
+        self.assertEqual(
+            str(err_info.exception), "unable to connect to ftp.example.com"
+        )
 
 
 @pytest.mark.slow
@@ -178,20 +180,34 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         super(TestFTPFS, self).tearDown()
 
     def test_ftp_url(self):
-        self.assertEqual(self.fs.ftp_url, "ftp://{}:{}@{}:{}".format(self.user, self.pasw, self.server.host, self.server.port))
+        self.assertEqual(
+            self.fs.ftp_url,
+            "ftp://{}:{}@{}:{}".format(
+                self.user, self.pasw, self.server.host, self.server.port
+            ),
+        )
 
     def test_geturl(self):
         self.fs.makedir("foo")
         self.fs.create("bar")
         self.fs.create("foo/bar")
         self.assertEqual(
-            self.fs.geturl('foo'), "ftp://{}:{}@{}:{}/foo".format(self.user, self.pasw, self.server.host, self.server.port)
+            self.fs.geturl("foo"),
+            "ftp://{}:{}@{}:{}/foo".format(
+                self.user, self.pasw, self.server.host, self.server.port
+            ),
         )
         self.assertEqual(
-            self.fs.geturl('bar'), "ftp://{}:{}@{}:{}/bar".format(self.user, self.pasw, self.server.host, self.server.port)
+            self.fs.geturl("bar"),
+            "ftp://{}:{}@{}:{}/bar".format(
+                self.user, self.pasw, self.server.host, self.server.port
+            ),
         )
         self.assertEqual(
-            self.fs.geturl('foo/bar'), "ftp://{}:{}@{}:{}/foo/bar".format(self.user, self.pasw, self.server.host, self.server.port)
+            self.fs.geturl("foo/bar"),
+            "ftp://{}:{}@{}:{}/foo/bar".format(
+                self.user, self.pasw, self.server.host, self.server.port
+            ),
         )
 
     def test_host(self):
@@ -299,11 +315,7 @@ class TestAnonFTPFS(FSTestCases, unittest.TestCase):
         super(TestAnonFTPFS, cls).tearDownClass()
 
     def make_fs(self):
-        return open_fs(
-            "ftp://{}:{}".format(
-                self.server.host, self.server.port
-            )
-        )
+        return open_fs("ftp://{}:{}".format(self.server.host, self.server.port))
 
     def tearDown(self):
         shutil.rmtree(self._temp_path)
@@ -311,12 +323,23 @@ class TestAnonFTPFS(FSTestCases, unittest.TestCase):
         super(TestAnonFTPFS, self).tearDown()
 
     def test_ftp_url(self):
-        self.assertEqual(self.fs.ftp_url, "ftp://{}:{}".format(self.server.host, self.server.port))
+        self.assertEqual(
+            self.fs.ftp_url, "ftp://{}:{}".format(self.server.host, self.server.port)
+        )
 
     def test_geturl(self):
         self.fs.makedir("foo")
         self.fs.create("bar")
         self.fs.create("foo/bar")
-        self.assertEqual(self.fs.geturl('foo'), "ftp://{}:{}/foo".format(self.server.host, self.server.port))
-        self.assertEqual(self.fs.geturl('bar'), "ftp://{}:{}/bar".format(self.server.host, self.server.port))
-        self.assertEqual(self.fs.geturl('foo/bar'), "ftp://{}:{}/foo/bar".format(self.server.host, self.server.port))
+        self.assertEqual(
+            self.fs.geturl("foo"),
+            "ftp://{}:{}/foo".format(self.server.host, self.server.port),
+        )
+        self.assertEqual(
+            self.fs.geturl("bar"),
+            "ftp://{}:{}/bar".format(self.server.host, self.server.port),
+        )
+        self.assertEqual(
+            self.fs.geturl("foo/bar"),
+            "ftp://{}:{}/foo/bar".format(self.server.host, self.server.port),
+        )

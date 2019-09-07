@@ -3,7 +3,6 @@
 
 from __future__ import unicode_literals
 
-import copy
 import typing
 
 import six
@@ -16,7 +15,7 @@ from .move import move_file, move_dir
 from .path import abspath, normpath
 from .error_tools import unwrap_errors
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from datetime import datetime
     from threading import RLock
     from typing import (
@@ -25,7 +24,6 @@ if False:  # typing.TYPE_CHECKING
         BinaryIO,
         Callable,
         Collection,
-        Dict,
         Iterator,
         Iterable,
         IO,
@@ -33,7 +31,6 @@ if False:  # typing.TYPE_CHECKING
         Mapping,
         Optional,
         Text,
-        TextIO,
         Tuple,
         Union,
     )

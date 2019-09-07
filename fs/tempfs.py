@@ -21,7 +21,7 @@ import six
 from . import errors
 from .osfs import OSFS
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Optional, Text
 
 

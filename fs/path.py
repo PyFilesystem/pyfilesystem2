@@ -16,7 +16,7 @@ import typing
 
 from .errors import IllegalBackReference
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import List, Text, Tuple
 
 
@@ -68,7 +68,7 @@ def normpath(path):
             ...
         IllegalBackReference: path 'foo/../../bar' contains back-references outside of filesystem"
 
-    """
+    """  # noqa: E501
     if path in "/":
         return path
 

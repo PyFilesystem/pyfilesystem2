@@ -5,7 +5,7 @@ from __future__ import unicode_literals
 
 import typing
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Text, Tuple
 
 

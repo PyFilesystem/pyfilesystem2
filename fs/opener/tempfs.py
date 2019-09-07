@@ -11,10 +11,10 @@ import typing
 from .base import Opener
 from .registry import registry
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Text
     from .parse import ParseResult
-    from ..tempfs import TempFS
+    from ..tempfs import TempFS  # noqa: F401
 
 
 @registry.install

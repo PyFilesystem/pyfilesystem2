@@ -24,7 +24,7 @@ from .time import datetime_to_epoch
 from .wrapfs import WrapFS
 from ._url_tools import url_quote
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import (
         Any,
         BinaryIO,
@@ -181,7 +181,7 @@ class ZipFS(WrapFS):
         else:
             return ReadZipFS(file, encoding=encoding)
 
-    if False:  # typing.TYPE_CHECKING
+    if typing.TYPE_CHECKING:
 
         def __init__(
             self,

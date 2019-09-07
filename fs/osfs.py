@@ -50,11 +50,10 @@ from .mode import Mode, validate_open_mode
 from .errors import FileExpected, NoURL
 from ._url_tools import url_quote
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import (
         Any,
         BinaryIO,
-        Callable,
         Collection,
         Dict,
         Iterator,
@@ -151,7 +150,8 @@ class OSFS(FS):
 
         try:
             # https://stackoverflow.com/questions/7870041/check-if-file-system-is-case-insensitive-in-python
-            # I don't know of a better way of detecting case insensitivity of a filesystem
+            # I don't know of a better way of detecting case insensitivity of a
+            # filesystem
             with tempfile.NamedTemporaryFile(prefix="TmP") as _tmp_file:
                 _meta["case_insensitive"] = os.path.exists(_tmp_file.name.lower())
         except Exception:
@@ -396,7 +396,7 @@ class OSFS(FS):
 
     # --- Type hint for opendir ------------------------------
 
-    if False:  # typing.TYPE_CHECKING
+    if typing.TYPE_CHECKING:
 
         def opendir(self, path, factory=None):
             # type: (_O, Text, Optional[_OpendirFactory]) -> SubFS[_O]
@@ -672,8 +672,7 @@ class OSFS(FS):
         except UnicodeEncodeError as error:
             raise errors.InvalidCharsInPath(
                 path,
-                msg="path '{path}' could not be encoded for the filesystem (check LANG env var); {error}".format(
-                    path=path, error=error
-                ),
+                msg="path '{path}' could not be encoded for the filesystem (check LANG"
+                    " env var); {error}".format(path=path, error=error),
             )
         return super(OSFS, self).validatepath(path)

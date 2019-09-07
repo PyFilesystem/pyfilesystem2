@@ -12,7 +12,7 @@ from .base import Opener
 from .registry import registry
 from .errors import OpenerError
 
-if False:  # typing.TYPE_CHECKING
+if typing.TYPE_CHECKING:
     from typing import Text, Union
     from .parse import ParseResult
     from ..appfs import _AppFS
