@@ -509,7 +509,7 @@ def forcedir(path):
         >>> forcedir("foo/bar/")
         'foo/bar/'
         >>> forcedir("foo/spam.txt")
-        'foo/spam.txt'
+        'foo/spam.txt/'
 
     """
     if not path.endswith("/"):
