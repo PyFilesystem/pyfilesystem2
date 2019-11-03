@@ -9,9 +9,8 @@ python:
   - "3.6"
   - "3.7"
   - "3.8-dev"
-# TODO (dargueta): Enable these once we figure out FTP timing issues in PyPy tests
-#  - 'pypy'
-#  - 'pypy3.5-7.0'
+  - 'pypy'
+  - 'pypy3.5-7.0'  # Need 7.0+ due to a bug in earlier versions that broke our tests.
 
 matrix:
   include:
@@ -21,6 +20,11 @@ matrix:
     - name: 'Lint'
       python: '3.7'
       env: TOXENV=lint
+
+  # Temporary bandaid for https://github.com/PyFilesystem/pyfilesystem2/issues/342
+  allow_failures:
+    - python: pypy
+    - python: pypy3.5-7.0
 
 before_install:
   - pip install -U tox tox-travis
