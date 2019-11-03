@@ -163,7 +163,8 @@ class ZipFS(WrapFS):
 
     """
 
-    def __new__(
+    # TODO: __new__ returning different types may be too 'magical'
+    def __new__(  # type: ignore
         cls,
         file,  # type: Union[Text, BinaryIO]
         write=False,  # type: bool

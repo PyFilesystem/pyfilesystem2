@@ -112,7 +112,7 @@ class TarFS(WrapFS):
         "gz": (".tar.gz", ".tgz"),
     }
 
-    def __new__(
+    def __new__(  # type: ignore
         cls,
         file,  # type: Union[Text, BinaryIO]
         write=False,  # type: bool
