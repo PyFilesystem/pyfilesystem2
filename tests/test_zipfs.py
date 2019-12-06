@@ -52,7 +52,7 @@ class TestWriteReadZipFS(unittest.TestCase):
 
     def test_create_password(self):
         with self.assertRaises(PasswordUnsupported):
-            zipfs.ZipFS(self._temp_path, write=True, passwd="hello")
+            zipfs.ZipFS(self._temp_path, write=True, password="hello")
 
 
 class TestWriteZipFS(FSTestCases, unittest.TestCase):
@@ -255,21 +255,21 @@ class TestPasswordReadZipFS(unittest.TestCase):
         os.remove(self.path)
 
     def test_openbin(self):
-        with zipfs.ReadZipFS(self.path, passwd=self.PASSWD) as zip_fs:
+        with zipfs.ReadZipFS(self.path, password=self.PASSWD) as zip_fs:
             with zip_fs.openbin("foo") as fp:
                 self.assertEqual(fp.read(), b"hello world\n")
 
         with zipfs.ReadZipFS(self.path) as zip_fs:
-            with zip_fs.openbin("foo", passwd=self.PASSWD) as fp:
+            with zip_fs.openbin("foo", password=self.PASSWD) as fp:
                 self.assertEqual(fp.read(), b"hello world\n")
 
     def test_readbytes(self):
-        with zipfs.ReadZipFS(self.path, passwd=self.PASSWD) as zip_fs:
+        with zipfs.ReadZipFS(self.path, password=self.PASSWD) as zip_fs:
             self.assertEqual(zip_fs.readbytes("foo"), b"hello world\n")
 
         with zipfs.ReadZipFS(self.path) as zip_fs:
             self.assertEqual(
-                zip_fs.readbytes("foo", passwd=self.PASSWD), b"hello world\n"
+                zip_fs.readbytes("foo", password=self.PASSWD), b"hello world\n"
             )
 
     def test_setpassword(self):
