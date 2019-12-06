@@ -21,15 +21,6 @@ from fs.enums import Seek
 from .test_archives import ArchiveTestCases
 
 
-class TestBytes(unittest.TestCase):
-    def test_conversion(self):
-        self.assertIsNone(zipfs._bytes(None))
-        self.assertEqual(zipfs._bytes("passwd"), b"passwd")
-        self.assertEqual(zipfs._bytes(b"passwd"), b"passwd")
-        with self.assertRaises(TypeError):
-            zipfs._bytes(1234)
-
-
 class TestWriteReadZipFS(unittest.TestCase):
     def setUp(self):
         fh, self._temp_path = tempfile.mkstemp()
@@ -243,7 +234,7 @@ class TestPasswordReadZipFS(unittest.TestCase):
         b"AAAAUEsFBgAAAAABAAEASQAAAGUAAAAAAA=="
     )
 
-    PASSWD = "P@ssw0rd"
+    PASSWD = b"P@ssw0rd"
 
     def setUp(self):
         fh, path = tempfile.mkstemp("testzip.zip")
@@ -279,6 +270,14 @@ class TestPasswordReadZipFS(unittest.TestCase):
 
             zip_fs.setpassword(self.PASSWD)
             self.assertEqual(zip_fs._zip.read("foo"), b"hello world\n")
+
+
+class TestPasswordTypeCheck(unittest.TestCase):
+    def test_raise(self):
+        with self.assertRaises(TypeError):
+            zipfs._password_type_check("string")
+
+        zipfs._password_type_check(b"bytes")
 
 
 class TestOpener(unittest.TestCase):
