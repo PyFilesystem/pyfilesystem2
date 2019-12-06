@@ -45,7 +45,7 @@ if typing.TYPE_CHECKING:
 
 
 def _bytes(s):
-    # type: (AnyStr) -> Optional[bytes]
+    # type: (Optional[AnyStr]) -> Optional[bytes]
     if s is None:
         return None
     elif isinstance(s, six.binary_type):
