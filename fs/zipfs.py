@@ -43,13 +43,27 @@ if typing.TYPE_CHECKING:
     R = typing.TypeVar("R", bound="ReadZipFS")
 
 
+def _bytes(s):
+    # type: (AnyStr) -> bytes
+    if s is None:
+        return None
+    elif isinstance(s, six.binary_type):
+        return s
+    elif isinstance(s, six.string_types):
+        return s.encode()
+    else:
+        raise TypeError("expected string type or byte type, not " + type(s).__name__)
+
+
 class _ZipExtFile(RawWrapper):
-    def __init__(self, fs, name):
-        # type: (ReadZipFS, Text) -> None
+    def __init__(self, fs, name, passwd=None):
+        # type: (ReadZipFS, Text, Optional[AnyStr]) -> None
         self._zip = _zip = fs._zip
         self._end = _zip.getinfo(name).file_size
         self._pos = 0
-        super(_ZipExtFile, self).__init__(_zip.open(name), "r", name)
+        super(_ZipExtFile, self).__init__(
+            _zip.open(name, pwd=_bytes(passwd)), "r", name
+        )
 
     def read(self, size=-1):
         # type: (int) -> bytes
@@ -185,7 +199,7 @@ class ZipFS(WrapFS):
                 file, compression=compression, encoding=encoding, temp_fs=temp_fs
             )
         else:
-            return ReadZipFS(file, encoding=encoding)
+            return ReadZipFS(file, encoding=encoding, passwd=passwd)
 
     if typing.TYPE_CHECKING:
 
@@ -296,13 +310,15 @@ class ReadZipFS(FS):
     }
 
     @errors.CreateFailed.catch_all
-    def __init__(self, file, encoding="utf-8"):
-        # type: (Union[BinaryIO, Text], Text) -> None
+    def __init__(self, file, encoding="utf-8", passwd=None):
+        # type: (Union[BinaryIO, Text], Text, Optional[AnyStr]) -> None
         super(ReadZipFS, self).__init__()
         self._file = file
         self.encoding = encoding
         self._zip = zipfile.ZipFile(file, "r")
         self._directory_fs = None  # type: Optional[MemoryFS]
+        if passwd is not None:
+            self.setpassword(_bytes(passwd))
 
     def __repr__(self):
         # type: () -> Text
@@ -415,8 +431,8 @@ class ReadZipFS(FS):
         self.check()
         raise errors.ResourceReadOnly(path)
 
-    def openbin(self, path, mode="r", buffering=-1, **kwargs):
-        # type: (Text, Text, int, **Any) -> BinaryIO
+    def openbin(self, path, mode="r", buffering=-1, passwd=None, **kwargs):
+        # type: (Text, Text, int, Optional[AnyStr], **Any) -> BinaryIO
         self.check()
         if "w" in mode or "+" in mode or "a" in mode:
             raise errors.ResourceReadOnly(path)
@@ -427,7 +443,7 @@ class ReadZipFS(FS):
             raise errors.FileExpected(path)
 
         zip_name = self._path_to_zip_name(path)
-        return _ZipExtFile(self, zip_name)  # type: ignore
+        return _ZipExtFile(self, zip_name, passwd)  # type: ignore
 
     def remove(self, path):
         # type: (Text) -> None
@@ -445,13 +461,13 @@ class ReadZipFS(FS):
         if hasattr(self, "_zip"):
             self._zip.close()
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, pwd=None):
+        # type: (Text, Optional[AnyStr]) -> bytes
         self.check()
         if not self._directory.isfile(path):
             raise errors.ResourceNotFound(path)
         zip_name = self._path_to_zip_name(path)
-        zip_bytes = self._zip.read(zip_name)
+        zip_bytes = self._zip.read(zip_name, pwd=_bytes(pwd))
         return zip_bytes
 
     def geturl(self, path, purpose="download"):
@@ -462,3 +478,11 @@ class ReadZipFS(FS):
             return "zip://{}!/{}".format(quoted_file, quoted_path)
         else:
             raise errors.NoURL(path, purpose)
+
+    def setpassword(self, passwd):
+        # type: (AnyStr) -> None
+        """Set *passwd* as default password to extract encrypted files.
+        """
+        if passwd is None:
+            raise ValueError('passwd')
+        self._zip.setpassword(_bytes(passwd))
