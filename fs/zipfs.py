@@ -483,6 +483,4 @@ class ReadZipFS(FS):
         # type: (AnyStr) -> None
         """Set *passwd* as default password to extract encrypted files.
         """
-        if passwd is None:
-            raise ValueError('passwd')
         self._zip.setpassword(_bytes(passwd))

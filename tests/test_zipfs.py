@@ -272,6 +272,14 @@ class TestPasswordReadZipFS(unittest.TestCase):
                 zip_fs.readbytes("foo", passwd=self.PASSWD), b"hello world\n"
             )
 
+    def test_setpassword(self):
+        with zipfs.ReadZipFS(self.path) as zip_fs:
+            with self.assertRaises(RuntimeError):
+                zip_fs._zip.read("foo")
+
+            zip_fs.setpassword(self.PASSWD)
+            self.assertEqual(zip_fs._zip.read("foo"), b"hello world\n")
+
 
 class TestOpener(unittest.TestCase):
     def test_not_writeable(self):
