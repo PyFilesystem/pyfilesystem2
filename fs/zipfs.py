@@ -461,13 +461,13 @@ class ReadZipFS(FS):
         if hasattr(self, "_zip"):
             self._zip.close()
 
-    def readbytes(self, path, pwd=None):
+    def readbytes(self, path, passwd=None):
         # type: (Text, Optional[AnyStr]) -> bytes
         self.check()
         if not self._directory.isfile(path):
             raise errors.ResourceNotFound(path)
         zip_name = self._path_to_zip_name(path)
-        zip_bytes = self._zip.read(zip_name, pwd=_bytes(pwd))
+        zip_bytes = self._zip.read(zip_name, pwd=_bytes(passwd))
         return zip_bytes
 
     def geturl(self, path, purpose="download"):

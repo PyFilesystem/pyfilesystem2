@@ -1,6 +1,7 @@
 # -*- encoding: UTF-8
 from __future__ import unicode_literals
 
+import codecs
 import os
 import sys
 import tempfile
@@ -13,11 +14,20 @@ from fs import zipfs
 from fs.compress import write_zip
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
-from fs.errors import NoURL
+from fs.errors import NoURL, PasswordUnsupported
 from fs.test import FSTestCases
 from fs.enums import Seek
 
 from .test_archives import ArchiveTestCases
+
+
+class TestBytes(unittest.TestCase):
+    def test_conversion(self):
+        self.assertIsNone(zipfs._bytes(None))
+        self.assertEqual(zipfs._bytes("passwd"), b"passwd")
+        self.assertEqual(zipfs._bytes(b"passwd"), b"passwd")
+        with self.assertRaises(TypeError):
+            zipfs._bytes(1234)
 
 
 class TestWriteReadZipFS(unittest.TestCase):
@@ -39,6 +49,10 @@ class TestWriteReadZipFS(unittest.TestCase):
                 self.assertIsInstance(path, six.text_type)
                 with zip_fs.openbin(path) as f:
                     f.read()
+
+    def test_create_password(self):
+        with self.assertRaises(PasswordUnsupported):
+            zipfs.ZipFS(self._temp_path, write=True, passwd="hello")
 
 
 class TestWriteZipFS(FSTestCases, unittest.TestCase):
@@ -218,6 +232,45 @@ class TestDirsZipFS(unittest.TestCase):
                 self.assertTrue(zip_fs.isfile("foo/bar/baz/egg"))
         finally:
             os.remove(path)
+
+
+class TestPasswordReadZipFS(unittest.TestCase):
+
+    ZIP_BIN = (
+        b"UEsDBAoACQAAAH2whk8tOwivGAAAAAwAAAADABwAZm9vVVQJAAPNX+pdzl/qXXV4CwABBPUBAAAE"
+        b"FAAAAJ6pj1kohibjIq4YqnEKUZ8SCJMeUkl9oVBLBwgtOwivGAAAAAwAAABQSwECHgMKAAkAAAB9"
+        b"sIZPLTsIrxgAAAAMAAAAAwAYAAAAAAABAAAApIEAAAAAZm9vVVQFAAPNX+pddXgLAAEE9QEAAAQU"
+        b"AAAAUEsFBgAAAAABAAEASQAAAGUAAAAAAA=="
+    )
+
+    PASSWD = "P@ssw0rd"
+
+    def setUp(self):
+        fh, path = tempfile.mkstemp("testzip.zip")
+        os.write(fh, codecs.decode(self.ZIP_BIN, "base64"))
+        os.close(fh)
+        self.path = path
+
+    def tearDown(self):
+        os.remove(self.path)
+
+    def test_openbin(self):
+        with zipfs.ReadZipFS(self.path, passwd=self.PASSWD) as zip_fs:
+            with zip_fs.openbin("foo") as fp:
+                self.assertEqual(fp.read(), b"hello world\n")
+
+        with zipfs.ReadZipFS(self.path) as zip_fs:
+            with zip_fs.openbin("foo", passwd=self.PASSWD) as fp:
+                self.assertEqual(fp.read(), b"hello world\n")
+
+    def test_readbytes(self):
+        with zipfs.ReadZipFS(self.path, passwd=self.PASSWD) as zip_fs:
+            self.assertEqual(zip_fs.readbytes("foo"), b"hello world\n")
+
+        with zipfs.ReadZipFS(self.path) as zip_fs:
+            self.assertEqual(
+                zip_fs.readbytes("foo", passwd=self.PASSWD), b"hello world\n"
+            )
 
 
 class TestOpener(unittest.TestCase):
