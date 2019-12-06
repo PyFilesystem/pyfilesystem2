@@ -1169,7 +1169,7 @@ class FS(object):
         """
         validate_open_mode(mode)
         bin_mode = mode.replace("t", "")
-        bin_file = self.openbin(path, mode=bin_mode, buffering=buffering)
+        bin_file = self.openbin(path, mode=bin_mode, buffering=buffering, **options)
         io_stream = iotools.make_stream(
             path,
             bin_file,
@@ -1178,7 +1178,6 @@ class FS(object):
             encoding=encoding or "utf-8",
             errors=errors,
             newline=newline,
-            **options
         )
         return io_stream
 
