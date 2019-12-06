@@ -1178,6 +1178,7 @@ class FS(object):
             encoding=encoding or "utf-8",
             errors=errors,
             newline=newline,
+            line_buffering=options.get("line_buffering", False),
         )
         return io_stream
 
