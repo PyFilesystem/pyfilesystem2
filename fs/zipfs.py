@@ -160,6 +160,8 @@ class ZipFS(WrapFS):
             defined in the `zipfile` module in the stdlib).
         temp_fs (str): An FS URL for the temporary filesystem used to
             store data prior to zipping.
+        passwd (str or bytes): Password for extracting file from zip file. Only
+            used for read mode.
 
     """
 
@@ -171,11 +173,14 @@ class ZipFS(WrapFS):
         compression=zipfile.ZIP_DEFLATED,  # type: int
         encoding="utf-8",  # type: Text
         temp_fs="temp://__ziptemp__",  # type: Text
+        passwd=None,  # type: Optional[AnyStr]
     ):
         # type: (...) -> FS
         # This magic returns a different class instance based on the
         # value of the ``write`` parameter.
         if write:
+            if passwd is not None:
+                raise errors.PasswordUnsupported()
             return WriteZipFS(
                 file, compression=compression, encoding=encoding, temp_fs=temp_fs
             )
@@ -191,6 +196,7 @@ class ZipFS(WrapFS):
             compression=zipfile.ZIP_DEFLATED,  # type: int
             encoding="utf-8",  # type: Text
             temp_fs="temp://__ziptemp__",  # type: Text
+            passwd=None,  # type: Optional[AnyStr]
         ):
             # type: (...) -> None
             pass
