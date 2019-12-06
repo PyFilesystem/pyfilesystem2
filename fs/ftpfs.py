@@ -772,8 +772,8 @@ class FTPFS(FS):
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, **options):
+        # type: (Text, Any) -> bytes
         _path = self.validatepath(path)
         data = io.BytesIO()
         with ftp_errors(self, path):

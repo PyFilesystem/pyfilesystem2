@@ -439,8 +439,8 @@ class ReadZipFS(FS):
         if hasattr(self, "_zip"):
             self._zip.close()
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, **options):
+        # type: (Text, Any) -> bytes
         self.check()
         if not self._directory.isfile(path):
             raise errors.ResourceNotFound(path)

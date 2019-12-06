@@ -586,8 +586,8 @@ class FS(object):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, **options):
+        # type: (Text, Any) -> bytes
         """Get the contents of a file as bytes.
 
         Arguments:

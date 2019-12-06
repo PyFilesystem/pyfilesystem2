@@ -334,8 +334,8 @@ class WrapFS(FS, typing.Generic[_F]):
             for info in iter_files:
                 yield info
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, **options):
+        # type: (Text, Any) -> bytes
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):

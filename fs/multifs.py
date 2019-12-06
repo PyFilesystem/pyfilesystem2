@@ -280,8 +280,8 @@ class MultiFS(FS):
         if not exists:
             raise errors.ResourceNotFound(path)
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, **options):
+        # type: (Text, Any) -> bytes
         self.check()
         fs = self._delegate(path)
         if fs is None:

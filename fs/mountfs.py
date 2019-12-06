@@ -186,8 +186,8 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.removedir(_path)
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, **options):
+        # type: (Text, Any) -> bytes
         self.check()
         fs, _path = self._delegate(path)
         return fs.readbytes(_path)
