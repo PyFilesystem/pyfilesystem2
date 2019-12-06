@@ -293,8 +293,8 @@ class MultiFS(FS):
         fs = self._delegate_required(path)
         return fs.download(path, file, chunk_size=chunk_size, **options)
 
-    def readtext(self, path, encoding=None, errors=None, newline=""):
-        # type: (Text, Optional[Text], Optional[Text], Text) -> Text
+    def readtext(self, path, encoding=None, errors=None, newline="", **options):
+        # type: (Text, Optional[Text], Optional[Text], Text, Any) -> Text
         self.check()
         fs = self._delegate_required(path)
         return fs.readtext(path, encoding=encoding, errors=errors, newline=newline)

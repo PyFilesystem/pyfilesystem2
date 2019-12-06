@@ -221,7 +221,7 @@ class FS(object):
         path,  # type: Text
         mode="r",  # type: Text
         buffering=-1,  # type: int
-        **options  # type: Any
+        **options,  # type: Any
     ):
         # type: (...) -> BinaryIO
         """Open a binary file-like object.
@@ -644,6 +644,7 @@ class FS(object):
         encoding=None,  # type: Optional[Text]
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options,  # type: Any
     ):
         # type: (...) -> Text
         """Get the contents of a file as a string.
@@ -664,7 +665,12 @@ class FS(object):
         """
         with closing(
             self.open(
-                path, mode="rt", encoding=encoding, errors=errors, newline=newline
+                path,
+                mode="rt",
+                encoding=encoding,
+                errors=errors,
+                newline=newline,
+                **options,
             )
         ) as read_file:
             contents = read_file.read()
@@ -1130,7 +1136,7 @@ class FS(object):
         encoding=None,  # type: Optional[Text]
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
-        **options  # type: Any
+        **options,  # type: Any
     ):
         # type: (...) -> IO
         """Open a file.
