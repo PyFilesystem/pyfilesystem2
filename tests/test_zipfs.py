@@ -284,3 +284,5 @@ class TestOpener(unittest.TestCase):
     def test_not_writeable(self):
         with self.assertRaises(NotWriteable):
             open_fs("zip://foo.zip", writeable=True)
+
+        open_fs("zip://foo.zip?password=1234")

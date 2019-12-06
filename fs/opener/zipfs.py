@@ -38,5 +38,10 @@ class ZipOpener(Opener):
 
         if not create and writeable:
             raise NotWriteable("Unable to open existing ZIP file for writing")
-        zip_fs = ZipFS(parse_result.resource, write=create)
+
+        password = parse_result.params.get("password")
+        if password is not None:
+            password = password.encode()
+
+        zip_fs = ZipFS(parse_result.resource, write=create, password=password)
         return zip_fs
