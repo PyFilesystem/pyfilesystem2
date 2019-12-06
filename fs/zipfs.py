@@ -27,6 +27,7 @@ from ._url_tools import url_quote
 if typing.TYPE_CHECKING:
     from typing import (
         Any,
+        AnyStr,
         BinaryIO,
         Collection,
         Dict,
@@ -44,7 +45,7 @@ if typing.TYPE_CHECKING:
 
 
 def _bytes(s):
-    # type: (AnyStr) -> bytes
+    # type: (AnyStr) -> Optional[bytes]
     if s is None:
         return None
     elif isinstance(s, six.binary_type):
