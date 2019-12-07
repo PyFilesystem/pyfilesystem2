@@ -1,0 +1,2 @@
+[tool.black]
+py36 = false

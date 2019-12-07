@@ -348,7 +348,7 @@ class WrapFS(FS, typing.Generic[_F]):
         encoding=None,  # type: Optional[Text]
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
-        **options,  # type: Any
+        **options  # type: Any
     ):
         # type: (...) -> Text
         self.check()
@@ -457,7 +457,7 @@ class WrapFS(FS, typing.Generic[_F]):
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
         line_buffering=False,  # type: bool
-        **options,  # type: Any
+        **options  # type: Any
     ):
         # type: (...) -> IO[AnyStr]
         self.check()
