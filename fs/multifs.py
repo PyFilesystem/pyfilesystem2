@@ -286,7 +286,7 @@ class MultiFS(FS):
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
-        return fs.readbytes(path)
+        return fs.readbytes(path, **options)
 
     def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
@@ -297,7 +297,9 @@ class MultiFS(FS):
         # type: (Text, Optional[Text], Optional[Text], Text, Any) -> Text
         self.check()
         fs = self._delegate_required(path)
-        return fs.readtext(path, encoding=encoding, errors=errors, newline=newline)
+        return fs.readtext(
+            path, encoding=encoding, errors=errors, newline=newline, **options
+        )
 
     def getsize(self, path):
         # type: (Text) -> int

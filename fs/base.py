@@ -602,7 +602,7 @@ class FS(object):
             fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         """
-        with closing(self.open(path, mode="rb")) as read_file:
+        with closing(self.open(path, mode="rb", **options)) as read_file:
             contents = read_file.read()
         return contents
 

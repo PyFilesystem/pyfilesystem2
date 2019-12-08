@@ -190,7 +190,7 @@ class MountFS(FS):
         # type: (Text, Any) -> bytes
         self.check()
         fs, _path = self._delegate(path)
-        return fs.readbytes(_path)
+        return fs.readbytes(_path, **options)
 
     def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
@@ -208,7 +208,9 @@ class MountFS(FS):
         # type: (...) -> Text
         self.check()
         fs, _path = self._delegate(path)
-        return fs.readtext(_path, encoding=encoding, errors=errors, newline=newline)
+        return fs.readtext(
+            _path, encoding=encoding, errors=errors, newline=newline, **options
+        )
 
     def getsize(self, path):
         # type: (Text) -> int

@@ -339,7 +339,7 @@ class WrapFS(FS, typing.Generic[_F]):
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            _bytes = _fs.readbytes(_path)
+            _bytes = _fs.readbytes(_path, **options)
         return _bytes
 
     def readtext(
@@ -355,7 +355,7 @@ class WrapFS(FS, typing.Generic[_F]):
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
             _text = _fs.readtext(
-                _path, encoding=encoding, errors=errors, newline=newline
+                _path, encoding=encoding, errors=errors, newline=newline, **options
             )
         return _text
 
