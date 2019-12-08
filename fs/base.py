@@ -592,6 +592,8 @@ class FS(object):
 
         Arguments:
             path (str): A path to a readable file on the filesystem.
+            **options: keyword arguments for any additional information
+                required by the filesystem (if any).
 
         Returns:
             bytes: the file contents.
@@ -655,6 +657,8 @@ class FS(object):
                 in text mode (defaults to `None`, reading in binary mode).
             errors (str, optional): Unicode errors parameter.
             newline (str): Newlines parameter.
+            **options: keyword arguments for any additional information
+                required by the filesystem (if any).
 
         Returns:
             str: file contents.
