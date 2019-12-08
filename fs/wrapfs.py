@@ -471,7 +471,7 @@ class WrapFS(FS, typing.Generic[_F]):
                 errors=errors,
                 newline=newline,
                 line_buffering=line_buffering,
-                **options,
+                **options
             )
         return open_file
 
@@ -522,7 +522,7 @@ class WrapFS(FS, typing.Generic[_F]):
                 encoding=encoding,
                 errors=errors,
                 newline=newline,
-                **options,
+                **options
             )
 
     def validatepath(self, path):

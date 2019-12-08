@@ -674,7 +674,7 @@ class FS(object):
                 encoding=encoding,
                 errors=errors,
                 newline=newline,
-                **options,
+                **options
             )
         ) as read_file:
             contents = read_file.read()
@@ -1382,7 +1382,7 @@ class FS(object):
                 encoding=encoding,
                 errors=errors,
                 newline=newline,
-                **options,
+                **options
             ) as dst_file:
                 tools.copy_file_data(file, dst_file)
 
@@ -1450,7 +1450,7 @@ class FS(object):
                 encoding=encoding,
                 errors=errors,
                 newline=newline,
-                **options,
+                **options
             )
         ) as write_file:
             write_file.write(contents)

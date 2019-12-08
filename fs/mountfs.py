@@ -300,7 +300,7 @@ class MountFS(FS):
             encoding=encoding,
             errors=errors,
             newline=newline,
-            **options,
+            **options
         )
 
     def upload(self, path, file, chunk_size=None, **options):
@@ -332,5 +332,5 @@ class MountFS(FS):
             encoding=encoding,
             errors=errors,
             newline=newline,
-            **options,
+            **options
         )
