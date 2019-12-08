@@ -489,12 +489,12 @@ class WrapFS(FS, typing.Generic[_F]):
         with unwrap_errors(path):
             return factory(self, path)
 
-    def writebytes(self, path, contents):
-        # type: (Text, bytes) -> None
+    def writebytes(self, path, contents, **options):
+        # type: (Text, bytes, Any) -> None
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
-            _fs.writebytes(_path, contents)
+            _fs.writebytes(_path, contents, **options)
 
     def upload(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
@@ -510,13 +510,19 @@ class WrapFS(FS, typing.Generic[_F]):
         encoding=None,  # type: Optional[Text]
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options  # type: Any
     ):
         # type: (...) -> None
         self.check()
         _fs, _path = self.delegate_path(path)
         with unwrap_errors(path):
             _fs.writefile(
-                _path, file, encoding=encoding, errors=errors, newline=newline
+                _path,
+                file,
+                encoding=encoding,
+                errors=errors,
+                newline=newline,
+                **options,
             )
 
     def validatepath(self, path):

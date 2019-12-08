@@ -1281,14 +1281,16 @@ class FS(object):
             iter_info = itertools.islice(iter_info, start, end)
         return iter_info
 
-    def writebytes(self, path, contents):
-        # type: (Text, bytes) -> None
+    def writebytes(self, path, contents, **options):
+        # type: (Text, bytes, Any) -> None
         # FIXME(@althonos): accept bytearray and memoryview as well ?
         """Copy binary data to a file.
 
         Arguments:
             path (str): Destination path on the filesystem.
             contents (bytes): Data to be written.
+            **options: keyword arguments for any additional information
+                required by the filesystem (if any).
 
         Raises:
             TypeError: if contents is not bytes.
@@ -1296,7 +1298,7 @@ class FS(object):
         """
         if not isinstance(contents, bytes):
             raise TypeError("contents must be bytes")
-        with closing(self.open(path, mode="wb")) as write_file:
+        with closing(self.open(path, mode="wb", **options)) as write_file:
             write_file.write(contents)
 
     setbytes = _new_name(writebytes, "setbytes")
@@ -1341,6 +1343,7 @@ class FS(object):
         encoding=None,  # type: Optional[Text]
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options  # type: Any
     ):
         # type: (...) -> None
         """Set a file to the contents of a file object.
@@ -1353,6 +1356,8 @@ class FS(object):
             errors (str, optional): How encoding errors should be treated
                 (same as `io.open`).
             newline (str): Newline parameter (same as `io.open`).
+            **options: Implementation specific options required to open
+                the source file.
 
         This method is similar to `~FS.upload`, in that it copies data from a
         file-like object to a resource on the filesystem, but unlike ``upload``,
@@ -1372,7 +1377,12 @@ class FS(object):
 
         with self._lock:
             with self.open(
-                path, mode=mode, encoding=encoding, errors=errors, newline=newline
+                path,
+                mode=mode,
+                encoding=encoding,
+                errors=errors,
+                newline=newline,
+                **options,
             ) as dst_file:
                 tools.copy_file_data(file, dst_file)
 
@@ -1411,6 +1421,7 @@ class FS(object):
         encoding="utf-8",  # type: Text
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options  # type: Any
     ):
         # type: (...) -> None
         """Create or replace a file with text.
@@ -1423,6 +1434,8 @@ class FS(object):
             errors (str, optional): How encoding errors should be treated
                 (same as `io.open`).
             newline (str): Newline parameter (same as `io.open`).
+            **options: keyword arguments for any additional information
+                required by the filesystem (if any).
 
         Raises:
             TypeError: if ``contents`` is not a unicode string.
@@ -1432,7 +1445,12 @@ class FS(object):
             raise TypeError("contents must be unicode")
         with closing(
             self.open(
-                path, mode="wt", encoding=encoding, errors=errors, newline=newline
+                path,
+                mode="wt",
+                encoding=encoding,
+                errors=errors,
+                newline=newline,
+                **options,
             )
         ) as write_file:
             write_file.write(contents)

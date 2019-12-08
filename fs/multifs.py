@@ -408,9 +408,9 @@ class MultiFS(FS):
             path, file, chunk_size=chunk_size, **options
         )
 
-    def writebytes(self, path, contents):
-        # type: (Text, bytes) -> None
-        self._writable_required(path).writebytes(path, contents)
+    def writebytes(self, path, contents, **options):
+        # type: (Text, bytes, Any) -> None
+        self._writable_required(path).writebytes(path, contents, **options)
 
     def writetext(
         self,
@@ -419,9 +419,10 @@ class MultiFS(FS):
         encoding="utf-8",  # type: Text
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options  # type: Any
     ):
         # type: (...) -> None
         write_fs = self._writable_required(path)
         return write_fs.writetext(
-            path, contents, encoding=encoding, errors=errors, newline=newline
+            path, contents, encoding=encoding, errors=errors, newline=newline, **options
         )

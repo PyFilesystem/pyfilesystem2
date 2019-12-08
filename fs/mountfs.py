@@ -309,11 +309,11 @@ class MountFS(FS):
         fs, _path = self._delegate(path)
         return fs.upload(_path, file, chunk_size=chunk_size, **options)
 
-    def writebytes(self, path, contents):
-        # type: (Text, bytes) -> None
+    def writebytes(self, path, contents, **options):
+        # type: (Text, bytes, Any) -> None
         self.check()
         fs, _path = self._delegate(path)
-        return fs.writebytes(_path, contents)
+        return fs.writebytes(_path, contents, **options)
 
     def writetext(
         self,
@@ -322,9 +322,15 @@ class MountFS(FS):
         encoding="utf-8",  # type: Text
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options  # type: Any
     ):
         # type: (...) -> None
         fs, _path = self._delegate(path)
         return fs.writetext(
-            _path, contents, encoding=encoding, errors=errors, newline=newline
+            _path,
+            contents,
+            encoding=encoding,
+            errors=errors,
+            newline=newline,
+            **options,
         )
