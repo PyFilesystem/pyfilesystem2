@@ -1409,7 +1409,7 @@ class FS(object):
             path (str): Destination path on the filesystem.
             contents (str): Text to be written.
             encoding (str, optional): Encoding of destination file
-                (defaults to ``'ut-8'``).
+                (defaults to ``'utf-8'``).
             errors (str, optional): How encoding errors should be treated
                 (same as `io.open`).
             newline (str): Newline parameter (same as `io.open`).
