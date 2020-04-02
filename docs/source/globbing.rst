@@ -15,7 +15,7 @@ Matching Files and Directories
 
 In a glob pattern, A ``*`` means match anything text in a filename. A ``?``
 matches any single character. A ``**`` matches any number of subdirectories,
-making the glob *recusrive*. If the glob pattern ends in a ``/``, it will
+making the glob *recursive*. If the glob pattern ends in a ``/``, it will
 only match directory paths, otherwise it will match files and directories.
 
 .. note::
