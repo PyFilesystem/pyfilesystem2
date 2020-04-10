@@ -113,6 +113,7 @@ class _MemoryFile(io.RawIOBase):
     def next(self):
         # type: () -> bytes
         with self._seek_lock():
+            self.on_access()
             return next(self._bytes_io)
 
     __next__ = next
@@ -153,6 +154,7 @@ class _MemoryFile(io.RawIOBase):
     def readlines(self, hint=-1):
         # type: (int) -> List[bytes]
         with self._seek_lock():
+            self.on_access()
             return self._bytes_io.readlines(hint)
 
     def seekable(self):
