@@ -870,6 +870,11 @@ class FSTestCases(object):
             self.assertTrue(f.readable())
             self.assertFalse(f.closed)
             self.assertEqual(f.readlines(8), [b"Hello\n", b"World\n"])
+            self.assertEqual(f.tell(), 12)
+            b = bytearray(4)
+            self.assertEqual(f.readinto(b), 4)
+            self.assertEqual(f.tell(), 16)
+            self.assertEqual(b, b"foo\n")
             with self.assertRaises(IOError):
                 f.write(b"no")
         self.assertTrue(f.closed)
