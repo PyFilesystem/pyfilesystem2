@@ -146,7 +146,7 @@ class _MemoryFile(io.RawIOBase):
         return self._mode.reading
 
     def readinto(self, b):
-        # type (bytes) -> Optional[int]
+        # type (bytearray) -> Optional[int]
         if not self._mode.reading:
             raise IOError("File not open for reading")
         with self._seek_lock():
