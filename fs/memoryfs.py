@@ -145,13 +145,13 @@ class _MemoryFile(io.RawIOBase):
         # type: () -> bool
         return self._mode.reading
 
-    def readinto(self, b):
+    def readinto(self, buffer):
         # type (bytearray) -> Optional[int]
         if not self._mode.reading:
             raise IOError("File not open for reading")
         with self._seek_lock():
             self.on_access()
-            return self._bytes_io.readinto(b)
+            return self._bytes_io.readinto(buffer)
 
     def readlines(self, hint=-1):
         # type: (int) -> List[bytes]
