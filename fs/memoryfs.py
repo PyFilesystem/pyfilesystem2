@@ -120,6 +120,8 @@ class _MemoryFile(io.RawIOBase):
 
     def readline(self, size=-1):
         # type: (int) -> bytes
+        if not self._mode.reading:
+            raise IOError("File not open for reading")
         with self._seek_lock():
             self.on_access()
             return self._bytes_io.readline(size)
@@ -153,6 +155,8 @@ class _MemoryFile(io.RawIOBase):
 
     def readlines(self, hint=-1):
         # type: (int) -> List[bytes]
+        if not self._mode.reading:
+            raise IOError("File not open for reading")
         with self._seek_lock():
             self.on_access()
             return self._bytes_io.readlines(hint)
