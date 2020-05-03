@@ -24,7 +24,7 @@ matrix:
   # Temporary bandaid for https://github.com/PyFilesystem/pyfilesystem2/issues/342
   allow_failures:
     - python: pypy
-    - python: pypy3.5-7.0
+    - python: pypy3.5-8.0
 
 before_install:
   - pip install -U tox tox-travis
