@@ -12,20 +12,6 @@ python:
   - "pypy"
   - "pypy3.5-7.0" # Need 7.0+ due to a bug in earlier versions that broke our tests.
 
-matrix:
-  include:
-    - name: "Type checking"
-      python: "3.7"
-      env: TOXENV=typecheck
-    - name: "Lint"
-      python: "3.7"
-      env: TOXENV=lint
-    - python: "3.8"
-
-  # Temporary bandaid for https://github.com/PyFilesystem/pyfilesystem2/issues/342
-  allow_failures:
-    - python: pypy
-    - python: pypy3.5-7.0
 
 before_install:
   - pip install -U tox tox-travis
