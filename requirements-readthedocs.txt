@@ -1,2 +1,2 @@
 # requirements for readthedocs.io
--e .
+-e .00x..mmx..2sx.,efbx.00.ex
