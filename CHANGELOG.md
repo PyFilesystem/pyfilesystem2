@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   ensuring `conftest.py` is present, fixes [#364](https://github.com/PyFilesystem/pyfilesystem2/issues/364).
 - Stop patching copy with Python 3.8+ because it already uses sendfile.
 - Fixed crash when CPython's -OO flag is used
+- Fixed error when parsing timestamps from a FTP directory served from a WindowsNT FTP Server, fixes [#395](https://github.com/PyFilesystem/pyfilesystem2/issues/395).
 
 ## [2.4.11] - 2019-09-07
 

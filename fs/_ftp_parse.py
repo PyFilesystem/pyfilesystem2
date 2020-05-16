@@ -41,7 +41,7 @@ RE_LINUX = re.compile(
 RE_WINDOWSNT = re.compile(
     r"""
     ^
-    (?P<modified>.*(AM|PM))
+    (?P<modified>.*?(AM|PM))
     \s*
     (?P<size>(<DIR>|\d*))
     \s*
