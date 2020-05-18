@@ -320,6 +320,9 @@ def splitext(path):
     # type: (Text) -> Tuple[Text, Text]
     """Split the extension from the path.
 
+    Please be aware that double forward slashes in your URL
+    will become single slash, i.e. s3://path -> s3:/path.
+
     Arguments:
         path (str): A path to split.
 
@@ -333,6 +336,8 @@ def splitext(path):
         ('foo/bar/baz', '.txt')
         >>> splitext('foo/bar/.foo')
         ('foo/bar/.foo', '')
+        >>> splittext('s3://simonm3/_testdata/file1.pkl')
+        ('s3:/simonm3/_testdata/file1', '.pkl')
 
     """
     parent_path, pathname = split(path)
