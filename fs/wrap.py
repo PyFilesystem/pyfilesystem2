@@ -215,6 +215,7 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         encoding="utf-8",  # type: Text
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options  # type: Any
     ):
         # type: (...) -> None
         self.check()
@@ -271,8 +272,8 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
             **options
         )
 
-    def writebytes(self, path, contents):
-        # type: (Text, bytes) -> None
+    def writebytes(self, path, contents, **options):
+        # type: (Text, bytes, Any) -> None
         self.check()
         raise ResourceReadOnly(path)
 
@@ -288,6 +289,7 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         encoding=None,  # type: Optional[Text]
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options  # type: Any
     ):
         # type: (...) -> None
         self.check()

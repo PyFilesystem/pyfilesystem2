@@ -7,11 +7,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.4.12] - (Unreleased)
 
+### Added
+
+- Added `options` kwargs to several I/O operations, including: `readbytes`,
+  `writebytes`, `readtext`, `writetext` and `writefile`.
+
 ### Changed
 
 - Start testing on PyPy. Due to [#342](https://github.com/PyFilesystem/pyfilesystem2/issues/342)
   we have to treat PyPy builds specially and allow them to fail, but at least we'll
   be able to see if we break something aside from known issues with FTP tests.
+- Set `py36 = false` for black to prevent adding trailing comma in function
+  definition and cause `SyntaxError` in older python version.
 
 ## [2.4.11] - 2019-09-07
 

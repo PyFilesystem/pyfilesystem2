@@ -280,24 +280,26 @@ class MultiFS(FS):
         if not exists:
             raise errors.ResourceNotFound(path)
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, **options):
+        # type: (Text, Any) -> bytes
         self.check()
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
-        return fs.readbytes(path)
+        return fs.readbytes(path, **options)
 
     def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
         fs = self._delegate_required(path)
         return fs.download(path, file, chunk_size=chunk_size, **options)
 
-    def readtext(self, path, encoding=None, errors=None, newline=""):
-        # type: (Text, Optional[Text], Optional[Text], Text) -> Text
+    def readtext(self, path, encoding=None, errors=None, newline="", **options):
+        # type: (Text, Optional[Text], Optional[Text], Text, Any) -> Text
         self.check()
         fs = self._delegate_required(path)
-        return fs.readtext(path, encoding=encoding, errors=errors, newline=newline)
+        return fs.readtext(
+            path, encoding=encoding, errors=errors, newline=newline, **options
+        )
 
     def getsize(self, path):
         # type: (Text) -> int
@@ -406,9 +408,9 @@ class MultiFS(FS):
             path, file, chunk_size=chunk_size, **options
         )
 
-    def writebytes(self, path, contents):
-        # type: (Text, bytes) -> None
-        self._writable_required(path).writebytes(path, contents)
+    def writebytes(self, path, contents, **options):
+        # type: (Text, bytes, Any) -> None
+        self._writable_required(path).writebytes(path, contents, **options)
 
     def writetext(
         self,
@@ -417,9 +419,10 @@ class MultiFS(FS):
         encoding="utf-8",  # type: Text
         errors=None,  # type: Optional[Text]
         newline="",  # type: Text
+        **options  # type: Any
     ):
         # type: (...) -> None
         write_fs = self._writable_required(path)
         return write_fs.writetext(
-            path, contents, encoding=encoding, errors=errors, newline=newline
+            path, contents, encoding=encoding, errors=errors, newline=newline, **options
         )

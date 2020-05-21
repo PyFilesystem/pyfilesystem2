@@ -761,19 +761,19 @@ class FTPFS(FS):
                         str("STOR ") + _encode(_path, self.ftp.encoding), file
                     )
 
-    def writebytes(self, path, contents):
-        # type: (Text, ByteString) -> None
+    def writebytes(self, path, contents, **options):
+        # type: (Text, ByteString, Any) -> None
         if not isinstance(contents, bytes):
             raise TypeError("contents must be bytes")
-        self.upload(path, io.BytesIO(contents))
+        self.upload(path, io.BytesIO(contents), **options)
 
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
 
-    def readbytes(self, path):
-        # type: (Text) -> bytes
+    def readbytes(self, path, **options):
+        # type: (Text, Any) -> bytes
         _path = self.validatepath(path)
         data = io.BytesIO()
         with ftp_errors(self, path):
