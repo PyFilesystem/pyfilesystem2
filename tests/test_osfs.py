@@ -6,6 +6,7 @@ import io
 import os
 import shutil
 import tempfile
+import sys
 import unittest
 import pytest
 
@@ -88,6 +89,11 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         self.assertNotIn("TYRIONLANISTER", fs2.getsyspath("/"))
 
     @pytest.mark.skipif(osfs.sendfile is None, reason="sendfile not supported")
+    @pytest.mark.skipif(
+        sys.version_info >= (3, 8),
+        reason="the copy function uses sendfile in Python 3.8+, "
+        "making the patched implementation irrelevant",
+    )
     def test_copy_sendfile(self):
         # try copying using sendfile
         with mock.patch.object(osfs, "sendfile") as sendfile:
