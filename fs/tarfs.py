@@ -318,7 +318,11 @@ class ReadTarFS(FS):
         return self._directory_cache
 
     def _follow_symlink(self, entry):
-        """Follow an symlink `TarInfo` to find a concrete entry."""
+        """Follow an symlink `TarInfo` to find a concrete entry.
+
+        Returns ``None`` if the symlink is dangling.
+        """
+        done = set()
         _entry = entry
         while _entry.issym():
             linkname = normpath(
@@ -326,17 +330,21 @@ class ReadTarFS(FS):
             )
             resolved = self._resolve(linkname)
             if resolved is None:
-                raise errors.ResourceNotFound(linkname)
+                return None
+            done.add(_entry)
             _entry = self._directory_entries[resolved]
+            # if we already saw this symlink, then we are following cyclic
+            # symlinks and we should break the loop
+            if _entry in done:
+                return None
 
         return _entry
 
     def _resolve(self, path):
         """Replace path components that are symlinks with concrete components.
 
-        Returns:
-
-
+        Returns ``None`` when the path could not be resolved to an existing
+        entry in the archive.
         """
         if path in self._directory_entries or not path:
             return path
@@ -406,7 +414,7 @@ class ReadTarFS(FS):
                     target = normpath(join(
                         dirname(self._decode(member.name)),
                         self._decode(member.linkname),
-                    ))  # type: Option[Text]
+                    ))  # type: Optional[Text]
                 else:
                     target = None
                 raw_info["link"] = {"target": target}
@@ -441,8 +449,8 @@ class ReadTarFS(FS):
         _path = relpath(self.validatepath(path))
         realpath = self._resolve(_path)
         if realpath is not None:
-            entry = self._directory_entries[realpath]
-            return self._follow_symlink(entry).isdir()
+            entry = self._follow_symlink(self._directory_entries[realpath])
+            return False if entry is None else entry.isdir()
         else:
             return False
 
@@ -450,8 +458,8 @@ class ReadTarFS(FS):
         _path = relpath(self.validatepath(path))
         realpath = self._resolve(_path)
         if realpath is not None:
-            entry = self._directory_entries[realpath]
-            return self._follow_symlink(entry).isfile()
+            entry = self._follow_symlink(self._directory_entries[realpath])
+            return False if entry is None else entry.isfile()
         else:
             return False
 
@@ -480,12 +488,12 @@ class ReadTarFS(FS):
         elif realpath:
             target = self._follow_symlink(self._directory_entries[realpath])
             # check the path is either a symlink mapping to a directory or a directory
-            if target.isdir():
-                base = target.name
-            elif target.issym():
-                base = target.linkname
-            else:
+            if target is None:
+                raise errors.ResourceNotFound(path)
+            elif not target.isdir():
                 raise errors.DirectoryExpected(path)
+            else:
+                base = target.name
         else:
             base = ""
 
@@ -515,9 +523,14 @@ class ReadTarFS(FS):
         if "w" in mode or "+" in mode or "a" in mode:
             raise errors.ResourceReadOnly(path)
 
-        # check the path actually resolves after following symlinks
+        # check the path actually resolves after following symlink components
         _realpath = self._resolve(_path)
         if _realpath is None:
+            raise errors.ResourceNotFound(path)
+
+        # get the entry at the resolved path and follow all symlinks
+        entry = self._follow_symlink(self._directory_entries[_realpath])
+        if entry is None:
             raise errors.ResourceNotFound(path)
 
         # TarFile.extractfile returns None if the entry is not a file

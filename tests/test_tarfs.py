@@ -14,7 +14,7 @@ from fs.enums import ResourceType
 from fs.compress import write_tar
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
-from fs.errors import NoURL
+from fs.errors import NoURL, ResourceNotFound
 from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases
@@ -413,6 +413,54 @@ class TestSymlinks(unittest.TestCase):
     def test_listdir(self):
         self.assertEqual(sorted(self.fs.listdir("foo")), ["bar.txt", "baz.txt"])
         self.assertEqual(sorted(self.fs.listdir("spam")), ["bar.txt", "baz.txt"])
+
+
+class TestBrokenSymlinks(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpfs = open_fs("temp://")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmpfs.close()
+
+    def setUp(self):
+        def _info(name, **kwargs):
+            info = tarfile.TarInfo(name)
+            for k, v in kwargs.items():
+                setattr(info, k, v)
+            return info
+
+        # /foo
+        # /foo/baz.txt -> /foo/bar.txt
+        # /spam -> /eggs
+        # /eggs -> /spam
+
+        self.tempfile = self.tmpfs.open("test.tar", "wb+")
+        with tarfile.open(mode="w", fileobj=self.tempfile) as tf:
+            tf.addfile(_info("foo", type=tarfile.DIRTYPE))
+            tf.addfile(_info("foo/baz.txt", type=tarfile.SYMTYPE, linkname="bar.txt"))
+            tf.addfile(_info("spam", type=tarfile.SYMTYPE, linkname="eggs"))
+            tf.addfile(_info("eggs", type=tarfile.SYMTYPE, linkname="spam"))
+        self.tempfile.seek(0)
+        self.fs = tarfs.TarFS(self.tempfile)
+
+    def tearDown(self):
+        self.fs.close()
+        self.tempfile.close()
+
+    def test_dangling(self):
+        self.assertFalse(self.fs.isfile("foo/baz.txt"))
+        self.assertFalse(self.fs.isdir("foo/baz.txt"))
+        self.assertRaises(ResourceNotFound, self.fs.openbin, "foo/baz.txt")
+        self.assertRaises(ResourceNotFound, self.fs.listdir, "foo/baz.txt")
+
+    def test_cyclic(self):
+        self.assertFalse(self.fs.isfile("spam"))
+        self.assertFalse(self.fs.isdir("spam"))
+        self.assertRaises(ResourceNotFound, self.fs.openbin, "spam")
+        self.assertRaises(ResourceNotFound, self.fs.listdir, "spam")
 
 
 class TestReadTarFSMem(TestReadTarFS):
