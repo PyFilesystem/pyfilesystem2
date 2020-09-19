@@ -1,13 +1,13 @@
 # -*- encoding: UTF-8
 from __future__ import unicode_literals
 
-import io
 import os
 import six
 import tarfile
 import tempfile
 import unittest
 import pytest
+from six import BytesIO
 
 from fs import tarfs
 from fs.enums import ResourceType
@@ -223,8 +223,8 @@ class TestBrokenPaths(unittest.TestCase):
     def setUp(self):
         self.tempfile = self.tmpfs.open("test.tar", "wb+")
         with tarfile.open(mode="w", fileobj=self.tempfile) as tf:
-            tf.addfile(tarfile.TarInfo("."), io.StringIO())
-            tf.addfile(tarfile.TarInfo("../foo.txt"), io.StringIO())
+            tf.addfile(tarfile.TarInfo("."))
+            tf.addfile(tarfile.TarInfo("../foo.txt"))
         self.tempfile.seek(0)
         self.fs = tarfs.TarFS(self.tempfile)
 
@@ -237,8 +237,7 @@ class TestBrokenPaths(unittest.TestCase):
 
 
 class TestImplicitDirectories(unittest.TestCase):
-    """Regression tests for #160.
-    """
+    """Regression tests for #160."""
 
     @classmethod
     def setUpClass(cls):
@@ -251,12 +250,12 @@ class TestImplicitDirectories(unittest.TestCase):
     def setUp(self):
         self.tempfile = self.tmpfs.open("test.tar", "wb+")
         with tarfile.open(mode="w", fileobj=self.tempfile) as tf:
-            tf.addfile(tarfile.TarInfo("foo/bar/baz/spam.txt"), io.StringIO())
-            tf.addfile(tarfile.TarInfo("./foo/eggs.bin"), io.StringIO())
-            tf.addfile(tarfile.TarInfo("./foo/yolk/beans.txt"), io.StringIO())
+            tf.addfile(tarfile.TarInfo("foo/bar/baz/spam.txt"))
+            tf.addfile(tarfile.TarInfo("./foo/eggs.bin"))
+            tf.addfile(tarfile.TarInfo("./foo/yolk/beans.txt"))
             info = tarfile.TarInfo("foo/yolk")
             info.type = tarfile.DIRTYPE
-            tf.addfile(info, io.BytesIO())
+            tf.addfile(info)
         self.tempfile.seek(0)
         self.fs = tarfs.TarFS(self.tempfile)
 
@@ -299,6 +298,121 @@ class TestImplicitDirectories(unittest.TestCase):
         self.assertEqual(info.name, "foo")
         self.assertEqual(info.size, 0)
         self.assertIs(info.type, ResourceType.directory)
+
+
+class TestSymlinks(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpfs = open_fs("temp://")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmpfs.close()
+
+    def setUp(self):
+        def _info(name, **kwargs):
+            info = tarfile.TarInfo(name)
+            for k, v in kwargs.items():
+                setattr(info, k, v)
+            return info
+
+        # /foo
+        # /foo/bar.txt
+        # /foo/baz.txt -> /foo/bar.txt
+        # /spam -> /foo
+        # /eggs
+        # /eggs/yolk -> /spam
+
+        self.tempfile = self.tmpfs.open("test.tar", "wb+")
+        with tarfile.open(mode="w", fileobj=self.tempfile) as tf:
+            tf.addfile(_info("foo", type=tarfile.DIRTYPE))
+            buff = BytesIO(b"hello")
+            tf.addfile(_info("foo/bar.txt", size=len(buff.getvalue())), buff)
+            tf.addfile(_info("foo/baz.txt", type=tarfile.SYMTYPE, linkname="bar.txt"))
+            tf.addfile(_info("spam", type=tarfile.SYMTYPE, linkname="foo"))
+            tf.addfile(_info("eggs", type=tarfile.DIRTYPE))
+            tf.addfile(_info("eggs/yolk", type=tarfile.SYMTYPE, linkname="../spam"))
+        self.tempfile.seek(0)
+        self.fs = tarfs.TarFS(self.tempfile)
+
+    def tearDown(self):
+        self.fs.close()
+        self.tempfile.close()
+
+    def test_openbin(self):
+        # read an actual file
+        with self.fs.openbin("foo/bar.txt") as bar:
+            self.assertEqual(bar.read(), b"hello")
+        # read a link to an actual file
+        with self.fs.openbin("foo/baz.txt") as baz:
+            self.assertEqual(baz.read(), b"hello")
+        # read an actual file via a linked directory
+        with self.fs.openbin("spam/bar.txt") as bar:
+            self.assertEqual(bar.read(), b"hello")
+        # read a link via a linked directory
+        with self.fs.openbin("spam/baz.txt") as baz:
+            self.assertEqual(baz.read(), b"hello")
+
+    def test_isfile(self):
+        self.assertFalse(self.fs.isfile("foo"))
+        self.assertFalse(self.fs.isfile("spam"))
+        self.assertFalse(self.fs.isfile("eggs"))
+        self.assertFalse(self.fs.isfile("eggs/yolk"))
+        self.assertTrue(self.fs.isfile("foo/bar.txt"))
+        self.assertTrue(self.fs.isfile("foo/baz.txt"))
+        self.assertTrue(self.fs.isfile("eggs/yolk/bar.txt"))
+        self.assertTrue(self.fs.isfile("eggs/yolk/baz.txt"))
+
+    def test_isdir(self):
+        self.assertTrue(self.fs.isdir("foo"))
+        self.assertTrue(self.fs.isdir("spam"))
+        self.assertTrue(self.fs.isdir("eggs/yolk"))
+        self.assertFalse(self.fs.isdir("foo/bar.txt"))
+        self.assertFalse(self.fs.isdir("foo/baz.txt"))
+        self.assertFalse(self.fs.isdir("eggs/yolk/bar.txt"))
+        self.assertFalse(self.fs.isdir("eggs/yolk/baz.txt"))
+
+    def test_islink(self):
+        self.assertFalse(self.fs.islink("foo"))
+        self.assertTrue(self.fs.islink("spam"))
+        self.assertTrue(self.fs.islink("eggs/yolk"))
+        self.assertFalse(self.fs.islink("foo/bar.txt"))
+        self.assertTrue(self.fs.islink("foo/baz.txt"))
+        self.assertFalse(self.fs.islink("eggs/yolk/bar.txt"))
+        self.assertTrue(self.fs.islink("eggs/yolk/baz.txt"))
+
+    def test_getinfo(self):
+        file_info = self.fs.getinfo("foo/bar.txt", namespaces=("details", "link"))
+        self.assertIn("details", file_info.namespaces)
+        self.assertIn("link", file_info.namespaces)
+        self.assertFalse(file_info.is_dir)
+        self.assertIs(file_info.target, None)
+        self.assertEqual(file_info.type, ResourceType.file)
+
+        link_info = self.fs.getinfo("foo/baz.txt", namespaces=("details", "link"))
+        self.assertIn("details", link_info.namespaces)
+        self.assertIn("link", link_info.namespaces)
+        self.assertFalse(link_info.is_dir)
+        self.assertEqual(link_info.target, "foo/bar.txt")
+        self.assertEqual(link_info.type, ResourceType.symlink)
+
+        dir_info = self.fs.getinfo("foo", namespaces=("details", "link"))
+        self.assertIn("details", dir_info.namespaces)
+        self.assertIn("link", dir_info.namespaces)
+        self.assertTrue(dir_info.is_dir)
+        self.assertEqual(dir_info.target, None)
+        self.assertEqual(dir_info.type, ResourceType.directory)
+
+        dirlink_info = self.fs.getinfo("spam", namespaces=("details", "link"))
+        self.assertIn("details", dirlink_info.namespaces)
+        self.assertIn("link", dirlink_info.namespaces)
+        self.assertTrue(dirlink_info.is_dir)
+        self.assertEqual(dirlink_info.target, "foo")
+        self.assertEqual(dirlink_info.type, ResourceType.symlink)
+
+    def test_listdir(self):
+        self.assertEqual(sorted(self.fs.listdir("foo")), ["bar.txt", "baz.txt"])
+        self.assertEqual(sorted(self.fs.listdir("spam")), ["bar.txt", "baz.txt"])
 
 
 class TestReadTarFSMem(TestReadTarFS):
