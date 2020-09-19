@@ -431,11 +431,13 @@ class ReadTarFS(FS):
         except KeyError:
             six.raise_from(errors.ResourceNotFound(path), None)
 
-        if not member.isfile():
+        # TarFile.extractfile returns None if the entry is
+        # neither a file nor a symlink
+        reader =  self._tar.extractfile(member)
+        if reader is None:
             raise errors.FileExpected(path)
 
-        rw = RawWrapper(cast(IO, self._tar.extractfile(member)))
-
+        rw = RawWrapper(reader)
         if six.PY2:  # Patch nonexistent file.flush in Python2
 
             def _flush():
