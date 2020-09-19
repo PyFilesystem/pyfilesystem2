@@ -348,6 +348,10 @@ class ReadTarFS(FS):
                 "is_dir": member.isdir(),
             }
 
+            if "link" in namespaces:
+                raw_info["link"] = {
+                    "target": self._decode(member.linkname) if member.issym() else None
+                }
             if "details" in namespaces:
                 raw_info["details"] = {
                     "size": member.size,
