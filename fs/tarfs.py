@@ -4,12 +4,10 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import operator
 import os
 import tarfile
 import typing
 from collections import OrderedDict
-from typing import cast, IO
 
 import six
 from six.moves import map
@@ -309,7 +307,7 @@ class ReadTarFS(FS):
 
                 # add all implicit dirnames if not in the cache already
                 for partial_name in map(relpath, recursepath(_name)):
-                    dirinfo = tarfile.TarInfo(self._encode(partial_name))
+                    dirinfo = tarfile.TarInfo(_encode(partial_name))
                     dirinfo.type = tarfile.DIRTYPE
                     _cache.setdefault(partial_name, dirinfo)
 
@@ -391,7 +389,6 @@ class ReadTarFS(FS):
                 raw_info["details"] = {"type": int(ResourceType.directory)}
 
         else:
-
             _realpath = self._resolve(_path)
             if _realpath is None:
                 raise errors.ResourceNotFound(path)
@@ -406,10 +403,10 @@ class ReadTarFS(FS):
 
             if "link" in namespaces:
                 if member.issym():
-                    target = join(
+                    target = normpath(join(
                         dirname(self._decode(member.name)),
                         self._decode(member.linkname),
-                    )
+                    ))  # type: Option[Text]
                 else:
                     target = None
                 raw_info["link"] = {"target": target}
