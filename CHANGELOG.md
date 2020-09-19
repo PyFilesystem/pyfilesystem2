@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.4.12] - (Unreleased)
 
+### Added
+
+- Symlink support to `ReadTarFS` [#426](https://github.com/PyFilesystem/pyfilesystem2/pull/426). Closes [#409](https://github.com/PyFilesystem/pyfilesystem2/issues/409).
+
 ### Changed
 
 - Start testing on PyPy. Due to [#342](https://github.com/PyFilesystem/pyfilesystem2/issues/342)
