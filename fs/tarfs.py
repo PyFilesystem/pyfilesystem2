@@ -389,6 +389,13 @@ class ReadTarFS(FS):
         except KeyError:
             return False
 
+    def islink(self, path):
+        _path = relpath(self.validatepath(path))
+        try:
+            return self._directory_entries[_path].issym()
+        except KeyError:
+            return False
+
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
         self.check()
