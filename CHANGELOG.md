@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Include docs in source distributions as well the whole tests folder,
   ensuring `conftest.py` is present, fixes [#364](https://github.com/PyFilesystem/pyfilesystem2/issues/364).
 - Stop patching copy with Python 3.8+ because it already uses sendfile.
+- Fixed crash when CPython's -OO flag is used
 
 ## [2.4.11] - 2019-09-07
 
