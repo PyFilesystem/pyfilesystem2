@@ -981,8 +981,12 @@ class FS(object):
             bool: `True` if ``path`` maps to a symlink.
 
         """
-        self.getinfo(path)
-        return False
+        try:
+            self.getinfo(path, namespaces=["link"]).target is not None
+        except errors.MissingInfoNamespace:
+            return False  # filesystem does not support symlinks
+        except errors.ResourceNotFound:
+            return False  # path does not exist, so it can't be a link
 
     def lock(self):
         # type: () -> RLock
