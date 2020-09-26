@@ -50,7 +50,6 @@ if typing.TYPE_CHECKING:
         Union,
     )
     from types import TracebackType
-    from .enums import ResourceType
     from .info import Info, RawInfo
     from .subfs import SubFS
     from .permissions import Permissions
