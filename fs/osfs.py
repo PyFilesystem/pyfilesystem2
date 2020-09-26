@@ -608,8 +608,6 @@ class OSFS(FS):
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
-        if not self.exists(path):
-            raise errors.ResourceNotFound(path)
         with convert_os_errors("islink", path):
             return os.path.islink(sys_path)
 
