@@ -203,3 +203,17 @@ class TestOSFS(FSTestCases, unittest.TestCase):
 
     def test_geturl_return_no_url(self):
         self.assertRaises(errors.NoURL, self.fs.geturl, "test/path", "upload")
+
+    @pytest.mark.skipif(not hasattr(os, "symlink"), reason="No symlink support")
+    def test_symlinks_dangling(self):
+        self.fs.create("a")
+        os.symlink(self.fs.getsyspath("a"), self.fs.getsyspath("b"))
+
+        self.assertTrue(self.fs.exists("a"))
+        self.assertFalse(self.fs.islink("a"))
+        self.assertTrue(self.fs.exists("b"))
+        self.assertTrue(self.fs.islink("b"))
+
+        self.fs.remove("a")
+        self.assertTrue(self.fs.islink("b"))
+        self.assertIs(self.fs.getinfo("b", namespaces=["link"]).target, None)
