@@ -11,6 +11,7 @@ import unittest
 import pytest
 
 from fs import osfs, open_fs
+from fs.enums import ResourceType
 from fs.path import relpath, dirname
 from fs import errors
 from fs.test import FSTestCases
@@ -211,9 +212,11 @@ class TestOSFS(FSTestCases, unittest.TestCase):
 
         self.assertTrue(self.fs.exists("a"))
         self.assertFalse(self.fs.islink("a"))
+        self.assertEqual(self.fs.gettype("a"), ResourceType.file)
         self.assertTrue(self.fs.exists("b"))
         self.assertTrue(self.fs.islink("b"))
+        self.assertEqual(self.fs.gettype("b"), ResourceType.symlink)
 
         self.fs.remove("a")
         self.assertTrue(self.fs.islink("b"))
-        self.assertIs(self.fs.getinfo("b", namespaces=["link"]).target, None)
+        self.assertEqual(self.fs.gettype("b"), ResourceType.symlink)
