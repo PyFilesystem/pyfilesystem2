@@ -22,6 +22,7 @@ import warnings
 import six
 
 from . import copy, errors, fsencode, iotools, move, tools, walk, wildcard
+from .enums import ResourceType
 from .glob import BoundGlobber
 from .mode import validate_open_mode
 from .path import abspath, join, normpath
@@ -982,11 +983,9 @@ class FS(object):
 
         """
         try:
-            self.getinfo(path, namespaces=["link"]).target is not None
-        except errors.MissingInfoNamespace:
-            return False  # filesystem does not support symlinks
+            return self.gettype(path) == ResourceType.symlink
         except errors.ResourceNotFound:
-            return False  # path does not exist, so it can't be a link
+            return False
 
     def lock(self):
         # type: () -> RLock
