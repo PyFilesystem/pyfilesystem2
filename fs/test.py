@@ -392,8 +392,7 @@ class FSTestCases(object):
     def test_islink(self):
         self.fs.touch("foo")
         self.assertFalse(self.fs.islink("foo"))
-        with self.assertRaises(errors.ResourceNotFound):
-            self.fs.islink("bar")
+        self.assertFalse(self.fs.islink("bar"))
 
     def test_getsize(self):
         self.fs.writebytes("empty", b"")
