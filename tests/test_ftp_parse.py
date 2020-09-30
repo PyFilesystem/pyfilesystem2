@@ -166,6 +166,7 @@ drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485
         directory = """\
 11-02-17  02:00AM       <DIR>          docs
 11-02-17  02:12PM       <DIR>          images
+11-02-17  02:12PM       <DIR>          AM to PM
 11-02-17  03:33PM                 9276 logo.gif
 """
         expected = [
@@ -181,6 +182,13 @@ drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485
                 "details": {"modified": 1486822320.0, "type": 1},
                 "ftp": {
                     "ls": "11-02-17  02:12PM       <DIR>          images"
+                },
+            },
+            {
+                "basic": {"is_dir": True, "name": "AM to PM"},
+                "details": {"modified": 1486822320.0, "type": 1},
+                "ftp": {
+                    "ls": "11-02-17  02:12PM       <DIR>          AM to PM"
                 },
             },
             {
