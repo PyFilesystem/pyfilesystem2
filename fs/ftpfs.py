@@ -396,8 +396,7 @@ class FTPFS(FS):
     @classmethod
     def _parse_features(cls, feat_response):
         # type: (Text) -> Dict[Text, Text]
-        """Parse a dict of features from FTP feat response.
-        """
+        """Parse a dict of features from FTP feat response."""
         features = {}
         if feat_response.split("-")[0] == "211":
             for line in feat_response.splitlines():
@@ -408,8 +407,7 @@ class FTPFS(FS):
 
     def _open_ftp(self):
         # type: () -> FTP
-        """Open a new ftp object.
-        """
+        """Open a new ftp object."""
         _ftp = FTP()
         _ftp.set_debuglevel(0)
         with ftp_errors(self):
@@ -455,8 +453,7 @@ class FTPFS(FS):
     @property
     def ftp(self):
         # type: () -> FTP
-        """~ftplib.FTP: the underlying FTP client.
-        """
+        """~ftplib.FTP: the underlying FTP client."""
         return self._get_ftp()
 
     def geturl(self, path, purpose="download"):
@@ -476,8 +473,7 @@ class FTPFS(FS):
     @property
     def features(self):
         # type: () -> Dict[Text, Text]
-        """dict: features of the remote FTP server.
-        """
+        """dict: features of the remote FTP server."""
         self._get_ftp()
         return self._features
 
@@ -499,8 +495,7 @@ class FTPFS(FS):
     @property
     def supports_mlst(self):
         # type: () -> bool
-        """bool: whether the server supports MLST feature.
-        """
+        """bool: whether the server supports MLST feature."""
         return "MLST" in self.features
 
     def create(self, path, wipe=False):
@@ -518,8 +513,7 @@ class FTPFS(FS):
     @classmethod
     def _parse_ftp_time(cls, time_text):
         # type: (Text) -> Optional[int]
-        """Parse a time from an ftp directory listing.
-        """
+        """Parse a time from an ftp directory listing."""
         try:
             tm_year = int(time_text[0:4])
             tm_month = int(time_text[4:6])

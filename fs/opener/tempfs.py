@@ -19,8 +19,7 @@ if typing.TYPE_CHECKING:
 
 @registry.install
 class TempOpener(Opener):
-    """`TempFS` opener.
-    """
+    """`TempFS` opener."""
 
     protocols = ["temp"]
 

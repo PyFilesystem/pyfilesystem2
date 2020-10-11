@@ -85,14 +85,12 @@ class _MemoryFile(io.RawIOBase):
 
     def on_modify(self):  # noqa: D401
         # type: () -> None
-        """Called when file data is modified.
-        """
+        """Called when file data is modified."""
         self._dir_entry.modified_time = self.modified_time = time.time()
 
     def on_access(self):  # noqa: D401
         # type: () -> None
-        """Called when file is accessed.
-        """
+        """Called when file is accessed."""
         self._dir_entry.accessed_time = self.accessed_time = time.time()
 
     def flush(self):
@@ -307,8 +305,7 @@ class MemoryFS(FS):
 
     def __init__(self):
         # type: () -> None
-        """Create an in-memory filesystem.
-        """
+        """Create an in-memory filesystem."""
         self._meta = self._meta.copy()
         self.root = self._make_dir_entry(ResourceType.directory, "")
         super(MemoryFS, self).__init__()
@@ -327,8 +324,7 @@ class MemoryFS(FS):
 
     def _get_dir_entry(self, dir_path):
         # type: (Text) -> Optional[_DirEntry]
-        """Get a directory entry, or `None` if one doesn't exist.
-        """
+        """Get a directory entry, or `None` if one doesn't exist."""
         with self._lock:
             dir_path = normpath(dir_path)
             current_entry = self.root  # type: Optional[_DirEntry]

@@ -19,8 +19,7 @@ if typing.TYPE_CHECKING:
 
 @registry.install
 class MemOpener(Opener):
-    """`MemoryFS` opener.
-    """
+    """`MemoryFS` opener."""
 
     protocols = ["mem"]
 

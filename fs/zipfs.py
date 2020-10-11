@@ -198,8 +198,7 @@ class ZipFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class WriteZipFS(WrapFS):
-    """A writable zip file.
-    """
+    """A writable zip file."""
 
     def __init__(
         self,
@@ -276,8 +275,7 @@ class WriteZipFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class ReadZipFS(FS):
-    """A readable zip file.
-    """
+    """A readable zip file."""
 
     _meta = {
         "case_insensitive": True,
@@ -308,8 +306,7 @@ class ReadZipFS(FS):
 
     def _path_to_zip_name(self, path):
         # type: (Text) -> str
-        """Convert a path to a zip file name.
-        """
+        """Convert a path to a zip file name."""
         path = relpath(normpath(path))
         if self._directory.isdir(path):
             path = forcedir(path)
@@ -320,8 +317,7 @@ class ReadZipFS(FS):
     @property
     def _directory(self):
         # type: () -> MemoryFS
-        """`MemoryFS`: a filesystem with the same folder hierarchy as the zip.
-        """
+        """`MemoryFS`: a filesystem with the same folder hierarchy as the zip."""
         self.check()
         with self._lock:
             if self._directory_fs is None:

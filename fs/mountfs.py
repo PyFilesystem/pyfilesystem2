@@ -41,8 +41,7 @@ if typing.TYPE_CHECKING:
 
 
 class MountError(Exception):
-    """Thrown when mounts conflict.
-    """
+    """Thrown when mounts conflict."""
 
 
 class MountFS(FS):

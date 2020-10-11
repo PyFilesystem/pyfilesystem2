@@ -157,8 +157,7 @@ class TarFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class WriteTarFS(WrapFS):
-    """A writable tar file.
-    """
+    """A writable tar file."""
 
     def __init__(
         self,
@@ -234,8 +233,7 @@ class WriteTarFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class ReadTarFS(FS):
-    """A readable tar file.
-    """
+    """A readable tar file."""
 
     _meta = {
         "case_insensitive": True,

@@ -19,8 +19,7 @@ if typing.TYPE_CHECKING:
 
 @registry.install
 class OSFSOpener(Opener):
-    """`OSFS` opener.
-    """
+    """`OSFS` opener."""
 
     protocols = ["file", "osfs"]
 

@@ -48,7 +48,8 @@ RE_WINDOWSNT = re.compile(
     (?P<name>.*)
     $
     """,
-    re.VERBOSE)
+    re.VERBOSE,
+)
 
 
 def get_decoders():

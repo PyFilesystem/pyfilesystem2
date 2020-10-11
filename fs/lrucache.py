@@ -27,8 +27,7 @@ class LRUCache(OrderedDict, typing.Generic[_K, _V]):
 
     def __setitem__(self, key, value):
         # type: (_K, _V) -> None
-        """Store a new views, potentially discarding an old value.
-        """
+        """Store a new views, potentially discarding an old value."""
         if key not in self:
             if len(self) >= self.cache_size:
                 self.popitem(last=False)
@@ -36,8 +35,7 @@ class LRUCache(OrderedDict, typing.Generic[_K, _V]):
 
     def __getitem__(self, key):
         # type: (_K) -> _V
-        """Get the item, but also makes it most recent.
-        """
+        """Get the item, but also makes it most recent."""
         _super = typing.cast(OrderedDict, super(LRUCache, self))
         value = _super.__getitem__(key)
         _super.__delitem__(key)

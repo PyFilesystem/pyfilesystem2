@@ -65,8 +65,7 @@ class Mode(typing.Container[Text]):
 
     def __contains__(self, character):
         # type: (object) -> bool
-        """Check if a mode contains a given character.
-        """
+        """Check if a mode contains a given character."""
         assert isinstance(character, Text)
         return character in self._mode
 
@@ -124,64 +123,55 @@ class Mode(typing.Container[Text]):
     @property
     def create(self):
         # type: () -> bool
-        """`bool`: `True` if the mode would create a file.
-        """
+        """`bool`: `True` if the mode would create a file."""
         return "a" in self or "w" in self or "x" in self
 
     @property
     def reading(self):
         # type: () -> bool
-        """`bool`: `True` if the mode permits reading.
-        """
+        """`bool`: `True` if the mode permits reading."""
         return "r" in self or "+" in self
 
     @property
     def writing(self):
         # type: () -> bool
-        """`bool`: `True` if the mode permits writing.
-        """
+        """`bool`: `True` if the mode permits writing."""
         return "w" in self or "a" in self or "+" in self or "x" in self
 
     @property
     def appending(self):
         # type: () -> bool
-        """`bool`: `True` if the mode permits appending.
-        """
+        """`bool`: `True` if the mode permits appending."""
         return "a" in self
 
     @property
     def updating(self):
         # type: () -> bool
-        """`bool`: `True` if the mode permits both reading and writing.
-        """
+        """`bool`: `True` if the mode permits both reading and writing."""
         return "+" in self
 
     @property
     def truncate(self):
         # type: () -> bool
-        """`bool`: `True` if the mode would truncate an existing file.
-        """
+        """`bool`: `True` if the mode would truncate an existing file."""
         return "w" in self or "x" in self
 
     @property
     def exclusive(self):
         # type: () -> bool
-        """`bool`: `True` if the mode require exclusive creation.
-        """
+        """`bool`: `True` if the mode require exclusive creation."""
         return "x" in self
 
     @property
     def binary(self):
         # type: () -> bool
-        """`bool`: `True` if a mode specifies binary.
-        """
+        """`bool`: `True` if a mode specifies binary."""
         return "b" in self
 
     @property
     def text(self):
         # type: () -> bool
-        """`bool`: `True` if a mode specifies text.
-        """
+        """`bool`: `True` if a mode specifies text."""
         return "t" in self or "b" not in self
 
 

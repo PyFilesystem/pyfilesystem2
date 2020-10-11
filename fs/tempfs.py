@@ -76,8 +76,7 @@ class TempFS(OSFS):
 
     def clean(self):
         # type: () -> None
-        """Clean (delete) temporary files created by this filesystem.
-        """
+        """Clean (delete) temporary files created by this filesystem."""
         if self._cleaned:
             return
 

@@ -30,8 +30,7 @@ __all__ = [
 
 
 class _AppFS(OSFS):
-    """Abstract base class for an app FS.
-    """
+    """Abstract base class for an app FS."""
 
     # FIXME(@althonos): replace by ClassVar[Text] once
     # https://github.com/python/mypy/pull/4718 is accepted

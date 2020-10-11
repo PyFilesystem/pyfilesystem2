@@ -55,8 +55,7 @@ class SubFS(WrapFS[_F], typing.Generic[_F]):
 
 
 class ClosingSubFS(SubFS[_F], typing.Generic[_F]):
-    """A version of `SubFS` which closes its parent when closed.
-    """
+    """A version of `SubFS` which closes its parent when closed."""
 
     def close(self):
         # type: () -> None

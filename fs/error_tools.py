@@ -28,8 +28,7 @@ _WINDOWS_PLATFORM = platform.system() == "Windows"
 
 
 class _ConvertOSErrors(object):
-    """Context manager to convert OSErrors in to FS Errors.
-    """
+    """Context manager to convert OSErrors in to FS Errors."""
 
     FILE_ERRORS = {
         64: errors.RemoteConnectionError,  # ENONET
