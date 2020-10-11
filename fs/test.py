@@ -1422,7 +1422,8 @@ class FSTestCases(object):
             self.fs.download("foo.bin", write_file)
 
     def test_download_callback(self):
-        def callback(bytes: int):
+        def callback(bytes):
+            # type: (int) -> int
             # print(f"Read {bytes} bytes")
             return bytes
 
