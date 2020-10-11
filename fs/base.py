@@ -633,8 +633,9 @@ class FS(object):
 
         """
         with self._lock:
+            callback = options.pop("callback", None)
             with self.openbin(path, **options) as read_file:
-                tools.copy_file_data(read_file, file, chunk_size=chunk_size)
+                tools.copy_file_data(read_file, file, chunk_size=chunk_size, callback=callback)
 
     getfile = _new_name(download, "getfile")
 

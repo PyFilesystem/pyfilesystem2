@@ -37,7 +37,7 @@ def remove_empty(fs, path):
         pass
 
 
-def copy_file_data(src_file, dst_file, chunk_size=None):
+def copy_file_data(src_file, dst_file, chunk_size=None, callback=None):
     # type: (IO, IO, Optional[int]) -> None
     """Copy data from one file object to another.
 
@@ -55,7 +55,9 @@ def copy_file_data(src_file, dst_file, chunk_size=None):
     for chunk in iter(
         lambda: read(_chunk_size) or None, None
     ):  # type: Optional[Union[bytes, str]]
-        write(chunk)
+        bytes = write(chunk)
+        if callback:
+            callback(bytes)
 
 
 def get_intermediate_dirs(fs, dir_path):

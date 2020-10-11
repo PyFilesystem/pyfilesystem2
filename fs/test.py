@@ -16,6 +16,7 @@ import math
 import os
 import time
 import unittest
+from unittest.mock import create_autospec
 
 import fs.copy
 import fs.move
@@ -1424,6 +1425,20 @@ class FSTestCases(object):
 
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.download("foo.bin", write_file)
+
+    def test_download_callback(self):
+
+        def callback(bytes: int):
+            # print(f"Read {bytes} bytes")
+            return bytes
+
+        mock_callback = create_autospec(callback)
+        test_bytes = b"Hello, World"
+        self.fs.writebytes("hello.bin", test_bytes)
+        write_file = io.BytesIO()
+        self.fs.download("hello.bin", write_file, callback=mock_callback)
+        self.assertEqual(write_file.getvalue(), test_bytes)
+        mock_callback.assert_called_once_with(12)
 
     def test_download_chunk_size(self):
         test_bytes = b"Hello, World" * 100
