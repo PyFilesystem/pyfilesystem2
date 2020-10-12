@@ -15,7 +15,7 @@ from .path import normpath
 from .path import recursepath
 
 if typing.TYPE_CHECKING:
-    from typing import IO, List, Optional, Text, Union
+    from typing import IO, List, Optional, Text, Union, Callable
     from .base import FS
 
 
@@ -38,7 +38,7 @@ def remove_empty(fs, path):
 
 
 def copy_file_data(src_file, dst_file, chunk_size=None, callback=None):
-    # type: (IO, IO, Optional[int]) -> None
+    # type: (IO, IO, Optional[int], Optional[Callable[[int], int]]) -> None
     """Copy data from one file object to another.
 
     Arguments:
