@@ -16,7 +16,10 @@ import math
 import os
 import time
 import unittest
-from unittest.mock import create_autospec
+try:
+    from unittest.mock import create_autospec
+except ImportError:
+    from mock import create_autospec
 
 import fs.copy
 import fs.move
