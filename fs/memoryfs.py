@@ -77,6 +77,7 @@ class _MemoryFile(io.RawIOBase):
 
     @property
     def mode(self):
+        # type: () -> Text
         return self._mode.to_platform_bin()
 
     @contextlib.contextmanager
