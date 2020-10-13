@@ -12,11 +12,17 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Start testing on PyPy. Due to [#342](https://github.com/PyFilesystem/pyfilesystem2/issues/342)
   we have to treat PyPy builds specially and allow them to fail, but at least we'll
   be able to see if we break something aside from known issues with FTP tests.
-- Include docs in source distributions as well the whole tests folder,
+- Include docs in source distributions as well as the whole tests folder,
   ensuring `conftest.py` is present, fixes [#364](https://github.com/PyFilesystem/pyfilesystem2/issues/364).
-- Stop patching copy with Python 3.8+ because it already uses sendfile.
+- Stop patching copy with Python 3.8+ because it already uses `sendfile`.
+
+### Fixed
+
 - Fixed crash when CPython's -OO flag is used
 - Fixed error when parsing timestamps from a FTP directory served from a WindowsNT FTP Server, fixes [#395](https://github.com/PyFilesystem/pyfilesystem2/issues/395).
+- Fixed documentation of `Mode.to_platform_bin`. Closes [#382](https://github.com/PyFilesystem/pyfilesystem2/issues/382).
+- Fixed the code example in the "Testing Filesystems" section of the
+  "Implementing Filesystems" guide. Closes [#407](https://github.com/PyFilesystem/pyfilesystem2/issues/407).
 
 ## [2.4.11] - 2019-09-07
 
