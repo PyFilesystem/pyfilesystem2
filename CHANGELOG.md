@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.4.12] - (Unreleased)
 
+### Added
+
+- Missing `mode` attribute to `_MemoryFile` objects returned by `MemoryFS.openbin`.
+
 ### Changed
 
 - Start testing on PyPy. Due to [#342](https://github.com/PyFilesystem/pyfilesystem2/issues/342)
@@ -23,6 +27,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Fixed documentation of `Mode.to_platform_bin`. Closes [#382](https://github.com/PyFilesystem/pyfilesystem2/issues/382).
 - Fixed the code example in the "Testing Filesystems" section of the
   "Implementing Filesystems" guide. Closes [#407](https://github.com/PyFilesystem/pyfilesystem2/issues/407).
+- Fixed `FTPFS.openbin` not implicitly opening files in binary mode like expected
+  from `openbin`. Closes [#406](https://github.com/PyFilesystem/pyfilesystem2/issues/406).
 
 ## [2.4.11] - 2019-09-07
 

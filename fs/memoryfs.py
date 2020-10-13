@@ -75,6 +75,11 @@ class _MemoryFile(io.RawIOBase):
         _template = "<memoryfile '{path}' '{mode}'>"
         return _template.format(path=self._path, mode=self._mode)
 
+    @property
+    def mode(self):
+        # type: () -> Text
+        return self._mode.to_platform_bin()
+
     @contextlib.contextmanager
     def _seek_lock(self):
         # type: () -> Iterator[None]
