@@ -40,9 +40,10 @@ To test your implementation, you can borrow the test suite used to test the buil
 
 Here's the simplest possible example to test a filesystem class called ``MyFS``::
 
+    import unittest
     from fs.test import FSTestCases
 
-    class TestMyFS(FSTestCases):
+    class TestMyFS(FSTestCases, unittest.TestCase):
 
         def make_fs(self):
             # Return an instance of your FS object here
