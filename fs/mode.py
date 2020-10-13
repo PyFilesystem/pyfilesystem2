@@ -84,8 +84,7 @@ class Mode(typing.Container[Text]):
         # type: () -> Text
         """Get a *binary* mode string for the current platform.
 
-        Currently, this just removes the 'x' on PY2 because PY2 doesn't
-        support exclusive mode.
+        This removes the 't' and adds a 'b' if needed.
 
         """
         _mode = self.to_platform().replace("t", "")
