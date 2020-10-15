@@ -239,7 +239,7 @@ class FTPFile(io.RawIOBase):
         # type: (bytearray) -> int
         data = self.read(len(buffer))
         bytes_read = len(data)
-        buffer[: len(data)] = data
+        buffer[:bytes_read] = data
         return bytes_read
 
     def readline(self, size=-1):
