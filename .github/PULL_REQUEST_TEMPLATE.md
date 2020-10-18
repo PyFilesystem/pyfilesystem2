@@ -1,17 +1,19 @@
 ## Type of changes
 
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Documentation / docstrings
-- [ ] Tests
-- [ ] Other
+<!-- Remove unrelated categories -->
+
+- Bug fix
+- New feature
+- Documentation / docstrings
+- Tests
+- Other
 
 ## Checklist
 
 - [ ] I've run the latest [black](https://github.com/ambv/black) with default args on new code.
 - [ ] I've updated CHANGELOG.md and CONTRIBUTORS.md where appropriate.
 - [ ] I've added tests for new code.
-- [ ] I accept that @willmcgugan may be pedantic in the code review.
+- [ ] I accept that @PyFilesystem/maintainers may be pedantic in the code review.
 
 ## Description
 
