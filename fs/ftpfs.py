@@ -235,6 +235,13 @@ class FTPFile(io.RawIOBase):
                 remaining -= len(chunk)
         return b"".join(chunks)
 
+    def readinto(self, buffer):
+        # type: (bytearray) -> int
+        data = self.read(len(buffer))
+        bytes_read = len(data)
+        buffer[:bytes_read] = data
+        return bytes_read
+
     def readline(self, size=-1):
         # type: (int) -> bytes
         return next(line_iterator(self, size))  # type: ignore

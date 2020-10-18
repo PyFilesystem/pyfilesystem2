@@ -10,6 +10,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Added
 
 - Missing `mode` attribute to `_MemoryFile` objects returned by `MemoryFS.openbin`.
+- Missing `readinto` method for `MemoryFS` and `FTPFS` file objects. Closes
+  [#380](https://github.com/PyFilesystem/pyfilesystem2/issues/380).
 
 ### Changed
 

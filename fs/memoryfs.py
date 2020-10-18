@@ -113,12 +113,15 @@ class _MemoryFile(io.RawIOBase):
     def next(self):
         # type: () -> bytes
         with self._seek_lock():
+            self.on_access()
             return next(self._bytes_io)
 
     __next__ = next
 
     def readline(self, size=-1):
         # type: (int) -> bytes
+        if not self._mode.reading:
+            raise IOError("File not open for reading")
         with self._seek_lock():
             self.on_access()
             return self._bytes_io.readline(size)
@@ -142,9 +145,20 @@ class _MemoryFile(io.RawIOBase):
         # type: () -> bool
         return self._mode.reading
 
+    def readinto(self, buffer):
+        # type (bytearray) -> Optional[int]
+        if not self._mode.reading:
+            raise IOError("File not open for reading")
+        with self._seek_lock():
+            self.on_access()
+            return self._bytes_io.readinto(buffer)
+
     def readlines(self, hint=-1):
         # type: (int) -> List[bytes]
+        if not self._mode.reading:
+            raise IOError("File not open for reading")
         with self._seek_lock():
+            self.on_access()
             return self._bytes_io.readlines(hint)
 
     def seekable(self):

@@ -117,7 +117,7 @@ class RawWrapper(io.RawIOBase):
         except AttributeError:
             data = self._f.read(len(b))
             bytes_read = len(data)
-            b[: len(data)] = data
+            b[:bytes_read] = data
             return bytes_read
 
     @typing.no_type_check
@@ -128,7 +128,7 @@ class RawWrapper(io.RawIOBase):
         except AttributeError:
             data = self._f.read1(len(b))
             bytes_read = len(data)
-            b[: len(data)] = data
+            b[:bytes_read] = data
             return bytes_read
 
     def readline(self, limit=-1):
