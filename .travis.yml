@@ -9,6 +9,7 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9-dev"
   - "pypy"
   - "pypy3.5-7.0" # Need 7.0+ due to a bug in earlier versions that broke our tests.
 
