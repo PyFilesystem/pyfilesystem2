@@ -145,11 +145,11 @@ def decode_linux(line, match):
     return raw_info
 
 
-def _decode_windowsnt_time(date, time):
-    while len(time.split(":")[0]) < 2:
-        time = "0" + time
+def _decode_windowsnt_time(mdate, mtime):
+    if len(mtime.split(":")[0]) == 1:
+        mtime = "0" + mtime
     return _parse_time(
-        date + " " + time, formats=["%d-%m-%y %I:%M%p", "%d-%m-%y %H:%M"]
+        mdate + " " + mtime, formats=["%d-%m-%y %I:%M%p", "%d-%m-%y %H:%M"]
     )
 
 

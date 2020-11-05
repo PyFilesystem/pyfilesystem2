@@ -173,6 +173,9 @@ unparsable line
 05-11-20   22:11  <DIR>       src
 11-02-17   01:23       1      12
 11-02-17    4:54                 0 icon.bmp
+11-02-17    4:54AM                 0 icon.gif
+11-02-17    4:54PM                 0 icon.png
+11-02-17    16:54                 0 icon.jpg
 """
         expected = [
             {
@@ -209,6 +212,21 @@ unparsable line
                 "basic": {"is_dir": False, "name": "icon.bmp"},
                 "details": {"modified": 1486788840.0, "size": 0, "type": 2},
                 "ftp": {"ls": "11-02-17    4:54                 0 icon.bmp"},
+            },
+            {
+                "basic": {"is_dir": False, "name": "icon.gif"},
+                "details": {"modified": 1486788840.0, "size": 0, "type": 2},
+                "ftp": {"ls": "11-02-17    4:54AM                 0 icon.gif"},
+            },
+            {
+                "basic": {"is_dir": False, "name": "icon.png"},
+                "details": {"modified": 1486832040.0, "size": 0, "type": 2},
+                "ftp": {"ls": "11-02-17    4:54PM                 0 icon.png"},
+            },
+            {
+                "basic": {"is_dir": False, "name": "icon.jpg"},
+                "details": {"modified": 1486832040.0, "size": 0, "type": 2},
+                "ftp": {"ls": "11-02-17    16:54                 0 icon.jpg"},
             },
         ]
 
