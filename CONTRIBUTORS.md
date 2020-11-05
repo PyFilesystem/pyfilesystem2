@@ -13,3 +13,4 @@ Many thanks to the following developers for contributing to this project:
 - [Will McGugan](https://github.com/willmcgugan)
 - [Zmej Serow](https://github.com/zmej-serow)
 - [Morten Engelhardt Olsen](https://github.com/xoriath)
+- [Andreas Tollkötter](https://github.com/atollk)
