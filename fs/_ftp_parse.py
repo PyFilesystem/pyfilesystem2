@@ -84,17 +84,21 @@ def parse_line(line):
     return None
 
 
-def _parse_time(t, formats):
-    t = " ".join(token.strip() for token in t.lower().split(" "))
-
-    _t = None
+def _find_suitable_format(t, formats):
     for frmt in formats:
         try:
-            _t = time.strptime(t, frmt)
+            if time.strptime(t, frmt):
+                return frmt
         except ValueError:
             continue
-    if not _t:
+    return None
+
+
+def _parse_time(t, formats):
+    frmt = _find_suitable_format(t, formats)
+    if frmt is None:
         return None
+    _t = time.strptime(t, frmt)
 
     year = _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year
     month = _t.tm_mon
