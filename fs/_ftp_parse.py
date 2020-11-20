@@ -149,12 +149,8 @@ def decode_linux(line, match):
     return raw_info
 
 
-def _decode_windowsnt_time(mdate, mtime):
-    if len(mtime.split(":")[0]) == 1:
-        mtime = "0" + mtime
-    return _parse_time(
-        mdate + " " + mtime, formats=["%d-%m-%y %I:%M%p", "%d-%m-%y %H:%M"]
-    )
+def _decode_windowsnt_time(mtime):
+    return _parse_time(mtime, formats=["%d-%m-%y %I:%M%p", "%d-%m-%y %H:%M"])
 
 
 def decode_windowsnt(line, match):
@@ -183,7 +179,7 @@ def decode_windowsnt(line, match):
         raw_info["details"]["size"] = int(match.group("size"))
 
     modified = _decode_windowsnt_time(
-        match.group("modified_date"), match.group("modified_time")
+        match.group("modified_date") + " " + match.group("modified_time")
     )
     if modified is not None:
         raw_info["details"]["modified"] = modified
