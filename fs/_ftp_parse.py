@@ -95,10 +95,16 @@ def _find_suitable_format(t, formats):
 
 
 def _parse_time(t, formats):
-    frmt = _find_suitable_format(t, formats)
-    if frmt is None:
+    _t = None
+    for frmt in formats:
+        try:
+            _t = time.strptime(t, frmt)
+            if t:
+                break
+        except ValueError:
+            continue
+    if not _t:
         return None
-    _t = time.strptime(t, frmt)
 
     year = _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year
     month = _t.tm_mon
