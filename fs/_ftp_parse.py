@@ -84,16 +84,6 @@ def parse_line(line):
     return None
 
 
-def _find_suitable_format(t, formats):
-    for frmt in formats:
-        try:
-            if time.strptime(t, frmt):
-                return frmt
-        except ValueError:
-            continue
-    return None
-
-
 def _parse_time(t, formats):
     _t = None
     for frmt in formats:
