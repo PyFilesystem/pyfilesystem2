@@ -85,7 +85,6 @@ def parse_line(line):
 
 
 def _parse_time(t, formats):
-    _t = None
     for frmt in formats:
         try:
             _t = time.strptime(t, frmt)
