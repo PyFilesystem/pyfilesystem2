@@ -89,11 +89,10 @@ def _parse_time(t, formats):
     for frmt in formats:
         try:
             _t = time.strptime(t, frmt)
-            if t:
-                break
+            break
         except ValueError:
             continue
-    if not _t:
+    else:
         return None
 
     year = _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year
