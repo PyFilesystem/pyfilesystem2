@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Missing `mode` attribute to `_MemoryFile` objects returned by `MemoryFS.openbin`.
 - Missing `readinto` method for `MemoryFS` and `FTPFS` file objects. Closes
   [#380](https://github.com/PyFilesystem/pyfilesystem2/issues/380).
+- Added compatibility if a Windows FTP server returns file information to the
+  `LIST` command with 24-hour times. Closes [#438](https://github.com/PyFilesystem/pyfilesystem2/issues/438).
 
 ### Changed
 

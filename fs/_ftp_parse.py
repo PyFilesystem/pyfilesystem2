@@ -41,14 +41,17 @@ RE_LINUX = re.compile(
 RE_WINDOWSNT = re.compile(
     r"""
     ^
-    (?P<modified>.*?(AM|PM))
-    \s*
-    (?P<size>(<DIR>|\d*))
-    \s*
+    (?P<modified_date>\S+)
+    \s+
+    (?P<modified_time>\S+(AM|PM)?)
+    \s+
+    (?P<size>(<DIR>|\d+))
+    \s+
     (?P<name>.*)
     $
     """,
-    re.VERBOSE)
+    re.VERBOSE,
+)
 
 
 def get_decoders():
@@ -82,15 +85,13 @@ def parse_line(line):
 
 
 def _parse_time(t, formats):
-    t = " ".join(token.strip() for token in t.lower().split(" "))
-
-    _t = None
     for frmt in formats:
         try:
             _t = time.strptime(t, frmt)
+            break
         except ValueError:
             continue
-    if not _t:
+    else:
         return None
 
     year = _t.tm_year if _t.tm_year != 1900 else time.localtime().tm_year
@@ -104,6 +105,10 @@ def _parse_time(t, formats):
     return epoch_time
 
 
+def _decode_linux_time(mtime):
+    return _parse_time(mtime, formats=["%b %d %Y", "%b %d %H:%M"])
+
+
 def decode_linux(line, match):
     perms, links, uid, gid, size, mtime, name = match.groups()
     is_link = perms.startswith("l")
@@ -114,7 +119,7 @@ def decode_linux(line, match):
         _link_name = _link_name.strip()
     permissions = Permissions.parse(perms[1:])
 
-    mtime_epoch = _parse_time(mtime, formats=["%b %d %Y", "%b %d %H:%M"])
+    mtime_epoch = _decode_linux_time(mtime)
 
     name = unicodedata.normalize("NFC", name)
 
@@ -138,12 +143,18 @@ def decode_linux(line, match):
     return raw_info
 
 
+def _decode_windowsnt_time(mtime):
+    return _parse_time(mtime, formats=["%d-%m-%y %I:%M%p", "%d-%m-%y %H:%M"])
+
+
 def decode_windowsnt(line, match):
     """
-    Decodes a Windows NT FTP LIST line like these two:
+    Decodes a Windows NT FTP LIST line like one of these:
 
     `11-02-18  02:12PM       <DIR>          images`
     `11-02-18  03:33PM                 9276 logo.gif`
+
+    Alternatively, the time (02:12PM) might also be present in 24-hour format (14:12).
     """
     is_dir = match.group("size") == "<DIR>"
 
@@ -161,7 +172,9 @@ def decode_windowsnt(line, match):
     if not is_dir:
         raw_info["details"]["size"] = int(match.group("size"))
 
-    modified = _parse_time(match.group("modified"), formats=["%d-%m-%y %I:%M%p"])
+    modified = _decode_windowsnt_time(
+        match.group("modified_date") + " " + match.group("modified_time")
+    )
     if modified is not None:
         raw_info["details"]["modified"] = modified
 

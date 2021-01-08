@@ -17,17 +17,18 @@ class TestFTPParse(unittest.TestCase):
     @mock.patch("time.localtime")
     def test_parse_time(self, mock_localtime):
         self.assertEqual(
-            ftp_parse._parse_time("JUL 05 1974", formats=["%b %d %Y"]),
-            142214400.0)
+            ftp_parse._parse_time("JUL 05 1974", formats=["%b %d %Y"]), 142214400.0
+        )
 
         mock_localtime.return_value = time2017
         self.assertEqual(
-            ftp_parse._parse_time("JUL 05 02:00", formats=["%b %d %H:%M"]),
-            1499220000.0)
+            ftp_parse._parse_time("JUL 05 02:00", formats=["%b %d %H:%M"]), 1499220000.0
+        )
 
         self.assertEqual(
             ftp_parse._parse_time("05-07-17  02:00AM", formats=["%d-%m-%y %I:%M%p"]),
-            1499220000.0)
+            1499220000.0,
+        )
 
         self.assertEqual(ftp_parse._parse_time("notadate", formats=["%b %d %Y"]), None)
 
@@ -164,39 +165,68 @@ drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485
     def test_decode_windowsnt(self, mock_localtime):
         mock_localtime.return_value = time2017
         directory = """\
+unparsable line
 11-02-17  02:00AM       <DIR>          docs
 11-02-17  02:12PM       <DIR>          images
-11-02-17  02:12PM       <DIR>          AM to PM
+11-02-17 02:12PM <DIR> AM to PM
 11-02-17  03:33PM                 9276 logo.gif
+05-11-20   22:11  <DIR>       src
+11-02-17   01:23       1      12
+11-02-17    4:54                 0 icon.bmp
+11-02-17    4:54AM                 0 icon.gif
+11-02-17    4:54PM                 0 icon.png
+11-02-17    16:54                 0 icon.jpg
 """
         expected = [
             {
                 "basic": {"is_dir": True, "name": "docs"},
                 "details": {"modified": 1486778400.0, "type": 1},
-                "ftp": {
-                    "ls": "11-02-17  02:00AM       <DIR>          docs"
-                },
+                "ftp": {"ls": "11-02-17  02:00AM       <DIR>          docs"},
             },
             {
                 "basic": {"is_dir": True, "name": "images"},
                 "details": {"modified": 1486822320.0, "type": 1},
-                "ftp": {
-                    "ls": "11-02-17  02:12PM       <DIR>          images"
-                },
+                "ftp": {"ls": "11-02-17  02:12PM       <DIR>          images"},
             },
             {
                 "basic": {"is_dir": True, "name": "AM to PM"},
                 "details": {"modified": 1486822320.0, "type": 1},
-                "ftp": {
-                    "ls": "11-02-17  02:12PM       <DIR>          AM to PM"
-                },
+                "ftp": {"ls": "11-02-17 02:12PM <DIR> AM to PM"},
             },
             {
                 "basic": {"is_dir": False, "name": "logo.gif"},
                 "details": {"modified": 1486827180.0, "size": 9276, "type": 2},
-                "ftp": {
-                    "ls": "11-02-17  03:33PM                 9276 logo.gif"
-                },
+                "ftp": {"ls": "11-02-17  03:33PM                 9276 logo.gif"},
+            },
+            {
+                "basic": {"is_dir": True, "name": "src"},
+                "details": {"modified": 1604614260.0, "type": 1},
+                "ftp": {"ls": "05-11-20   22:11  <DIR>       src"},
+            },
+            {
+                "basic": {"is_dir": False, "name": "12"},
+                "details": {"modified": 1486776180.0, "size": 1, "type": 2},
+                "ftp": {"ls": "11-02-17   01:23       1      12"},
+            },
+            {
+                "basic": {"is_dir": False, "name": "icon.bmp"},
+                "details": {"modified": 1486788840.0, "size": 0, "type": 2},
+                "ftp": {"ls": "11-02-17    4:54                 0 icon.bmp"},
+            },
+            {
+                "basic": {"is_dir": False, "name": "icon.gif"},
+                "details": {"modified": 1486788840.0, "size": 0, "type": 2},
+                "ftp": {"ls": "11-02-17    4:54AM                 0 icon.gif"},
+            },
+            {
+                "basic": {"is_dir": False, "name": "icon.png"},
+                "details": {"modified": 1486832040.0, "size": 0, "type": 2},
+                "ftp": {"ls": "11-02-17    4:54PM                 0 icon.png"},
+            },
+            {
+                "basic": {"is_dir": False, "name": "icon.jpg"},
+                "details": {"modified": 1486832040.0, "size": 0, "type": 2},
+                "ftp": {"ls": "11-02-17    16:54                 0 icon.jpg"},
             },
         ]
 
