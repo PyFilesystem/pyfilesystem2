@@ -22,7 +22,8 @@ CLASSIFIERS = [
     "Topic :: System :: Filesystems",
 ]
 
-REQUIREMENTS = ["appdirs~=1.4.3", "pytz", "setuptools", "six~=1.10"]
+REQUIREMENTS = ["appdirs~=1.4.3", "pytz", "setuptools", "six~=1.10", "typing; python_version < '3.5'"]
+
 
 setup(
     author="Will McGugan",
@@ -33,7 +34,6 @@ setup(
     extras_require={
         "scandir :python_version < '3.5'": ["scandir~=1.5"],
         ":python_version < '3.4'": ["enum34~=1.1.6"],
-        ":python_version < '3.6'": ["typing~=3.6"],
         ":python_version < '3.0'": ["backports.os~=0.1"],
     },
     license="MIT",
