@@ -95,10 +95,11 @@ The following developers have contributed code and their time to this projects:
 
 - [Will McGugan](https://github.com/willmcgugan)
 - [Martin Larralde](https://github.com/althonos)
-- [Giampaolo](https://github.com/gpcimino)
+- [Giampaolo Cimino](https://github.com/gpcimino)
 - [Geoff Jukes](https://github.com/geoffjukes)
 
-See CONTRIBUTORS.md for a full list of contributors.
+See [CONTRIBUTORS.md](https://github.com/PyFilesystem/pyfilesystem2/blob/master/CONTRIBUTORS.md)
+for a full list of contributors.
 
 PyFilesystem2 owes a massive debt of gratitude to the following
 developers who contributed code and ideas to the original version.

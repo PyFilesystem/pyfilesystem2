@@ -6,7 +6,7 @@ Many thanks to the following developers for contributing to this project:
 - [C. W.](https://github.com/chfw)
 - [Diego Argueta](https://github.com/dargueta)
 - [Geoff Jukes](https://github.com/geoffjukes)
-- [Giampaolo](https://github.com/gpcimino)
+- [Giampaolo Cimino](https://github.com/gpcimino)
 - [Justin Charlong](https://github.com/jcharlong)
 - [Louis Sautier](https://github.com/sbraz)
 - [Martin Larralde](https://github.com/althonos)

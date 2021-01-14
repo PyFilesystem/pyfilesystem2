@@ -9,6 +9,7 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
   - "pypy"
   - "pypy3.5-7.0" # Need 7.0+ due to a bug in earlier versions that broke our tests.
 
@@ -35,8 +36,22 @@ before_install:
 install:
   - pip install -e .
 
+# command to run tests
+script: tox
+
 after_success:
   - coveralls
 
-# command to run tests
-script: tox
+before_deploy:
+  - pip install -U twine wheel
+  - python setup.py sdist bdist_wheel
+
+deploy:
+  provider: script
+  script: twine upload dist/*
+  skip_cleanup: true
+  on:
+    python: 3.9
+    tags: true
+    repo: PyFilesystem/pyfilesystem2
+
