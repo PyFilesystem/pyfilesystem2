@@ -1308,7 +1308,7 @@ class FS(object):
                 sensible default.
             **options: Implementation specific options required to open
                 the source file.
-                
+
         Raises:
             fs.errors.ResourceNotFound: If a parent directory of
                 ``path`` does not exist.
