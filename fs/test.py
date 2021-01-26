@@ -1495,9 +1495,9 @@ class FSTestCases(object):
             data = f.read()
         self.assertEqual(data, b"bar")
         
-        # upload to non-existing path (/foo/bar)
+        # upload to non-existing path (/spam/eggs)
         with self.assertRaises(errors.ResourceNotFound):
-            self.fs.upload("/foo/bar/baz", bytes_file)
+            self.fs.upload("/spam/eggs", bytes_file)
 
     def test_upload_chunk_size(self):
         test_data = b"bar" * 128
