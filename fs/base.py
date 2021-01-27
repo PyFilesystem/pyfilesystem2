@@ -1309,6 +1309,10 @@ class FS(object):
             **options: Implementation specific options required to open
                 the source file.
 
+        Raises:
+            fs.errors.ResourceNotFound: If a parent directory of
+                ``path`` does not exist.
+
         Note that the file object ``file`` will *not* be closed by this
         method. Take care to close it after this method completes
         (ideally with a context manager).
