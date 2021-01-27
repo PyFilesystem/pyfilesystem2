@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
+
+## Unreleased
+
+### Changed
+- Make `FS.upload` explicit about the expected error when the parent directory of the destination does not exist
+  [#445](https://github.com/PyFilesystem/pyfilesystem2/pull/445).
+
+
 ## [2.4.12] - 2021-01-14
 
 ### Added

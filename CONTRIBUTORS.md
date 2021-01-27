@@ -5,6 +5,7 @@ Many thanks to the following developers for contributing to this project:
 - [Andreas Tollkötter](https://github.com/atollk)
 - [C. W.](https://github.com/chfw)
 - [Diego Argueta](https://github.com/dargueta)
+- [Eelke van den Bos](https://github.com/eelkevdbos)
 - [Geoff Jukes](https://github.com/geoffjukes)
 - [Giampaolo Cimino](https://github.com/gpcimino)
 - [Justin Charlong](https://github.com/jcharlong)
