@@ -11,7 +11,6 @@ jobs:
       matrix:
         python-version:
           - 2.7
-          - 3.4
           - 3.5
           - 3.6
           - 3.7
@@ -24,7 +23,9 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: ${{ matrix.python-version }}
+    - name: Update pip
+      run: python -m pip install -U pip wheel
     - name: Install tox
-      run: python -m pip install -U pip tox tox-gh-actions
+      run: python -m pip install tox tox-gh-actions
     - name: Test with tox
-      run: tox
+      run: python -m tox
