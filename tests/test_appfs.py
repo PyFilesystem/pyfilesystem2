@@ -15,12 +15,13 @@ import fs.test
 from fs import appfs
 
 
-class _TestAppFS(object):
+class _TestAppFS(fs.test.FSTestCases):
 
     AppFS = None
 
     @classmethod
     def setUpClass(cls):
+        super(_TestAppFS, cls).setUpClass()
         cls.tmpdir = tempfile.mkdtemp()
 
     @classmethod
@@ -62,25 +63,25 @@ class _TestAppFS(object):
         )
 
 
-class TestUserDataFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
+class TestUserDataFS(_TestAppFS, unittest.TestCase):
     AppFS = appfs.UserDataFS
 
 
-class TestUserConfigFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
+class TestUserConfigFS(_TestAppFS, unittest.TestCase):
     AppFS = appfs.UserConfigFS
 
 
-class TestUserCacheFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
+class TestUserCacheFS(_TestAppFS, unittest.TestCase):
     AppFS = appfs.UserCacheFS
 
 
-class TestSiteDataFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
+class TestSiteDataFS(_TestAppFS, unittest.TestCase):
     AppFS = appfs.SiteDataFS
 
 
-class TestSiteConfigFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
+class TestSiteConfigFS(_TestAppFS, unittest.TestCase):
     AppFS = appfs.SiteConfigFS
 
 
-class TestUserLogFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
+class TestUserLogFS(_TestAppFS, unittest.TestCase):
     AppFS = appfs.UserLogFS
