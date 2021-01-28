@@ -133,7 +133,7 @@ def render(
         try:
             directory = sorted(
                 fs.filterdir(path, exclude_dirs=exclude, files=filter),
-                key=sort_key_dirs_first if dirs_first else sort_key,
+                key=sort_key_dirs_first if dirs_first else sort_key,  # type: ignore
             )
         except Exception as error:
             prefix = (

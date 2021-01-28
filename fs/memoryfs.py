@@ -24,11 +24,14 @@ from .path import split
 from ._typing import overload
 
 if typing.TYPE_CHECKING:
+    import array
+    import mmap
     from typing import (
         Any,
         BinaryIO,
         Collection,
         Dict,
+        Iterable,
         Iterator,
         List,
         Optional,
@@ -116,8 +119,8 @@ class _MemoryFile(io.RawIOBase):
 
     __next__ = next
 
-    def readline(self, size=-1):
-        # type: (int) -> bytes
+    def readline(self, size=None):
+        # type: (Optional[int]) -> bytes
         if not self._mode.reading:
             raise IOError("File not open for reading")
         with self._seek_lock():
@@ -131,7 +134,7 @@ class _MemoryFile(io.RawIOBase):
                 self._dir_entry.remove_open_file(self)
                 super(_MemoryFile, self).close()
 
-    def read(self, size=-1):
+    def read(self, size=None):
         # type: (Optional[int]) -> bytes
         if not self._mode.reading:
             raise IOError("File not open for reading")
@@ -190,15 +193,15 @@ class _MemoryFile(io.RawIOBase):
         return self._mode.writing
 
     def write(self, data):
-        # type: (bytes) -> int
+        # type: (Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]) -> int
         if not self._mode.writing:
             raise IOError("File not open for writing")
         with self._seek_lock():
             self.on_modify()
             return self._bytes_io.write(data)
 
-    def writelines(self, sequence):  # type: ignore
-        # type: (List[bytes]) -> None
+    def writelines(self, sequence):
+        # type: (Iterable[Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]]) -> None
         # FIXME(@althonos): For some reason the stub for IOBase.writelines
         #      is List[Any] ?! It should probably be Iterable[ByteString]
         with self._seek_lock():
