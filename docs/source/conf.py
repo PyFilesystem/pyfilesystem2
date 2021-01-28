@@ -304,3 +304,14 @@ texinfo_documents = [
 #texinfo_no_detailmenu = False
 
 napoleon_include_special_with_doc = True
+
+
+# -- Options for autodoc -----------------------------------------------------
+
+# Configure autodoc so that it doesn't skip building the documentation for
+# __init__ methods, since the arguments to instantiate classes should be in
+# the __init__ docstring and not at the class-level.
+
+autodoc_default_options = {
+    'special-members': '__init__',
+}
