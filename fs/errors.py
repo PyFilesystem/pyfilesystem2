@@ -41,6 +41,7 @@ __all__ = [
     "NoURL",
     "OperationFailed",
     "OperationTimeout",
+    "PasswordUnsupported",
     "PathError",
     "PermissionDenied",
     "RemoteConnectionError",
@@ -253,6 +254,13 @@ class RemoveRootError(OperationFailed):
     """
 
     default_message = "root directory may not be removed"
+
+
+class PasswordUnsupported(Unsupported):
+    """Attempt to create a password protected zip file.
+    """
+
+    default_message = "can not create password protected zip"
 
 
 class ResourceError(FSError):

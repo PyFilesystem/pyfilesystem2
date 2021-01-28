@@ -1,6 +1,7 @@
 # -*- encoding: UTF-8
 from __future__ import unicode_literals
 
+import codecs
 import os
 import sys
 import tempfile
@@ -13,7 +14,7 @@ from fs import zipfs
 from fs.compress import write_zip
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
-from fs.errors import NoURL
+from fs.errors import NoURL, PasswordUnsupported
 from fs.test import FSTestCases
 from fs.enums import Seek
 
@@ -39,6 +40,10 @@ class TestWriteReadZipFS(unittest.TestCase):
                 self.assertIsInstance(path, six.text_type)
                 with zip_fs.openbin(path) as f:
                     f.read()
+
+    def test_create_password(self):
+        with self.assertRaises(PasswordUnsupported):
+            zipfs.ZipFS(self._temp_path, write=True, password="hello")
 
 
 class TestWriteZipFS(FSTestCases, unittest.TestCase):
@@ -220,7 +225,64 @@ class TestDirsZipFS(unittest.TestCase):
             os.remove(path)
 
 
+class TestPasswordReadZipFS(unittest.TestCase):
+
+    ZIP_BIN = (
+        b"UEsDBAoACQAAAH2whk8tOwivGAAAAAwAAAADABwAZm9vVVQJAAPNX+pdzl/qXXV4CwABBPUBAAAE"
+        b"FAAAAJ6pj1kohibjIq4YqnEKUZ8SCJMeUkl9oVBLBwgtOwivGAAAAAwAAABQSwECHgMKAAkAAAB9"
+        b"sIZPLTsIrxgAAAAMAAAAAwAYAAAAAAABAAAApIEAAAAAZm9vVVQFAAPNX+pddXgLAAEE9QEAAAQU"
+        b"AAAAUEsFBgAAAAABAAEASQAAAGUAAAAAAA=="
+    )
+
+    PASSWD = b"P@ssw0rd"
+
+    def setUp(self):
+        fh, path = tempfile.mkstemp("testzip.zip")
+        os.write(fh, codecs.decode(self.ZIP_BIN, "base64"))
+        os.close(fh)
+        self.path = path
+
+    def tearDown(self):
+        os.remove(self.path)
+
+    def test_openbin(self):
+        with zipfs.ReadZipFS(self.path, password=self.PASSWD) as zip_fs:
+            with zip_fs.openbin("foo") as fp:
+                self.assertEqual(fp.read(), b"hello world\n")
+
+        with zipfs.ReadZipFS(self.path) as zip_fs:
+            with zip_fs.openbin("foo", password=self.PASSWD) as fp:
+                self.assertEqual(fp.read(), b"hello world\n")
+
+    def test_readbytes(self):
+        with zipfs.ReadZipFS(self.path, password=self.PASSWD) as zip_fs:
+            self.assertEqual(zip_fs.readbytes("foo"), b"hello world\n")
+
+        with zipfs.ReadZipFS(self.path) as zip_fs:
+            self.assertEqual(
+                zip_fs.readbytes("foo", password=self.PASSWD), b"hello world\n"
+            )
+
+    def test_setpassword(self):
+        with zipfs.ReadZipFS(self.path) as zip_fs:
+            with self.assertRaises(RuntimeError):
+                zip_fs._zip.read("foo")
+
+            zip_fs.setpassword(self.PASSWD)
+            self.assertEqual(zip_fs._zip.read("foo"), b"hello world\n")
+
+
+class TestPasswordTypeCheck(unittest.TestCase):
+    def test_raise(self):
+        with self.assertRaises(TypeError):
+            zipfs._password_type_check("string")
+
+        zipfs._password_type_check(b"bytes")
+
+
 class TestOpener(unittest.TestCase):
     def test_not_writeable(self):
         with self.assertRaises(NotWriteable):
             open_fs("zip://foo.zip", writeable=True)
+
+        open_fs("zip://foo.zip?password=1234")
