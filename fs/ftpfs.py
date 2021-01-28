@@ -4,6 +4,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import array
 import calendar
 import io
 import itertools
@@ -36,6 +37,7 @@ from .path import split
 from . import _ftp_parse as ftp_parse
 
 if typing.TYPE_CHECKING:
+    import mmap
     import ftplib
     from typing import (
         Any,
@@ -236,14 +238,17 @@ class FTPFile(io.RawIOBase):
         return b"".join(chunks)
 
     def readinto(self, buffer):
-        # type: (bytearray) -> int
+        # type: (Union[bytearray, memoryview, array.array[Any], mmap.mmap]) -> int
         data = self.read(len(buffer))
         bytes_read = len(data)
-        buffer[:bytes_read] = data
+        if isinstance(buffer, array.array):
+            buffer[:bytes_read] = array.array(buffer.typecode, data)
+        else:
+            buffer[:bytes_read] = data  # type: ignore
         return bytes_read
 
-    def readline(self, size=-1):
-        # type: (int) -> bytes
+    def readline(self, size=None):
+        # type: (Optional[int]) -> bytes
         return next(line_iterator(self, size))  # type: ignore
 
     def readlines(self, hint=-1):
@@ -262,9 +267,12 @@ class FTPFile(io.RawIOBase):
         return self.mode.writing
 
     def write(self, data):
-        # type: (bytes) -> int
+        # type: (Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]) -> int
         if not self.mode.writing:
             raise IOError("File not open for writing")
+
+        if isinstance(data, array.array):
+            data = data.tobytes()
 
         with self._lock:
             conn = self.write_conn
@@ -281,8 +289,9 @@ class FTPFile(io.RawIOBase):
         return data_pos
 
     def writelines(self, lines):
-        # type: (Iterable[bytes]) -> None
-        self.write(b"".join(lines))
+        # type: (Iterable[Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]]) -> None
+        for line in lines:
+            self.write(line)
 
     def truncate(self, size=None):
         # type: (Optional[int]) -> int
