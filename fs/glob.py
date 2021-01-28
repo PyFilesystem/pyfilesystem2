@@ -94,16 +94,16 @@ def imatch(pattern, path):
 class Globber(object):
     """A generator of glob results.
 
-        Arguments:
-            fs (~fs.base.FS): A filesystem object
-            pattern (str): A glob pattern, e.g. ``"**/*.py"``
-            path (str): A path to a directory in the filesystem.
-            namespaces (list): A list of additional info namespaces.
-            case_sensitive (bool): If ``True``, the path matching will be
-                case *sensitive* i.e. ``"FOO.py"`` and ``"foo.py"`` will
-                be different, otherwise path matching will be case *insensitive*.
-            exclude_dirs (list): A list of patterns to exclude when searching,
-                e.g. ``["*.git"]``.
+    Arguments:
+        fs (~fs.base.FS): A filesystem object
+        pattern (str): A glob pattern, e.g. ``"**/*.py"``
+        path (str): A path to a directory in the filesystem.
+        namespaces (list): A list of additional info namespaces.
+        case_sensitive (bool): If ``True``, the path matching will be
+            case *sensitive* i.e. ``"FOO.py"`` and ``"foo.py"`` will
+            be different, otherwise path matching will be case *insensitive*.
+        exclude_dirs (list): A list of patterns to exclude when searching,
+            e.g. ``["*.git"]``.
 
     """
 

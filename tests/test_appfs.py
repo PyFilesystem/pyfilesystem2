@@ -33,7 +33,7 @@ class _TestAppFS(object):
             "appdirs.{}".format(self.AppFS.app_dir),
             autospec=True,
             spec_set=True,
-            return_value=tempfile.mkdtemp(dir=self.tmpdir)
+            return_value=tempfile.mkdtemp(dir=self.tmpdir),
         ):
             return self.AppFS("fstest", "willmcgugan", "1.0")
 
@@ -42,7 +42,9 @@ class _TestAppFS(object):
         def test_repr(self):
             self.assertEqual(
                 repr(self.fs),
-                "{}(u'fstest', author=u'willmcgugan', version=u'1.0')".format(self.AppFS.__name__)
+                "{}(u'fstest', author=u'willmcgugan', version=u'1.0')".format(
+                    self.AppFS.__name__
+                ),
             )
 
     else:
@@ -50,31 +52,36 @@ class _TestAppFS(object):
         def test_repr(self):
             self.assertEqual(
                 repr(self.fs),
-                "{}('fstest', author='willmcgugan', version='1.0')".format(self.AppFS.__name__)
+                "{}('fstest', author='willmcgugan', version='1.0')".format(
+                    self.AppFS.__name__
+                ),
             )
-
 
     def test_str(self):
         self.assertEqual(
-            str(self.fs),
-            "<{} 'fstest'>".format(self.AppFS.__name__.lower())
+            str(self.fs), "<{} 'fstest'>".format(self.AppFS.__name__.lower())
         )
 
 
 class TestUserDataFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
     AppFS = appfs.UserDataFS
 
+
 class TestUserConfigFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
     AppFS = appfs.UserConfigFS
+
 
 class TestUserCacheFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
     AppFS = appfs.UserCacheFS
 
+
 class TestSiteDataFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
     AppFS = appfs.SiteDataFS
 
+
 class TestSiteConfigFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
     AppFS = appfs.SiteConfigFS
+
 
 class TestUserLogFS(_TestAppFS, fs.test.FSTestCases, unittest.TestCase):
     AppFS = appfs.UserLogFS

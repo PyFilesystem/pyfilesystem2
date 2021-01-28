@@ -30,7 +30,7 @@ class TestErrors(unittest.TestCase):
             [errors.NoURL, "some_path", "some_purpose"],
             [errors.Unsupported],
             [errors.IllegalBackReference, "path"],
-            [errors.MissingInfoNamespace, "path"]
+            [errors.MissingInfoNamespace, "path"],
         ]
         try:
             pool = multiprocessing.Pool(1)

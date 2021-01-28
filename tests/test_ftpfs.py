@@ -29,9 +29,9 @@ from fs.test import FSTestCases
 try:
     from pytest.mark import slow
 except:
+
     def slow(cls):
         return cls
-
 
 
 # Prevent socket timeouts from slowing tests too much

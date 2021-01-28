@@ -20,8 +20,7 @@ if typing.TYPE_CHECKING:
 
 @registry.install
 class ZipOpener(Opener):
-    """`ZipFS` opener.
-    """
+    """`ZipFS` opener."""
 
     protocols = ["zip"]
 

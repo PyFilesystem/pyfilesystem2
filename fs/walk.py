@@ -198,8 +198,7 @@ class Walker(object):
 
     def _check_open_dir(self, fs, path, info):
         # type: (FS, Text, Info) -> bool
-        """Check if a directory should be considered in the walk.
-        """
+        """Check if a directory should be considered in the walk."""
         if self.exclude_dirs is not None and fs.match(self.exclude_dirs, info.name):
             return False
         if self.filter_dirs is not None and not fs.match(self.filter_dirs, info.name):
@@ -411,8 +410,7 @@ class Walker(object):
         namespaces=None,  # type: Optional[Collection[Text]]
     ):
         # type: (...) -> Iterator[Tuple[Text, Optional[Info]]]
-        """Walk files using a *breadth first* search.
-        """
+        """Walk files using a *breadth first* search."""
         queue = deque([path])
         push = queue.appendleft
         pop = queue.pop
@@ -447,8 +445,7 @@ class Walker(object):
         namespaces=None,  # type: Optional[Collection[Text]]
     ):
         # type: (...) -> Iterator[Tuple[Text, Optional[Info]]]
-        """Walk files using a *depth first* search.
-        """
+        """Walk files using a *depth first* search."""
         # No recursion!
 
         _combine = combine
@@ -526,8 +523,7 @@ class BoundWalker(typing.Generic[_F]):
 
     def _make_walker(self, *args, **kwargs):
         # type: (*Any, **Any) -> Walker
-        """Create a walker instance.
-        """
+        """Create a walker instance."""
         walker = self.walker_class(*args, **kwargs)
         return walker
 

@@ -25,8 +25,7 @@ if typing.TYPE_CHECKING:
 
 
 class RawWrapper(io.RawIOBase):
-    """Convert a Python 2 style file-like object in to a IO object.
-    """
+    """Convert a Python 2 style file-like object in to a IO object."""
 
     def __init__(self, f, mode=None, name=None):
         # type: (IO[bytes], Optional[Text], Optional[Text]) -> None
@@ -161,8 +160,7 @@ def make_stream(
     **kwargs  # type: Any
 ):
     # type: (...) -> IO
-    """Take a Python 2.x binary file and return an IO Stream.
-    """
+    """Take a Python 2.x binary file and return an IO Stream."""
     reading = "r" in mode
     writing = "w" in mode
     appending = "a" in mode

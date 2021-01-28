@@ -245,13 +245,10 @@ Box drawing alignment tests:                                          █
 
 
 class FSTestCases(object):
-    """Basic FS tests.
-    """
+    """Basic FS tests."""
 
     def make_fs(self):
-        """Return an FS instance.
-
-        """
+        """Return an FS instance."""
         raise NotImplementedError("implement me")
 
     def destroy_fs(self, fs):
@@ -430,15 +427,13 @@ class FSTestCases(object):
         self.fs.hasurl("a/b/c/foo/bar")
 
     def test_geturl_purpose(self):
-        """Check an unknown purpose raises a NoURL error.
-        """
+        """Check an unknown purpose raises a NoURL error."""
         self.fs.create("foo")
         with self.assertRaises(errors.NoURL):
             self.fs.geturl("foo", purpose="__nosuchpurpose__")
 
     def test_validatepath(self):
-        """Check validatepath returns an absolute path.
-        """
+        """Check validatepath returns an absolute path."""
         path = self.fs.validatepath("foo")
         self.assertEqual(path, "/foo")
 
@@ -1494,7 +1489,7 @@ class FSTestCases(object):
         with self.fs.open("foo", "rb") as f:
             data = f.read()
         self.assertEqual(data, b"bar")
-        
+
         # upload to non-existing path (/spam/eggs)
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.upload("/spam/eggs", bytes_file)

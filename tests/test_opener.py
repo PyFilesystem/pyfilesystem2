@@ -208,7 +208,6 @@ class TestManageFS(unittest.TestCase):
 
 
 class TestOpeners(unittest.TestCase):
-
     def setUp(self):
         self.tmpdir = tempfile.mkdtemp()
 

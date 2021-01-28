@@ -29,8 +29,7 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
                 )
 
     @unittest.skipUnless(
-        tracemalloc,
-        reason="`tracemalloc` isn't supported on this Python version."
+        tracemalloc, reason="`tracemalloc` isn't supported on this Python version."
     )
     def test_close_mem_free(self):
         """Ensure all file memory is freed when calling close().

@@ -92,8 +92,7 @@ def _new_name(method, old_name):
 
 @six.add_metaclass(abc.ABCMeta)
 class FS(object):
-    """Base class for FS objects.
-    """
+    """Base class for FS objects."""
 
     # This is the "standard" meta namespace.
     _meta = {}  # type: Dict[Text, Union[Text, int, bool, None]]
@@ -106,8 +105,7 @@ class FS(object):
 
     def __init__(self):
         # type: (...) -> None
-        """Create a filesystem. See help(type(self)) for accurate signature.
-        """
+        """Create a filesystem. See help(type(self)) for accurate signature."""
         self._closed = False
         self._lock = threading.RLock()
         super(FS, self).__init__()
@@ -118,8 +116,7 @@ class FS(object):
 
     def __enter__(self):
         # type: (...) -> FS
-        """Allow use of filesystem as a context manager.
-        """
+        """Allow use of filesystem as a context manager."""
         return self
 
     def __exit__(
@@ -129,21 +126,18 @@ class FS(object):
         traceback,  # type: Optional[TracebackType]
     ):
         # type: (...) -> None
-        """Close filesystem on exit.
-        """
+        """Close filesystem on exit."""
         self.close()
 
     @property
     def glob(self):
-        """`~fs.glob.BoundGlobber`: a globber object..
-        """
+        """`~fs.glob.BoundGlobber`: a globber object.."""
         return BoundGlobber(self)
 
     @property
     def walk(self):
         # type: (_F) -> BoundWalker[_F]
-        """`~fs.walk.BoundWalker`: a walker bound to this filesystem.
-        """
+        """`~fs.walk.BoundWalker`: a walker bound to this filesystem."""
         return self.walker_class.bind(self)
 
     # ---------------------------------------------------------------- #
@@ -544,26 +538,22 @@ class FS(object):
 
         def match_dir(patterns, info):
             # type: (Optional[Iterable[Text]], Info) -> bool
-            """Pattern match info.name.
-            """
+            """Pattern match info.name."""
             return info.is_file or self.match(patterns, info.name)
 
         def match_file(patterns, info):
             # type: (Optional[Iterable[Text]], Info) -> bool
-            """Pattern match info.name.
-            """
+            """Pattern match info.name."""
             return info.is_dir or self.match(patterns, info.name)
 
         def exclude_dir(patterns, info):
             # type: (Optional[Iterable[Text]], Info) -> bool
-            """Pattern match info.name.
-            """
+            """Pattern match info.name."""
             return info.is_file or not self.match(patterns, info.name)
 
         def exclude_file(patterns, info):
             # type: (Optional[Iterable[Text]], Info) -> bool
-            """Pattern match info.name.
-            """
+            """Pattern match info.name."""
             return info.is_dir or not self.match(patterns, info.name)
 
         if files:
@@ -914,8 +904,7 @@ class FS(object):
 
     def isclosed(self):
         # type: () -> bool
-        """Check if the filesystem is closed.
-        """
+        """Check if the filesystem is closed."""
         return getattr(self, "_closed", False)
 
     def isdir(self, path):

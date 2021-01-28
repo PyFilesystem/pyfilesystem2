@@ -55,8 +55,7 @@ __all__ = [
 
 
 class MissingInfoNamespace(AttributeError):
-    """An expected namespace is missing.
-    """
+    """An expected namespace is missing."""
 
     def __init__(self, namespace):
         # type: (Text) -> None
@@ -70,8 +69,7 @@ class MissingInfoNamespace(AttributeError):
 
 @six.python_2_unicode_compatible
 class FSError(Exception):
-    """Base exception for the `fs` module.
-    """
+    """Base exception for the `fs` module."""
 
     default_message = "Unspecified error"
 
@@ -82,8 +80,7 @@ class FSError(Exception):
 
     def __str__(self):
         # type: () -> Text
-        """Return the error message.
-        """
+        """Return the error message."""
         msg = self._msg.format(**self.__dict__)
         return msg
 
@@ -94,8 +91,7 @@ class FSError(Exception):
 
 
 class FilesystemClosed(FSError):
-    """Attempt to use a closed filesystem.
-    """
+    """Attempt to use a closed filesystem."""
 
     default_message = "attempt to use closed filesystem"
 
@@ -111,8 +107,7 @@ class BulkCopyFailed(FSError):
 
 
 class CreateFailed(FSError):
-    """Filesystem could not be created.
-    """
+    """Filesystem could not be created."""
 
     default_message = "unable to create filesystem, {details}"
 
@@ -140,8 +135,7 @@ class CreateFailed(FSError):
 
 
 class PathError(FSError):
-    """Base exception for errors to do with a path string.
-    """
+    """Base exception for errors to do with a path string."""
 
     default_message = "path '{path}' is invalid"
 
@@ -155,15 +149,13 @@ class PathError(FSError):
 
 
 class NoSysPath(PathError):
-    """The filesystem does not provide *sys paths* to the resource.
-    """
+    """The filesystem does not provide *sys paths* to the resource."""
 
     default_message = "path '{path}' does not map to the local filesystem"
 
 
 class NoURL(PathError):
-    """The filesystem does not provide an URL for the resource.
-    """
+    """The filesystem does not provide an URL for the resource."""
 
     default_message = "path '{path}' has no '{purpose}' URL"
 
@@ -177,22 +169,19 @@ class NoURL(PathError):
 
 
 class InvalidPath(PathError):
-    """Path can't be mapped on to the underlaying filesystem.
-    """
+    """Path can't be mapped on to the underlaying filesystem."""
 
     default_message = "path '{path}' is invalid on this filesystem "
 
 
 class InvalidCharsInPath(InvalidPath):
-    """Path contains characters that are invalid on this filesystem.
-    """
+    """Path contains characters that are invalid on this filesystem."""
 
     default_message = "path '{path}' contains invalid characters"
 
 
 class OperationFailed(FSError):
-    """A specific operation failed.
-    """
+    """A specific operation failed."""
 
     default_message = "operation failed, {details}"
 
@@ -214,50 +203,43 @@ class OperationFailed(FSError):
 
 
 class Unsupported(OperationFailed):
-    """Operation not supported by the filesystem.
-    """
+    """Operation not supported by the filesystem."""
 
     default_message = "not supported"
 
 
 class RemoteConnectionError(OperationFailed):
-    """Operations encountered remote connection trouble.
-    """
+    """Operations encountered remote connection trouble."""
 
     default_message = "remote connection error"
 
 
 class InsufficientStorage(OperationFailed):
-    """Storage is insufficient for requested operation.
-    """
+    """Storage is insufficient for requested operation."""
 
     default_message = "insufficient storage space"
 
 
 class PermissionDenied(OperationFailed):
-    """Not enough permissions.
-    """
+    """Not enough permissions."""
 
     default_message = "permission denied"
 
 
 class OperationTimeout(OperationFailed):
-    """Filesystem took too long.
-    """
+    """Filesystem took too long."""
 
     default_message = "operation timed out"
 
 
 class RemoveRootError(OperationFailed):
-    """Attempt to remove the root directory.
-    """
+    """Attempt to remove the root directory."""
 
     default_message = "root directory may not be removed"
 
 
 class ResourceError(FSError):
-    """Base exception class for error associated with a specific resource.
-    """
+    """Base exception class for error associated with a specific resource."""
 
     default_message = "failed on path {path}"
 
@@ -272,71 +254,61 @@ class ResourceError(FSError):
 
 
 class ResourceNotFound(ResourceError):
-    """Required resource not found.
-    """
+    """Required resource not found."""
 
     default_message = "resource '{path}' not found"
 
 
 class ResourceInvalid(ResourceError):
-    """Resource has the wrong type.
-    """
+    """Resource has the wrong type."""
 
     default_message = "resource '{path}' is invalid for this operation"
 
 
 class FileExists(ResourceError):
-    """File already exists.
-    """
+    """File already exists."""
 
     default_message = "resource '{path}' exists"
 
 
 class FileExpected(ResourceInvalid):
-    """Operation only works on files.
-    """
+    """Operation only works on files."""
 
     default_message = "path '{path}' should be a file"
 
 
 class DirectoryExpected(ResourceInvalid):
-    """Operation only works on directories.
-    """
+    """Operation only works on directories."""
 
     default_message = "path '{path}' should be a directory"
 
 
 class DestinationExists(ResourceError):
-    """Target destination already exists.
-    """
+    """Target destination already exists."""
 
     default_message = "destination '{path}' exists"
 
 
 class DirectoryExists(ResourceError):
-    """Directory already exists.
-    """
+    """Directory already exists."""
 
     default_message = "directory '{path}' exists"
 
 
 class DirectoryNotEmpty(ResourceError):
-    """Attempt to remove a non-empty directory.
-    """
+    """Attempt to remove a non-empty directory."""
 
     default_message = "directory '{path}' is not empty"
 
 
 class ResourceLocked(ResourceError):
-    """Attempt to use a locked resource.
-    """
+    """Attempt to use a locked resource."""
 
     default_message = "resource '{path}' is locked"
 
 
 class ResourceReadOnly(ResourceError):
-    """Attempting to modify a read-only resource.
-    """
+    """Attempting to modify a read-only resource."""
 
     default_message = "resource '{path}' is read only"
 

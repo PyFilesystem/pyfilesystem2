@@ -236,8 +236,7 @@ class TestBrokenPaths(unittest.TestCase):
 
 
 class TestImplicitDirectories(unittest.TestCase):
-    """Regression tests for #160.
-    """
+    """Regression tests for #160."""
 
     @classmethod
     def setUpClass(cls):

@@ -112,8 +112,7 @@ class OSFS(FS):
         expand_vars=True,  # type: bool
     ):
         # type: (...) -> None
-        """Create an OSFS instance.
-        """
+        """Create an OSFS instance."""
         super(OSFS, self).__init__()
         if isinstance(root_path, bytes):
             root_path = fsdecode(root_path)
@@ -188,8 +187,7 @@ class OSFS(FS):
 
     def _to_sys_path(self, path):
         # type: (Text) -> bytes
-        """Convert a FS path to a path on the OS.
-        """
+        """Convert a FS path to a path on the OS."""
         sys_path = fsencode(
             os.path.join(self._root_path, path.lstrip("/").replace("/", os.sep))
         )
@@ -198,8 +196,7 @@ class OSFS(FS):
     @classmethod
     def _make_details_from_stat(cls, stat_result):
         # type: (os.stat_result) -> Dict[Text, object]
-        """Make a *details* info dict from an `os.stat_result` object.
-        """
+        """Make a *details* info dict from an `os.stat_result` object."""
         details = {
             "_write": ["accessed", "modified"],
             "accessed": stat_result.st_atime,
@@ -218,8 +215,7 @@ class OSFS(FS):
     @classmethod
     def _make_access_from_stat(cls, stat_result):
         # type: (os.stat_result) -> Dict[Text, object]
-        """Make an *access* info dict from an `os.stat_result` object.
-        """
+        """Make an *access* info dict from an `os.stat_result` object."""
         access = {}  # type: Dict[Text, object]
         access["permissions"] = Permissions(mode=stat_result.st_mode).dump()
         access["gid"] = gid = stat_result.st_gid
@@ -252,8 +248,7 @@ class OSFS(FS):
     @classmethod
     def _get_type_from_stat(cls, _stat):
         # type: (os.stat_result) -> ResourceType
-        """Get the resource type from an `os.stat_result` object.
-        """
+        """Get the resource type from an `os.stat_result` object."""
         st_mode = _stat.st_mode
         st_type = stat.S_IFMT(st_mode)
         return cls.STAT_TO_RESOURCE_TYPE.get(st_type, ResourceType.unknown)
@@ -673,6 +668,6 @@ class OSFS(FS):
             raise errors.InvalidCharsInPath(
                 path,
                 msg="path '{path}' could not be encoded for the filesystem (check LANG"
-                    " env var); {error}".format(path=path, error=error),
+                " env var); {error}".format(path=path, error=error),
             )
         return super(OSFS, self).validatepath(path)

@@ -20,8 +20,7 @@ if typing.TYPE_CHECKING:
 
 @registry.install
 class TarOpener(Opener):
-    """`TarFS` opener.
-    """
+    """`TarFS` opener."""
 
     protocols = ["tar"]
 

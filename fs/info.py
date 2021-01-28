@@ -49,8 +49,7 @@ class Info(object):
 
     def __init__(self, raw_info, to_datetime=epoch_to_datetime):
         # type: (RawInfo, ToDatetime) -> None
-        """Create a resource info object from a raw info dict.
-        """
+        """Create a resource info object from a raw info dict."""
         self.raw = raw_info
         self._to_datetime = to_datetime
         self.namespaces = frozenset(self.raw.keys())
@@ -160,8 +159,7 @@ class Info(object):
 
     def copy(self, to_datetime=None):
         # type: (Optional[ToDatetime]) -> Info
-        """Create a copy of this resource info object.
-        """
+        """Create a copy of this resource info object."""
         return Info(deepcopy(self.raw), to_datetime=to_datetime or self._to_datetime)
 
     def make_path(self, dir_path):
@@ -180,8 +178,7 @@ class Info(object):
     @property
     def name(self):
         # type: () -> Text
-        """`str`: the resource name.
-        """
+        """`str`: the resource name."""
         return cast(Text, self.get("basic", "name"))
 
     @property
@@ -238,22 +235,19 @@ class Info(object):
     @property
     def is_dir(self):
         # type: () -> bool
-        """`bool`: `True` if the resource references a directory.
-        """
+        """`bool`: `True` if the resource references a directory."""
         return cast(bool, self.get("basic", "is_dir"))
 
     @property
     def is_file(self):
         # type: () -> bool
-        """`bool`: `True` if the resource references a file.
-        """
+        """`bool`: `True` if the resource references a file."""
         return not cast(bool, self.get("basic", "is_dir"))
 
     @property
     def is_link(self):
         # type: () -> bool
-        """`bool`: `True` if the resource is a symlink.
-        """
+        """`bool`: `True` if the resource is a symlink."""
         self._require_namespace("link")
         return self.get("link", "target", None) is not None
 
