@@ -304,12 +304,16 @@ class MemoryFS(FS):
     fast, but non-permanent. The `MemoryFS` constructor takes no
     arguments.
 
-    Example:
-        >>> mem_fs = MemoryFS()
+    Examples:
+        Create with the constructor::
 
-    Or via an FS URL:
-        >>> import fs
-        >>> mem_fs = fs.open_fs('mem://')
+            >>> from fs.memoryfs import MemoryFS
+            >>> mem_fs = MemoryFS()
+
+        Or via an FS URL::
+
+            >>> import fs
+            >>> mem_fs = fs.open_fs('mem://')
 
     """
 
