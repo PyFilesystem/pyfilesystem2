@@ -3,10 +3,10 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import socket
 import os
 import platform
 import shutil
+import socket
 import tempfile
 import time
 import unittest
@@ -133,6 +133,7 @@ class TestFTPErrors(unittest.TestCase):
 
 
 @mark.slow
+@unittest.skipIf(platform.python_implementation() == "PyPy", "ftp unreliable with PyPy")
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     user = "user"
@@ -283,6 +284,7 @@ class TestFTPFSNoMLSD(TestFTPFS):
 
 
 @mark.slow
+@unittest.skipIf(platform.python_implementation() == "PyPy", "ftp unreliable with PyPy")
 class TestAnonFTPFS(FSTestCases, unittest.TestCase):
 
     user = "anonymous"
