@@ -290,8 +290,15 @@ class FTPFile(io.RawIOBase):
 
     def writelines(self, lines):
         # type: (Iterable[Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]]) -> None
+        if not self.mode.writing:
+            raise IOError("File not open for writing")
+        data = bytearray()
         for line in lines:
-            self.write(line)
+            if isinstance(line, array.array):
+                data.extend(line.tobytes())
+            else:
+                data.extend(line)  # type: ignore
+        self.write(data)
 
     def truncate(self, size=None):
         # type: (Optional[int]) -> int
