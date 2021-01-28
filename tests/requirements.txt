@@ -1,0 +1,4 @@
+# the bare requirements for running tests
+pyftpdlib ~=1.5
+psutil ~=5.0
+pysendfile ~=2.0 ; python_version <= "3.3"
