@@ -18,6 +18,11 @@ from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases
 
+try:
+    from pytest import mark
+except ImportError:
+    from . import mark
+
 
 class TestWriteReadTarFS(unittest.TestCase):
     def setUp(self):
@@ -93,6 +98,7 @@ class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
         del fs._tar_file
 
 
+@mark.slow
 @unittest.skipIf(six.PY2, "Python2 does not support LZMA")
 class TestWriteXZippedTarFS(FSTestCases, unittest.TestCase):
     def make_fs(self):
@@ -118,6 +124,7 @@ class TestWriteXZippedTarFS(FSTestCases, unittest.TestCase):
                 tarfile.open(fs._tar_file, "r:{}".format(other_comps))
 
 
+@mark.slow
 class TestWriteBZippedTarFS(FSTestCases, unittest.TestCase):
     def make_fs(self):
         fh, _tar_file = tempfile.mkstemp()

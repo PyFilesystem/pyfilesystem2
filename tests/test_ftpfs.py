@@ -27,12 +27,9 @@ from fs.subfs import SubFS
 from fs.test import FSTestCases
 
 try:
-    from pytest.mark import slow
+    from pytest import mark
 except ImportError:
-
-    def slow(cls):
-        return cls
-
+    from . import mark
 
 # Prevent socket timeouts from slowing tests too much
 socket.setdefaulttimeout(1)
@@ -135,7 +132,7 @@ class TestFTPErrors(unittest.TestCase):
         )
 
 
-@slow
+@mark.slow
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     user = "user"
@@ -285,7 +282,7 @@ class TestFTPFSNoMLSD(TestFTPFS):
         pass
 
 
-@slow
+@mark.slow
 class TestAnonFTPFS(FSTestCases, unittest.TestCase):
 
     user = "anonymous"
