@@ -5,7 +5,7 @@ on:
   - pull_request
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,8 +24,22 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Update pip
-      run: python -m pip install -U pip wheel
+      run: python -m pip install -U pip wheel setuptools
     - name: Install tox
       run: python -m pip install tox tox-gh-actions
     - name: Test with tox
       run: python -m tox
+    - name: Collect coverage results
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel: true
+        flag-name: test (${{ matrix.python-version}})
+
+  coveralls:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Upload coverage statistics to Coveralls
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel-finished: true
