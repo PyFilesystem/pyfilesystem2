@@ -7,7 +7,6 @@ import six
 import tarfile
 import tempfile
 import unittest
-import pytest
 
 from fs import tarfs
 from fs.enums import ResourceType
@@ -94,7 +93,7 @@ class TestWriteGZippedTarFS(FSTestCases, unittest.TestCase):
         del fs._tar_file
 
 
-@pytest.mark.skipif(six.PY2, reason="Python2 does not support LZMA")
+@unittest.skipIf(six.PY2, "Python2 does not support LZMA")
 class TestWriteXZippedTarFS(FSTestCases, unittest.TestCase):
     def make_fs(self):
         fh, _tar_file = tempfile.mkstemp()
