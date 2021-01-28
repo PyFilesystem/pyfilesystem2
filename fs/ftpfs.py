@@ -347,18 +347,6 @@ class FTPFile(io.RawIOBase):
 
 class FTPFS(FS):
     """A FTP (File Transport Protocol) Filesystem.
-
-    Arguments:
-        host (str): A FTP host, e.g. ``'ftp.mirror.nl'``.
-        user (str): A username (default is ``'anonymous'``).
-        passwd (str): Password for the server, or `None` for anon.
-        acct (str): FTP account.
-        timeout (int): Timeout for contacting server (in seconds,
-            defaults to 10).
-        port (int): FTP port number (default 21).
-        proxy (str, optional): An FTP proxy, or ``None`` (default)
-            for no proxy.
-
     """
 
     _meta = {
@@ -381,6 +369,20 @@ class FTPFS(FS):
         proxy=None,  # type: Optional[Text]
     ):
         # type: (...) -> None
+        """Create a new `FTPFS` instance.
+
+        Arguments:
+            host (str): A FTP host, e.g. ``'ftp.mirror.nl'``.
+            user (str): A username (default is ``'anonymous'``).
+            passwd (str): Password for the server, or `None` for anon.
+            acct (str): FTP account.
+            timeout (int): Timeout for contacting server (in seconds,
+                defaults to 10).
+            port (int): FTP port number (default 21).
+            proxy (str, optional): An FTP proxy, or ``None`` (default)
+                for no proxy.
+
+        """
         super(FTPFS, self).__init__()
         self._host = host
         self._user = user
@@ -494,9 +496,9 @@ class FTPFS(FS):
         return self._ftp
 
     @property
-    def features(self):
+    def features(self):  # noqa: D401
         # type: () -> Dict[Text, Text]
-        """dict: features of the remote FTP server."""
+        """`dict`: Features of the remote FTP server."""
         self._get_ftp()
         return self._features
 

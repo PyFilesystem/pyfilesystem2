@@ -50,19 +50,6 @@ class Permissions(object):
     on a resource. It supports Linux permissions, but is generic enough
     to manage permission information from almost any filesystem.
 
-    Arguments:
-        names (list, optional): A list of permissions.
-        mode (int, optional): A mode integer.
-        user (str, optional): A triplet of *user* permissions, e.g.
-            ``"rwx"`` or ``"r--"``
-        group (str, optional): A triplet of *group* permissions, e.g.
-            ``"rwx"`` or ``"r--"``
-        other (str, optional): A triplet of *other* permissions, e.g.
-            ``"rwx"`` or ``"r--"``
-        sticky (bool, optional): A boolean for the *sticky* bit.
-        setuid (bool, optional): A boolean for the *setuid* bit.
-        setguid (bool, optional): A boolean for the *setguid* bit.
-
     Example:
         >>> from fs.permissions import Permissions
         >>> p = Permissions(user='rwx', group='rw-', other='r--')
@@ -103,6 +90,22 @@ class Permissions(object):
         setguid=None,  # type: Optional[bool]
     ):
         # type: (...) -> None
+        """Create a new `Permissions` instance.
+
+        Arguments:
+            names (list, optional): A list of permissions.
+            mode (int, optional): A mode integer.
+            user (str, optional): A triplet of *user* permissions, e.g.
+                ``"rwx"`` or ``"r--"``
+            group (str, optional): A triplet of *group* permissions, e.g.
+                ``"rwx"`` or ``"r--"``
+            other (str, optional): A triplet of *other* permissions, e.g.
+                ``"rwx"`` or ``"r--"``
+            sticky (bool, optional): A boolean for the *sticky* bit.
+            setuid (bool, optional): A boolean for the *setuid* bit.
+            setguid (bool, optional): A boolean for the *setguid* bit.
+            
+        """
         if names is not None:
             self._perms = set(names)
         elif mode is not None:

@@ -68,6 +68,7 @@ class Registry(object):
                 @registry.install
                 class ArchiveOpener(Opener):
                     protocols = ['zip', 'tar']
+
         """
         _opener = opener if isinstance(opener, Opener) else opener()
         assert isinstance(_opener, Opener), "Opener instance required"
@@ -80,7 +81,6 @@ class Registry(object):
     def protocols(self):
         # type: () -> List[Text]
         """`list`: the list of supported protocols."""
-
         _protocols = list(self._protocols)
         if self.load_extern:
             _protocols.extend(

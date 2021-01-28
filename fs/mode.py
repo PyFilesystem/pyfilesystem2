@@ -31,12 +31,6 @@ class Mode(typing.Container[Text]):
     `mode strings <https://docs.python.org/3/library/functions.html#open>`_
     used when opening files.
 
-    Arguments:
-        mode (str): A *mode* string, as used by `io.open`.
-
-    Raises:
-        ValueError: If the mode string is invalid.
-
     Example:
         >>> mode = Mode('rb')
         >>> mode.reading
@@ -52,6 +46,15 @@ class Mode(typing.Container[Text]):
 
     def __init__(self, mode):
         # type: (Text) -> None
+        """Create a new `Mode` instance.
+
+        Arguments:
+            mode (str): A *mode* string, as used by `io.open`.
+
+        Raises:
+            ValueError: If the mode string is invalid.
+
+        """
         self._mode = mode
         self.validate()
 

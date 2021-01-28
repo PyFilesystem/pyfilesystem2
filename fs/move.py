@@ -41,7 +41,7 @@ def move_file(
     Arguments:
         src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a file on ``src_fs``.
-        dst_fs (FS or str); Destination filesystem (instance or URL).
+        dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on ``dst_fs``.
 
     """
@@ -72,8 +72,8 @@ def move_dir(
         src_path (str): Path to a directory on ``src_fs``
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a directory on ``dst_fs``.
-        workers (int): Use `worker` threads to copy data, or ``0`` (default) for
-            a single-threaded copy.
+        workers (int): Use ``worker`` threads to copy data, or ``0``
+            (default) for a single-threaded copy.
 
     """
 

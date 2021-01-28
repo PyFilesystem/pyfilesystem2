@@ -598,7 +598,7 @@ class FS(object):
 
     def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
-        """Copies a file from the filesystem to a file-like object.
+        """Copy a file from the filesystem to a file-like object.
 
         This may be more efficient that opening and copying files
         manually if the filesystem supplies an optimized method.
@@ -741,7 +741,7 @@ class FS(object):
         # type: (Text) -> Text
         """Get the *system path* of a resource.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -777,10 +777,9 @@ class FS(object):
 
     def getospath(self, path):
         # type: (Text) -> bytes
-        """Get a *system path* to a resource, encoded in the operating
-        system's prefered encoding.
+        """Get the *system path* to a resource, in the OS' prefered encoding.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -809,7 +808,7 @@ class FS(object):
         # type: (Text) -> ResourceType
         """Get the type of a resource.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -847,7 +846,7 @@ class FS(object):
         # type: (Text, Text) -> Text
         """Get the URL to a given resource.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem
             purpose (str): A short string that indicates which URL
                 to retrieve for the given path (if there is more than
@@ -868,7 +867,7 @@ class FS(object):
         # type: (Text) -> bool
         """Check if a path maps to a system path.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -886,7 +885,7 @@ class FS(object):
         # type: (Text, Text) -> bool
         """Check if a path has a corresponding URL.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
             purpose (str): A purpose parameter, as given in
                 `~fs.base.FS.geturl`.
@@ -911,7 +910,7 @@ class FS(object):
         # type: (Text) -> bool
         """Check if a path maps to an existing directory.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -930,7 +929,7 @@ class FS(object):
         A directory is considered empty when it does not contain
         any file or any directory.
 
-        Parameters:
+        Arguments:
             path (str): A path to a directory on the filesystem.
 
         Returns:
@@ -947,7 +946,7 @@ class FS(object):
         # type: (Text) -> bool
         """Check if a path maps to an existing file.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -963,7 +962,7 @@ class FS(object):
         # type: (Text) -> bool
         """Check if a path maps to a symlink.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -1009,7 +1008,7 @@ class FS(object):
         # type: (Text, Text, bool) -> None
         """Move directory ``src_path`` to ``dst_path``.
 
-        Parameters:
+        Arguments:
             src_path (str): Path of source directory on the filesystem.
             dst_path (str): Path to destination directory.
             create (bool): If `True`, then ``dst_path`` will be created
@@ -1443,8 +1442,7 @@ class FS(object):
 
     def validatepath(self, path):
         # type: (Text) -> Text
-        """Check if a path is valid, returning a normalized absolute
-        path.
+        """Validate a path, returning a normalized absolute path on sucess.
 
         Many filesystems have restrictions on the format of paths they
         support. This method will check that ``path`` is valid on the

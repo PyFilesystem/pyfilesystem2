@@ -150,7 +150,7 @@ class TarFS(WrapFS):
             compression=None,  # type: Optional[Text]
             encoding="utf-8",  # type: Text
             temp_fs="temp://__tartemp__",  # type: Text
-        ):
+        ):  # noqa: D107
             # type: (...) -> None
             pass
 
@@ -165,7 +165,7 @@ class WriteTarFS(WrapFS):
         compression=None,  # type: Optional[Text]
         encoding="utf-8",  # type: Text
         temp_fs="temp://__tartemp__",  # type: Text
-    ):
+    ):  # noqa: D107
         # type: (...) -> None
         self._file = file  # type: Union[Text, BinaryIO]
         self.compression = compression
@@ -221,6 +221,7 @@ class WriteTarFS(WrapFS):
 
         Note:
             This is called automatically when the TarFS is closed.
+
         """
         if not self.isclosed():
             write_tar(
@@ -258,7 +259,7 @@ class ReadTarFS(FS):
     }
 
     @errors.CreateFailed.catch_all
-    def __init__(self, file, encoding="utf-8"):
+    def __init__(self, file, encoding="utf-8"):  # noqa: D107
         # type: (Union[Text, BinaryIO], Text) -> None
         super(ReadTarFS, self).__init__()
         self._file = file

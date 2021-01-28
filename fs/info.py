@@ -184,14 +184,20 @@ class Info(object):
     @property
     def suffix(self):
         # type: () -> Text
-        """`str`: the last component of the name (including dot), or an
-        empty string if there is no suffix.
+        """`str`: the last component of the name (with dot).
+
+        In case there is no suffix, an empty string is returned.
 
         Example:
             >>> info
             <info 'foo.py'>
             >>> info.suffix
             '.py'
+            >>> info2
+            <info 'bar'>
+            >>> info2.suffix
+            ''
+
         """
         name = self.get("basic", "name")
         if name.startswith(".") and name.count(".") == 1:
@@ -209,6 +215,7 @@ class Info(object):
             <info 'foo.tar.gz'>
             >>> info.suffixes
             ['.tar', '.gz']
+
         """
         name = self.get("basic", "name")
         if name.startswith(".") and name.count(".") == 1:

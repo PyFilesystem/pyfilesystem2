@@ -55,6 +55,13 @@ class MultiFS(FS):
 
     def __init__(self, auto_close=True):
         # type: (bool) -> None
+        """Create a new MultiFS.
+
+        Arguments:
+            auto_close (bool): If `True` (the default), the child
+                filesystems will be closed when `MultiFS` is closed.
+
+        """
         super(MultiFS, self).__init__()
 
         self._auto_close = auto_close

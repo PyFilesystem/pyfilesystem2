@@ -44,7 +44,7 @@ if typing.TYPE_CHECKING:
 
 
 class _ZipExtFile(RawWrapper):
-    def __init__(self, fs, name):
+    def __init__(self, fs, name):  # noqa: D107
         # type: (ReadZipFS, Text) -> None
         self._zip = _zip = fs._zip
         self._end = _zip.getinfo(name).file_size
@@ -191,7 +191,7 @@ class ZipFS(WrapFS):
             compression=zipfile.ZIP_DEFLATED,  # type: int
             encoding="utf-8",  # type: Text
             temp_fs="temp://__ziptemp__",  # type: Text
-        ):
+        ):  # noqa: D107
             # type: (...) -> None
             pass
 
@@ -206,7 +206,7 @@ class WriteZipFS(WrapFS):
         compression=zipfile.ZIP_DEFLATED,  # type: int
         encoding="utf-8",  # type: Text
         temp_fs="temp://__ziptemp__",  # type: Text
-    ):
+    ):  # noqa: D107
         # type: (...) -> None
         self._file = file
         self.compression = compression
@@ -288,7 +288,7 @@ class ReadZipFS(FS):
     }
 
     @errors.CreateFailed.catch_all
-    def __init__(self, file, encoding="utf-8"):
+    def __init__(self, file, encoding="utf-8"):  # noqa: D107
         # type: (Union[BinaryIO, Text], Text) -> None
         super(ReadZipFS, self).__init__()
         self._file = file

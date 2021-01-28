@@ -29,7 +29,7 @@ if typing.TYPE_CHECKING:
 class RawWrapper(io.RawIOBase):
     """Convert a Python 2 style file-like object in to a IO object."""
 
-    def __init__(self, f, mode=None, name=None):
+    def __init__(self, f, mode=None, name=None):  # noqa: D107
         # type: (IO[bytes], Optional[Text], Optional[Text]) -> None
         self._f = f
         self.mode = mode or getattr(f, "mode", None)
