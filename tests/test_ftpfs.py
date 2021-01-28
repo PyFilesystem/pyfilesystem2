@@ -12,7 +12,6 @@ import time
 import unittest
 import uuid
 
-import pytest
 from six import text_type
 
 from ftplib import error_perm
@@ -26,6 +25,13 @@ from fs.ftpfs import FTPFS, ftp_errors
 from fs.path import join
 from fs.subfs import SubFS
 from fs.test import FSTestCases
+
+try:
+    from pytest.mark import slow
+except:
+    def slow(cls):
+        return cls
+
 
 
 # Prevent socket timeouts from slowing tests too much
@@ -129,7 +135,7 @@ class TestFTPErrors(unittest.TestCase):
         )
 
 
-@pytest.mark.slow
+@slow
 class TestFTPFS(FSTestCases, unittest.TestCase):
 
     user = "user"
@@ -279,7 +285,7 @@ class TestFTPFSNoMLSD(TestFTPFS):
         pass
 
 
-@pytest.mark.slow
+@slow
 class TestAnonFTPFS(FSTestCases, unittest.TestCase):
 
     user = "anonymous"
