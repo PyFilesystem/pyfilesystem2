@@ -1,12 +1,11 @@
 from __future__ import unicode_literals
 
 import os
+import shutil
 import sys
 import tempfile
 import unittest
 import pkg_resources
-
-import pytest
 
 from fs import open_fs, opener
 from fs.osfs import OSFS
@@ -208,8 +207,14 @@ class TestManageFS(unittest.TestCase):
         self.assertTrue(mem_fs.isclosed())
 
 
-@pytest.mark.usefixtures("mock_appdir_directories")
 class TestOpeners(unittest.TestCase):
+
+    def setUp(self):
+        self.tmpdir = tempfile.mkdtemp()
+
+    def tearDown(self):
+        shutil.rmtree(self.tmpdir)
+
     def test_repr(self):
         # Check __repr__ works
         for entry_point in pkg_resources.iter_entry_points("fs.opener"):
@@ -260,7 +265,10 @@ class TestOpeners(unittest.TestCase):
         mem_fs_2 = opener.open_fs(mem_fs)
         self.assertEqual(mem_fs, mem_fs_2)
 
-    def test_open_userdata(self):
+    @mock.patch("appdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
+    def test_open_userdata(self, app_dir):
+        app_dir.return_value = self.tmpdir
+
         with self.assertRaises(errors.OpenerError):
             opener.open_fs("userdata://foo:bar:baz:egg")
 
@@ -269,13 +277,19 @@ class TestOpeners(unittest.TestCase):
         self.assertEqual(app_fs.app_dirs.appauthor, "willmcgugan")
         self.assertEqual(app_fs.app_dirs.version, "1.0")
 
-    def test_open_userdata_no_version(self):
+    @mock.patch("appdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
+    def test_open_userdata_no_version(self, app_dir):
+        app_dir.return_value = self.tmpdir
+
         app_fs = opener.open_fs("userdata://fstest:willmcgugan", create=True)
         self.assertEqual(app_fs.app_dirs.appname, "fstest")
         self.assertEqual(app_fs.app_dirs.appauthor, "willmcgugan")
         self.assertEqual(app_fs.app_dirs.version, None)
 
-    def test_user_data_opener(self):
+    @mock.patch("appdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
+    def test_user_data_opener(self, app_dir):
+        app_dir.return_value = self.tmpdir
+
         user_data_fs = open_fs("userdata://fstest:willmcgugan:1.0", create=True)
         self.assertIsInstance(user_data_fs, UserDataFS)
         user_data_fs.makedir("foo", recreate=True)
