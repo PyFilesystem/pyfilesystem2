@@ -23,6 +23,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added compatibility if a Windows FTP server returns file information to the
   `LIST` command with 24-hour times. Closes [#438](https://github.com/PyFilesystem/pyfilesystem2/issues/438).
 
+### Added
+
+- Symlink support to `ReadTarFS` [#426](https://github.com/PyFilesystem/pyfilesystem2/pull/426). Closes [#409](https://github.com/PyFilesystem/pyfilesystem2/issues/409).
+
 ### Changed
 
 - Start testing on PyPy. Due to [#342](https://github.com/PyFilesystem/pyfilesystem2/issues/342)
