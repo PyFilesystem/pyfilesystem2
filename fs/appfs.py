@@ -44,7 +44,7 @@ class _CopyInitMeta(abc.ABCMeta):
 
     def __new__(mcls, classname, bases, cls_dict):
         cls_dict.setdefault("__init__", bases[0].__init__)
-        return super().__new__(mcls, classname, bases, cls_dict)
+        return super(abc.ABCMeta, mcls).__new__(mcls, classname, bases, cls_dict)
 
 
 @six.add_metaclass(_CopyInitMeta)

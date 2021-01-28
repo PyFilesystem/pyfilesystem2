@@ -50,8 +50,7 @@ Step = namedtuple("Step", "path, dirs, files")
 
 
 class Walker(object):
-    """A walker object recursively lists directories in a filesystem.
-    """
+    """A walker object recursively lists directories in a filesystem."""
 
     def __init__(
         self,
@@ -128,8 +127,7 @@ class Walker(object):
     @classmethod
     def _calculate_depth(cls, path):
         # type: (Text) -> int
-        """Calculate the 'depth' of a directory path (i.e. count components).
-        """
+        """Calculate the 'depth' of a directory path (i.e. count components)."""
         _path = path.strip("/")
         return _path.count("/") + 1 if _path else 0
 
@@ -508,6 +506,7 @@ class BoundWalker(typing.Generic[_F]):
     """
 
     def __init__(self, fs, walker_class=Walker):
+        # type: (_F, Type[Walker]) -> None
         """Create a new walker bound to the given filesystem.
 
         Arguments:
@@ -516,7 +515,6 @@ class BoundWalker(typing.Generic[_F]):
                 sub-class. The default uses `~fs.walk.Walker`.
 
         """
-        # type: (_F, Type[Walker]) -> None
         self.fs = fs
         self.walker_class = walker_class
 

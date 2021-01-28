@@ -346,8 +346,7 @@ class FTPFile(io.RawIOBase):
 
 
 class FTPFS(FS):
-    """A FTP (File Transport Protocol) Filesystem.
-    """
+    """A FTP (File Transport Protocol) Filesystem."""
 
     _meta = {
         "invalid_path_chars": "\0",

@@ -95,8 +95,7 @@ def imatch(pattern, path):
 
 
 class Globber(object):
-    """A generator of glob results.
-    """
+    """A generator of glob results."""
 
     def __init__(
         self,

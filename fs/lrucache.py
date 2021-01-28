@@ -21,8 +21,8 @@ class LRUCache(OrderedDict, typing.Generic[_K, _V]):
     """
 
     def __init__(self, cache_size):
-        """Create a new LRUCache with the given size."""
         # type: (int) -> None
+        """Create a new LRUCache with the given size."""
         self.cache_size = cache_size
         super(LRUCache, self).__init__()
 

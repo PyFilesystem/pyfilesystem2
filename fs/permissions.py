@@ -104,7 +104,7 @@ class Permissions(object):
             sticky (bool, optional): A boolean for the *sticky* bit.
             setuid (bool, optional): A boolean for the *setuid* bit.
             setguid (bool, optional): A boolean for the *setguid* bit.
-            
+
         """
         if names is not None:
             self._perms = set(names)

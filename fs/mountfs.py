@@ -45,8 +45,7 @@ class MountError(Exception):
 
 
 class MountFS(FS):
-    """A virtual filesystem that maps directories on to other file-systems.
-    """
+    """A virtual filesystem that maps directories on to other file-systems."""
 
     _meta = {
         "virtual": True,
@@ -57,6 +56,7 @@ class MountFS(FS):
     }
 
     def __init__(self, auto_close=True):
+        # type: (bool) -> None
         """Create a new `MountFS` instance.
 
         Arguments:
@@ -64,7 +64,6 @@ class MountFS(FS):
                 filesystems will be closed when `MountFS` is closed.
 
         """
-        # type: (bool) -> None
         super(MountFS, self).__init__()
         self.auto_close = auto_close
         self.default_fs = MemoryFS()  # type: FS

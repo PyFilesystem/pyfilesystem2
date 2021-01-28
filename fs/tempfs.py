@@ -27,8 +27,7 @@ if typing.TYPE_CHECKING:
 
 @six.python_2_unicode_compatible
 class TempFS(OSFS):
-    """A temporary filesystem on the OS.
-    """
+    """A temporary filesystem on the OS."""
 
     def __init__(
         self,
