@@ -90,7 +90,7 @@ class RawWrapper(io.RawIOBase):
         return self._f.truncate(size)
 
     def write(self, data):
-        # type: (Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]) -> int
+        # type: (Union[bytes, memoryview, array.array[Any], mmap.mmap]) -> int
         if isinstance(data, array.array):
             count = self._f.write(data.tobytes())
         else:
@@ -144,7 +144,7 @@ class RawWrapper(io.RawIOBase):
         return self._f.readlines(-1 if hint is None else hint)
 
     def writelines(self, lines):
-        # type: (Iterable[Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]]) -> None
+        # type: (Iterable[Union[bytes, memoryview, array.array[Any], mmap.mmap]]) -> None  # noqa: E501
         _lines = (
             line.tobytes() if isinstance(line, array.array) else line for line in lines
         )

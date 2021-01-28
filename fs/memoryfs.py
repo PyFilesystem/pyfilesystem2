@@ -193,7 +193,7 @@ class _MemoryFile(io.RawIOBase):
         return self._mode.writing
 
     def write(self, data):
-        # type: (Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]) -> int
+        # type: (Union[bytes, memoryview, array.array[Any], mmap.mmap]) -> int
         if not self._mode.writing:
             raise IOError("File not open for writing")
         with self._seek_lock():
@@ -201,9 +201,7 @@ class _MemoryFile(io.RawIOBase):
             return self._bytes_io.write(data)
 
     def writelines(self, sequence):
-        # type: (Iterable[Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]]) -> None
-        # FIXME(@althonos): For some reason the stub for IOBase.writelines
-        #      is List[Any] ?! It should probably be Iterable[ByteString]
+        # type: (Iterable[Union[bytes, memoryview, array.array[Any], mmap.mmap]]) -> None  # noqa: E501
         with self._seek_lock():
             self.on_modify()
             self._bytes_io.writelines(sequence)
@@ -248,18 +246,18 @@ class _DirEntry(object):
                 _bytes_file.seek(0, os.SEEK_END)
                 return _bytes_file.tell()
 
-    @overload  # noqa: F811
-    def get_entry(self, name, default):
+    @overload
+    def get_entry(self, name, default):  # noqa: F811
         # type: (Text, _DirEntry) -> _DirEntry
         pass
 
-    @overload  # noqa: F811
-    def get_entry(self, name):
+    @overload
+    def get_entry(self, name):  # noqa: F811
         # type: (Text) -> Optional[_DirEntry]
         pass
 
-    @overload  # noqa: F811
-    def get_entry(self, name, default):
+    @overload
+    def get_entry(self, name, default):  # noqa: F811
         # type: (Text, None) -> Optional[_DirEntry]
         pass
 

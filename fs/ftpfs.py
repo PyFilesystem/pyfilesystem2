@@ -267,7 +267,7 @@ class FTPFile(io.RawIOBase):
         return self.mode.writing
 
     def write(self, data):
-        # type: (Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]) -> int
+        # type: (Union[bytes, memoryview, array.array[Any], mmap.mmap]) -> int
         if not self.mode.writing:
             raise IOError("File not open for writing")
 
@@ -289,7 +289,7 @@ class FTPFile(io.RawIOBase):
         return data_pos
 
     def writelines(self, lines):
-        # type: (Iterable[Union[bytes, bytearray, memoryview, array.array[Any], mmap.mmap]]) -> None
+        # type: (Iterable[Union[bytes, memoryview, array.array[Any], mmap.mmap]]) -> None  # noqa: E501
         if not self.mode.writing:
             raise IOError("File not open for writing")
         data = bytearray()

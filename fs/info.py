@@ -72,8 +72,8 @@ class Info(object):
         # type: (None) -> None
         pass
 
-    @overload  # noqa: F811
-    def _make_datetime(self, t):
+    @overload
+    def _make_datetime(self, t):  # noqa: F811
         # type: (int) -> datetime
         pass
 
@@ -90,7 +90,7 @@ class Info(object):
         pass
 
     @overload  # noqa: F811
-    def get(self, namespace, key, default):
+    def get(self, namespace, key, default):  # noqa: F811
         # type: (Text, Text, T) -> Union[Any, T]
         pass
 

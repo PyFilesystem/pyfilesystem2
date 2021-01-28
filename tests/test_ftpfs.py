@@ -28,7 +28,7 @@ from fs.test import FSTestCases
 
 try:
     from pytest.mark import slow
-except:
+except ImportError:
 
     def slow(cls):
         return cls
