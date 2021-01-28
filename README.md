@@ -2,15 +2,14 @@
 
 Python's Filesystem abstraction layer.
 
-[![PyPI version](https://badge.fury.io/py/fs.svg)](https://badge.fury.io/py/fs)
+[![PyPI version](https://img.shields.io/pypi/v/fs)](https://pypi.org/project/fs/)
 [![PyPI](https://img.shields.io/pypi/pyversions/fs.svg)](https://pypi.org/project/fs/)
-[![Downloads](https://pepy.tech/badge/fs/month)](https://pepy.tech/project/fs/month)
-
-
-[![Build Status](https://travis-ci.org/PyFilesystem/pyfilesystem2.svg?branch=master)](https://travis-ci.org/PyFilesystem/pyfilesystem2)
-[![Windows Build Status](https://ci.appveyor.com/api/projects/status/github/pyfilesystem/pyfilesystem2?branch=master&svg=true)](https://ci.appveyor.com/project/willmcgugan/pyfilesystem2)
-[![Coverage Status](https://coveralls.io/repos/github/PyFilesystem/pyfilesystem2/badge.svg)](https://coveralls.io/github/PyFilesystem/pyfilesystem2)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/30ad6445427349218425d93886ade9ee)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&utm_medium=referral&utm_content=PyFilesystem/pyfilesystem2&utm_campaign=Badge_Grade)
+[![Downloads](https://pepy.tech/badge/fs/month)](https://pepy.tech/project/fs/)
+[![Build Status](https://img.shields.io/github/workflow/status/PyFilesystem/pyfilesystem2/Test/master?logo=github&cacheSeconds=600)](https://github.com/PyFilesystem/pyfilesystem2/actions?query=branch%3Amaster)
+[![Windows Build Status](https://img.shields.io/appveyor/build/willmcgugan/pyfilesystem2/master?logo=appveyor&cacheSeconds=600)](https://ci.appveyor.com/project/willmcgugan/pyfilesystem2)
+[![Coverage Status](https://img.shields.io/coveralls/github/PyFilesystem/pyfilesystem2/master?cacheSeconds=600)](https://coveralls.io/github/PyFilesystem/pyfilesystem2)
+[![Codacy Badge](https://img.shields.io/codacy/grade/30ad6445427349218425d93886ade9ee/master?logo=codacy)](https://www.codacy.com/app/will-mcgugan/pyfilesystem2?utm_source=github.com&utm_medium=referral&utm_content=PyFilesystem/pyfilesystem2&utm_campaign=Badge_Grade)
+[![Docs](https://img.shields.io/readthedocs/pyfilesystem2?maxAge=3600)](http://pyfilesystem2.readthedocs.io/en/stable/?badge=stable)
 
 ## Documentation
 
