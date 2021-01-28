@@ -50,10 +50,10 @@ jobs:
       fail-fast: false
       matrix:
         linter:
-          - mypy
-          - flake8
-          - black
-          - pydocstyle
+          - typecheck
+          - codestyle
+          - docstyle
+          - codeformat
     steps:
     - name: Checkout code
       uses: actions/checkout@v1
