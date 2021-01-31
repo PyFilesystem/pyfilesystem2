@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+
+- Added FTP over TLS (FTPS) support to FTPFS.
+  Closes [#437](https://github.com/PyFilesystem/pyfilesystem2/issues/437),
+  [#449](https://github.com/PyFilesystem/pyfilesystem2/pull/449).
+
 ### Changed
 
 - Make `FS.upload` explicit about the expected error when the parent directory of the destination does not exist.

@@ -13,5 +13,6 @@ Many thanks to the following developers for contributing to this project:
 - [Martin Larralde](https://github.com/althonos)
 - [Morten Engelhardt Olsen](https://github.com/xoriath)
 - [Nick Henderson](https://github.com/nwh)
+- [Oliver Galvin](https://github.com/odgalvin)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Zmej Serow](https://github.com/zmej-serow)
