@@ -9,8 +9,22 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ## Unreleased
 
 ### Changed
-- Make `FS.upload` explicit about the expected error when the parent directory of the destination does not exist
-  [#445](https://github.com/PyFilesystem/pyfilesystem2/pull/445).
+
+- Make `FS.upload` explicit about the expected error when the parent directory of the destination does not exist.
+  Closes [#445](https://github.com/PyFilesystem/pyfilesystem2/pull/445).
+- Migrate continuous integration from Travis-CI to GitHub Actions and introduce several linters
+  again in the build steps ([#448](https://github.com/PyFilesystem/pyfilesystem2/pull/448)).
+  Closes [#446](https://github.com/PyFilesystem/pyfilesystem2/pull/446).
+- Stop requiring `pytest` to run tests, allowing any test runner supporting `unittest`-style
+  test suites.
+- `FSTestCases` now builds the large data required for `upload` and `download` tests only
+  once in order to reduce the total testing time.
+
+### Fixed
+
+- Make `FTPFile`, `MemoryFile` and `RawWrapper` accept [`array.array`](https://docs.python.org/3/library/array.html)
+  arguments for the `write` and `writelines` methods, as expected by their base class [`io.RawIOBase`](https://docs.python.org/3/library/io.html#io.RawIOBase).
+- Various documentation issues, including `MemoryFS` docstring not rendering properly.
 
 
 ## [2.4.12] - 2021-01-14
@@ -22,6 +36,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   [#380](https://github.com/PyFilesystem/pyfilesystem2/issues/380).
 - Added compatibility if a Windows FTP server returns file information to the
   `LIST` command with 24-hour times. Closes [#438](https://github.com/PyFilesystem/pyfilesystem2/issues/438).
+- Added Python 3.9 support. Closes [#443](https://github.com/PyFilesystem/pyfilesystem2/issues/443).
 
 ### Changed
 
@@ -30,25 +45,30 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   be able to see if we break something aside from known issues with FTP tests.
 - Include docs in source distributions as well as the whole tests folder,
   ensuring `conftest.py` is present, fixes [#364](https://github.com/PyFilesystem/pyfilesystem2/issues/364).
-- Stop patching copy with Python 3.8+ because it already uses `sendfile`.
+- Stop patching copy with Python 3.8+ because it already uses `sendfile`
+  ([#424](https://github.com/PyFilesystem/pyfilesystem2/pull/424)).
+  Closes [#421](https://github.com/PyFilesystem/pyfilesystem2/issues/421).
 
 ### Fixed
 
 - Fixed crash when CPython's -OO flag is used
-- Fixed error when parsing timestamps from a FTP directory served from a WindowsNT FTP Server, fixes [#395](https://github.com/PyFilesystem/pyfilesystem2/issues/395).
+- Fixed error when parsing timestamps from a FTP directory served from a WindowsNT FTP Server.
+  Closes [#395](https://github.com/PyFilesystem/pyfilesystem2/issues/395).
 - Fixed documentation of `Mode.to_platform_bin`. Closes [#382](https://github.com/PyFilesystem/pyfilesystem2/issues/382).
 - Fixed the code example in the "Testing Filesystems" section of the
   "Implementing Filesystems" guide. Closes [#407](https://github.com/PyFilesystem/pyfilesystem2/issues/407).
 - Fixed `FTPFS.openbin` not implicitly opening files in binary mode like expected
   from `openbin`. Closes [#406](https://github.com/PyFilesystem/pyfilesystem2/issues/406).
 
+
 ## [2.4.11] - 2019-09-07
 
 ### Added
 
 - Added geturl for TarFS and ZipFS for 'fs' purpose. NoURL for 'download' purpose.
-- Added helpful root path in CreateFailed exception [#340](https://github.com/PyFilesystem/pyfilesystem2/issues/340)
-- Added Python 3.8 support
+- Added helpful root path in CreateFailed exception.
+  Closes [#340](https://github.com/PyFilesystem/pyfilesystem2/issues/340).
+- Added Python 3.8 support.
 
 ### Fixed
 
@@ -76,7 +96,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
-- Fixed broken WrapFS.movedir [#322](https://github.com/PyFilesystem/pyfilesystem2/issues/322)
+- Fixed broken WrapFS.movedir [#322](https://github.com/PyFilesystem/pyfilesystem2/issues/322).
 
 ## [2.4.9] - 2019-07-28
 
@@ -458,7 +478,7 @@ No changes, pushed wrong branch to PyPi.
 
 ### Added
 
-- New `copy_if_newer' functionality in`copy` module.
+- New `copy_if_newer` functionality in `copy` module.
 
 ### Fixed
 
@@ -469,17 +489,17 @@ No changes, pushed wrong branch to PyPi.
 ### Changed
 
 - Improved FTP support for non-compliant servers
-- Fix for ZipFS implied directories
+- Fix for `ZipFS` implied directories
 
 ## [2.0.1] - 2017-03-11
 
 ### Added
 
-- TarFS contributed by Martin Larralde
+- `TarFS` contributed by Martin Larralde.
 
 ### Fixed
 
-- FTPFS bugs.
+- `FTPFS` bugs.
 
 ## [2.0.0] - 2016-12-07
 

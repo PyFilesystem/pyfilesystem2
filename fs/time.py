@@ -16,13 +16,11 @@ GMT = timezone("GMT")
 
 def datetime_to_epoch(d):
     # type: (datetime) -> int
-    """Convert datetime to epoch.
-    """
+    """Convert datetime to epoch."""
     return timegm(d.utctimetuple())
 
 
 def epoch_to_datetime(t):
     # type: (int) -> datetime
-    """Convert epoch time to a UTC datetime.
-    """
+    """Convert epoch time to a UTC datetime."""
     return utclocalize(utcfromtimestamp(t)) if t is not None else None

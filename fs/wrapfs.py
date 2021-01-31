@@ -60,7 +60,7 @@ class WrapFS(FS, typing.Generic[_F]):
 
     wrap_name = None  # type: Optional[Text]
 
-    def __init__(self, wrap_fs):
+    def __init__(self, wrap_fs):  # noqa: D107
         # type: (_F) -> None
         self._wrap_fs = wrap_fs
         super(WrapFS, self).__init__()

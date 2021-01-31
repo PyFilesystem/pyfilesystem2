@@ -94,7 +94,7 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
 
     wrap_name = "cached-dir"
 
-    def __init__(self, wrap_fs):
+    def __init__(self, wrap_fs):  # noqa: D107
         # type: (_F) -> None
         super(WrapCachedDir, self).__init__(wrap_fs)
         self._cache = {}  # type: Dict[Tuple[Text, frozenset], Dict[Text, Info]]

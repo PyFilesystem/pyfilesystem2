@@ -1,3 +1,6 @@
+"""Useful functions for working with glob patterns.
+"""
+
 from __future__ import unicode_literals
 
 from collections import namedtuple
@@ -92,20 +95,7 @@ def imatch(pattern, path):
 
 
 class Globber(object):
-    """A generator of glob results.
-
-        Arguments:
-            fs (~fs.base.FS): A filesystem object
-            pattern (str): A glob pattern, e.g. ``"**/*.py"``
-            path (str): A path to a directory in the filesystem.
-            namespaces (list): A list of additional info namespaces.
-            case_sensitive (bool): If ``True``, the path matching will be
-                case *sensitive* i.e. ``"FOO.py"`` and ``"foo.py"`` will
-                be different, otherwise path matching will be case *insensitive*.
-            exclude_dirs (list): A list of patterns to exclude when searching,
-                e.g. ``["*.git"]``.
-
-    """
+    """A generator of glob results."""
 
     def __init__(
         self,
@@ -117,6 +107,20 @@ class Globber(object):
         exclude_dirs=None,
     ):
         # type: (FS, str, str, Optional[List[str]], bool, Optional[List[str]]) -> None
+        """Create a new Globber instance.
+
+        Arguments:
+            fs (~fs.base.FS): A filesystem object
+            pattern (str): A glob pattern, e.g. ``"**/*.py"``
+            path (str): A path to a directory in the filesystem.
+            namespaces (list): A list of additional info namespaces.
+            case_sensitive (bool): If ``True``, the path matching will be
+                case *sensitive* i.e. ``"FOO.py"`` and ``"foo.py"`` will be
+                different, otherwise path matching will be case *insensitive*.
+            exclude_dirs (list): A list of patterns to exclude when searching,
+                e.g. ``["*.git"]``.
+
+        """
         self.fs = fs
         self.pattern = pattern
         self.path = path
@@ -160,7 +164,7 @@ class Globber(object):
 
     def __iter__(self):
         # type: () -> Iterator[GlobMatch]
-        """An iterator of :class:`fs.glob.GlobMatch` objects."""
+        """Get an iterator of :class:`fs.glob.GlobMatch` objects."""
         return self._make_iter()
 
     def count(self):
@@ -200,7 +204,6 @@ class Globber(object):
             LineCounts(lines=5767102, non_blank=4915110)
 
         """
-
         lines = 0
         non_blank = 0
         for path, info in self._make_iter():
@@ -213,7 +216,7 @@ class Globber(object):
 
     def remove(self):
         # type: () -> int
-        """Removed all matched paths.
+        """Remove all matched paths.
 
         Returns:
             int: Number of file and directories removed.
@@ -235,13 +238,10 @@ class Globber(object):
 
 
 class BoundGlobber(object):
-    """A :class:`~Globber` object bound to a filesystem.
+    """A `~fs.glob.Globber` object bound to a filesystem.
 
     An instance of this object is available on every Filesystem object
-    as ``.glob``.
-
-    Arguments:
-        fs (FS): A filesystem object.
+    as the `~fs.base.FS.glob` property.
 
     """
 
@@ -249,6 +249,12 @@ class BoundGlobber(object):
 
     def __init__(self, fs):
         # type: (FS) -> None
+        """Create a new bound Globber.
+
+        Arguments:
+            fs (FS): A filesystem object to bind to.
+
+        """
         self.fs = fs
 
     def __repr__(self):
@@ -270,9 +276,7 @@ class BoundGlobber(object):
                 e.g. ``["*.git"]``.
 
         Returns:
-            `~Globber`:
-                An object that may be queried for the glob matches.
-
+            `Globber`: An object that may be queried for the glob matches.
 
         """
         return Globber(

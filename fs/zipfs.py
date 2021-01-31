@@ -44,7 +44,7 @@ if typing.TYPE_CHECKING:
 
 
 class _ZipExtFile(RawWrapper):
-    def __init__(self, fs, name):
+    def __init__(self, fs, name):  # noqa: D107
         # type: (ReadZipFS, Text) -> None
         self._zip = _zip = fs._zip
         self._end = _zip.getinfo(name).file_size
@@ -191,15 +191,14 @@ class ZipFS(WrapFS):
             compression=zipfile.ZIP_DEFLATED,  # type: int
             encoding="utf-8",  # type: Text
             temp_fs="temp://__ziptemp__",  # type: Text
-        ):
+        ):  # noqa: D107
             # type: (...) -> None
             pass
 
 
 @six.python_2_unicode_compatible
 class WriteZipFS(WrapFS):
-    """A writable zip file.
-    """
+    """A writable zip file."""
 
     def __init__(
         self,
@@ -207,7 +206,7 @@ class WriteZipFS(WrapFS):
         compression=zipfile.ZIP_DEFLATED,  # type: int
         encoding="utf-8",  # type: Text
         temp_fs="temp://__ziptemp__",  # type: Text
-    ):
+    ):  # noqa: D107
         # type: (...) -> None
         self._file = file
         self.compression = compression
@@ -276,8 +275,7 @@ class WriteZipFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class ReadZipFS(FS):
-    """A readable zip file.
-    """
+    """A readable zip file."""
 
     _meta = {
         "case_insensitive": True,
@@ -290,7 +288,7 @@ class ReadZipFS(FS):
     }
 
     @errors.CreateFailed.catch_all
-    def __init__(self, file, encoding="utf-8"):
+    def __init__(self, file, encoding="utf-8"):  # noqa: D107
         # type: (Union[BinaryIO, Text], Text) -> None
         super(ReadZipFS, self).__init__()
         self._file = file
@@ -308,8 +306,7 @@ class ReadZipFS(FS):
 
     def _path_to_zip_name(self, path):
         # type: (Text) -> str
-        """Convert a path to a zip file name.
-        """
+        """Convert a path to a zip file name."""
         path = relpath(normpath(path))
         if self._directory.isdir(path):
             path = forcedir(path)
@@ -320,8 +317,7 @@ class ReadZipFS(FS):
     @property
     def _directory(self):
         # type: () -> MemoryFS
-        """`MemoryFS`: a filesystem with the same folder hierarchy as the zip.
-        """
+        """`MemoryFS`: a filesystem with the same folder hierarchy as the zip."""
         self.check()
         with self._lock:
             if self._directory_fs is None:

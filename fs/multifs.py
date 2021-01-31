@@ -55,6 +55,13 @@ class MultiFS(FS):
 
     def __init__(self, auto_close=True):
         # type: (bool) -> None
+        """Create a new MultiFS.
+
+        Arguments:
+            auto_close (bool): If `True` (the default), the child
+                filesystems will be closed when `MultiFS` is closed.
+
+        """
         super(MultiFS, self).__init__()
 
         self._auto_close = auto_close
@@ -127,14 +134,12 @@ class MultiFS(FS):
 
     def _resort(self):
         # type: () -> None
-        """Force `iterate_fs` to re-sort on next reference.
-        """
+        """Force `iterate_fs` to re-sort on next reference."""
         self._fs_sequence = None
 
     def iterate_fs(self):
         # type: () -> Iterator[Tuple[Text, FS]]
-        """Get iterator that returns (name, fs) in priority order.
-        """
+        """Get iterator that returns (name, fs) in priority order."""
         if self._fs_sequence is None:
             self._fs_sequence = [
                 (name, fs)
@@ -146,8 +151,7 @@ class MultiFS(FS):
 
     def _delegate(self, path):
         # type: (Text) -> Optional[FS]
-        """Get a filesystem which has a given path.
-        """
+        """Get a filesystem which has a given path."""
         for _name, fs in self.iterate_fs():
             if fs.exists(path):
                 return fs
@@ -155,8 +159,7 @@ class MultiFS(FS):
 
     def _delegate_required(self, path):
         # type: (Text) -> FS
-        """Check that there is a filesystem with the given ``path``.
-        """
+        """Check that there is a filesystem with the given ``path``."""
         fs = self._delegate(path)
         if fs is None:
             raise errors.ResourceNotFound(path)
@@ -164,8 +167,7 @@ class MultiFS(FS):
 
     def _writable_required(self, path):
         # type: (Text) -> FS
-        """Check that ``path`` is writeable.
-        """
+        """Check that ``path`` is writeable."""
         if self.write_fs is None:
             raise errors.ResourceReadOnly(path)
         return self.write_fs

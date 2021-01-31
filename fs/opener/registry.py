@@ -31,8 +31,7 @@ if typing.TYPE_CHECKING:
 
 
 class Registry(object):
-    """A registry for `Opener` instances.
-    """
+    """A registry for `Opener` instances."""
 
     def __init__(self, default_opener="osfs", load_extern=False):
         # type: (Text, bool) -> None
@@ -64,10 +63,12 @@ class Registry(object):
 
         Note:
             May be used as a class decorator. For example::
+
                 registry = Registry()
                 @registry.install
                 class ArchiveOpener(Opener):
                     protocols = ['zip', 'tar']
+
         """
         _opener = opener if isinstance(opener, Opener) else opener()
         assert isinstance(_opener, Opener), "Opener instance required"
@@ -79,9 +80,7 @@ class Registry(object):
     @property
     def protocols(self):
         # type: () -> List[Text]
-        """`list`: the list of supported protocols.
-        """
-
+        """`list`: the list of supported protocols."""
         _protocols = list(self._protocols)
         if self.load_extern:
             _protocols.extend(

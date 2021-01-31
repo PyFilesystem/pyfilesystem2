@@ -18,14 +18,12 @@ if typing.TYPE_CHECKING:
 
 def make_mode(init):
     # type: (Union[int, Iterable[Text], None]) -> int
-    """Make a mode integer from an initial value.
-    """
+    """Make a mode integer from an initial value."""
     return Permissions.get_mode(init)
 
 
 class _PermProperty(object):
-    """Creates simple properties to get/set permissions.
-    """
+    """Creates simple properties to get/set permissions."""
 
     def __init__(self, name):
         # type: (Text) -> None
@@ -51,19 +49,6 @@ class Permissions(object):
     Permissions objects store information regarding the permissions
     on a resource. It supports Linux permissions, but is generic enough
     to manage permission information from almost any filesystem.
-
-    Arguments:
-        names (list, optional): A list of permissions.
-        mode (int, optional): A mode integer.
-        user (str, optional): A triplet of *user* permissions, e.g.
-            ``"rwx"`` or ``"r--"``
-        group (str, optional): A triplet of *group* permissions, e.g.
-            ``"rwx"`` or ``"r--"``
-        other (str, optional): A triplet of *other* permissions, e.g.
-            ``"rwx"`` or ``"r--"``
-        sticky (bool, optional): A boolean for the *sticky* bit.
-        setuid (bool, optional): A boolean for the *setuid* bit.
-        setguid (bool, optional): A boolean for the *setguid* bit.
 
     Example:
         >>> from fs.permissions import Permissions
@@ -105,6 +90,22 @@ class Permissions(object):
         setguid=None,  # type: Optional[bool]
     ):
         # type: (...) -> None
+        """Create a new `Permissions` instance.
+
+        Arguments:
+            names (list, optional): A list of permissions.
+            mode (int, optional): A mode integer.
+            user (str, optional): A triplet of *user* permissions, e.g.
+                ``"rwx"`` or ``"r--"``
+            group (str, optional): A triplet of *group* permissions, e.g.
+                ``"rwx"`` or ``"r--"``
+            other (str, optional): A triplet of *other* permissions, e.g.
+                ``"rwx"`` or ``"r--"``
+            sticky (bool, optional): A boolean for the *sticky* bit.
+            setuid (bool, optional): A boolean for the *setuid* bit.
+            setguid (bool, optional): A boolean for the *setguid* bit.
+
+        """
         if names is not None:
             self._perms = set(names)
         elif mode is not None:
@@ -174,8 +175,7 @@ class Permissions(object):
     @classmethod
     def parse(cls, ls):
         # type: (Text) -> Permissions
-        """Parse permissions in Linux notation.
-        """
+        """Parse permissions in Linux notation."""
         user = ls[:3]
         group = ls[3:6]
         other = ls[6:9]
@@ -184,8 +184,7 @@ class Permissions(object):
     @classmethod
     def load(cls, permissions):
         # type: (List[Text]) -> Permissions
-        """Load a serialized permissions object.
-        """
+        """Load a serialized permissions object."""
         return cls(names=permissions)
 
     @classmethod
@@ -222,26 +221,22 @@ class Permissions(object):
     @classmethod
     def get_mode(cls, init):
         # type: (Union[int, Iterable[Text], None]) -> int
-        """Convert an initial value to a mode integer.
-        """
+        """Convert an initial value to a mode integer."""
         return cls.create(init).mode
 
     def copy(self):
         # type: () -> Permissions
-        """Make a copy of this permissions object.
-        """
+        """Make a copy of this permissions object."""
         return Permissions(names=list(self._perms))
 
     def dump(self):
         # type: () -> List[Text]
-        """Get a list suitable for serialization.
-        """
+        """Get a list suitable for serialization."""
         return sorted(self._perms)
 
     def as_str(self):
         # type: () -> Text
-        """Get a Linux-style string representation of permissions.
-        """
+        """Get a Linux-style string representation of permissions."""
         perms = [
             c if name in self._perms else "-"
             for name, c in zip(self._LINUX_PERMS_NAMES[-9:], "rwxrwxrwx")
@@ -259,8 +254,7 @@ class Permissions(object):
     @property
     def mode(self):
         # type: () -> int
-        """`int`: mode integer.
-        """
+        """`int`: mode integer."""
         mode = 0
         for name, mask in self._LINUX_PERMS:
             if name in self._perms:

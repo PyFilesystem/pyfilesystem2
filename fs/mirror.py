@@ -73,6 +73,7 @@ def mirror(
         workers (int): Number of worker threads used
             (0 for single threaded). Set to a relatively low number
             for network filesystems, 4 would be a good start.
+
     """
 
     def src():

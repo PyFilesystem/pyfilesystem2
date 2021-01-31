@@ -55,10 +55,9 @@ __all__ = [
 
 
 class MissingInfoNamespace(AttributeError):
-    """An expected namespace is missing.
-    """
+    """An expected namespace is missing."""
 
-    def __init__(self, namespace):
+    def __init__(self, namespace):  # noqa: D107
         # type: (Text) -> None
         self.namespace = namespace
         msg = "namespace '{}' is required for this attribute"
@@ -70,20 +69,18 @@ class MissingInfoNamespace(AttributeError):
 
 @six.python_2_unicode_compatible
 class FSError(Exception):
-    """Base exception for the `fs` module.
-    """
+    """Base exception for the `fs` module."""
 
     default_message = "Unspecified error"
 
-    def __init__(self, msg=None):
+    def __init__(self, msg=None):  # noqa: D107
         # type: (Optional[Text]) -> None
         self._msg = msg or self.default_message
         super(FSError, self).__init__()
 
     def __str__(self):
         # type: () -> Text
-        """Return the error message.
-        """
+        """Return the error message."""
         msg = self._msg.format(**self.__dict__)
         return msg
 
@@ -94,8 +91,7 @@ class FSError(Exception):
 
 
 class FilesystemClosed(FSError):
-    """Attempt to use a closed filesystem.
-    """
+    """Attempt to use a closed filesystem."""
 
     default_message = "attempt to use closed filesystem"
 
@@ -105,18 +101,17 @@ class BulkCopyFailed(FSError):
 
     default_message = "One or more copy operations failed (see errors attribute)"
 
-    def __init__(self, errors):
+    def __init__(self, errors):  # noqa: D107
         self.errors = errors
         super(BulkCopyFailed, self).__init__()
 
 
 class CreateFailed(FSError):
-    """Filesystem could not be created.
-    """
+    """Filesystem could not be created."""
 
     default_message = "unable to create filesystem, {details}"
 
-    def __init__(self, msg=None, exc=None):
+    def __init__(self, msg=None, exc=None):  # noqa: D107
         # type: (Optional[Text], Optional[Exception]) -> None
         self._msg = msg or self.default_message
         self.details = "" if exc is None else text_type(exc)
@@ -140,12 +135,11 @@ class CreateFailed(FSError):
 
 
 class PathError(FSError):
-    """Base exception for errors to do with a path string.
-    """
+    """Base exception for errors to do with a path string."""
 
     default_message = "path '{path}' is invalid"
 
-    def __init__(self, path, msg=None):
+    def __init__(self, path, msg=None):  # noqa: D107
         # type: (Text, Optional[Text]) -> None
         self.path = path
         super(PathError, self).__init__(msg=msg)
@@ -155,19 +149,17 @@ class PathError(FSError):
 
 
 class NoSysPath(PathError):
-    """The filesystem does not provide *sys paths* to the resource.
-    """
+    """The filesystem does not provide *sys paths* to the resource."""
 
     default_message = "path '{path}' does not map to the local filesystem"
 
 
 class NoURL(PathError):
-    """The filesystem does not provide an URL for the resource.
-    """
+    """The filesystem does not provide an URL for the resource."""
 
     default_message = "path '{path}' has no '{purpose}' URL"
 
-    def __init__(self, path, purpose, msg=None):
+    def __init__(self, path, purpose, msg=None):  # noqa: D107
         # type: (Text, Text, Optional[Text]) -> None
         self.purpose = purpose
         super(NoURL, self).__init__(path, msg=msg)
@@ -177,22 +169,19 @@ class NoURL(PathError):
 
 
 class InvalidPath(PathError):
-    """Path can't be mapped on to the underlaying filesystem.
-    """
+    """Path can't be mapped on to the underlaying filesystem."""
 
     default_message = "path '{path}' is invalid on this filesystem "
 
 
 class InvalidCharsInPath(InvalidPath):
-    """Path contains characters that are invalid on this filesystem.
-    """
+    """Path contains characters that are invalid on this filesystem."""
 
     default_message = "path '{path}' contains invalid characters"
 
 
 class OperationFailed(FSError):
-    """A specific operation failed.
-    """
+    """A specific operation failed."""
 
     default_message = "operation failed, {details}"
 
@@ -201,7 +190,7 @@ class OperationFailed(FSError):
         path=None,  # type: Optional[Text]
         exc=None,  # type: Optional[Exception]
         msg=None,  # type: Optional[Text]
-    ):
+    ):  # noqa: D107
         # type: (...) -> None
         self.path = path
         self.exc = exc
@@ -214,54 +203,47 @@ class OperationFailed(FSError):
 
 
 class Unsupported(OperationFailed):
-    """Operation not supported by the filesystem.
-    """
+    """Operation not supported by the filesystem."""
 
     default_message = "not supported"
 
 
 class RemoteConnectionError(OperationFailed):
-    """Operations encountered remote connection trouble.
-    """
+    """Operations encountered remote connection trouble."""
 
     default_message = "remote connection error"
 
 
 class InsufficientStorage(OperationFailed):
-    """Storage is insufficient for requested operation.
-    """
+    """Storage is insufficient for requested operation."""
 
     default_message = "insufficient storage space"
 
 
 class PermissionDenied(OperationFailed):
-    """Not enough permissions.
-    """
+    """Not enough permissions."""
 
     default_message = "permission denied"
 
 
 class OperationTimeout(OperationFailed):
-    """Filesystem took too long.
-    """
+    """Filesystem took too long."""
 
     default_message = "operation timed out"
 
 
 class RemoveRootError(OperationFailed):
-    """Attempt to remove the root directory.
-    """
+    """Attempt to remove the root directory."""
 
     default_message = "root directory may not be removed"
 
 
 class ResourceError(FSError):
-    """Base exception class for error associated with a specific resource.
-    """
+    """Base exception class for error associated with a specific resource."""
 
     default_message = "failed on path {path}"
 
-    def __init__(self, path, exc=None, msg=None):
+    def __init__(self, path, exc=None, msg=None):  # noqa: D107
         # type: (Text, Optional[Exception], Optional[Text]) -> None
         self.path = path
         self.exc = exc
@@ -272,71 +254,61 @@ class ResourceError(FSError):
 
 
 class ResourceNotFound(ResourceError):
-    """Required resource not found.
-    """
+    """Required resource not found."""
 
     default_message = "resource '{path}' not found"
 
 
 class ResourceInvalid(ResourceError):
-    """Resource has the wrong type.
-    """
+    """Resource has the wrong type."""
 
     default_message = "resource '{path}' is invalid for this operation"
 
 
 class FileExists(ResourceError):
-    """File already exists.
-    """
+    """File already exists."""
 
     default_message = "resource '{path}' exists"
 
 
 class FileExpected(ResourceInvalid):
-    """Operation only works on files.
-    """
+    """Operation only works on files."""
 
     default_message = "path '{path}' should be a file"
 
 
 class DirectoryExpected(ResourceInvalid):
-    """Operation only works on directories.
-    """
+    """Operation only works on directories."""
 
     default_message = "path '{path}' should be a directory"
 
 
 class DestinationExists(ResourceError):
-    """Target destination already exists.
-    """
+    """Target destination already exists."""
 
     default_message = "destination '{path}' exists"
 
 
 class DirectoryExists(ResourceError):
-    """Directory already exists.
-    """
+    """Directory already exists."""
 
     default_message = "directory '{path}' exists"
 
 
 class DirectoryNotEmpty(ResourceError):
-    """Attempt to remove a non-empty directory.
-    """
+    """Attempt to remove a non-empty directory."""
 
     default_message = "directory '{path}' is not empty"
 
 
 class ResourceLocked(ResourceError):
-    """Attempt to use a locked resource.
-    """
+    """Attempt to use a locked resource."""
 
     default_message = "resource '{path}' is locked"
 
 
 class ResourceReadOnly(ResourceError):
-    """Attempting to modify a read-only resource.
-    """
+    """Attempting to modify a read-only resource."""
 
     default_message = "resource '{path}' is read only"
 
@@ -354,7 +326,7 @@ class IllegalBackReference(ValueError):
 
     """
 
-    def __init__(self, path):
+    def __init__(self, path):  # noqa: D107
         # type: (Text) -> None
         self.path = path
         msg = ("path '{path}' contains back-references outside of filesystem").format(

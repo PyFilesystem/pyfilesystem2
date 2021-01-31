@@ -4,6 +4,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import array
 import calendar
 import io
 import itertools
@@ -36,6 +37,7 @@ from .path import split
 from . import _ftp_parse as ftp_parse
 
 if typing.TYPE_CHECKING:
+    import mmap
     import ftplib
     from typing import (
         Any,
@@ -236,14 +238,17 @@ class FTPFile(io.RawIOBase):
         return b"".join(chunks)
 
     def readinto(self, buffer):
-        # type: (bytearray) -> int
+        # type: (Union[bytearray, memoryview, array.array[Any], mmap.mmap]) -> int
         data = self.read(len(buffer))
         bytes_read = len(data)
-        buffer[:bytes_read] = data
+        if isinstance(buffer, array.array):
+            buffer[:bytes_read] = array.array(buffer.typecode, data)
+        else:
+            buffer[:bytes_read] = data  # type: ignore
         return bytes_read
 
-    def readline(self, size=-1):
-        # type: (int) -> bytes
+    def readline(self, size=None):
+        # type: (Optional[int]) -> bytes
         return next(line_iterator(self, size))  # type: ignore
 
     def readlines(self, hint=-1):
@@ -262,9 +267,12 @@ class FTPFile(io.RawIOBase):
         return self.mode.writing
 
     def write(self, data):
-        # type: (bytes) -> int
+        # type: (Union[bytes, memoryview, array.array[Any], mmap.mmap]) -> int
         if not self.mode.writing:
             raise IOError("File not open for writing")
+
+        if isinstance(data, array.array):
+            data = data.tobytes()
 
         with self._lock:
             conn = self.write_conn
@@ -281,8 +289,16 @@ class FTPFile(io.RawIOBase):
         return data_pos
 
     def writelines(self, lines):
-        # type: (Iterable[bytes]) -> None
-        self.write(b"".join(lines))
+        # type: (Iterable[Union[bytes, memoryview, array.array[Any], mmap.mmap]]) -> None  # noqa: E501
+        if not self.mode.writing:
+            raise IOError("File not open for writing")
+        data = bytearray()
+        for line in lines:
+            if isinstance(line, array.array):
+                data.extend(line.tobytes())
+            else:
+                data.extend(line)  # type: ignore
+        self.write(data)
 
     def truncate(self, size=None):
         # type: (Optional[int]) -> int
@@ -330,20 +346,7 @@ class FTPFile(io.RawIOBase):
 
 
 class FTPFS(FS):
-    """A FTP (File Transport Protocol) Filesystem.
-
-    Arguments:
-        host (str): A FTP host, e.g. ``'ftp.mirror.nl'``.
-        user (str): A username (default is ``'anonymous'``).
-        passwd (str): Password for the server, or `None` for anon.
-        acct (str): FTP account.
-        timeout (int): Timeout for contacting server (in seconds,
-            defaults to 10).
-        port (int): FTP port number (default 21).
-        proxy (str, optional): An FTP proxy, or ``None`` (default)
-            for no proxy.
-
-    """
+    """A FTP (File Transport Protocol) Filesystem."""
 
     _meta = {
         "invalid_path_chars": "\0",
@@ -365,6 +368,20 @@ class FTPFS(FS):
         proxy=None,  # type: Optional[Text]
     ):
         # type: (...) -> None
+        """Create a new `FTPFS` instance.
+
+        Arguments:
+            host (str): A FTP host, e.g. ``'ftp.mirror.nl'``.
+            user (str): A username (default is ``'anonymous'``).
+            passwd (str): Password for the server, or `None` for anon.
+            acct (str): FTP account.
+            timeout (int): Timeout for contacting server (in seconds,
+                defaults to 10).
+            port (int): FTP port number (default 21).
+            proxy (str, optional): An FTP proxy, or ``None`` (default)
+                for no proxy.
+
+        """
         super(FTPFS, self).__init__()
         self._host = host
         self._user = user
@@ -403,8 +420,7 @@ class FTPFS(FS):
     @classmethod
     def _parse_features(cls, feat_response):
         # type: (Text) -> Dict[Text, Text]
-        """Parse a dict of features from FTP feat response.
-        """
+        """Parse a dict of features from FTP feat response."""
         features = {}
         if feat_response.split("-")[0] == "211":
             for line in feat_response.splitlines():
@@ -415,8 +431,7 @@ class FTPFS(FS):
 
     def _open_ftp(self):
         # type: () -> FTP
-        """Open a new ftp object.
-        """
+        """Open a new ftp object."""
         _ftp = FTP()
         _ftp.set_debuglevel(0)
         with ftp_errors(self):
@@ -462,8 +477,7 @@ class FTPFS(FS):
     @property
     def ftp(self):
         # type: () -> FTP
-        """~ftplib.FTP: the underlying FTP client.
-        """
+        """~ftplib.FTP: the underlying FTP client."""
         return self._get_ftp()
 
     def geturl(self, path, purpose="download"):
@@ -481,10 +495,9 @@ class FTPFS(FS):
         return self._ftp
 
     @property
-    def features(self):
+    def features(self):  # noqa: D401
         # type: () -> Dict[Text, Text]
-        """dict: features of the remote FTP server.
-        """
+        """`dict`: Features of the remote FTP server."""
         self._get_ftp()
         return self._features
 
@@ -506,8 +519,7 @@ class FTPFS(FS):
     @property
     def supports_mlst(self):
         # type: () -> bool
-        """bool: whether the server supports MLST feature.
-        """
+        """bool: whether the server supports MLST feature."""
         return "MLST" in self.features
 
     def create(self, path, wipe=False):
@@ -525,8 +537,7 @@ class FTPFS(FS):
     @classmethod
     def _parse_ftp_time(cls, time_text):
         # type: (Text) -> Optional[int]
-        """Parse a time from an ftp directory listing.
-        """
+        """Parse a time from an ftp directory listing."""
         try:
             tm_year = int(time_text[0:4])
             tm_month = int(time_text[4:6])

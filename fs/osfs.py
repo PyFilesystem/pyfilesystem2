@@ -81,22 +81,6 @@ _WINDOWS_PLATFORM = platform.system() == "Windows"
 class OSFS(FS):
     """Create an OSFS.
 
-    Arguments:
-        root_path (str or ~os.PathLike): An OS path or path-like object to
-            the location on your HD you wish to manage.
-        create (bool): Set to `True` to create the root directory if it
-            does not already exist, otherwise the directory should exist
-            prior to creating the ``OSFS`` instance (defaults to `False`).
-        create_mode (int): The permissions that will be used to create
-            the directory if ``create`` is `True` and the path doesn't
-            exist, defaults to ``0o777``.
-        expand_vars(bool): If `True` (the default) environment variables of
-            the form $name or ${name} will be expanded.
-
-    Raises:
-        `fs.errors.CreateFailed`: If ``root_path`` does not
-            exist, or could not be created.
-
     Examples:
         >>> current_directory_fs = OSFS('.')
         >>> home_fs = OSFS('~/')
@@ -113,6 +97,23 @@ class OSFS(FS):
     ):
         # type: (...) -> None
         """Create an OSFS instance.
+
+        Arguments:
+            root_path (str or ~os.PathLike): An OS path or path-like object
+                to the location on your HD you wish to manage.
+            create (bool): Set to `True` to create the root directory if it
+                does not already exist, otherwise the directory should exist
+                prior to creating the ``OSFS`` instance (defaults to `False`).
+            create_mode (int): The permissions that will be used to create
+                the directory if ``create`` is `True` and the path doesn't
+                exist, defaults to ``0o777``.
+            expand_vars(bool): If `True` (the default) environment variables
+                of the form ``~``, ``$name`` or ``${name}`` will be expanded.
+
+        Raises:
+            `fs.errors.CreateFailed`: If ``root_path`` does not
+                exist, or could not be created.
+
         """
         super(OSFS, self).__init__()
         if isinstance(root_path, bytes):
@@ -188,8 +189,7 @@ class OSFS(FS):
 
     def _to_sys_path(self, path):
         # type: (Text) -> bytes
-        """Convert a FS path to a path on the OS.
-        """
+        """Convert a FS path to a path on the OS."""
         sys_path = fsencode(
             os.path.join(self._root_path, path.lstrip("/").replace("/", os.sep))
         )
@@ -198,8 +198,7 @@ class OSFS(FS):
     @classmethod
     def _make_details_from_stat(cls, stat_result):
         # type: (os.stat_result) -> Dict[Text, object]
-        """Make a *details* info dict from an `os.stat_result` object.
-        """
+        """Make a *details* info dict from an `os.stat_result` object."""
         details = {
             "_write": ["accessed", "modified"],
             "accessed": stat_result.st_atime,
@@ -218,8 +217,7 @@ class OSFS(FS):
     @classmethod
     def _make_access_from_stat(cls, stat_result):
         # type: (os.stat_result) -> Dict[Text, object]
-        """Make an *access* info dict from an `os.stat_result` object.
-        """
+        """Make an *access* info dict from an `os.stat_result` object."""
         access = {}  # type: Dict[Text, object]
         access["permissions"] = Permissions(mode=stat_result.st_mode).dump()
         access["gid"] = gid = stat_result.st_gid
@@ -252,8 +250,7 @@ class OSFS(FS):
     @classmethod
     def _get_type_from_stat(cls, _stat):
         # type: (os.stat_result) -> ResourceType
-        """Get the resource type from an `os.stat_result` object.
-        """
+        """Get the resource type from an `os.stat_result` object."""
         st_mode = _stat.st_mode
         st_type = stat.S_IFMT(st_mode)
         return cls.STAT_TO_RESOURCE_TYPE.get(st_type, ResourceType.unknown)
@@ -673,6 +670,6 @@ class OSFS(FS):
             raise errors.InvalidCharsInPath(
                 path,
                 msg="path '{path}' could not be encoded for the filesystem (check LANG"
-                    " env var); {error}".format(path=path, error=error),
+                " env var); {error}".format(path=path, error=error),
             )
         return super(OSFS, self).validatepath(path)

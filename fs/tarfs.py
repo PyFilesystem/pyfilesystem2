@@ -150,15 +150,14 @@ class TarFS(WrapFS):
             compression=None,  # type: Optional[Text]
             encoding="utf-8",  # type: Text
             temp_fs="temp://__tartemp__",  # type: Text
-        ):
+        ):  # noqa: D107
             # type: (...) -> None
             pass
 
 
 @six.python_2_unicode_compatible
 class WriteTarFS(WrapFS):
-    """A writable tar file.
-    """
+    """A writable tar file."""
 
     def __init__(
         self,
@@ -166,7 +165,7 @@ class WriteTarFS(WrapFS):
         compression=None,  # type: Optional[Text]
         encoding="utf-8",  # type: Text
         temp_fs="temp://__tartemp__",  # type: Text
-    ):
+    ):  # noqa: D107
         # type: (...) -> None
         self._file = file  # type: Union[Text, BinaryIO]
         self.compression = compression
@@ -222,6 +221,7 @@ class WriteTarFS(WrapFS):
 
         Note:
             This is called automatically when the TarFS is closed.
+
         """
         if not self.isclosed():
             write_tar(
@@ -234,8 +234,7 @@ class WriteTarFS(WrapFS):
 
 @six.python_2_unicode_compatible
 class ReadTarFS(FS):
-    """A readable tar file.
-    """
+    """A readable tar file."""
 
     _meta = {
         "case_insensitive": True,
@@ -260,7 +259,7 @@ class ReadTarFS(FS):
     }
 
     @errors.CreateFailed.catch_all
-    def __init__(self, file, encoding="utf-8"):
+    def __init__(self, file, encoding="utf-8"):  # noqa: D107
         # type: (Union[Text, BinaryIO], Text) -> None
         super(ReadTarFS, self).__init__()
         self._file = file

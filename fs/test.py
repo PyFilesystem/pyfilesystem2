@@ -245,13 +245,15 @@ Box drawing alignment tests:                                          █
 
 
 class FSTestCases(object):
-    """Basic FS tests.
-    """
+    """Basic FS tests."""
+
+    data1 = b"foo" * 256 * 1024
+    data2 = b"bar" * 2 * 256 * 1024
+    data3 = b"baz" * 3 * 256 * 1024
+    data4 = b"egg" * 7 * 256 * 1024
 
     def make_fs(self):
-        """Return an FS instance.
-
-        """
+        """Return an FS instance."""
         raise NotImplementedError("implement me")
 
     def destroy_fs(self, fs):
@@ -430,15 +432,13 @@ class FSTestCases(object):
         self.fs.hasurl("a/b/c/foo/bar")
 
     def test_geturl_purpose(self):
-        """Check an unknown purpose raises a NoURL error.
-        """
+        """Check an unknown purpose raises a NoURL error."""
         self.fs.create("foo")
         with self.assertRaises(errors.NoURL):
             self.fs.geturl("foo", purpose="__nosuchpurpose__")
 
     def test_validatepath(self):
-        """Check validatepath returns an absolute path.
-        """
+        """Check validatepath returns an absolute path."""
         path = self.fs.validatepath("foo")
         self.assertEqual(path, "/foo")
 
@@ -1196,22 +1196,17 @@ class FSTestCases(object):
 
     def _test_upload(self, workers):
         """Test fs.copy with varying number of worker threads."""
-        data1 = b"foo" * 256 * 1024
-        data2 = b"bar" * 2 * 256 * 1024
-        data3 = b"baz" * 3 * 256 * 1024
-        data4 = b"egg" * 7 * 256 * 1024
-
         with open_fs("temp://") as src_fs:
-            src_fs.writebytes("foo", data1)
-            src_fs.writebytes("bar", data2)
-            src_fs.makedir("dir1").writebytes("baz", data3)
-            src_fs.makedirs("dir2/dir3").writebytes("egg", data4)
+            src_fs.writebytes("foo", self.data1)
+            src_fs.writebytes("bar", self.data2)
+            src_fs.makedir("dir1").writebytes("baz", self.data3)
+            src_fs.makedirs("dir2/dir3").writebytes("egg", self.data4)
             dst_fs = self.fs
             fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
-            self.assertEqual(dst_fs.readbytes("foo"), data1)
-            self.assertEqual(dst_fs.readbytes("bar"), data2)
-            self.assertEqual(dst_fs.readbytes("dir1/baz"), data3)
-            self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), data4)
+            self.assertEqual(dst_fs.readbytes("foo"), self.data1)
+            self.assertEqual(dst_fs.readbytes("bar"), self.data2)
+            self.assertEqual(dst_fs.readbytes("dir1/baz"), self.data3)
+            self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), self.data4)
 
     def test_upload_0(self):
         self._test_upload(0)
@@ -1227,21 +1222,17 @@ class FSTestCases(object):
 
     def _test_download(self, workers):
         """Test fs.copy with varying number of worker threads."""
-        data1 = b"foo" * 256 * 1024
-        data2 = b"bar" * 2 * 256 * 1024
-        data3 = b"baz" * 3 * 256 * 1024
-        data4 = b"egg" * 7 * 256 * 1024
         src_fs = self.fs
         with open_fs("temp://") as dst_fs:
-            src_fs.writebytes("foo", data1)
-            src_fs.writebytes("bar", data2)
-            src_fs.makedir("dir1").writebytes("baz", data3)
-            src_fs.makedirs("dir2/dir3").writebytes("egg", data4)
+            src_fs.writebytes("foo", self.data1)
+            src_fs.writebytes("bar", self.data2)
+            src_fs.makedir("dir1").writebytes("baz", self.data3)
+            src_fs.makedirs("dir2/dir3").writebytes("egg", self.data4)
             fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
-            self.assertEqual(dst_fs.readbytes("foo"), data1)
-            self.assertEqual(dst_fs.readbytes("bar"), data2)
-            self.assertEqual(dst_fs.readbytes("dir1/baz"), data3)
-            self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), data4)
+            self.assertEqual(dst_fs.readbytes("foo"), self.data1)
+            self.assertEqual(dst_fs.readbytes("bar"), self.data2)
+            self.assertEqual(dst_fs.readbytes("dir1/baz"), self.data3)
+            self.assertEqual(dst_fs.readbytes("dir2/dir3/egg"), self.data4)
 
     def test_download_0(self):
         self._test_download(0)
@@ -1494,7 +1485,7 @@ class FSTestCases(object):
         with self.fs.open("foo", "rb") as f:
             data = f.read()
         self.assertEqual(data, b"bar")
-        
+
         # upload to non-existing path (/spam/eggs)
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.upload("/spam/eggs", bytes_file)

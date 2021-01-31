@@ -1,24 +1,87 @@
 from __future__ import unicode_literals
 
-import pytest
+import shutil
+import tempfile
+import unittest
+
 import six
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
+import fs.test
 from fs import appfs
 
 
-@pytest.fixture
-def fs(mock_appdir_directories):
-    """Create a UserDataFS but strictly using a temporary directory."""
-    return appfs.UserDataFS("fstest", "willmcgugan", "1.0")
+class _TestAppFS(fs.test.FSTestCases):
+
+    AppFS = None
+
+    @classmethod
+    def setUpClass(cls):
+        super(_TestAppFS, cls).setUpClass()
+        cls.tmpdir = tempfile.mkdtemp()
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmpdir)
+
+    def make_fs(self):
+        with mock.patch(
+            "appdirs.{}".format(self.AppFS.app_dir),
+            autospec=True,
+            spec_set=True,
+            return_value=tempfile.mkdtemp(dir=self.tmpdir),
+        ):
+            return self.AppFS("fstest", "willmcgugan", "1.0")
+
+    if six.PY2:
+
+        def test_repr(self):
+            self.assertEqual(
+                repr(self.fs),
+                "{}(u'fstest', author=u'willmcgugan', version=u'1.0')".format(
+                    self.AppFS.__name__
+                ),
+            )
+
+    else:
+
+        def test_repr(self):
+            self.assertEqual(
+                repr(self.fs),
+                "{}('fstest', author='willmcgugan', version='1.0')".format(
+                    self.AppFS.__name__
+                ),
+            )
+
+    def test_str(self):
+        self.assertEqual(
+            str(self.fs), "<{} 'fstest'>".format(self.AppFS.__name__.lower())
+        )
 
 
-@pytest.mark.skipif(six.PY2, reason="Test requires Python 3 repr")
-def test_user_data_repr_py3(fs):
-    assert repr(fs) == "UserDataFS('fstest', author='willmcgugan', version='1.0')"
-    assert str(fs) == "<userdatafs 'fstest'>"
+class TestUserDataFS(_TestAppFS, unittest.TestCase):
+    AppFS = appfs.UserDataFS
 
 
-@pytest.mark.skipif(not six.PY2, reason="Test requires Python 2 repr")
-def test_user_data_repr_py2(fs):
-    assert repr(fs) == "UserDataFS(u'fstest', author=u'willmcgugan', version=u'1.0')"
-    assert str(fs) == "<userdatafs 'fstest'>"
+class TestUserConfigFS(_TestAppFS, unittest.TestCase):
+    AppFS = appfs.UserConfigFS
+
+
+class TestUserCacheFS(_TestAppFS, unittest.TestCase):
+    AppFS = appfs.UserCacheFS
+
+
+class TestSiteDataFS(_TestAppFS, unittest.TestCase):
+    AppFS = appfs.SiteDataFS
+
+
+class TestSiteConfigFS(_TestAppFS, unittest.TestCase):
+    AppFS = appfs.SiteConfigFS
+
+
+class TestUserLogFS(_TestAppFS, unittest.TestCase):
+    AppFS = appfs.UserLogFS

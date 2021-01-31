@@ -46,9 +46,9 @@ def write_zip(
         compression (int): Compression to use (one of the constants
             defined in the `zipfile` module in the stdlib). Defaults
             to `zipfile.ZIP_DEFLATED`.
-        encoding (str):
-             The encoding to use for filenames. The default is ``"utf-8"``,
-             use ``"CP437"`` if compatibility with WinZip is desired.
+        encoding (str): The encoding to use for filenames. The default
+            is ``"utf-8"``, use ``"CP437"`` if compatibility with WinZip
+            is desired.
         walker (~fs.walk.Walker, optional): A `Walker` instance, or `None`
             to use default walker. You can use this to specify which files
             you want to compress.
@@ -116,6 +116,7 @@ def write_tar(
     """Write the contents of a filesystem to a tar file.
 
     Arguments:
+        src_fs (~fs.base.FS): The source filesystem to compress.
         file (str or io.IOBase): Destination file, may be a file
             name or an open file object.
         compression (str, optional): Compression to use, or `None`

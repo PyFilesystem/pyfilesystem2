@@ -1,0 +1,72 @@
+name: Test
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version:
+          - 2.7
+          - 3.5
+          - 3.6
+          - 3.7
+          - 3.8
+          - 3.9
+          - pypy-2.7
+          - pypy-3.6
+          - pypy-3.7
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Setup Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Update pip
+      run: python -m pip install -U pip wheel setuptools
+    - name: Install tox
+      run: python -m pip install tox tox-gh-actions
+    - name: Test with tox
+      run: python -m tox
+    - name: Collect coverage results
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel: true
+        flag-name: test (${{ matrix.python-version}})
+
+  coveralls:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+    - name: Upload coverage statistics to Coveralls
+      uses: AndreMiras/coveralls-python-action@develop
+      with:
+        parallel-finished: true
+
+  lint:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        linter:
+          - typecheck
+          - codestyle
+          - docstyle
+          - codeformat
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Setup Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+    - name: Update pip
+      run: python -m pip install -U pip wheel setuptools
+    - name: Install tox
+      run: python -m pip install tox tox-gh-actions
+    - name: Run ${{ matrix.linter }} linter
+      run: python -m tox -e ${{ matrix.linter }}

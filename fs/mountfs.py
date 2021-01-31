@@ -41,18 +41,11 @@ if typing.TYPE_CHECKING:
 
 
 class MountError(Exception):
-    """Thrown when mounts conflict.
-    """
+    """Thrown when mounts conflict."""
 
 
 class MountFS(FS):
-    """A virtual filesystem that maps directories on to other file-systems.
-
-    Arguments:
-        auto_close (bool): If `True` (the default), the child
-            filesystems will be closed when `MountFS` is closed.
-
-    """
+    """A virtual filesystem that maps directories on to other file-systems."""
 
     _meta = {
         "virtual": True,
@@ -64,6 +57,13 @@ class MountFS(FS):
 
     def __init__(self, auto_close=True):
         # type: (bool) -> None
+        """Create a new `MountFS` instance.
+
+        Arguments:
+            auto_close (bool): If `True` (the default), the child
+                filesystems will be closed when `MountFS` is closed.
+
+        """
         super(MountFS, self).__init__()
         self.auto_close = auto_close
         self.default_fs = MemoryFS()  # type: FS

@@ -18,12 +18,12 @@ if typing.TYPE_CHECKING:
     from typing import Optional, Text
 
 
-_ParseResult = collections.namedtuple(
-    "ParseResult", ["protocol", "username", "password", "resource", "params", "path"]
-)
-
-
-class ParseResult(_ParseResult):
+class ParseResult(
+    collections.namedtuple(
+        "ParseResult",
+        ["protocol", "username", "password", "resource", "params", "path"],
+    )
+):
     """A named tuple containing fields of a parsed FS URL.
 
     Attributes:

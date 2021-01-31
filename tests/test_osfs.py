@@ -8,7 +8,6 @@ import shutil
 import tempfile
 import sys
 import unittest
-import pytest
 
 from fs import osfs, open_fs
 from fs.path import relpath, dirname
@@ -88,10 +87,10 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         self.assertIn("TYRIONLANISTER", fs1.getsyspath("/"))
         self.assertNotIn("TYRIONLANISTER", fs2.getsyspath("/"))
 
-    @pytest.mark.skipif(osfs.sendfile is None, reason="sendfile not supported")
-    @pytest.mark.skipif(
+    @unittest.skipUnless(osfs.sendfile, "sendfile not supported")
+    @unittest.skipIf(
         sys.version_info >= (3, 8),
-        reason="the copy function uses sendfile in Python 3.8+, "
+        "the copy function uses sendfile in Python 3.8+, "
         "making the patched implementation irrelevant",
     )
     def test_copy_sendfile(self):
@@ -139,7 +138,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         finally:
             shutil.rmtree(dir_path)
 
-    @pytest.mark.skipif(not hasattr(os, "symlink"), reason="No symlink support")
+    @unittest.skipUnless(hasattr(os, "symlink"), "No symlink support")
     def test_symlinks(self):
         with open(self._get_real_path("foo"), "wb") as f:
             f.write(b"foobar")

@@ -27,20 +27,7 @@ if typing.TYPE_CHECKING:
 
 @six.python_2_unicode_compatible
 class TempFS(OSFS):
-    """A temporary filesystem on the OS.
-
-    Arguments:
-        identifier (str): A string to distinguish the directory within
-            the OS temp location, used as part of the directory name.
-        temp_dir (str, optional): An OS path to your temp directory
-            (leave as `None` to auto-detect)
-        auto_clean (bool): If `True` (the default), the directory
-            contents will be wiped on close.
-        ignore_clean_errors (bool): If `True` (the default), any errors
-            in the clean process will be suppressed. If `False`, they
-            will be raised.
-
-    """
+    """A temporary filesystem on the OS."""
 
     def __init__(
         self,
@@ -50,6 +37,20 @@ class TempFS(OSFS):
         ignore_clean_errors=True,  # type: bool
     ):
         # type: (...) -> None
+        """Create a new `TempFS` instance.
+
+        Arguments:
+            identifier (str): A string to distinguish the directory within
+                the OS temp location, used as part of the directory name.
+            temp_dir (str, optional): An OS path to your temp directory
+                (leave as `None` to auto-detect)
+            auto_clean (bool): If `True` (the default), the directory
+                contents will be wiped on close.
+            ignore_clean_errors (bool): If `True` (the default), any errors
+                in the clean process will be suppressed. If `False`, they
+                will be raised.
+
+        """
         self.identifier = identifier
         self._auto_clean = auto_clean
         self._ignore_clean_errors = ignore_clean_errors
@@ -76,8 +77,7 @@ class TempFS(OSFS):
 
     def clean(self):
         # type: () -> None
-        """Clean (delete) temporary files created by this filesystem.
-        """
+        """Clean (delete) temporary files created by this filesystem."""
         if self._cleaned:
             return
 

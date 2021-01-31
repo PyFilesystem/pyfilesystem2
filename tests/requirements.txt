@@ -1,0 +1,16 @@
+# the bare requirements for running tests
+
+# pyftpdlib is needed to spawn a FTP server for the
+# FTPFS test suite
+pyftpdlib ~=1.5
+
+# these are optional dependencies for pyftpdlib that
+# are not explicitly listed, we need to install these
+# ourselves
+psutil ~=5.0
+pysendfile ~=2.0 ; python_version <= "3.3"
+
+# mock is only available from Python 3.3 onward, and 
+# mock v4+ doesn't support Python 2.7 anymore
+mock ~=3.0 ; python_version < "3.3"
+

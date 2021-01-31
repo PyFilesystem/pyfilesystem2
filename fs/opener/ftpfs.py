@@ -21,8 +21,7 @@ if typing.TYPE_CHECKING:
 
 @registry.install
 class FTPOpener(Opener):
-    """`FTPFS` opener.
-    """
+    """`FTPFS` opener."""
 
     protocols = ["ftp"]
 

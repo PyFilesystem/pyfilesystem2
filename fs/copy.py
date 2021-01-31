@@ -150,7 +150,7 @@ def copy_file_internal(
     dst_path,  # type: Text
 ):
     # type: (...) -> None
-    """Low level copy, that doesn't call manage_fs or lock.
+    """Copy a file at low level, without calling `manage_fs` or locking.
 
     If the destination exists, and is a file, it will be first truncated.
 
@@ -160,7 +160,7 @@ def copy_file_internal(
     Arguments:
         src_fs (FS): Source filesystem.
         src_path (str): Path to a file on the source filesystem.
-        dst_fs (FS: Destination filesystem.
+        dst_fs (FS): Destination filesystem.
         dst_path (str): Path to a file on the destination filesystem.
 
     """

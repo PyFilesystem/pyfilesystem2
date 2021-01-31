@@ -29,7 +29,7 @@ class SubFS(WrapFS[_F], typing.Generic[_F]):
 
     """
 
-    def __init__(self, parent_fs, path):
+    def __init__(self, parent_fs, path):  # noqa: D107
         # type: (_F, Text) -> None
         super(SubFS, self).__init__(parent_fs)
         self._sub_dir = abspath(normpath(path))
@@ -55,8 +55,7 @@ class SubFS(WrapFS[_F], typing.Generic[_F]):
 
 
 class ClosingSubFS(SubFS[_F], typing.Generic[_F]):
-    """A version of `SubFS` which closes its parent when closed.
-    """
+    """A version of `SubFS` which closes its parent when closed."""
 
     def close(self):
         # type: () -> None

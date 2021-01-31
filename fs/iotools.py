@@ -4,6 +4,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import array
 import io
 import typing
 from io import SEEK_SET, SEEK_CUR
@@ -11,6 +12,7 @@ from io import SEEK_SET, SEEK_CUR
 from .mode import Mode
 
 if typing.TYPE_CHECKING:
+    import mmap
     from io import RawIOBase
     from typing import (
         Any,
@@ -25,10 +27,9 @@ if typing.TYPE_CHECKING:
 
 
 class RawWrapper(io.RawIOBase):
-    """Convert a Python 2 style file-like object in to a IO object.
-    """
+    """Convert a Python 2 style file-like object in to a IO object."""
 
-    def __init__(self, f, mode=None, name=None):
+    def __init__(self, f, mode=None, name=None):  # noqa: D107
         # type: (IO[bytes], Optional[Text], Optional[Text]) -> None
         self._f = f
         self.mode = mode or getattr(f, "mode", None)
@@ -89,8 +90,11 @@ class RawWrapper(io.RawIOBase):
         return self._f.truncate(size)
 
     def write(self, data):
-        # type: (bytes) -> int
-        count = self._f.write(data)
+        # type: (Union[bytes, memoryview, array.array[Any], mmap.mmap]) -> int
+        if isinstance(data, array.array):
+            count = self._f.write(data.tobytes())
+        else:
+            count = self._f.write(data)  # type: ignore
         return len(data) if count is None else count
 
     @typing.no_type_check
@@ -131,17 +135,20 @@ class RawWrapper(io.RawIOBase):
             b[:bytes_read] = data
             return bytes_read
 
-    def readline(self, limit=-1):
-        # type: (int) -> bytes
-        return self._f.readline(limit)
+    def readline(self, limit=None):
+        # type: (Optional[int]) -> bytes
+        return self._f.readline(-1 if limit is None else limit)
 
-    def readlines(self, hint=-1):
-        # type: (int) -> List[bytes]
-        return self._f.readlines(hint)
+    def readlines(self, hint=None):
+        # type: (Optional[int]) -> List[bytes]
+        return self._f.readlines(-1 if hint is None else hint)
 
-    def writelines(self, sequence):
-        # type: (Iterable[Union[bytes, bytearray]]) -> None
-        return self._f.writelines(sequence)
+    def writelines(self, lines):
+        # type: (Iterable[Union[bytes, memoryview, array.array[Any], mmap.mmap]]) -> None  # noqa: E501
+        _lines = (
+            line.tobytes() if isinstance(line, array.array) else line for line in lines
+        )
+        return self._f.writelines(typing.cast("Iterable[bytes]", _lines))
 
     def __iter__(self):
         # type: () -> Iterator[bytes]
@@ -161,8 +168,7 @@ def make_stream(
     **kwargs  # type: Any
 ):
     # type: (...) -> IO
-    """Take a Python 2.x binary file and return an IO Stream.
-    """
+    """Take a Python 2.x binary file and return an IO Stream."""
     reading = "r" in mode
     writing = "w" in mode
     appending = "a" in mode

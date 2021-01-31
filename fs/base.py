@@ -92,8 +92,7 @@ def _new_name(method, old_name):
 
 @six.add_metaclass(abc.ABCMeta)
 class FS(object):
-    """Base class for FS objects.
-    """
+    """Base class for FS objects."""
 
     # This is the "standard" meta namespace.
     _meta = {}  # type: Dict[Text, Union[Text, int, bool, None]]
@@ -106,8 +105,7 @@ class FS(object):
 
     def __init__(self):
         # type: (...) -> None
-        """Create a filesystem. See help(type(self)) for accurate signature.
-        """
+        """Create a filesystem. See help(type(self)) for accurate signature."""
         self._closed = False
         self._lock = threading.RLock()
         super(FS, self).__init__()
@@ -118,8 +116,7 @@ class FS(object):
 
     def __enter__(self):
         # type: (...) -> FS
-        """Allow use of filesystem as a context manager.
-        """
+        """Allow use of filesystem as a context manager."""
         return self
 
     def __exit__(
@@ -129,21 +126,18 @@ class FS(object):
         traceback,  # type: Optional[TracebackType]
     ):
         # type: (...) -> None
-        """Close filesystem on exit.
-        """
+        """Close filesystem on exit."""
         self.close()
 
     @property
     def glob(self):
-        """`~fs.glob.BoundGlobber`: a globber object..
-        """
+        """`~fs.glob.BoundGlobber`: a globber object.."""
         return BoundGlobber(self)
 
     @property
     def walk(self):
         # type: (_F) -> BoundWalker[_F]
-        """`~fs.walk.BoundWalker`: a walker bound to this filesystem.
-        """
+        """`~fs.walk.BoundWalker`: a walker bound to this filesystem."""
         return self.walker_class.bind(self)
 
     # ---------------------------------------------------------------- #
@@ -544,26 +538,22 @@ class FS(object):
 
         def match_dir(patterns, info):
             # type: (Optional[Iterable[Text]], Info) -> bool
-            """Pattern match info.name.
-            """
+            """Pattern match info.name."""
             return info.is_file or self.match(patterns, info.name)
 
         def match_file(patterns, info):
             # type: (Optional[Iterable[Text]], Info) -> bool
-            """Pattern match info.name.
-            """
+            """Pattern match info.name."""
             return info.is_dir or self.match(patterns, info.name)
 
         def exclude_dir(patterns, info):
             # type: (Optional[Iterable[Text]], Info) -> bool
-            """Pattern match info.name.
-            """
+            """Pattern match info.name."""
             return info.is_file or not self.match(patterns, info.name)
 
         def exclude_file(patterns, info):
             # type: (Optional[Iterable[Text]], Info) -> bool
-            """Pattern match info.name.
-            """
+            """Pattern match info.name."""
             return info.is_dir or not self.match(patterns, info.name)
 
         if files:
@@ -608,7 +598,7 @@ class FS(object):
 
     def download(self, path, file, chunk_size=None, **options):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
-        """Copies a file from the filesystem to a file-like object.
+        """Copy a file from the filesystem to a file-like object.
 
         This may be more efficient that opening and copying files
         manually if the filesystem supplies an optimized method.
@@ -751,7 +741,7 @@ class FS(object):
         # type: (Text) -> Text
         """Get the *system path* of a resource.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -787,10 +777,9 @@ class FS(object):
 
     def getospath(self, path):
         # type: (Text) -> bytes
-        """Get a *system path* to a resource, encoded in the operating
-        system's prefered encoding.
+        """Get the *system path* to a resource, in the OS' prefered encoding.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -819,7 +808,7 @@ class FS(object):
         # type: (Text) -> ResourceType
         """Get the type of a resource.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -857,7 +846,7 @@ class FS(object):
         # type: (Text, Text) -> Text
         """Get the URL to a given resource.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem
             purpose (str): A short string that indicates which URL
                 to retrieve for the given path (if there is more than
@@ -878,7 +867,7 @@ class FS(object):
         # type: (Text) -> bool
         """Check if a path maps to a system path.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -896,7 +885,7 @@ class FS(object):
         # type: (Text, Text) -> bool
         """Check if a path has a corresponding URL.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
             purpose (str): A purpose parameter, as given in
                 `~fs.base.FS.geturl`.
@@ -914,15 +903,14 @@ class FS(object):
 
     def isclosed(self):
         # type: () -> bool
-        """Check if the filesystem is closed.
-        """
+        """Check if the filesystem is closed."""
         return getattr(self, "_closed", False)
 
     def isdir(self, path):
         # type: (Text) -> bool
         """Check if a path maps to an existing directory.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -941,7 +929,7 @@ class FS(object):
         A directory is considered empty when it does not contain
         any file or any directory.
 
-        Parameters:
+        Arguments:
             path (str): A path to a directory on the filesystem.
 
         Returns:
@@ -958,7 +946,7 @@ class FS(object):
         # type: (Text) -> bool
         """Check if a path maps to an existing file.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -974,7 +962,7 @@ class FS(object):
         # type: (Text) -> bool
         """Check if a path maps to a symlink.
 
-        Parameters:
+        Arguments:
             path (str): A path on the filesystem.
 
         Returns:
@@ -1020,7 +1008,7 @@ class FS(object):
         # type: (Text, Text, bool) -> None
         """Move directory ``src_path`` to ``dst_path``.
 
-        Parameters:
+        Arguments:
             src_path (str): Path of source directory on the filesystem.
             dst_path (str): Path to destination directory.
             create (bool): If `True`, then ``dst_path`` will be created
@@ -1454,8 +1442,7 @@ class FS(object):
 
     def validatepath(self, path):
         # type: (Text) -> Text
-        """Check if a path is valid, returning a normalized absolute
-        path.
+        """Validate a path, returning a normalized absolute path on sucess.
 
         Many filesystems have restrictions on the format of paths they
         support. This method will check that ``path`` is valid on the

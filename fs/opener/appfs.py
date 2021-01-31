@@ -21,8 +21,7 @@ if typing.TYPE_CHECKING:
 
 @registry.install
 class AppFSOpener(Opener):
-    """``AppFS`` opener.
-    """
+    """``AppFS`` opener."""
 
     protocols = ["userdata", "userconf", "sitedata", "siteconf", "usercache", "userlog"]
     _protocol_mapping = None
