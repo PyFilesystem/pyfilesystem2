@@ -18,7 +18,7 @@ from ftplib import FTP
 try:
     from ftplib import FTP_TLS
 except ImportError as err:
-    FTP_TLS = err
+    FTP_TLS = err  # type: ignore
 from ftplib import error_perm
 from ftplib import error_temp
 from typing import cast
@@ -472,8 +472,10 @@ class FTPFS(FS):
         with ftp_errors(self):
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
-            if self.tls:
+            try:
                 _ftp.prot_p()
+            except AttributeError:
+                pass
             self._features = {}
             try:
                 feat_response = _decode(_ftp.sendcmd("FEAT"), "latin-1")
