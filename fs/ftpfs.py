@@ -17,14 +17,15 @@ from ftplib import FTP
 
 try:
     from ftplib import FTP_TLS
-except ImportError:
-    FTP_TLS = None
+except ImportError as err:
+    FTP_TLS = err
 from ftplib import error_perm
 from ftplib import error_temp
 from typing import cast
 
 from six import PY2
 from six import text_type
+from six import raise_from
 
 from . import errors
 from .base import FS
@@ -422,6 +423,9 @@ class FTPFS(FS):
         self.proxy = proxy
         self.tls = tls
 
+        if self.tls and isinstance(FTP_TLS, Exception):
+            raise_from(errors.CreateFailed("FTP over TLS not supported"), FTP_TLS)
+
         self.encoding = "latin-1"
         self._ftp = None  # type: Optional[FTP]
         self._welcome = None  # type: Optional[Text]
@@ -463,11 +467,7 @@ class FTPFS(FS):
     def _open_ftp(self):
         # type: () -> FTP
         """Open a new ftp object."""
-        if self.tls and FTP_TLS:
-            _ftp = FTP_TLS()
-        else:
-            self.tls = False
-            _ftp = FTP()
+        _ftp = FTP_TLS() if self.tls else FTP()
         _ftp.set_debuglevel(0)
         with ftp_errors(self):
             _ftp.connect(self.host, self.port, self.timeout)
