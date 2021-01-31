@@ -88,6 +88,10 @@ class TestFTPFSClass(unittest.TestCase):
         self.assertIsInstance(ftp_fs, FTPFS)
         self.assertEqual(ftp_fs.host, "ftp.example.org")
 
+        ftps_fs = open_fs("ftps://will:wfc@ftp.example.org")
+        self.assertIsInstance(ftps_fs, FTPFS)
+        self.assertTrue(ftps_fs.tls)
+
 
 class TestFTPErrors(unittest.TestCase):
     """Test the ftp_errors context manager."""
