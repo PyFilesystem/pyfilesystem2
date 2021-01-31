@@ -473,7 +473,7 @@ class FTPFS(FS):
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
             try:
-                _ftp.prot_p()
+                _ftp.prot_p()  # type: ignore
             except AttributeError:
                 pass
             self._features = {}
