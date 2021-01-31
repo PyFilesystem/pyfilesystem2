@@ -14,6 +14,11 @@ import typing
 from collections import OrderedDict
 from contextlib import contextmanager
 from ftplib import FTP
+
+try:
+    from ftplib import FTP_TLS
+except ImportError:
+    FTP_TLS = None
 from ftplib import error_perm
 from ftplib import error_temp
 from typing import cast
@@ -346,7 +351,30 @@ class FTPFile(io.RawIOBase):
 
 
 class FTPFS(FS):
-    """A FTP (File Transport Protocol) Filesystem."""
+    """A FTP (File Transport Protocol) Filesystem.
+
+    Optionally, the connection can be made securely via TLS. This is known as
+    FTPS, or FTP Secure. TLS will be enabled when using the ftps:// protocol,
+    or when setting the `tls` argument to True in the constructor.
+
+
+    Examples:
+        Create with the constructor::
+
+            >>> from fs.ftpfs import FTPFS
+            >>> ftp_fs = FTPFS()
+
+        Or via an FS URL::
+
+            >>> import fs
+            >>> ftp_fs = fs.open_fs('ftp://')
+
+        Or via an FS URL, using TLS::
+
+            >>> import fs
+            >>> ftp_fs = fs.open_fs('ftps://')
+
+    """
 
     _meta = {
         "invalid_path_chars": "\0",
@@ -366,6 +394,7 @@ class FTPFS(FS):
         timeout=10,  # type: int
         port=21,  # type: int
         proxy=None,  # type: Optional[Text]
+        tls=False,  # type: bool
     ):
         # type: (...) -> None
         """Create a new `FTPFS` instance.
@@ -380,6 +409,7 @@ class FTPFS(FS):
             port (int): FTP port number (default 21).
             proxy (str, optional): An FTP proxy, or ``None`` (default)
                 for no proxy.
+            tls (bool): Attempt to use FTP over TLS (FTPS) (default: False)
 
         """
         super(FTPFS, self).__init__()
@@ -390,6 +420,7 @@ class FTPFS(FS):
         self.timeout = timeout
         self.port = port
         self.proxy = proxy
+        self.tls = tls
 
         self.encoding = "latin-1"
         self._ftp = None  # type: Optional[FTP]
@@ -432,11 +463,17 @@ class FTPFS(FS):
     def _open_ftp(self):
         # type: () -> FTP
         """Open a new ftp object."""
-        _ftp = FTP()
+        if self.tls and FTP_TLS:
+            _ftp = FTP_TLS()
+        else:
+            self.tls = False
+            _ftp = FTP()
         _ftp.set_debuglevel(0)
         with ftp_errors(self):
             _ftp.connect(self.host, self.port, self.timeout)
             _ftp.login(self.user, self.passwd, self.acct)
+            if self.tls:
+                _ftp.prot_p()
             self._features = {}
             try:
                 feat_response = _decode(_ftp.sendcmd("FEAT"), "latin-1")
@@ -471,7 +508,9 @@ class FTPFS(FS):
             _user_part = ""
         else:
             _user_part = "{}:{}@".format(self.user, self.passwd)
-        url = "ftp://{}{}".format(_user_part, _host_part)
+
+        scheme = "ftps" if self.tls else "ftp"
+        url = "{}://{}{}".format(scheme, _user_part, _host_part)
         return url
 
     @property
