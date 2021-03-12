@@ -796,7 +796,7 @@ class FS(object):
 
         Note:
             If you want your code to work in Python2.7 and Python3 then
-            use this method if you want to work will the OS filesystem
+            use this method if you want to work with the OS filesystem
             outside of the OSFS interface.
 
         """
