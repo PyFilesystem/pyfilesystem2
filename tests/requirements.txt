@@ -14,3 +14,5 @@ pysendfile ~=2.0 ; python_version <= "3.3"
 # mock v4+ doesn't support Python 2.7 anymore
 mock ~=3.0 ; python_version < "3.3"
 
+# parametrized to prevent code duplication in tests.
+parameterized ~=0.8

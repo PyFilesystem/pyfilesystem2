@@ -7,6 +7,7 @@ import os
 import shutil
 import tempfile
 import sys
+import time
 import unittest
 
 from fs import osfs, open_fs
@@ -86,6 +87,25 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         fs2 = osfs.OSFS(path, expand_vars=False)
         self.assertIn("TYRIONLANISTER", fs1.getsyspath("/"))
         self.assertNotIn("TYRIONLANISTER", fs2.getsyspath("/"))
+
+    def test_copy_preserve_time(self):
+        self.fs.makedir("foo")
+        self.fs.makedir("bar")
+        now = time.time() - 10000
+        if not self.fs.create("foo/file.txt"):
+            raw_info = {"details": {"accessed": now, "modified": now}}
+            self.fs.setinfo("foo/file.txt", raw_info)
+
+        namespaces = ("details", "accessed", "metadata_changed", "modified")
+        src_info = self.fs.getinfo("foo/file.txt", namespaces)
+
+        self.fs.copy("foo/file.txt", "bar/file.txt", preserve_time=True)
+        self.assertTrue(self.fs.exists("bar/file.txt"))
+
+        dst_info = self.fs.getinfo("bar/file.txt", namespaces)
+        self.assertEqual(dst_info.modified, src_info.modified)
+        self.assertEqual(dst_info.accessed, src_info.accessed)
+        self.assertEqual(dst_info.metadata_changed, src_info.metadata_changed)
 
     @unittest.skipUnless(osfs.sendfile, "sendfile not supported")
     @unittest.skipIf(
