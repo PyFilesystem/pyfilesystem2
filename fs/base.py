@@ -387,8 +387,14 @@ class FS(object):
         """
         self._closed = True
 
-    def copy(self, src_path, dst_path, overwrite=False):
-        # type: (Text, Text, bool) -> None
+    def copy(
+        self,
+        src_path,  # type: Text
+        dst_path,  # type: Text
+        overwrite=False,  # type: bool
+        preserve_time=False,  # type: bool
+    ):
+        # type: (...) -> None
         """Copy file contents from ``src_path`` to ``dst_path``.
 
         Arguments:
@@ -396,6 +402,8 @@ class FS(object):
             dst_path (str): Path to destination file.
             overwrite (bool): If `True`, overwrite the destination file
                 if it exists (defaults to `False`).
+            preserve_time (bool): If `True`, try to preserve atime, ctime,
+                and mtime of the resource (defaults to `False`).
 
         Raises:
             fs.errors.DestinationExists: If ``dst_path`` exists,
@@ -404,6 +412,7 @@ class FS(object):
                 ``dst_path`` does not exist.
 
         """
+        # TODO(preserve_time)
         with self._lock:
             if not overwrite and self.exists(dst_path):
                 raise errors.DestinationExists(dst_path)
@@ -411,8 +420,14 @@ class FS(object):
                 # FIXME(@althonos): typing complains because open return IO
                 self.upload(dst_path, read_file)  # type: ignore
 
-    def copydir(self, src_path, dst_path, create=False):
-        # type: (Text, Text, bool) -> None
+    def copydir(
+        self,
+        src_path,  # type: Text
+        dst_path,  # type: Text
+        create=False,  # type: bool
+        preserve_time=False,  # type: bool
+    ):
+        # type: (...) -> None
         """Copy the contents of ``src_path`` to ``dst_path``.
 
         Arguments:
@@ -420,6 +435,8 @@ class FS(object):
             dst_path (str): Path to destination directory.
             create (bool): If `True`, then ``dst_path`` will be created
                 if it doesn't exist already (defaults to `False`).
+            preserve_time (bool): If `True`, try to preserve atime, ctime,
+                and mtime of the resource (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: If the ``dst_path``
@@ -431,7 +448,7 @@ class FS(object):
                 raise errors.ResourceNotFound(dst_path)
             if not self.getinfo(src_path).is_dir:
                 raise errors.DirectoryExpected(src_path)
-            copy.copy_dir(self, src_path, self, dst_path)
+            copy.copy_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
 
     def create(self, path, wipe=False):
         # type: (Text, bool) -> bool
@@ -1004,8 +1021,8 @@ class FS(object):
         """
         return self._lock
 
-    def movedir(self, src_path, dst_path, create=False):
-        # type: (Text, Text, bool) -> None
+    def movedir(self, src_path, dst_path, create=False, preserve_time=False):
+        # type: (Text, Text, bool, bool) -> None
         """Move directory ``src_path`` to ``dst_path``.
 
         Arguments:
@@ -1013,6 +1030,8 @@ class FS(object):
             dst_path (str): Path to destination directory.
             create (bool): If `True`, then ``dst_path`` will be created
                 if it doesn't exist already (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resources (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: if ``dst_path`` does not exist,
@@ -1022,7 +1041,7 @@ class FS(object):
         with self._lock:
             if not create and not self.exists(dst_path):
                 raise errors.ResourceNotFound(dst_path)
-            move.move_dir(self, src_path, self, dst_path)
+            move.move_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
 
     def makedirs(
         self,

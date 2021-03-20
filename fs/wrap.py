@@ -225,8 +225,8 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         self.check()
         raise ResourceReadOnly(path)
 
-    def copy(self, src_path, dst_path, overwrite=False):
-        # type: (Text, Text, bool) -> None
+    def copy(self, src_path, dst_path, overwrite=False, preserve_time=False):
+        # type: (Text, Text, bool, bool) -> None
         self.check()
         raise ResourceReadOnly(dst_path)
 

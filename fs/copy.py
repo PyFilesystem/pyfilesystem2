@@ -24,6 +24,7 @@ def copy_fs(
     walker=None,  # type: Optional[Walker]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Copy the contents of one filesystem to another.
@@ -39,6 +40,8 @@ def copy_fs(
             dst_path)``.
         workers (int): Use `worker` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resources (defaults to `False`).
 
     """
     return copy_dir(
@@ -52,6 +55,7 @@ def copy_fs_if_newer(
     walker=None,  # type: Optional[Walker]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Copy the contents of one filesystem to another, checking times.
@@ -72,10 +76,19 @@ def copy_fs_if_newer(
             dst_path)``.
         workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resources (defaults to `False`).
 
     """
     return copy_dir_if_newer(
-        src_fs, "/", dst_fs, "/", walker=walker, on_copy=on_copy, workers=workers
+        src_fs,
+        "/",
+        dst_fs,
+        "/",
+        walker=walker,
+        on_copy=on_copy,
+        workers=workers,
+        preserve_time=preserve_time,
     )
 
 
@@ -113,6 +126,7 @@ def copy_file(
     src_path,  # type: Text
     dst_fs,  # type: Union[FS, Text]
     dst_path,  # type: Text
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Copy a file from one filesystem to another.
@@ -124,6 +138,8 @@ def copy_file(
         src_path (str): Path to a file on the source filesystem.
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on the destination filesystem.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resource (defaults to `False`).
 
     """
     with manage_fs(src_fs, writeable=False) as _src_fs:
@@ -131,8 +147,11 @@ def copy_file(
             if _src_fs is _dst_fs:
                 # Same filesystem, so we can do a potentially optimized
                 # copy
-                _src_fs.copy(src_path, dst_path, overwrite=True)
+                _src_fs.copy(
+                    src_path, dst_path, overwrite=True, preserve_time=preserve_time
+                )
             else:
+                # TODO(preserve_time)
                 # Standard copy
                 with _src_fs.lock(), _dst_fs.lock():
                     if _dst_fs.hassyspath(dst_path):
@@ -148,6 +167,7 @@ def copy_file_internal(
     src_path,  # type: Text
     dst_fs,  # type: FS
     dst_path,  # type: Text
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Copy a file at low level, without calling `manage_fs` or locking.
@@ -162,12 +182,15 @@ def copy_file_internal(
         src_path (str): Path to a file on the source filesystem.
         dst_fs (FS): Destination filesystem.
         dst_path (str): Path to a file on the destination filesystem.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resource (defaults to `False`).
 
     """
     if src_fs is dst_fs:
         # Same filesystem, so we can do a potentially optimized
         # copy
-        src_fs.copy(src_path, dst_path, overwrite=True)
+        src_fs.copy(src_path, dst_path, overwrite=True, preserve_time=preserve_time)
+        # TODO(preserve_time)
     elif dst_fs.hassyspath(dst_path):
         with dst_fs.openbin(dst_path, "w") as write_file:
             src_fs.download(src_path, write_file)
@@ -181,6 +204,7 @@ def copy_file_if_newer(
     src_path,  # type: Text
     dst_fs,  # type: Union[FS, Text]
     dst_path,  # type: Text
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> bool
     """Copy a file from one filesystem to another, checking times.
@@ -196,6 +220,8 @@ def copy_file_if_newer(
         src_path (str): Path to a file on the source filesystem.
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on the destination filesystem.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resource (defaults to `False`).
 
     Returns:
         bool: `True` if the file copy was executed, `False` otherwise.
@@ -207,7 +233,9 @@ def copy_file_if_newer(
                 # Same filesystem, so we can do a potentially optimized
                 # copy
                 if _source_is_newer(_src_fs, src_path, _dst_fs, dst_path):
-                    _src_fs.copy(src_path, dst_path, overwrite=True)
+                    _src_fs.copy(
+                        src_path, dst_path, overwrite=True, preserve_time=preserve_time
+                    )
                     return True
                 else:
                     return False
@@ -215,7 +243,13 @@ def copy_file_if_newer(
                 # Standard copy
                 with _src_fs.lock(), _dst_fs.lock():
                     if _source_is_newer(_src_fs, src_path, _dst_fs, dst_path):
-                        copy_file_internal(_src_fs, src_path, _dst_fs, dst_path)
+                        copy_file_internal(
+                            _src_fs,
+                            src_path,
+                            _dst_fs,
+                            dst_path,
+                            preserve_time=preserve_time,
+                        )
                         return True
                     else:
                         return False
@@ -225,6 +259,7 @@ def copy_structure(
     src_fs,  # type: Union[FS, Text]
     dst_fs,  # type: Union[FS, Text]
     walker=None,  # type: Optional[Walker]
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Copy directories (but not files) from ``src_fs`` to ``dst_fs``.
@@ -235,6 +270,8 @@ def copy_structure(
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only
             want to consider a sub-set of the resources in ``src_fs``.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resource (defaults to `False`).
 
     """
     walker = walker or Walker()
@@ -253,6 +290,7 @@ def copy_dir(
     walker=None,  # type: Optional[Walker]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Copy a directory from one filesystem to another.
@@ -270,6 +308,8 @@ def copy_dir(
             ``(src_fs, src_path, dst_fs, dst_path)``.
         workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resources (defaults to `False`).
 
     """
     on_copy = on_copy or (lambda *args: None)
@@ -297,7 +337,13 @@ def copy_dir(
                     for info in files:
                         src_path = info.make_path(dir_path)
                         dst_path = info.make_path(copy_path)
-                        copier.copy(_src_fs, src_path, _dst_fs, dst_path)
+                        copier.copy(
+                            _src_fs,
+                            src_path,
+                            _dst_fs,
+                            dst_path,
+                            preserve_time=preserve_time,
+                        )
                         on_copy(_src_fs, src_path, _dst_fs, dst_path)
 
 
@@ -309,6 +355,7 @@ def copy_dir_if_newer(
     walker=None,  # type: Optional[Walker]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Copy a directory from one filesystem to another, checking times.
@@ -331,6 +378,8 @@ def copy_dir_if_newer(
             ``(src_fs, src_path, dst_fs, dst_path)``.
         workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resources (defaults to `False`).
 
     """
     on_copy = on_copy or (lambda *args: None)
@@ -381,5 +430,11 @@ def copy_dir_if_newer(
                             )
 
                         if do_copy:
-                            copier.copy(_src_fs, dir_path, _dst_fs, copy_path)
+                            copier.copy(
+                                _src_fs,
+                                dir_path,
+                                _dst_fs,
+                                copy_path,
+                                preserve_time=preserve_time,
+                            )
                             on_copy(_src_fs, dir_path, _dst_fs, copy_path)

@@ -256,17 +256,17 @@ class WrapFS(FS, typing.Generic[_F]):
         with unwrap_errors(path):
             _fs.touch(_path)
 
-    def copy(self, src_path, dst_path, overwrite=False):
-        # type: (Text, Text, bool) -> None
+    def copy(self, src_path, dst_path, overwrite=False, preserve_time=False):
+        # type: (Text, Text, bool, bool) -> None
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
             if not overwrite and dst_fs.exists(_dst_path):
                 raise errors.DestinationExists(_dst_path)
-            copy_file(src_fs, _src_path, dst_fs, _dst_path)
+            copy_file(src_fs, _src_path, dst_fs, _dst_path, preserve_time=preserve_time)
 
-    def copydir(self, src_path, dst_path, create=False):
-        # type: (Text, Text, bool) -> None
+    def copydir(self, src_path, dst_path, create=False, preserve_time=False):
+        # type: (Text, Text, bool, bool) -> None
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
@@ -274,7 +274,7 @@ class WrapFS(FS, typing.Generic[_F]):
                 raise errors.ResourceNotFound(dst_path)
             if not src_fs.getinfo(_src_path).is_dir:
                 raise errors.DirectoryExpected(src_path)
-            copy_dir(src_fs, _src_path, dst_fs, _dst_path)
+            copy_dir(src_fs, _src_path, dst_fs, _dst_path, preserve_time=preserve_time)
 
     def create(self, path, wipe=False):
         # type: (Text, bool) -> bool

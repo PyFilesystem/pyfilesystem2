@@ -431,8 +431,9 @@ class OSFS(FS):
         if hasattr(errno, "ENOTSUP"):
             _sendfile_error_codes.add(errno.ENOTSUP)
 
-        def copy(self, src_path, dst_path, overwrite=False):
-            # type: (Text, Text, bool) -> None
+        def copy(self, src_path, dst_path, overwrite=False, preserve_time=False):
+            # type: (Text, Text, bool, bool) -> None
+            # TODO(preserve_time)
             with self._lock:
                 # validate and canonicalise paths
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
@@ -461,8 +462,9 @@ class OSFS(FS):
 
     else:
 
-        def copy(self, src_path, dst_path, overwrite=False):
-            # type: (Text, Text, bool) -> None
+        def copy(self, src_path, dst_path, overwrite=False, preserve_time=False):
+            # type: (Text, Text, bool, bool) -> None
+            # TODO(preserve_time)
             with self._lock:
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
                 shutil.copy2(self.getsyspath(_src_path), self.getsyspath(_dst_path))

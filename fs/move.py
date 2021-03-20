@@ -15,8 +15,13 @@ if typing.TYPE_CHECKING:
     from typing import Text, Union
 
 
-def move_fs(src_fs, dst_fs, workers=0):
-    # type: (Union[Text, FS], Union[Text, FS], int) -> None
+def move_fs(
+    src_fs,  # type: Union[Text, FS]
+    dst_fs,  # type:Union[Text, FS]
+    workers=0,  # type: int
+    preserve_time=False,  # type: bool
+):
+    # type: (...) -> None
     """Move the contents of a filesystem to another filesystem.
 
     Arguments:
@@ -24,9 +29,11 @@ def move_fs(src_fs, dst_fs, workers=0):
         dst_fs (FS or str): Destination filesystem (instance or URL).
         workers (int): Use `worker` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resources (defaults to `False`).
 
     """
-    move_dir(src_fs, "/", dst_fs, "/", workers=workers)
+    move_dir(src_fs, "/", dst_fs, "/", workers=workers, preserve_time=preserve_time)
 
 
 def move_file(
@@ -34,6 +41,7 @@ def move_file(
     src_path,  # type: Text
     dst_fs,  # type: Union[Text, FS]
     dst_path,  # type: Text
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Move a file from one filesystem to another.
@@ -43,8 +51,11 @@ def move_file(
         src_path (str): Path to a file on ``src_fs``.
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on ``dst_fs``.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resources (defaults to `False`).
 
     """
+    # TODO(preserve_time)
     with manage_fs(src_fs) as _src_fs:
         with manage_fs(dst_fs, create=True) as _dst_fs:
             if _src_fs is _dst_fs:
@@ -53,7 +64,13 @@ def move_file(
             else:
                 # Standard copy and delete
                 with _src_fs.lock(), _dst_fs.lock():
-                    copy_file(_src_fs, src_path, _dst_fs, dst_path)
+                    copy_file(
+                        _src_fs,
+                        src_path,
+                        _dst_fs,
+                        dst_path,
+                        preserve_time=preserve_time,
+                    )
                     _src_fs.remove(src_path)
 
 
@@ -63,6 +80,7 @@ def move_dir(
     dst_fs,  # type: Union[Text, FS]
     dst_path,  # type: Text
     workers=0,  # type: int
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Move a directory from one filesystem to another.
@@ -74,6 +92,8 @@ def move_dir(
         dst_path (str): Path to a directory on ``dst_fs``.
         workers (int): Use ``worker`` threads to copy data, or ``0``
             (default) for a single-threaded copy.
+        preserve_time (bool): If `True`, try to preserve atime, ctime,
+            and mtime of the resources (defaults to `False`).
 
     """
 
@@ -86,5 +106,12 @@ def move_dir(
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
             _dst_fs.makedir(dst_path, recreate=True)
-            copy_dir(src_fs, src_path, dst_fs, dst_path, workers=workers)
+            copy_dir(
+                src_fs,
+                src_path,
+                dst_fs,
+                dst_path,
+                workers=workers,
+                preserve_time=preserve_time,
+            )
             _src_fs.removetree(src_path)

@@ -124,13 +124,16 @@ class Copier(object):
         if traceback is None and self.errors:
             raise BulkCopyFailed(self.errors)
 
-    def copy(self, src_fs, src_path, dst_fs, dst_path):
-        # type: (FS, Text, FS, Text) -> None
+    def copy(self, src_fs, src_path, dst_fs, dst_path, preserve_time=False):
+        # type: (FS, Text, FS, Text, bool) -> None
         """Copy a file from one fs to another."""
         if self.queue is None:
             # This should be the most performant for a single-thread
-            copy_file_internal(src_fs, src_path, dst_fs, dst_path)
+            copy_file_internal(
+                src_fs, src_path, dst_fs, dst_path, preserve_time=preserve_time
+            )
         else:
+            # TODO(preserve_time)
             src_file = src_fs.openbin(src_path, "r")
             try:
                 dst_file = dst_fs.openbin(dst_path, "w")
