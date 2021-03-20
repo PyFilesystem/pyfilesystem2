@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added FTP over TLS (FTPS) support to FTPFS.
   Closes [#437](https://github.com/PyFilesystem/pyfilesystem2/issues/437),
   [#449](https://github.com/PyFilesystem/pyfilesystem2/pull/449).
+- Added `fs.copy.copy_file_if`, `fs.copy.copy_dir_if`, and `fs.copy.copy_fs_if`. 
+  Closes [#458](https://github.com/PyFilesystem/pyfilesystem2/issues/458).
 
 ### Changed
 
@@ -31,6 +33,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Make `FTPFile`, `MemoryFile` and `RawWrapper` accept [`array.array`](https://docs.python.org/3/library/array.html)
   arguments for the `write` and `writelines` methods, as expected by their base class [`io.RawIOBase`](https://docs.python.org/3/library/io.html#io.RawIOBase).
 - Various documentation issues, including `MemoryFS` docstring not rendering properly.
+- Fixed performance bugs in `fs.copy.copy_dir_if_newer`. Test cases were adapted to catch those bugs in the future.
 
 
 ## [2.4.12] - 2021-01-14
