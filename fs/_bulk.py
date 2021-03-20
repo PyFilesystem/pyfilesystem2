@@ -13,12 +13,11 @@ from six.moves.queue import Queue
 
 from .copy import copy_file_internal
 from .errors import BulkCopyFailed
-from .tools import copy_file_data
 
 if typing.TYPE_CHECKING:
     from .base import FS
     from types import TracebackType
-    from typing import IO, List, Optional, Text, Type
+    from typing import List, Optional, Text, Type
 
 
 class _Worker(threading.Thread):

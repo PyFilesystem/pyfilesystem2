@@ -22,7 +22,7 @@ import warnings
 import six
 
 from . import copy, errors, fsencode, iotools, move, tools, walk, wildcard
-from .copy import copy_metadata
+from .copy import copy_cmtime
 from .glob import BoundGlobber
 from .mode import validate_open_mode
 from .path import abspath, join, normpath
@@ -419,7 +419,7 @@ class FS(object):
             with closing(self.open(src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
                 self.upload(dst_path, read_file)  # type: ignore
-            copy_metadata(self, src_path, self, dst_path)
+            copy_cmtime(self, src_path, self, dst_path)
 
     def copydir(
         self,
@@ -1130,8 +1130,8 @@ class FS(object):
             with self.open(src_path, "rb") as read_file:
                 # FIXME(@althonos): typing complains because open return IO
                 self.upload(dst_path, read_file)  # type: ignore
+            copy_cmtime(self, src_path, self, dst_path)
             self.remove(src_path)
-            copy_metadata(self, src_path, self, dst_path)
 
     def open(
         self,

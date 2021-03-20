@@ -80,5 +80,4 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
 
         dst_info = self.fs.getinfo("bar/file.txt", namespaces)
         self.assertEqual(dst_info.modified, src_info.modified)
-        self.assertEqual(dst_info.accessed, src_info.accessed)
         self.assertEqual(dst_info.metadata_changed, src_info.metadata_changed)

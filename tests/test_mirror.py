@@ -12,7 +12,7 @@ from fs import open_fs
 class TestMirror(unittest.TestCase):
     def _contents(self, fs):
         """Extract an FS in to a simple data structure."""
-        namespaces = ("details", "accessed", "metadata_changed", "modified")
+        namespaces = ("details", "metadata_changed", "modified")
         contents = []
         for path, dirs, files in fs.walk():
             for info in dirs:
@@ -28,7 +28,6 @@ class TestMirror(unittest.TestCase):
                         "file",
                         _bytes,
                         _info.modified,
-                        _info.accessed,
                         _info.metadata_changed,
                     )
                 )

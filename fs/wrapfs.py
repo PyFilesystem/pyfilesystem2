@@ -177,8 +177,8 @@ class WrapFS(FS, typing.Generic[_F]):
                 raise errors.DestinationExists(_dst_path)
             move_file(src_fs, _src_path, dst_fs, _dst_path, preserve_time=preserve_time)
 
-    def movedir(self, src_path, dst_path, create=False):
-        # type: (Text, Text, bool) -> None
+    def movedir(self, src_path, dst_path, create=False, preserve_time=False):
+        # type: (Text, Text, bool, bool) -> None
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):

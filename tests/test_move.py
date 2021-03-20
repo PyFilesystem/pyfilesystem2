@@ -32,12 +32,10 @@ class TestMove(unittest.TestCase):
             dst_file1_info = dst_fs.getinfo("test.txt", namespaces)
             dst_file2_info = dst_fs.getinfo("foo/bar/baz.txt", namespaces)
             self.assertEqual(dst_file1_info.modified, src_file1_info.modified)
-            self.assertEqual(dst_file1_info.accessed, src_file1_info.accessed)
             self.assertEqual(
                 dst_file1_info.metadata_changed, src_file1_info.metadata_changed
             )
             self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
-            self.assertEqual(dst_file2_info.accessed, src_file2_info.accessed)
             self.assertEqual(
                 dst_file2_info.metadata_changed, src_file2_info.metadata_changed
             )
@@ -62,7 +60,6 @@ class TestMove(unittest.TestCase):
         if self.preserve_time:
             dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
             self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
-            self.assertEqual(dst_file2_info.accessed, src_file2_info.accessed)
             self.assertEqual(
                 dst_file2_info.metadata_changed, src_file2_info.metadata_changed
             )

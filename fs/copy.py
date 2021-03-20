@@ -159,7 +159,7 @@ def copy_file(
                     else:
                         with _src_fs.openbin(src_path) as read_file:
                             _dst_fs.upload(dst_path, read_file)
-                    copy_metadata(_src_fs, src_path, _dst_fs, dst_path)
+                    copy_cmtime(_src_fs, src_path, _dst_fs, dst_path)
 
 
 def copy_file_internal(
@@ -199,7 +199,7 @@ def copy_file_internal(
         with src_fs.openbin(src_path) as read_file:
             dst_fs.upload(dst_path, read_file)
 
-    copy_metadata(src_fs, src_path, dst_fs, dst_path)
+    copy_cmtime(src_fs, src_path, dst_fs, dst_path)
 
 
 def copy_file_if_newer(
@@ -445,14 +445,14 @@ def copy_dir_if_newer(
                             on_copy(_src_fs, dir_path, _dst_fs, copy_path)
 
 
-def copy_metadata(
+def copy_cmtime(
     src_fs,  # type: Union[FS, Text]
     src_path,  # type: Text
     dst_fs,  # type: Union[FS, Text]
     dst_path,  # type: Text
 ):
     # type: (...) -> None
-    """Copies metadata from one file to another.
+    """Copy modified time metadata from one file to another.
 
     Arguments:
         src_fs (FS or str): Source filesystem (instance or URL).
@@ -461,7 +461,13 @@ def copy_metadata(
         dst_path (str): Path to a directory on the destination filesystem.
 
     """
-    # TODO(preserve_time)
+    namespaces = ("details", "metadata_changed", "modified")
     with manage_fs(src_fs, writeable=False) as _src_fs:
         with manage_fs(dst_fs, create=True) as _dst_fs:
-            pass
+            src_meta = _src_fs.getinfo(src_path, namespaces)
+            src_details = src_meta.raw.get("details", {})
+            dst_details = {}
+            for value in ("metadata_changed", "modified"):
+                if value in src_details:
+                    dst_details[value] = src_details[value]
+            _dst_fs.setinfo(dst_path, {"details": dst_details})
