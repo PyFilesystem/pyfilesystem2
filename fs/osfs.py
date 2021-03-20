@@ -433,7 +433,6 @@ class OSFS(FS):
 
         def copy(self, src_path, dst_path, overwrite=False, preserve_time=False):
             # type: (Text, Text, bool, bool) -> None
-            # TODO(preserve_time)
             with self._lock:
                 # validate and canonicalise paths
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
@@ -464,7 +463,6 @@ class OSFS(FS):
 
         def copy(self, src_path, dst_path, overwrite=False, preserve_time=False):
             # type: (Text, Text, bool, bool) -> None
-            # TODO(preserve_time)
             with self._lock:
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
                 shutil.copy2(self.getsyspath(_src_path), self.getsyspath(_dst_path))

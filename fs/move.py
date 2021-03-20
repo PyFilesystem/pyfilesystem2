@@ -55,12 +55,13 @@ def move_file(
             and mtime of the resources (defaults to `False`).
 
     """
-    # TODO(preserve_time)
     with manage_fs(src_fs) as _src_fs:
         with manage_fs(dst_fs, create=True) as _dst_fs:
             if _src_fs is _dst_fs:
                 # Same filesystem, may be optimized
-                _src_fs.move(src_path, dst_path, overwrite=True)
+                _src_fs.move(
+                    src_path, dst_path, overwrite=True, preserve_time=preserve_time
+                )
             else:
                 # Standard copy and delete
                 with _src_fs.lock(), _dst_fs.lock():

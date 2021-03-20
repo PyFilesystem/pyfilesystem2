@@ -151,7 +151,6 @@ def copy_file(
                     src_path, dst_path, overwrite=True, preserve_time=preserve_time
                 )
             else:
-                # TODO(preserve_time)
                 # Standard copy
                 with _src_fs.lock(), _dst_fs.lock():
                     if _dst_fs.hassyspath(dst_path):
@@ -160,6 +159,7 @@ def copy_file(
                     else:
                         with _src_fs.openbin(src_path) as read_file:
                             _dst_fs.upload(dst_path, read_file)
+                    copy_metadata(_src_fs, src_path, _dst_fs, dst_path)
 
 
 def copy_file_internal(
@@ -190,13 +190,16 @@ def copy_file_internal(
         # Same filesystem, so we can do a potentially optimized
         # copy
         src_fs.copy(src_path, dst_path, overwrite=True, preserve_time=preserve_time)
-        # TODO(preserve_time)
-    elif dst_fs.hassyspath(dst_path):
+        return
+
+    if dst_fs.hassyspath(dst_path):
         with dst_fs.openbin(dst_path, "w") as write_file:
             src_fs.download(src_path, write_file)
     else:
         with src_fs.openbin(src_path) as read_file:
             dst_fs.upload(dst_path, read_file)
+
+    copy_metadata(src_fs, src_path, dst_fs, dst_path)
 
 
 def copy_file_if_newer(
@@ -326,9 +329,10 @@ def copy_dir(
     from ._bulk import Copier
 
     with src() as _src_fs, dst() as _dst_fs:
-        with _src_fs.lock(), _dst_fs.lock():
-            _thread_safe = is_thread_safe(_src_fs, _dst_fs)
-            with Copier(num_workers=workers if _thread_safe else 0) as copier:
+        _thread_safe = is_thread_safe(_src_fs, _dst_fs)
+        copier = Copier(num_workers=workers if _thread_safe else 0)
+        with copier:
+            with _src_fs.lock(), _dst_fs.lock():
                 _dst_fs.makedir(_dst_path, recreate=True)
                 for dir_path, dirs, files in walker.walk(_src_fs, _src_path):
                     copy_path = combine(_dst_path, frombase(_src_path, dir_path))
@@ -345,6 +349,7 @@ def copy_dir(
                             preserve_time=preserve_time,
                         )
                         on_copy(_src_fs, src_path, _dst_fs, dst_path)
+            pass
 
 
 def copy_dir_if_newer(
@@ -438,3 +443,25 @@ def copy_dir_if_newer(
                                 preserve_time=preserve_time,
                             )
                             on_copy(_src_fs, dir_path, _dst_fs, copy_path)
+
+
+def copy_metadata(
+    src_fs,  # type: Union[FS, Text]
+    src_path,  # type: Text
+    dst_fs,  # type: Union[FS, Text]
+    dst_path,  # type: Text
+):
+    # type: (...) -> None
+    """Copies metadata from one file to another.
+
+    Arguments:
+        src_fs (FS or str): Source filesystem (instance or URL).
+        src_path (str): Path to a directory on the source filesystem.
+        dst_fs (FS or str): Destination filesystem (instance or URL).
+        dst_path (str): Path to a directory on the destination filesystem.
+
+    """
+    # TODO(preserve_time)
+    with manage_fs(src_fs, writeable=False) as _src_fs:
+        with manage_fs(dst_fs, create=True) as _dst_fs:
+            pass

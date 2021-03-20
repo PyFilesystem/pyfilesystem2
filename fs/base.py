@@ -22,6 +22,7 @@ import warnings
 import six
 
 from . import copy, errors, fsencode, iotools, move, tools, walk, wildcard
+from .copy import copy_metadata
 from .glob import BoundGlobber
 from .mode import validate_open_mode
 from .path import abspath, join, normpath
@@ -412,13 +413,13 @@ class FS(object):
                 ``dst_path`` does not exist.
 
         """
-        # TODO(preserve_time)
         with self._lock:
             if not overwrite and self.exists(dst_path):
                 raise errors.DestinationExists(dst_path)
             with closing(self.open(src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
                 self.upload(dst_path, read_file)  # type: ignore
+            copy_metadata(self, src_path, self, dst_path)
 
     def copydir(
         self,
@@ -1030,8 +1031,8 @@ class FS(object):
             dst_path (str): Path to destination directory.
             create (bool): If `True`, then ``dst_path`` will be created
                 if it doesn't exist already (defaults to `False`).
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+            preserve_time (bool): If `True`, try to preserve atime, ctime,
+                and mtime of the resources (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: if ``dst_path`` does not exist,
@@ -1086,8 +1087,8 @@ class FS(object):
                     raise
             return self.opendir(path)
 
-    def move(self, src_path, dst_path, overwrite=False):
-        # type: (Text, Text, bool) -> None
+    def move(self, src_path, dst_path, overwrite=False, preserve_time=False):
+        # type: (Text, Text, bool, bool) -> None
         """Move a file from ``src_path`` to ``dst_path``.
 
         Arguments:
@@ -1096,6 +1097,8 @@ class FS(object):
                 file will be written to.
             overwrite (bool): If `True`, destination path will be
                 overwritten if it exists.
+            preserve_time (bool): If `True`, try to preserve atime, ctime,
+                and mtime of the resources (defaults to `False`).
 
         Raises:
             fs.errors.FileExpected: If ``src_path`` maps to a
@@ -1128,6 +1131,7 @@ class FS(object):
                 # FIXME(@althonos): typing complains because open return IO
                 self.upload(dst_path, read_file)  # type: ignore
             self.remove(src_path)
+            copy_metadata(self, src_path, self, dst_path)
 
     def open(
         self,

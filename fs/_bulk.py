@@ -56,20 +56,30 @@ class _Task(object):
 class _CopyTask(_Task):
     """A callable that copies from one file another."""
 
-    def __init__(self, src_file, dst_file):
-        # type: (IO, IO) -> None
-        self.src_file = src_file
-        self.dst_file = dst_file
+    def __init__(
+        self,
+        src_fs,  # type: FS
+        src_path,  # type: Text
+        dst_fs,  # type: FS
+        dst_path,  # type: Text
+        preserve_time,  # type: bool
+    ):
+        # type: (...) -> None
+        self.src_fs = src_fs
+        self.src_path = src_path
+        self.dst_fs = dst_fs
+        self.dst_path = dst_path
+        self.preserve_time = preserve_time
 
     def __call__(self):
         # type: () -> None
-        try:
-            copy_file_data(self.src_file, self.dst_file, chunk_size=1024 * 1024)
-        finally:
-            try:
-                self.src_file.close()
-            finally:
-                self.dst_file.close()
+        copy_file_internal(
+            self.src_fs,
+            self.src_path,
+            self.dst_fs,
+            self.dst_path,
+            preserve_time=self.preserve_time,
+        )
 
 
 class Copier(object):
@@ -88,7 +98,7 @@ class Copier(object):
     def start(self):
         """Start the workers."""
         if self.num_workers:
-            self.queue = Queue(maxsize=self.num_workers)
+            self.queue = Queue()
             self.workers = [_Worker(self) for _ in range(self.num_workers)]
             for worker in self.workers:
                 worker.start()
@@ -133,12 +143,5 @@ class Copier(object):
                 src_fs, src_path, dst_fs, dst_path, preserve_time=preserve_time
             )
         else:
-            # TODO(preserve_time)
-            src_file = src_fs.openbin(src_path, "r")
-            try:
-                dst_file = dst_fs.openbin(dst_path, "w")
-            except Exception:
-                src_file.close()
-                raise
-            task = _CopyTask(src_file, dst_file)
+            task = _CopyTask(src_fs, src_path, dst_fs, dst_path, preserve_time)
             self.queue.put(task)
