@@ -4,6 +4,7 @@
 from __future__ import print_function, unicode_literals
 
 import typing
+import warnings
 
 from .errors import ResourceNotFound
 from .opener import manage_fs
@@ -52,26 +53,8 @@ def copy_fs_if_newer(
     workers=0,  # type: int
 ):
     # type: (...) -> None
-    """Copy the contents of one filesystem to another, checking times.
-
-    If both source and destination files exist, the copy is executed
-    only if the source file is newer than the destination file. In case
-    modification times of source or destination files are not available,
-    copy file is always executed.
-
-    Arguments:
-        src_fs (FS or str): Source filesystem (URL or instance).
-        dst_fs (FS or str): Destination filesystem (URL or instance).
-        walker (~fs.walk.Walker, optional): A walker object that will be
-            used to scan for files in ``src_fs``. Set this if you only want
-            to consider a sub-set of the resources in ``src_fs``.
-        on_copy (callable):A function callback called after a single file copy
-            is executed. Expected signature is ``(src_fs, src_path, dst_fs,
-            dst_path)``.
-        workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
-            a single-threaded copy.
-
-    """
+    """Deprecated. Use ``copy_fs_if``."""
+    warnings.warn(DeprecationWarning("copy_fs_if_newer is deprecated. Use copy_fs_if instead."))
     return copy_fs_if(src_fs, dst_fs, "newer", walker, on_copy, workers)
 
 
@@ -157,24 +140,8 @@ def copy_file_if_newer(
     dst_path,  # type: Text
 ):
     # type: (...) -> bool
-    """Copy a file from one filesystem to another, checking times.
-
-    If the destination exists, and is a file, it will be first truncated.
-    If both source and destination files exist, the copy is executed only
-    if the source file is newer than the destination file. In case
-    modification times of source or destination files are not available,
-    copy is always executed.
-
-    Arguments:
-        src_fs (FS or str): Source filesystem (instance or URL).
-        src_path (str): Path to a file on the source filesystem.
-        dst_fs (FS or str): Destination filesystem (instance or URL).
-        dst_path (str): Path to a file on the destination filesystem.
-
-    Returns:
-        bool: `True` if the file copy was executed, `False` otherwise.
-
-    """
+    """Deprecated. Use ``copy_file_if``."""
+    warnings.warn(DeprecationWarning("copy_file_if_newer is deprecated. Use copy_file_if instead."))
     return copy_file_if(src_fs, src_path, dst_fs, dst_path, "newer")
 
 
@@ -342,28 +309,8 @@ def copy_dir_if_newer(
     workers=0,  # type: int
 ):
     # type: (...) -> None
-    """Copy a directory from one filesystem to another, checking times.
-
-    If both source and destination files exist, the copy is executed only
-    if the source file is newer than the destination file. In case
-    modification times of source or destination files are not available,
-    copy is always executed.
-
-    Arguments:
-        src_fs (FS or str): Source filesystem (instance or URL).
-        src_path (str): Path to a directory on the source filesystem.
-        dst_fs (FS or str): Destination filesystem (instance or URL).
-        dst_path (str): Path to a directory on the destination filesystem.
-        walker (~fs.walk.Walker, optional): A walker object that will be
-            used to scan for files in ``src_fs``. Set this if you only
-            want to consider a sub-set of the resources in ``src_fs``.
-        on_copy (callable, optional):  A function callback called after
-            a single file copy is executed. Expected signature is
-            ``(src_fs, src_path, dst_fs, dst_path)``.
-        workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
-            a single-threaded copy.
-
-    """
+    """Deprecated. Use ``copy_dir_if``."""
+    warnings.warn(DeprecationWarning("copy_dir_if_newer is deprecated. Use copy_dir_if instead."))
     copy_dir_if(src_fs, src_path, dst_fs, dst_path, "newer", walker, on_copy, workers)
 
 
