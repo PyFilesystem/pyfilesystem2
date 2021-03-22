@@ -53,8 +53,10 @@ def copy_fs_if_newer(
     workers=0,  # type: int
 ):
     # type: (...) -> None
-    """Deprecated. Use ``copy_fs_if``."""
-    warnings.warn(DeprecationWarning("copy_fs_if_newer is deprecated. Use copy_fs_if instead."))
+    """Use ``copy_fs_if`` instead."""
+    warnings.warn(
+        DeprecationWarning("copy_fs_if_newer is deprecated. Use copy_fs_if instead.")
+    )
     return copy_fs_if(src_fs, dst_fs, "newer", walker, on_copy, workers)
 
 
@@ -70,21 +72,22 @@ def copy_fs_if(
     """Copy the contents of one filesystem to another, depending on a condition.
 
     Depending on the value of ``strategy``, certain conditions must be fulfilled
-    for a file to be copied to ``dst_fs``.
+    for a file to be copied to ``dst_fs``. The following values
+    are supported:
 
-    If ``condition`` has the value ``"newer"``, the last modification time
-    of the source file must be newer than that of the destination file.
-    If either file has no modification time, the copy is performed always.
+    ``"always"``
+        The source file is always copied.
+    ``"newer"``
+        The last modification time of the source file must be newer than that of the destination file.
+        If either file has no modification time, the copy is performed always.
+    ``"older"``
+        The last modification time of the source file must be older than that of the destination file.
+        If either file has no modification time, the copy is performed always.
+    ``"exists"``
+        The source file is only copied if a file of the same path already exists in ``dst_fs``.
+    ``"not_exists"``
+        The source file is only copied if no file of the same path already exists in ``dst_fs``.
 
-    If ``condition`` has the value ``"older"``, the last modification time
-    of the source file must be older than that of the destination file.
-    If either file has no modification time, the copy is performed always.
-
-    If ``condition`` has the value ``"exists"``, the source file is only
-    copied if a file of the same path already exists in ``dst_fs``.
-
-    If ``condition`` has the value ``"not_exists"``, the source file is only
-    copied if no file of the same path already exists in ``dst_fs``.
 
     Arguments:
         src_fs (FS or str): Source filesystem (URL or instance).
@@ -140,8 +143,12 @@ def copy_file_if_newer(
     dst_path,  # type: Text
 ):
     # type: (...) -> bool
-    """Deprecated. Use ``copy_file_if``."""
-    warnings.warn(DeprecationWarning("copy_file_if_newer is deprecated. Use copy_file_if instead."))
+    """Use ``copy_file_if`` instead."""
+    warnings.warn(
+        DeprecationWarning(
+            "copy_file_if_newer is deprecated. Use copy_file_if instead."
+        )
+    )
     return copy_file_if(src_fs, src_path, dst_fs, dst_path, "newer")
 
 
@@ -156,21 +163,22 @@ def copy_file_if(
     """Copy a file from one filesystem to another, depending on a condition.
 
     Depending on the value of ``strategy``, certain conditions must be fulfilled
-    for a file to be copied to ``dst_fs``.
+    for a file to be copied to ``dst_fs``. The following values
+    are supported:
 
-    If ``condition`` has the value ``"newer"``, the last modification time
-    of the source file must be newer than that of the destination file.
-    If either file has no modification time, the copy is performed always.
+    ``"always"``
+        The source file is always copied.
+    ``"newer"``
+        The last modification time of the source file must be newer than that of the destination file.
+        If either file has no modification time, the copy is performed always.
+    ``"older"``
+        The last modification time of the source file must be older than that of the destination file.
+        If either file has no modification time, the copy is performed always.
+    ``"exists"``
+        The source file is only copied if a file of the same path already exists in ``dst_fs``.
+    ``"not_exists"``
+        The source file is only copied if no file of the same path already exists in ``dst_fs``.
 
-    If ``condition`` has the value ``"older"``, the last modification time
-    of the source file must be older than that of the destination file.
-    If either file has no modification time, the copy is performed always.
-
-    If ``condition`` has the value ``"exists"``, the source file is only
-    copied if a file of the same path already exists in ``dst_fs``.
-
-    If ``condition`` has the value ``"not_exists"``, the source file is only
-    copied if no file of the same path already exists in ``dst_fs``.
 
     Arguments:
         src_fs (FS or str): Source filesystem (instance or URL).
@@ -309,8 +317,10 @@ def copy_dir_if_newer(
     workers=0,  # type: int
 ):
     # type: (...) -> None
-    """Deprecated. Use ``copy_dir_if``."""
-    warnings.warn(DeprecationWarning("copy_dir_if_newer is deprecated. Use copy_dir_if instead."))
+    """Use ``copy_dir_if`` instead."""
+    warnings.warn(
+        DeprecationWarning("copy_dir_if_newer is deprecated. Use copy_dir_if instead.")
+    )
     copy_dir_if(src_fs, src_path, dst_fs, dst_path, "newer", walker, on_copy, workers)
 
 
@@ -328,39 +338,36 @@ def copy_dir_if(
     """Copy a directory from one filesystem to another, depending on a condition.
 
     Depending on the value of ``strategy``, certain conditions must be
-    fulfilled for a file to be copied to ``dst_fs``.
+    fulfilled for a file to be copied to ``dst_fs``. The following values
+    are supported:
 
-    If ``condition`` has the value ``"always"``, the source file is always
-    copied.
-
-    If ``condition`` has the value ``"newer"``, the last modification time
-    of the source file must be newer than that of the destination file.
-    If either file has no modification time, the copy is performed always.
-
-    If ``condition`` has the value ``"older"``, the last modification time
-    of the source file must be older than that of the destination file.
-    If either file has no modification time, the copy is performed always.
-
-    If ``condition`` has the value ``"exists"``, the source file is only
-    copied if a file of the same path already exists in ``dst_fs``.
-
-    If ``condition`` has the value ``"not_exists"``, the source file is only
-    copied if no file of the same path already exists in ``dst_fs``.
+    ``"always"``
+        The source file is always copied.
+    ``"newer"``
+        The last modification time of the source file must be newer than that of the destination file.
+        If either file has no modification time, the copy is performed always.
+    ``"older"``
+        The last modification time of the source file must be older than that of the destination file.
+        If either file has no modification time, the copy is performed always.
+    ``"exists"``
+        The source file is only copied if a file of the same path already exists in ``dst_fs``.
+    ``"not_exists"``
+        The source file is only copied if no file of the same path already exists in ``dst_fs``.
 
     Arguments:
-    src_fs (FS or str): Source filesystem (instance or URL).
-    src_path (str): Path to a directory on the source filesystem.
-    dst_fs (FS or str): Destination filesystem (instance or URL).
-    dst_path (str): Path to a directory on the destination filesystem.
-        condition (str): Name of the condition to check for each file.
-        walker (~fs.walk.Walker, optional): A walker object that will be
-            used to scan for files in ``src_fs``. Set this if you only want
-            to consider a sub-set of the resources in ``src_fs``.
-        on_copy (callable):A function callback called after a single file copy
-            is executed. Expected signature is ``(src_fs, src_path, dst_fs,
-            dst_path)``.
-        workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
-            a single-threaded copy.
+        src_fs (FS or str): Source filesystem (instance or URL).
+        src_path (str): Path to a directory on the source filesystem.
+        dst_fs (FS or str): Destination filesystem (instance or URL).
+        dst_path (str): Path to a directory on the destination filesystem.
+            condition (str): Name of the condition to check for each file.
+            walker (~fs.walk.Walker, optional): A walker object that will be
+                used to scan for files in ``src_fs``. Set this if you only want
+                to consider a sub-set of the resources in ``src_fs``.
+            on_copy (callable):A function callback called after a single file copy
+                is executed. Expected signature is ``(src_fs, src_path, dst_fs,
+                dst_path)``.
+            workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
+                a single-threaded copy.
 
     """
     on_copy = on_copy or (lambda *args: None)
@@ -434,4 +441,4 @@ def _copy_is_necessary(
         return not dst_fs.exists(dst_path)
 
     else:
-        raise ValueError(condition + "is not a valid copy condition.")
+        raise ValueError("{} is not a valid copy condition.".format(condition))
