@@ -78,15 +78,19 @@ def copy_fs_if(
     ``"always"``
         The source file is always copied.
     ``"newer"``
-        The last modification time of the source file must be newer than that of the destination file.
-        If either file has no modification time, the copy is performed always.
+        The last modification time of the source file must be newer than that
+        of the destination file. If either file has no modification time, the
+        copy is performed always.
     ``"older"``
-        The last modification time of the source file must be older than that of the destination file.
-        If either file has no modification time, the copy is performed always.
+        The last modification time of the source file must be older than that
+        of the destination file. If either file has no modification time, the
+        copy is performed always.
     ``"exists"``
-        The source file is only copied if a file of the same path already exists in ``dst_fs``.
+        The source file is only copied if a file of the same path already
+        exists in ``dst_fs``.
     ``"not_exists"``
-        The source file is only copied if no file of the same path already exists in ``dst_fs``.
+        The source file is only copied if no file of the same path already
+        exists in ``dst_fs``.
 
 
     Arguments:
@@ -99,8 +103,8 @@ def copy_fs_if(
         on_copy (callable):A function callback called after a single file copy
             is executed. Expected signature is ``(src_fs, src_path, dst_fs,
             dst_path)``.
-        workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
-            a single-threaded copy.
+        workers (int): Use ``worker`` threads to copy data, or ``0`` (default)
+            for a single-threaded copy.
 
     """
     return copy_dir_if(
@@ -169,15 +173,19 @@ def copy_file_if(
     ``"always"``
         The source file is always copied.
     ``"newer"``
-        The last modification time of the source file must be newer than that of the destination file.
-        If either file has no modification time, the copy is performed always.
+        The last modification time of the source file must be newer than that
+        of the destination file. If either file has no modification time, the
+        copy is performed always.
     ``"older"``
-        The last modification time of the source file must be older than that of the destination file.
-        If either file has no modification time, the copy is performed always.
+        The last modification time of the source file must be older than that
+        of the destination file. If either file has no modification time, the
+        copy is performed always.
     ``"exists"``
-        The source file is only copied if a file of the same path already exists in ``dst_fs``.
+        The source file is only copied if a file of the same path already
+        exists in ``dst_fs``.
     ``"not_exists"``
-        The source file is only copied if no file of the same path already exists in ``dst_fs``.
+        The source file is only copied if no file of the same path already
+        exists in ``dst_fs``.
 
 
     Arguments:
@@ -344,15 +352,19 @@ def copy_dir_if(
     ``"always"``
         The source file is always copied.
     ``"newer"``
-        The last modification time of the source file must be newer than that of the destination file.
-        If either file has no modification time, the copy is performed always.
+        The last modification time of the source file must be newer than that
+        of the destination file. If either file has no modification time, the
+        copy is performed always.
     ``"older"``
-        The last modification time of the source file must be older than that of the destination file.
-        If either file has no modification time, the copy is performed always.
+        The last modification time of the source file must be older than that
+        of the destination file. If either file has no modification time, the
+        copy is performed always.
     ``"exists"``
-        The source file is only copied if a file of the same path already exists in ``dst_fs``.
+        The source file is only copied if a file of the same path already
+        exists in ``dst_fs``.
     ``"not_exists"``
-        The source file is only copied if no file of the same path already exists in ``dst_fs``.
+        The source file is only copied if no file of the same path already
+        exists in ``dst_fs``.
 
     Arguments:
         src_fs (FS or str): Source filesystem (instance or URL).
