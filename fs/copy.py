@@ -53,9 +53,13 @@ def copy_fs_if_newer(
     workers=0,  # type: int
 ):
     # type: (...) -> None
-    """Use ``copy_fs_if`` instead."""
+    """Copy the contents of one filesystem to another, checking times.
+
+    .. deprecated:: 2.5.0
+       Use `~fs.copy_fs_if` with ``condition="newer"`` instead.
+    """
     warnings.warn(
-        DeprecationWarning("copy_fs_if_newer is deprecated. Use copy_fs_if instead.")
+        "copy_fs_if_newer is deprecated. Use copy_fs_if instead.", DeprecationWarning
     )
     return copy_fs_if(src_fs, dst_fs, "newer", walker, on_copy, workers)
 
@@ -147,11 +151,14 @@ def copy_file_if_newer(
     dst_path,  # type: Text
 ):
     # type: (...) -> bool
-    """Use ``copy_file_if`` instead."""
+    """Copy a file from one filesystem to another, checking times.
+
+    .. deprecated:: 2.5.0
+       Use `~fs.copy_file_if` with ``condition="newer"`` instead.
+    """
     warnings.warn(
-        DeprecationWarning(
-            "copy_file_if_newer is deprecated. Use copy_file_if instead."
-        )
+        "copy_file_if_newer is deprecated. Use copy_file_if instead.",
+        DeprecationWarning,
     )
     return copy_file_if(src_fs, src_path, dst_fs, dst_path, "newer")
 
@@ -325,9 +332,13 @@ def copy_dir_if_newer(
     workers=0,  # type: int
 ):
     # type: (...) -> None
-    """Use ``copy_dir_if`` instead."""
+    """Copy a directory from one filesystem to another, checking times.
+
+    .. deprecated:: 2.5.0
+       Use `~fs.copy_dir_if` with ``condition="newer"`` instead.
+    """
     warnings.warn(
-        DeprecationWarning("copy_dir_if_newer is deprecated. Use copy_dir_if instead.")
+        "copy_dir_if_newer is deprecated. Use copy_dir_if instead.", DeprecationWarning
     )
     copy_dir_if(src_fs, src_path, dst_fs, dst_path, "newer", walker, on_copy, workers)
 
@@ -371,15 +382,15 @@ def copy_dir_if(
         src_path (str): Path to a directory on the source filesystem.
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a directory on the destination filesystem.
-            condition (str): Name of the condition to check for each file.
-            walker (~fs.walk.Walker, optional): A walker object that will be
-                used to scan for files in ``src_fs``. Set this if you only want
-                to consider a sub-set of the resources in ``src_fs``.
-            on_copy (callable):A function callback called after a single file copy
-                is executed. Expected signature is ``(src_fs, src_path, dst_fs,
-                dst_path)``.
-            workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
-                a single-threaded copy.
+        condition (str): Name of the condition to check for each file.
+        walker (~fs.walk.Walker, optional): A walker object that will be
+            used to scan for files in ``src_fs``. Set this if you only want
+            to consider a sub-set of the resources in ``src_fs``.
+        on_copy (callable):A function callback called after a single file copy
+            is executed. Expected signature is ``(src_fs, src_path, dst_fs,
+            dst_path)``.
+        workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
+            a single-threaded copy.
 
     """
     on_copy = on_copy or (lambda *args: None)
