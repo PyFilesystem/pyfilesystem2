@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Make `FTPFile`, `MemoryFile` and `RawWrapper` accept [`array.array`](https://docs.python.org/3/library/array.html)
   arguments for the `write` and `writelines` methods, as expected by their base class [`io.RawIOBase`](https://docs.python.org/3/library/io.html#io.RawIOBase).
 - Various documentation issues, including `MemoryFS` docstring not rendering properly.
+- Avoid creating a new connection on every call of `FTPFS.upload`. Closes [#455](https://github.com/PyFilesystem/pyfilesystem2/issues/455).
 
 
 ## [2.4.12] - 2021-01-14
