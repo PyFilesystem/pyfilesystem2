@@ -147,7 +147,6 @@ class Walker(object):
             ~fs.walk.BoundWalker: a bound walker.
 
         Examples:
-
             Use this method to explicitly bind a filesystem instance::
 
                 >>> walker = Walker.bind(my_fs)
