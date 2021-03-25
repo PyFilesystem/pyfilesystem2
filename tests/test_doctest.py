@@ -9,6 +9,7 @@ import sys
 import types
 import warnings
 import tempfile
+import unittest
 
 try:
     from unittest import mock
@@ -107,7 +108,7 @@ def _load_tests_from_module(tests, module, globs, setUp=None, tearDown=None):
     return tests
 
 
-def load_tests(loader, tests, ignore):
+def _load_tests(loader, tests, ignore):
     """`load_test` function used by unittest to find the doctests."""
 
     # NB (@althonos): we only test docstrings on Python 3 because it's
@@ -135,7 +136,6 @@ def load_tests(loader, tests, ignore):
 
     # recursively traverse all library submodules and load tests from them
     packages = [None, fs]
-
     for pkg in iter(packages.pop, None):
         for (_, subpkgname, subispkg) in pkgutil.walk_packages(pkg.__path__):
             # import the submodule and add it to the tests
@@ -174,3 +174,30 @@ def load_tests(loader, tests, ignore):
                 packages.append(module)
 
     return tests
+
+
+# --- Unit test wrapper ------------------------------------------------------
+#
+# NB (@althonos): Since pytest doesn't support the `load_tests` protocol
+# above, we manually build a `unittest.TestCase` using a dedicated test
+# method for each doctest. This should be safe to remove when pytest
+# supports it, or if we move away from pytest to run tests.
+
+
+class TestDoctest(unittest.TestCase):
+    pass
+
+
+def make_wrapper(x):
+    def _test_wrapper(self):
+        x.setUp()
+        try:
+            x.runTest()
+        finally:
+            x.tearDown()
+
+    return _test_wrapper
+
+
+for x in _load_tests(None, unittest.TestSuite(), False):
+    setattr(TestDoctest, "test_{}".format(x.id().replace(".", "_")), make_wrapper(x))
