@@ -71,6 +71,28 @@ class TempFS(OSFS):
 
     def close(self):
         # type: () -> None
+        """Close the filesystem and release any resources.
+
+        It is important to call this method when you have finished
+        working with the filesystem. Some filesystems may not finalize
+        changes until they are closed (archives for example). You may
+        call this method explicitly (it is safe to call close multiple
+        times), or you can use the filesystem as a context manager to
+        automatically close.
+
+        Hint:
+            Depending on the value of ``auto_clean`` passed when creating
+            the `TempFS`, the underlying temporary folder may be removed
+            or not.
+
+        Example:
+            >>> tmp_fs = TempFS(auto_clean=False)
+            >>> syspath = tmp_fs.getsyspath("/")
+            >>> tmp_fs.close()
+            >>> os.path.exists(syspath)
+            True
+
+        """
         if self._auto_clean:
             self.clean()
         super(TempFS, self).close()
