@@ -14,8 +14,6 @@ from __future__ import unicode_literals
 import re
 import typing
 
-import six
-
 from .errors import IllegalBackReference
 
 if typing.TYPE_CHECKING:

@@ -21,7 +21,6 @@ import fs
 import fs.opener.parse
 from fs.memoryfs import MemoryFS
 from fs.subfs import ClosingSubFS
-from fs.tempfs import TempFS
 
 # --- Mocks ------------------------------------------------------------------
 
