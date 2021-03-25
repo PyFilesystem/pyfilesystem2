@@ -814,11 +814,10 @@ class FTPFS(FS):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
         _path = self.validatepath(path)
         with self._lock:
-            with self._manage_ftp() as ftp:
-                with ftp_errors(self, path):
-                    ftp.storbinary(
-                        str("STOR ") + _encode(_path, self.ftp.encoding), file
-                    )
+            with ftp_errors(self, path):
+                self.ftp.storbinary(
+                    str("STOR ") + _encode(_path, self.ftp.encoding), file
+                )
 
     def writebytes(self, path, contents):
         # type: (Text, ByteString) -> None
