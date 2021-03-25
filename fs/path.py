@@ -14,6 +14,8 @@ from __future__ import unicode_literals
 import re
 import typing
 
+import six
+
 from .errors import IllegalBackReference
 
 if typing.TYPE_CHECKING:
@@ -64,9 +66,9 @@ def normpath(path):
         >>> normpath("/foo//bar/frob/../baz")
         '/foo/bar/baz'
         >>> normpath("foo/../../bar")
-        Traceback (most recent call last)
+        Traceback (most recent call last):
             ...
-        IllegalBackReference: path 'foo/../../bar' contains back-references outside of filesystem"
+        fs.errors.IllegalBackReference: path 'foo/../../bar' contains back-references outside of filesystem
 
     """  # noqa: E501
     if path in "/":
@@ -86,6 +88,7 @@ def normpath(path):
             else:
                 components.append(component)
     except IndexError:
+        # FIXME (@althonos): should be raised from the IndexError
         raise IllegalBackReference(path)
     return prefix + "/".join(components)
 

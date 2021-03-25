@@ -619,7 +619,7 @@ class FS(object):
 
         Example:
             >>> with open('starwars.mov', 'wb') as write_file:
-            ...     my_fs.download('/movies/starwars.mov', write_file)
+            ...     my_fs.download('/Videos/starwars.mov', write_file)
 
         """
         with self._lock:
@@ -986,6 +986,7 @@ class FS(object):
         Example:
             >>> with my_fs.lock():  # May block
             ...    # code here has exclusive access to the filesystem
+            ...    pass
 
         It is a good idea to put a lock around any operations that you
         would like to be *atomic*. For instance if you are copying
@@ -1561,9 +1562,9 @@ class FS(object):
         names).
 
         Example:
-            >>> home_fs.match(['*.py'], '__init__.py')
+            >>> my_fs.match(['*.py'], '__init__.py')
             True
-            >>> home_fs.match(['*.jpg', '*.png'], 'foo.gif')
+            >>> my_fs.match(['*.jpg', '*.png'], 'foo.gif')
             False
 
         Note:

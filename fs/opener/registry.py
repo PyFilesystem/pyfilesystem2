@@ -260,10 +260,13 @@ class Registry(object):
         required logic for that.
 
         Example:
-            >>> def print_ls(list_fs):
-            ...     '''List a directory.'''
-            ...     with manage_fs(list_fs) as fs:
-            ...         print(' '.join(fs.listdir()))
+            The `~Registry.manage_fs` method can be used to define a small
+            utility function::
+
+                >>> def print_ls(list_fs):
+                ...     '''List a directory.'''
+                ...     with manage_fs(list_fs) as fs:
+                ...         print(' '.join(fs.listdir()))
 
             This function may be used in two ways. You may either pass
             a ``str``, as follows::

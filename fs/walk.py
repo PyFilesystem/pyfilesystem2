@@ -146,24 +146,25 @@ class Walker(object):
         Returns:
             ~fs.walk.BoundWalker: a bound walker.
 
-        Example:
-            >>> from fs import open_fs
-            >>> from fs.walk import Walker
-            >>> home_fs = open_fs('~/')
-            >>> walker = Walker.bind(home_fs)
-            >>> for path in walker.files(filter=['*.py']):
-            ...     print(path)
+        Examples:
 
-        Unless you have written a customized walker class, you will be
-        unlikely to need to call this explicitly, as filesystem objects
-        already have a ``walk`` attribute which is a bound walker
-        object.
+            Use this method to explicitly bind a filesystem instance::
 
-        Example:
-            >>> from fs import open_fs
-            >>> home_fs = open_fs('~/')
-            >>> for path in home_fs.walk.files(filter=['*.py']):
-            ...     print(path)
+                >>> walker = Walker.bind(my_fs)
+                >>> for path in walker.files(filter=['*.py']):
+                ...     print(path)
+                /foo.py
+                /bar.py
+
+            Unless you have written a customized walker class, you will
+            be unlikely to need to call this explicitly, as filesystem
+            objects already have a ``walk`` attribute which is a bound
+            walker object::
+
+                >>> for path in my_fs.walk.files(filter=['*.py']):
+                ...     print(path)
+                /foo.py
+                /bar.py
 
         """
         return BoundWalker(fs)
@@ -316,14 +317,16 @@ class Walker(object):
         `~fs.info.Info` objects for directories and files in ``<path>``.
 
         Example:
-            >>> home_fs = open_fs('~/')
             >>> walker = Walker(filter=['*.py'])
-            >>> namespaces = ['details']
-            >>> for path, dirs, files in walker.walk(home_fs, namespaces)
+            >>> for path, dirs, files in walker.walk(my_fs, namespaces=["details"]):
             ...    print("[{}]".format(path))
             ...    print("{} directories".format(len(dirs)))
             ...    total = sum(info.size for info in files)
-            ...    print("{} bytes {}".format(total))
+            ...    print("{} bytes".format(total))
+            [/]
+            2 directories
+            55 bytes
+            ...
 
         """
         _path = abspath(normpath(path))
@@ -495,10 +498,9 @@ class BoundWalker(typing.Generic[_F]):
     `BoundWalker` object.
 
     Example:
-        >>> import fs
-        >>> home_fs = fs.open_fs('~/')
-        >>> home_fs.walk
-        BoundWalker(OSFS('/Users/will', encoding='utf-8'))
+        >>> tmp_fs = fs.tempfs.TempFS()
+        >>> tmp_fs.walk
+        BoundWalker(TempFS())
 
     A `BoundWalker` is callable. Calling it is an alias for the
     `~fs.walk.BoundWalker.walk` method.
@@ -575,13 +577,16 @@ class BoundWalker(typing.Generic[_F]):
             `~fs.info.Info` objects for directories and files in ``<path>``.
 
         Example:
-            >>> home_fs = open_fs('~/')
             >>> walker = Walker(filter=['*.py'])
-            >>> for path, dirs, files in walker.walk(home_fs, namespaces=['details']):
+            >>> for path, dirs, files in walker.walk(my_fs, namespaces=['details']):
             ...     print("[{}]".format(path))
             ...     print("{} directories".format(len(dirs)))
             ...     total = sum(info.size for info in files)
-            ...     print("{} bytes {}".format(total))
+            ...     print("{} bytes".format(total))
+            [/]
+            2 directories
+            55 bytes
+            ...
 
         This method invokes `Walker.walk` with bound `FS` object.
 

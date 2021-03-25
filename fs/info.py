@@ -106,8 +106,9 @@ class Info(object):
                 is not found.
 
         Example:
-            >>> info.get('access', 'permissions')
-            ['u_r', 'u_w', '_wx']
+            >>> info = my_fs.getinfo("foo.py", namespaces=["details"])
+            >>> info.get('details', 'type')
+            2
 
         """
         try:
@@ -189,12 +190,10 @@ class Info(object):
         In case there is no suffix, an empty string is returned.
 
         Example:
-            >>> info
-            <info 'foo.py'>
+            >>> info = my_fs.getinfo("foo.py")
             >>> info.suffix
             '.py'
-            >>> info2
-            <info 'bar'>
+            >>> info2 = my_fs.getinfo("bar")
             >>> info2.suffix
             ''
 
@@ -211,8 +210,7 @@ class Info(object):
         """`List`: a list of any suffixes in the name.
 
         Example:
-            >>> info
-            <info 'foo.tar.gz'>
+            >>> info = my_fs.getinfo("foo.tar.gz")
             >>> info.suffixes
             ['.tar', '.gz']
 
@@ -228,8 +226,7 @@ class Info(object):
         """`str`: the name minus any suffixes.
 
         Example:
-            >>> info
-            <info 'foo.tar.gz'>
+            >>> info = my_fs.getinfo("foo.tar.gz")
             >>> info.stem
             'foo'
 
