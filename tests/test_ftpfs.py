@@ -12,7 +12,12 @@ import time
 import unittest
 import uuid
 
-from six import text_type
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
+from six import text_type, BytesIO
 
 from ftplib import error_perm
 from ftplib import error_temp
@@ -274,6 +279,12 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         # Open with create and check this does fail
         with open_fs(url, create=True) as ftp_fs:
             self.assertTrue(ftp_fs.isfile("foo"))
+
+    def test_upload_connection(self):
+        with mock.patch.object(self.fs, "_manage_ftp") as _manage_ftp:
+            self.fs.upload("foo", BytesIO(b"hello"))
+        self.assertEqual(self.fs.gettext("foo"), "hello")
+        _manage_ftp.assert_not_called()
 
 
 class TestFTPFSNoMLSD(TestFTPFS):
