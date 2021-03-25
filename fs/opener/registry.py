@@ -198,7 +198,8 @@ class Registry(object):
         """Open a filesystem from a FS URL (ignoring the path component).
 
         Arguments:
-            fs_url (str): A filesystem URL.
+            fs_url (str): A filesystem URL. If a filesystem instance is
+                given instead, it will be returned transparently.
             writeable (bool, optional): `True` if the filesystem must
                 be writeable.
             create (bool, optional): `True` if the filesystem should be
@@ -210,6 +211,14 @@ class Registry(object):
 
         Returns:
             ~fs.base.FS: A filesystem instance.
+
+        Caution:
+            The ``writeable`` parameter only controls whether the
+            filesystem *needs* to be writable, which is relevant for
+            some archive filesystems. Passing ``writeable=False`` will
+            **not** make the return filesystem read-only. For this,
+            consider using `fs.wrap.WrapReadOnly` to wrap the returned
+            instance.
 
         """
         from ..base import FS
