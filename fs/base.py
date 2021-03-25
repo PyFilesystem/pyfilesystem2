@@ -152,11 +152,15 @@ class FS(object):
 
         Arguments:
             path (str): A path to a resource on the filesystem.
-            namespaces (list, optional): Info namespaces to query
-                (defaults to *[basic]*).
+            namespaces (list, optional): Info namespaces to query. The
+                `"basic"` namespace is alway included in the returned
+                info, whatever the value of `namespaces` may be.
 
         Returns:
             ~fs.info.Info: resource information object.
+
+        Raises:
+            fs.errors.ResourceNotFound: If ``path`` does not exist.
 
         For more information regarding resource information, see :ref:`info`.
 
@@ -235,10 +239,12 @@ class FS(object):
             io.IOBase: a *file-like* object.
 
         Raises:
-            fs.errors.FileExpected: If the path is not a file.
-            fs.errors.FileExists: If the file exists, and *exclusive mode*
-                is specified (``x`` in the mode).
-            fs.errors.ResourceNotFound: If the path does not exist.
+            fs.errors.FileExpected: If ``path`` exists and is not a file.
+            fs.errors.FileExists: If the ``path`` exists, and
+                *exclusive mode* is specified (``x`` in the mode).
+            fs.errors.ResourceNotFound: If ``path`` does not exist and
+                ``mode`` does not imply creating the file, or if any
+                ancestor of ``path`` does not exist.
 
         """
 
@@ -402,6 +408,7 @@ class FS(object):
                 and ``overwrite`` is `False`.
             fs.errors.ResourceNotFound: If a parent directory of
                 ``dst_path`` does not exist.
+            fs.errors.FileExpected: If ``src_path`` is not a file.
 
         """
         with self._lock:
@@ -587,6 +594,7 @@ class FS(object):
             bytes: the file contents.
 
         Raises:
+            fs.errors.FileExpected: if ``path`` exists but is not a file.
             fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         """
@@ -603,6 +611,10 @@ class FS(object):
         This may be more efficient that opening and copying files
         manually if the filesystem supplies an optimized method.
 
+        Note that the file object ``file`` will *not* be closed by this
+        method. Take care to close it after this method completes
+        (ideally with a context manager).
+
         Arguments:
             path (str): Path to a resource.
             file (file-like): A file-like object open for writing in
@@ -613,13 +625,12 @@ class FS(object):
             **options: Implementation specific options required to open
                 the source file.
 
-        Note that the file object ``file`` will *not* be closed by this
-        method. Take care to close it after this method completes
-        (ideally with a context manager).
-
         Example:
             >>> with open('starwars.mov', 'wb') as write_file:
             ...     my_fs.download('/Videos/starwars.mov', write_file)
+
+        Raises:
+            fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         """
         with self._lock:
@@ -698,7 +709,7 @@ class FS(object):
                             network.
         read_only           `True` if this filesystem is read only.
         supports_rename     `True` if this filesystem supports an
-                            `os.rename` operation.
+                            `os.rename` operation (or equivalent).
         =================== ============================================
 
         Most builtin filesystems will provide all these keys, and third-
@@ -725,6 +736,9 @@ class FS(object):
 
         Returns:
             int: the *size* of the resource.
+
+        Raises:
+            fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         The *size* of a file is the total number of readable bytes,
         which may not reflect the exact number of bytes of reserved
@@ -1018,6 +1032,8 @@ class FS(object):
         Raises:
             fs.errors.ResourceNotFound: if ``dst_path`` does not exist,
                 and ``create`` is `False`.
+            fs.errors.DirectoryExpected: if ``src_path`` or one of its
+                ancestors is not a directory.
 
         """
         with self._lock:
@@ -1617,13 +1633,16 @@ class FS(object):
         Arguments:
             path(str): A path on the filesystem.
             name(str):
-                One of the algorithms supported by the hashlib module, e.g. `"md5"`
+                One of the algorithms supported by the `hashlib` module,
+                e.g. `"md5"` or `"sha256"`.
 
         Returns:
             str: The hex digest of the hash.
 
         Raises:
             fs.errors.UnsupportedHash: If the requested hash is not supported.
+            fs.errors.ResourceNotFound: If ``path`` does not exist.
+            fs.errors.FileExpected: If ``path`` exists but is not a file.
 
         """
         self.validatepath(path)

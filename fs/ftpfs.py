@@ -358,7 +358,6 @@ class FTPFS(FS):
     FTPS, or FTP Secure. TLS will be enabled when using the ftps:// protocol,
     or when setting the `tls` argument to True in the constructor.
 
-
     Examples:
         Create with the constructor::
 
