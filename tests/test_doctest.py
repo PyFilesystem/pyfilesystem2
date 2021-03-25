@@ -59,18 +59,15 @@ def _open_fs(path):
 def _my_fs(module):
     """Create a mock filesystem to be used in examples."""
     my_fs = MemoryFS()
-
     if module == "fs.base":
         my_fs.makedir("Desktop")
         my_fs.makedir("Videos")
         my_fs.touch("Videos/starwars.mov")
         my_fs.touch("file.txt")
-
     elif module == "fs.info":
         my_fs.touch("foo.tar.gz")
         my_fs.settext("foo.py", "print('Hello, world!')")
         my_fs.makedir("bar")
-
     elif module in {"fs.walk", "fs.glob"}:
         my_fs.makedir("dir1")
         my_fs.makedir("dir2")
@@ -78,10 +75,6 @@ def _my_fs(module):
         my_fs.touch("foo.pyc")
         my_fs.settext("bar.py", "print('ok')\n\n# this is a comment\n")
         my_fs.touch("bar.pyc")
-
-    # # used in `fs.glob`
-    # home_fs.touch("foo.pyc")
-    # home_fs.touch("bar.pyc")
     return my_fs
 
 
@@ -128,11 +121,6 @@ def _load_tests(loader, tests, ignore):
         self._open_fs_mock.__exit__(None, None, None)
         self._ftpfs_mock.__exit__(None, None, None)
         warnings.simplefilter(warnings.defaultaction)
-
-    # doctests are not compatible with `green`, so we may want to bail out
-    # early if `green` is running the tests
-    if sys.argv[0].endswith("green"):
-        return tests
 
     # recursively traverse all library submodules and load tests from them
     packages = [None, fs]
