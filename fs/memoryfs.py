@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 
 import contextlib
 import io
-import itertools
 import os
 import time
 import typing
@@ -39,6 +38,7 @@ if typing.TYPE_CHECKING:
         SupportsInt,
         Union,
         Text,
+        Tuple,
     )
     from .base import _OpendirFactory
     from .info import RawInfo
@@ -608,7 +608,8 @@ class MemoryFS(FS):
                 filenames = filenames[start:end]
             # yield info with the right namespaces
             for name in filenames:
-                yield dir_entry.get_entry(name).to_info(namespaces=namespaces)
+                entry = typing.cast(_DirEntry, dir_entry.get_entry(name))
+                yield entry.to_info(namespaces=namespaces)
 
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
