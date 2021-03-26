@@ -444,6 +444,46 @@ class MemoryFS(FS):
                 parent_dir.set_entry(dir_name, new_dir)
             return self.opendir(path)
 
+    def move(self, src_path, dst_path, overwrite=False):
+        src_dir, src_name = split(self.validatepath(src_path))
+        dst_dir, dst_name = split(self.validatepath(dst_path))
+
+        with self._lock:
+            src_dir_entry = self._get_dir_entry(src_dir)
+            if src_dir_entry is None or src_name not in src_dir_entry:
+                raise errors.ResourceNotFound(src_path)
+            src_entry = src_dir_entry.get_entry(src_name)
+            if src_entry.is_dir:
+                raise errors.FileExpected(src_path)
+
+            dst_dir_entry = self._get_dir_entry(dst_dir)
+            if dst_dir_entry is None:
+                raise errors.ResourceNotFound(dst_path)
+            elif not overwrite and dst_name in dst_dir_entry:
+                raise errors.DestinationExists(dst_path)
+
+            dst_dir_entry.set_entry(dst_name, src_entry)
+            src_dir_entry.remove_entry(src_name)
+
+    def movedir(self, src_path, dst_path, create=False):
+        src_dir, src_name = split(self.validatepath(src_path))
+        dst_dir, dst_name = split(self.validatepath(dst_path))
+
+        with self._lock:
+            src_dir_entry = self._get_dir_entry(src_dir)
+            if src_dir_entry is None or src_name not in src_dir_entry:
+                raise errors.ResourceNotFound(src_path)
+            src_entry = src_dir_entry.get_entry(src_name)
+            if not src_entry.is_dir:
+                raise errors.DirectoryExpected(src_path)
+
+            dst_dir_entry = self._get_dir_entry(dst_dir)
+            if dst_dir_entry is None or (not create and dst_name not in dst_dir_entry):
+                raise errors.ResourceNotFound(dst_path)
+
+            dst_dir_entry.set_entry(dst_name, src_entry)
+            src_dir_entry.remove_entry(src_name)
+
     def openbin(self, path, mode="r", buffering=-1, **options):
         # type: (Text, Text, int, **Any) -> BinaryIO
         _mode = Mode(mode)
