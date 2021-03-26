@@ -20,11 +20,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Closes [#445](https://github.com/PyFilesystem/pyfilesystem2/pull/445).
 - Migrate continuous integration from Travis-CI to GitHub Actions and introduce several linters
   again in the build steps ([#448](https://github.com/PyFilesystem/pyfilesystem2/pull/448)).
-  Closes [#446](https://github.com/PyFilesystem/pyfilesystem2/pull/446).
+  Closes [#446](https://github.com/PyFilesystem/pyfilesystem2/issues/446).
 - Stop requiring `pytest` to run tests, allowing any test runner supporting `unittest`-style
   test suites.
 - `FSTestCases` now builds the large data required for `upload` and `download` tests only
   once in order to reduce the total testing time.
+- `MemoryFS.move` and `MemoryFS.movedir` will now avoid copying data. 
+   Closes [#452](https://github.com/PyFilesystem/pyfilesystem2/issues/452).
 
 ### Fixed
 

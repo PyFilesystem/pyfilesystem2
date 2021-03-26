@@ -66,3 +66,20 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
             "Memory usage increased after closing the file system; diff is %0.2f KiB."
             % (diff_close.size_diff / 1024.0),
         )
+
+
+class TestMemoryFile(unittest.TestCase):
+
+    def setUp(self):
+        self.fs = memoryfs.MemoryFS()
+
+    def tearDown(self):
+        self.fs.close()
+
+    def test_readline_writing(self):
+        with self.fs.openbin("test.txt", "w") as f:
+            self.assertRaises(IOError, f.readline)
+
+    def test_readinto_writing(self):
+        with self.fs.openbin("test.txt", "w") as f:
+            self.assertRaises(IOError, f.readinto, bytearray(10))
