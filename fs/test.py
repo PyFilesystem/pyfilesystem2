@@ -1115,6 +1115,15 @@ class FSTestCases(object):
         self.fs.removetree("foo")
         self.assert_not_exists("foo")
 
+        # Errors on files
+        self.fs.create("bar")
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.removetree("bar")
+
+        # Errors on non-existing path
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.removetree("foofoo")
+
     def test_setinfo(self):
         self.fs.create("birthday.txt")
         now = math.floor(time.time())
