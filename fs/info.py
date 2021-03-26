@@ -41,7 +41,7 @@ class Info(object):
         raw_info (dict): A dict containing resource info.
         to_datetime (callable): A callable that converts an
             epoch time to a datetime object. The default uses
-            :func:`~fs.time.epoch_to_datetime`.
+            `~fs.time.epoch_to_datetime`.
 
     """
 
@@ -132,7 +132,8 @@ class Info(object):
         # type: (Text, Text) -> bool
         """Check if a given key in a namespace is writable.
 
-        Uses `~fs.base.FS.setinfo`.
+        When creating an `Info` object, you can add a ``_write`` key to
+        each raw namespace that lists which keys are writable or not.
 
         Arguments:
             namespace (str): A namespace identifier.
@@ -140,6 +141,24 @@ class Info(object):
 
         Returns:
             bool: `True` if the key can be modified, `False` otherwise.
+
+        Example:
+            Create an `Info` object that marks only the ``modified`` key
+            as writable in the ``details`` namespace::
+
+                >>> now = time.time()
+                >>> info = Info({
+                ...     "basic": {"name": "foo", "is_dir": False},
+                ...     "details": {
+                ...         "modified": now,
+                ...         "created": now,
+                ...         "_write": ["modified"],
+                ...     }
+                ... })
+                >>> info.is_writeable("details", "created")
+                False
+                >>> info.is_writeable("details", "modified")
+                True
 
         """
         _writeable = self.get(namespace, "_write", ())
