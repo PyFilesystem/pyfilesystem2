@@ -274,6 +274,10 @@ class _DirEntry(object):
         # type: (Text) -> None
         del self._dir[name]
 
+    def clear(self):
+        # type: () -> None
+        self._dir.clear()
+
     def __contains__(self, name):
         # type: (object) -> bool
         return name in self._dir
@@ -499,12 +503,29 @@ class MemoryFS(FS):
 
     def removedir(self, path):
         # type: (Text) -> None
+        # make sure the directory is empty
+        if not self.isempty(path):
+            return DirectoryNotEmpty(path)
+        # make sure we are not removing root
         _path = self.validatepath(path)
-
         if _path == "/":
             raise errors.RemoveRootError()
+        # we can now delegate to removetree since we confirmed that
+        # * path exists (isempty)
+        # * path is a folder (isempty)
+        # * path is not root
+        self.removetree(_path)
+
+    def removetree(self, path):
+        # type: (Text) -> None
+        _path = self.validatepath(path)
 
         with self._lock:
+
+            if _path == "/":
+                self.root.clear()
+                return
+
             dir_path, file_name = split(_path)
             parent_dir_entry = self._get_dir_entry(dir_path)
 
@@ -514,9 +535,6 @@ class MemoryFS(FS):
             dir_dir_entry = typing.cast(_DirEntry, self._get_dir_entry(_path))
             if not dir_dir_entry.is_dir:
                 raise errors.DirectoryExpected(path)
-
-            if len(dir_dir_entry):
-                raise errors.DirectoryNotEmpty(path)
 
             parent_dir_entry.remove_entry(file_name)
 
