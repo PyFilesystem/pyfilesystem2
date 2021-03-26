@@ -100,10 +100,10 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
     #
     # A possible solution would be to replaced the cached with a
     #     Dict[Text, Dict[Text, Dict[Text, Info]]]
-    #           ^           ^         ^     ^~~ the actual info object
-    #           |           |         |~~ the path of the directory entry
-    #           |           |~~ the namespace of the info
-    #           |~~ the cached directory entry
+    #           ^           ^         ^     ^-- the actual info object
+    #           |           |         \-- the path of the directory entry
+    #           |           \-- the namespace of the info
+    #           \-- the cached directory entry
     #
     # Furthermore, `listdir` and `filterdir` calls should be cached as well,
     # since they can be written as wrappers of `scandir`.
