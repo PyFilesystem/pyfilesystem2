@@ -203,6 +203,11 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         self.check()
         raise ResourceReadOnly(path)
 
+    def removetree(self, path):
+        # type: (Text) -> None
+        self.check()
+        raise ResourceReadOnly(path)
+
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
         self.check()
