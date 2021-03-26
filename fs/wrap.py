@@ -92,6 +92,22 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
 
     """
 
+    # FIXME (@althonos): The caching data structure can very likely be
+    # improved. With the current implementation, if `scandir` result was
+    # cached for `namespaces=["details", "access"]`, calling `scandir`
+    # again only with `names=["details"]` will miss the cache, even though
+    # we are already storing the totality of the required metadata.
+    #
+    # A possible solution would be to replaced the cached with a
+    #     Dict[Text, Dict[Text, Dict[Text, Info]]]
+    #           ^           ^         ^     ^~~ the actual info object
+    #           |           |         |~~ the path of the directory entry
+    #           |           |~~ the namespace of the info
+    #           |~~ the cached directory entry
+    #
+    # Furthermore, `listdir` and `filterdir` calls should be cached as well,
+    # since they can be written as wrappers of `scandir`.
+
     wrap_name = "cached-dir"
 
     def __init__(self, wrap_fs):  # noqa: D107
