@@ -5,7 +5,6 @@ import doctest
 import importlib
 import os
 import pkgutil
-import sys
 import types
 import warnings
 import tempfile
@@ -50,7 +49,7 @@ def _open_fs(path):
         if parse_result.path is not None:
             home_fs = home_fs.opendir(parse_result.path, factory=ClosingSubFS)
         return home_fs
-    elif parse_result.protocol in {"ftp", "ftps", "mem"}:
+    elif parse_result.protocol in {"ftp", "ftps", "mem", "temp"}:
         return MemoryFS()
     else:
         raise RuntimeError("not allowed in doctests: {}".format(path))

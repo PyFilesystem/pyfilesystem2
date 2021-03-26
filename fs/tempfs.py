@@ -27,7 +27,31 @@ if typing.TYPE_CHECKING:
 
 @six.python_2_unicode_compatible
 class TempFS(OSFS):
-    """A temporary filesystem on the OS."""
+    """A temporary filesystem on the OS.
+
+    Temporary filesystems are created using the `tempfile.mkdtemp`
+    function to obtain a temporary folder in an OS-specific location.
+    You can provide an alternative location with the ``temp_dir``
+    argument of the constructor.
+
+    Examples:
+        Create with the constructor::
+
+            >>> from fs.tempfs import TempFS
+            >>> tmp_fs = TempFS()
+
+        Or via an FS URL::
+
+            >>> import fs
+            >>> tmp_fs = fs.open_fs("temp://")
+
+        Use a specific identifier for the temporary folder to better
+        illustrate its purpose::
+
+            >>> named_tmp_fs = fs.open_fs("temp://local_copy")
+            >>> named_tmp_fs = TempFS(identifier="local_copy")
+
+    """
 
     def __init__(
         self,
@@ -43,7 +67,7 @@ class TempFS(OSFS):
             identifier (str): A string to distinguish the directory within
                 the OS temp location, used as part of the directory name.
             temp_dir (str, optional): An OS path to your temp directory
-                (leave as `None` to auto-detect)
+                (leave as `None` to auto-detect).
             auto_clean (bool): If `True` (the default), the directory
                 contents will be wiped on close.
             ignore_clean_errors (bool): If `True` (the default), any errors
