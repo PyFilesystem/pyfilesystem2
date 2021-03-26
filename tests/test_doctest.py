@@ -8,7 +8,9 @@ import pkgutil
 import types
 import warnings
 import tempfile
+import time
 import unittest
+from pprint import pprint
 
 try:
     from unittest import mock
@@ -142,6 +144,8 @@ def _load_tests(loader, tests, ignore):
                 OSFS=lambda path: MemoryFS(),
                 # NB (@althonos): This is for compatibility in `fs.registry`
                 print_list=lambda path: None,
+                pprint=pprint,
+                time=time,
             )
 
             # load the doctests into the unittest test suite

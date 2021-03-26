@@ -217,7 +217,7 @@ class Registry(object):
             filesystem *needs* to be writable, which is relevant for
             some archive filesystems. Passing ``writeable=False`` will
             **not** make the return filesystem read-only. For this,
-            consider using `fs.wrap.WrapReadOnly` to wrap the returned
+            consider using `fs.wrap.read_only` to wrap the returned
             instance.
 
         """

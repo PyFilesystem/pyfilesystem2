@@ -709,7 +709,7 @@ class FS(object):
                             network.
         read_only           `True` if this filesystem is read only.
         supports_rename     `True` if this filesystem supports an
-                            `os.rename` operation (or equivalent).
+                            `os.rename` operation.
         =================== ============================================
 
         Most builtin filesystems will provide all these keys, and third-
