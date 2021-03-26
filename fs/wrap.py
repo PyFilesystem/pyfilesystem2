@@ -135,13 +135,17 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
 
     def isdir(self, path):
         # type: (Text) -> bool
-        # FIXME(@althonos): this raises an error on non-existing file !
-        return self.getinfo(path).is_dir
+        try:
+            return self.getinfo(path).is_dir
+        except ResourceNotFound:
+            return False
 
     def isfile(self, path):
         # type: (Text) -> bool
-        # FIXME(@althonos): this raises an error on non-existing file !
-        return not self.getinfo(path).is_dir
+        try:
+            return not self.getinfo(path).is_dir
+        except ResourceNotFound:
+            return False
 
 
 class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
