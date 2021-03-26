@@ -285,7 +285,7 @@ class TestFTPParse(unittest.TestCase):
                 "ftp": {
                     "ls": "-rw-r--r--    1 ftp      ftp            25 Mar 18 19:34 robots.txt"
                 },
-            }
+            },
         ]
 
         parsed = ftp_parse.parse(directory.strip().splitlines())
