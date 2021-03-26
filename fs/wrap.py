@@ -92,6 +92,22 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
 
     """
 
+    # FIXME (@althonos): The caching data structure can very likely be
+    # improved. With the current implementation, if `scandir` result was
+    # cached for `namespaces=["details", "access"]`, calling `scandir`
+    # again only with `names=["details"]` will miss the cache, even though
+    # we are already storing the totality of the required metadata.
+    #
+    # A possible solution would be to replaced the cached with a
+    #     Dict[Text, Dict[Text, Dict[Text, Info]]]
+    #           ^           ^         ^     ^-- the actual info object
+    #           |           |         \-- the path of the directory entry
+    #           |           \-- the namespace of the info
+    #           \-- the cached directory entry
+    #
+    # Furthermore, `listdir` and `filterdir` calls should be cached as well,
+    # since they can be written as wrappers of `scandir`.
+
     wrap_name = "cached-dir"
 
     def __init__(self, wrap_fs):  # noqa: D107
@@ -135,13 +151,17 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
 
     def isdir(self, path):
         # type: (Text) -> bool
-        # FIXME(@althonos): this raises an error on non-existing file !
-        return self.getinfo(path).is_dir
+        try:
+            return self.getinfo(path).is_dir
+        except ResourceNotFound:
+            return False
 
     def isfile(self, path):
         # type: (Text) -> bool
-        # FIXME(@althonos): this raises an error on non-existing file !
-        return not self.getinfo(path).is_dir
+        try:
+            return not self.getinfo(path).is_dir
+        except ResourceNotFound:
+            return False
 
 
 class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
@@ -199,6 +219,11 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         raise ResourceReadOnly(path)
 
     def removedir(self, path):
+        # type: (Text) -> None
+        self.check()
+        raise ResourceReadOnly(path)
+
+    def removetree(self, path):
         # type: (Text) -> None
         self.check()
         raise ResourceReadOnly(path)

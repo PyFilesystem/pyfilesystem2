@@ -32,6 +32,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   arguments for the `write` and `writelines` methods, as expected by their base class [`io.RawIOBase`](https://docs.python.org/3/library/io.html#io.RawIOBase).
 - Various documentation issues, including `MemoryFS` docstring not rendering properly.
 - Avoid creating a new connection on every call of `FTPFS.upload`. Closes [#455](https://github.com/PyFilesystem/pyfilesystem2/issues/455).
+- `WrapReadOnly.removetree` not raising a `ResourceReadOnly` when called. Closes [#468](https://github.com/PyFilesystem/pyfilesystem2/issues/468).
+- `WrapCachedDir.isdir` and `WrapCachedDir.isfile` raising a `ResourceNotFound` error on non-existing path ([#470](https://github.com/PyFilesystem/pyfilesystem2/pull/470)).
 
 
 ## [2.4.12] - 2021-01-14
