@@ -5,6 +5,7 @@ from __future__ import unicode_literals
 
 import contextlib
 import io
+import itertools
 import os
 import time
 import typing
@@ -298,6 +299,21 @@ class _DirEntry(object):
         # type: (_MemoryFile) -> None
         self._open_files.remove(memory_file)
 
+    def to_info(self, namespaces=None):
+        # type: (Optional[Collection[Text]]) -> Info
+        namespaces = namespaces or ()
+        info = {"basic": {"name": self.name, "is_dir": self.is_dir}}
+        if "details" in namespaces:
+            info["details"] = {
+                "_write": ["accessed", "modified"],
+                "type": int(self.resource_type),
+                "size": self.size,
+                "accessed": self.accessed_time,
+                "modified": self.modified_time,
+                "created": self.created_time,
+            }
+        return Info(info)
+
 
 @six.python_2_unicode_compatible
 class MemoryFS(FS):
@@ -372,33 +388,24 @@ class MemoryFS(FS):
 
     def getinfo(self, path, namespaces=None):
         # type: (Text, Optional[Collection[Text]]) -> Info
-        namespaces = namespaces or ()
         _path = self.validatepath(path)
         dir_entry = self._get_dir_entry(_path)
         if dir_entry is None:
             raise errors.ResourceNotFound(path)
-        info = {"basic": {"name": dir_entry.name, "is_dir": dir_entry.is_dir}}
-        if "details" in namespaces:
-            info["details"] = {
-                "_write": ["accessed", "modified"],
-                "type": int(dir_entry.resource_type),
-                "size": dir_entry.size,
-                "accessed": dir_entry.accessed_time,
-                "modified": dir_entry.modified_time,
-                "created": dir_entry.created_time,
-            }
-        return Info(info)
+        return dir_entry.to_info(namespaces=namespaces)
 
     def listdir(self, path):
         # type: (Text) -> List[Text]
         self.check()
         _path = self.validatepath(path)
         with self._lock:
+            # locate and validate the entry corresponding to the given path
             dir_entry = self._get_dir_entry(_path)
             if dir_entry is None:
                 raise errors.ResourceNotFound(path)
             if not dir_entry.is_dir:
                 raise errors.DirectoryExpected(path)
+            # return the filenames in the order they were created
             return dir_entry.list()
 
     if typing.TYPE_CHECKING:
@@ -503,13 +510,13 @@ class MemoryFS(FS):
 
     def removedir(self, path):
         # type: (Text) -> None
-        # make sure the directory is empty
-        if not self.isempty(path):
-            return DirectoryNotEmpty(path)
         # make sure we are not removing root
         _path = self.validatepath(path)
         if _path == "/":
             raise errors.RemoveRootError()
+        # make sure the directory is empty
+        if not self.isempty(path):
+            raise errors.DirectoryNotEmpty(path)
         # we can now delegate to removetree since we confirmed that
         # * path exists (isempty)
         # * path is a folder (isempty)
@@ -537,6 +544,31 @@ class MemoryFS(FS):
                 raise errors.DirectoryExpected(path)
 
             parent_dir_entry.remove_entry(file_name)
+
+    def scandir(
+        self,
+        path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+        page=None,  # type: Optional[Tuple[int, int]]
+    ):
+        # type: (...) -> Iterator[Info]
+        self.check()
+        _path = self.validatepath(path)
+        with self._lock:
+            # locate and validate the entry corresponding to the given path
+            dir_entry = self._get_dir_entry(_path)
+            if dir_entry is None:
+                raise errors.ResourceNotFound(path)
+            if not dir_entry.is_dir:
+                raise errors.DirectoryExpected(path)
+            # if paging was requested, slice the filenames
+            filenames = dir_entry.list()
+            if page is not None:
+                start, end = page
+                filenames = filenames[start:end]
+            # yield info with the right namespaces
+            for name in filenames:
+                yield dir_entry.get_entry(name).to_info(namespaces=namespaces)
 
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
