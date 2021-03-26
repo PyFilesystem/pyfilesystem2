@@ -19,7 +19,8 @@ EPOCH_DT = datetime.datetime.fromtimestamp(0, UTC)
 RE_LINUX = re.compile(
     r"""
     ^
-    ([ldrwx-]{10})
+    ([-dlpscbD])
+    ([r-][w-][xsS-][r-][w-][xsS-][r-][w-][xtT-][\.\+]?)
     \s+?
     (\d+)
     \s+?
@@ -110,14 +111,14 @@ def _decode_linux_time(mtime):
 
 
 def decode_linux(line, match):
-    perms, links, uid, gid, size, mtime, name = match.groups()
-    is_link = perms.startswith("l")
-    is_dir = perms.startswith("d") or is_link
+    ty, perms, links, uid, gid, size, mtime, name = match.groups()
+    is_link = ty == "l"
+    is_dir = ty == "d" or is_link
     if is_link:
         name, _, _link_name = name.partition("->")
         name = name.strip()
         _link_name = _link_name.strip()
-    permissions = Permissions.parse(perms[1:])
+    permissions = Permissions.parse(perms)
 
     mtime_epoch = _decode_linux_time(mtime)
 

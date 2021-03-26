@@ -25,7 +25,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   test suites.
 - `FSTestCases` now builds the large data required for `upload` and `download` tests only
   once in order to reduce the total testing time.
-- `MemoryFS.move` and `MemoryFS.movedir` will now avoid copying data. 
+- `MemoryFS.move` and `MemoryFS.movedir` will now avoid copying data.
    Closes [#452](https://github.com/PyFilesystem/pyfilesystem2/issues/452).
 
 ### Fixed
@@ -36,6 +36,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Avoid creating a new connection on every call of `FTPFS.upload`. Closes [#455](https://github.com/PyFilesystem/pyfilesystem2/issues/455).
 - `WrapReadOnly.removetree` not raising a `ResourceReadOnly` when called. Closes [#468](https://github.com/PyFilesystem/pyfilesystem2/issues/468).
 - `WrapCachedDir.isdir` and `WrapCachedDir.isfile` raising a `ResourceNotFound` error on non-existing path ([#470](https://github.com/PyFilesystem/pyfilesystem2/pull/470)).
+- `FTPFS` not listing certain entries with sticky/SUID/SGID permissions set by Linux server ([#473](https://github.com/PyFilesystem/pyfilesystem2/pull/473)).
+  Closes [#451](https://github.com/PyFilesystem/pyfilesystem2/issues/451).
 
 
 ## [2.4.12] - 2021-01-14
