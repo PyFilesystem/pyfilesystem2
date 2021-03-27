@@ -483,39 +483,44 @@ class OSFS(FS):
             else:
                 sys_path = self._to_sys_path(_path)  # type: ignore
             with convert_os_errors("scandir", path, directory=True):
-                for dir_entry in scandir(sys_path):
-                    info = {
-                        "basic": {
-                            "name": fsdecode(dir_entry.name),
-                            "is_dir": dir_entry.is_dir(),
+                scandir_iter = scandir(sys_path)
+                try:
+                    for dir_entry in scandir_iter:
+                        info = {
+                            "basic": {
+                                "name": fsdecode(dir_entry.name),
+                                "is_dir": dir_entry.is_dir(),
+                            }
                         }
-                    }
-                    if "details" in namespaces:
-                        stat_result = dir_entry.stat()
-                        info["details"] = self._make_details_from_stat(stat_result)
-                    if "stat" in namespaces:
-                        stat_result = dir_entry.stat()
-                        info["stat"] = {
-                            k: getattr(stat_result, k)
-                            for k in dir(stat_result)
-                            if k.startswith("st_")
-                        }
-                    if "lstat" in namespaces:
-                        lstat_result = dir_entry.stat(follow_symlinks=False)
-                        info["lstat"] = {
-                            k: getattr(lstat_result, k)
-                            for k in dir(lstat_result)
-                            if k.startswith("st_")
-                        }
-                    if "link" in namespaces:
-                        info["link"] = self._make_link_info(
-                            os.path.join(sys_path, dir_entry.name)
-                        )
-                    if "access" in namespaces:
-                        stat_result = dir_entry.stat()
-                        info["access"] = self._make_access_from_stat(stat_result)
-
-                    yield Info(info)
+                        if "details" in namespaces:
+                            stat_result = dir_entry.stat()
+                            info["details"] = self._make_details_from_stat(stat_result)
+                        if "stat" in namespaces:
+                            stat_result = dir_entry.stat()
+                            info["stat"] = {
+                                k: getattr(stat_result, k)
+                                for k in dir(stat_result)
+                                if k.startswith("st_")
+                            }
+                        if "lstat" in namespaces:
+                            lstat_result = dir_entry.stat(follow_symlinks=False)
+                            info["lstat"] = {
+                                k: getattr(lstat_result, k)
+                                for k in dir(lstat_result)
+                                if k.startswith("st_")
+                            }
+                        if "link" in namespaces:
+                            info["link"] = self._make_link_info(
+                                os.path.join(sys_path, dir_entry.name)
+                            )
+                        if "access" in namespaces:
+                            stat_result = dir_entry.stat()
+                            info["access"] = self._make_access_from_stat(stat_result)
+                            
+                        yield Info(info)
+                finally:
+                    if sys.version_info >= (3, 6):
+                        scandir_iter.close()
 
     else:
 
