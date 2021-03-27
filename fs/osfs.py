@@ -475,6 +475,7 @@ class OSFS(FS):
             # type: (Text, Optional[Collection[Text]]) -> Iterator[Info]
             self.check()
             namespaces = namespaces or ()
+            requires_stat = not {"details", "stat", "access"}.isdisjoint(namespaces)
             _path = self.validatepath(path)
             if _WINDOWS_PLATFORM:
                 sys_path = os.path.join(
@@ -492,16 +493,18 @@ class OSFS(FS):
                                 "is_dir": dir_entry.is_dir(),
                             }
                         }
-                        if "details" in namespaces:
+                        if requires_stat:
                             stat_result = dir_entry.stat()
-                            info["details"] = self._make_details_from_stat(stat_result)
-                        if "stat" in namespaces:
-                            stat_result = dir_entry.stat()
-                            info["stat"] = {
-                                k: getattr(stat_result, k)
-                                for k in dir(stat_result)
-                                if k.startswith("st_")
-                            }
+                            if "details" in namespaces:
+                                info["details"] = self._make_details_from_stat(stat_result)
+                            if "stat" in namespaces:
+                                info["stat"] = {
+                                    k: getattr(stat_result, k)
+                                    for k in dir(stat_result)
+                                    if k.startswith("st_")
+                                }
+                            if "access" in namespaces:
+                                info["access"] = self._make_access_from_stat(stat_result)
                         if "lstat" in namespaces:
                             lstat_result = dir_entry.stat(follow_symlinks=False)
                             info["lstat"] = {
@@ -513,10 +516,7 @@ class OSFS(FS):
                             info["link"] = self._make_link_info(
                                 os.path.join(sys_path, dir_entry.name)
                             )
-                        if "access" in namespaces:
-                            stat_result = dir_entry.stat()
-                            info["access"] = self._make_access_from_stat(stat_result)
-                            
+
                         yield Info(info)
                 finally:
                     if sys.version_info >= (3, 6):
