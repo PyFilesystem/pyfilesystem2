@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Added FTP over TLS (FTPS) support to FTPFS.
   Closes [#437](https://github.com/PyFilesystem/pyfilesystem2/issues/437),
   [#449](https://github.com/PyFilesystem/pyfilesystem2/pull/449).
+- `PathError` now supports wrapping an exception using the `exc` argument.
+  Closes [#453](https://github.com/PyFilesystem/pyfilesystem2/issues/453).
 
 ### Changed
 
