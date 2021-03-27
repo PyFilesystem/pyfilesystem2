@@ -1209,7 +1209,7 @@ class FS(object):
 
         _factory = factory or self.subfs_class or SubFS
 
-        if not self.getbasic(path).is_dir:
+        if not self.getinfo(path).is_dir:
             raise errors.DirectoryExpected(path=path)
         return _factory(self, path)
 
@@ -1553,7 +1553,16 @@ class FS(object):
         Returns:
             ~fs.info.Info: Resource information object for ``path``.
 
+        Note:
+            .. deprecated:: 2.4.13
+                Please use `~FS.getinfo` directly, which is
+                required to always return the *basic* namespace.
+
         """
+        warnings.warn(
+            "method 'getbasic' has been deprecated, please use 'getinfo'",
+            DeprecationWarning,
+        )
         return self.getinfo(path, namespaces=["basic"])
 
     def getdetails(self, path):
