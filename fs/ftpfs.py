@@ -378,6 +378,12 @@ class FTPFS(FS):
             >>> ftp_fs = FTPFS("test.rebex.net", user="demo", passwd="password")
             >>> ftp_fs = fs.open_fs('ftp://demo:password@test.rebex.net')
 
+        Connecting via a proxy is supported. If using a FS URL, the proxy
+        URL will need to be added as a URL parameter::
+
+            >>> ftp_fs = FTPFS("ftp.ebi.ac.uk", proxy="test.rebex.net")
+            >>> ftp_fs = fs.open_fs('ftp://ftp.ebi.ac.uk/?proxy=test.rebex.net')
+
     """
 
     _meta = {
