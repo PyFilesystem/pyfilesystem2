@@ -40,6 +40,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `WrapCachedDir.isdir` and `WrapCachedDir.isfile` raising a `ResourceNotFound` error on non-existing path ([#470](https://github.com/PyFilesystem/pyfilesystem2/pull/470)).
 - `FTPFS` not listing certain entries with sticky/SUID/SGID permissions set by Linux server ([#473](https://github.com/PyFilesystem/pyfilesystem2/pull/473)).
   Closes [#451](https://github.com/PyFilesystem/pyfilesystem2/issues/451).
+- `scandir` iterator not being closed explicitly in `OSFS.scandir`, occasionally causing a `ResourceWarning` 
+  to be thrown. Closes [#311](https://github.com/PyFilesystem/pyfilesystem2/issues/311).
 
 
 ## [2.4.12] - 2021-01-14

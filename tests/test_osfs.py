@@ -8,6 +8,7 @@ import shutil
 import tempfile
 import sys
 import unittest
+import warnings
 
 from fs import osfs, open_fs
 from fs.path import relpath, dirname
@@ -24,6 +25,14 @@ except ImportError:
 
 class TestOSFS(FSTestCases, unittest.TestCase):
     """Test OSFS implementation."""
+
+    @classmethod
+    def setUpClass(cls):
+        warnings.simplefilter("error")
+
+    @classmethod
+    def tearDownClass(cls):
+        warnings.simplefilter(warnings.defaultaction)
 
     def make_fs(self):
         temp_dir = tempfile.mkdtemp("fstestosfs")
