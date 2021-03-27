@@ -16,6 +16,7 @@ import math
 import os
 import time
 import unittest
+import warnings
 
 import fs.copy
 import fs.move
@@ -884,8 +885,9 @@ class FSTestCases(object):
             self.assertFalse(f.closed)
         self.assertTrue(f.closed)
 
-        iter_lines = iter(self.fs.open("text"))
-        self.assertEqual(next(iter_lines), "Hello\n")
+        with self.fs.open("text") as f:
+            iter_lines = iter(f)
+            self.assertEqual(next(iter_lines), "Hello\n")
 
         with self.fs.open("unicode", "w") as f:
             self.assertEqual(12, f.write("Héllo\nWörld\n"))
@@ -1594,8 +1596,10 @@ class FSTestCases(object):
         self.assert_bytes("foo2", b"help")
 
         # Test __del__ doesn't throw traceback
-        f = self.fs.open("foo2", "r")
-        del f
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            f = self.fs.open("foo2", "r")
+            del f
 
         with self.assertRaises(IOError):
             with self.fs.open("foo2", "r") as f:
