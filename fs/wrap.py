@@ -2,14 +2,12 @@
 
 Here's an example that opens a filesystem then makes it *read only*::
 
-    >>> from fs import open_fs
-    >>> from fs.wrap import read_only
-    >>> projects_fs = open_fs('~/projects')
-    >>> read_only_projects_fs = read_only(projects_fs)
-    >>> read_only_projects_fs.remove('__init__.py')
+    >>> home_fs = fs.open_fs('~')
+    >>> read_only_home_fs = fs.wrap.read_only(home_fs)
+    >>> read_only_home_fs.removedir('Desktop')
     Traceback (most recent call last):
       ...
-    fs.errors.ResourceReadOnly: resource '__init__.py' is read only
+    fs.errors.ResourceReadOnly: resource 'Desktop' is read only
 
 """
 

@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   [#449](https://github.com/PyFilesystem/pyfilesystem2/pull/449).
 - `PathError` now supports wrapping an exception using the `exc` argument.
   Closes [#453](https://github.com/PyFilesystem/pyfilesystem2/issues/453).
+- Better documentation of the `writable` parameter of `fs.open_fs`, and
+  hint about using `fs.wrap.read_only` when a read-only filesystem is
+  required. Closes [#441](https://github.com/PyFilesystem/pyfilesystem2/issues/441).
 
 ### Changed
 
@@ -28,7 +31,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `FSTestCases` now builds the large data required for `upload` and `download` tests only
   once in order to reduce the total testing time.
 - `MemoryFS.move` and `MemoryFS.movedir` will now avoid copying data.
-   Closes [#452](https://github.com/PyFilesystem/pyfilesystem2/issues/452).
+  Closes [#452](https://github.com/PyFilesystem/pyfilesystem2/issues/452).
+- `FS.removetree("/")` behaviour has been standardized in all filesystems, and
+  is expected to clear the contents of the root folder without deleting it.
+  Closes [#471](https://github.com/PyFilesystem/pyfilesystem2/issues/471).
+- `FS.getbasic` is now deprecated, as it is redundant with `FS.getinfo`,
+  and `FS.getinfo` is now explicitly expected to return the *basic* info
+  namespace unconditionally. Closes [#469](https://github.com/PyFilesystem/pyfilesystem2/issues/469).
 
 ### Fixed
 
@@ -40,8 +49,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - `WrapCachedDir.isdir` and `WrapCachedDir.isfile` raising a `ResourceNotFound` error on non-existing path ([#470](https://github.com/PyFilesystem/pyfilesystem2/pull/470)).
 - `FTPFS` not listing certain entries with sticky/SUID/SGID permissions set by Linux server ([#473](https://github.com/PyFilesystem/pyfilesystem2/pull/473)).
   Closes [#451](https://github.com/PyFilesystem/pyfilesystem2/issues/451).
-- `scandir` iterator not being closed explicitly in `OSFS.scandir`, occasionally causing a `ResourceWarning` 
+- `scandir` iterator not being closed explicitly in `OSFS.scandir`, occasionally causing a `ResourceWarning`
   to be thrown. Closes [#311](https://github.com/PyFilesystem/pyfilesystem2/issues/311).
+- Incomplete type annotations for the `temp_fs` parameter of `WriteTarFS` and `WriteZipFS`.
+  Closes [#410](https://github.com/PyFilesystem/pyfilesystem2/issues/410).
 
 
 ## [2.4.12] - 2021-01-14

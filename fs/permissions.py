@@ -58,7 +58,7 @@ class Permissions(object):
         >>> p.mode
         500
         >>> oct(p.mode)
-        '0764'
+        '0o764'
 
     """
 
