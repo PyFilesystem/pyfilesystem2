@@ -292,6 +292,15 @@ class FSTestCases(object):
         """
         self.assertFalse(self.fs.exists(path))
 
+    def assert_isempty(self, path):
+        """Assert a path is an empty directory.
+
+        Arguments:
+            path (str): A path on the filesystem.
+
+        """
+        self.assertTrue(self.fs.isempty(path))
+
     def assert_isfile(self, path):
         """Assert a path is a file.
 
@@ -1101,6 +1110,7 @@ class FSTestCases(object):
             self.fs.removedir("foo/bar")
 
     def test_removetree(self):
+        self.fs.makedirs("spam")
         self.fs.makedirs("foo/bar/baz")
         self.fs.makedirs("foo/egg")
         self.fs.makedirs("foo/a/b/c/d/e")
@@ -1116,6 +1126,7 @@ class FSTestCases(object):
 
         self.fs.removetree("foo")
         self.assert_not_exists("foo")
+        self.assert_exists("spam")
 
         # Errors on files
         self.fs.create("bar")
@@ -1125,6 +1136,34 @@ class FSTestCases(object):
         # Errors on non-existing path
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.removetree("foofoo")
+
+    def test_removetree_root(self):
+        self.fs.makedirs("foo/bar/baz")
+        self.fs.makedirs("foo/egg")
+        self.fs.makedirs("foo/a/b/c/d/e")
+        self.fs.create("foo/egg.txt")
+        self.fs.create("foo/bar/egg.bin")
+        self.fs.create("foo/a/b/c/1.txt")
+        self.fs.create("foo/a/b/c/2.txt")
+        self.fs.create("foo/a/b/c/3.txt")
+
+        self.assert_exists("foo/egg.txt")
+        self.assert_exists("foo/bar/egg.bin")
+
+        # removetree("/") removes the contents,
+        # but not the root folder itself
+        self.fs.removetree("/")
+        self.assert_exists("/")
+        self.assert_isempty("/")
+
+        # we check we can create a file after
+        # to catch potential issues with the
+        # root folder being deleted on faulty
+        # implementations
+        self.fs.create("egg")
+        self.fs.makedir("yolk")
+        self.assert_exists("egg")
+        self.assert_exists("yolk")
 
     def test_setinfo(self):
         self.fs.create("birthday.txt")

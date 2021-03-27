@@ -273,7 +273,7 @@ class FS(object):
         Raises:
             fs.errors.DirectoryNotEmpty: If the directory is not empty (
                 see `~fs.base.FS.removetree` for a way to remove the
-                directory contents.).
+                directory contents).
             fs.errors.DirectoryExpected: If the path does not refer to
                 a directory.
             fs.errors.ResourceNotFound: If no resource exists at the
@@ -1215,13 +1215,37 @@ class FS(object):
 
     def removetree(self, dir_path):
         # type: (Text) -> None
-        """Recursively remove the contents of a directory.
+        """Recursively remove a directory and all its contents.
 
-        This method is similar to `~fs.base.removedir`, but will
+        This method is similar to `~fs.base.FS.removedir`, but will
         remove the contents of the directory if it is not empty.
 
         Arguments:
             dir_path (str): Path to a directory on the filesystem.
+
+        Caution:
+            A filesystem should never delete its root folder, so
+            ``FS.removetree("/")`` has different semantics: the
+            contents of the root folder will be deleted, but the
+            root will be untouched::
+
+                >>> home_fs = fs.open_fs("~")
+                >>> home_fs.removetree("/")
+                >>> home_fs.exists("/")
+                True
+                >>> home_fs.isempty("/")
+                True
+
+            Combined with `~fs.base.FS.opendir`, this can be used
+            to clear a directory without removing the directory
+            itself::
+
+                >>> home_fs = fs.open_fs("~")
+                >>> home_fs.opendir("/Videos").removetree("/")
+                >>> home_fs.exists("/Videos")
+                True
+                >>> home_fs.isempty("/Videos")
+                True
 
         """
         _dir_path = abspath(normpath(dir_path))
