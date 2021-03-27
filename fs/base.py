@@ -431,6 +431,8 @@ class FS(object):
         Raises:
             fs.errors.ResourceNotFound: If the ``dst_path``
                 does not exist, and ``create`` is not `True`.
+            fs.errors.DirectoryExpected: If ``src_path`` is not a
+                directory.
 
         """
         with self._lock:
@@ -473,6 +475,9 @@ class FS(object):
 
         Returns:
             str: a short description of the path.
+
+        Raises:
+            fs.errors.ResourceNotFound: If ``path`` does not exist.
 
         """
         if not self.exists(path):
@@ -827,6 +832,9 @@ class FS(object):
 
         Returns:
             ~fs.enums.ResourceType: the type of the resource.
+
+        Raises:
+            fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         A type of a resource is an integer that identifies the what
         the resource references. The standard type integers may be one
@@ -1201,8 +1209,8 @@ class FS(object):
             ~fs.subfs.SubFS: A filesystem representing a sub-directory.
 
         Raises:
-            fs.errors.DirectoryExpected: If ``dst_path`` does not
-                exist or is not a directory.
+            fs.errors.ResourceNotFound: If ``path`` does not exist.
+            fs.errors.DirectoryExpected: If ``path`` is not a directory.
 
         """
         from .subfs import SubFS
@@ -1222,6 +1230,10 @@ class FS(object):
 
         Arguments:
             dir_path (str): Path to a directory on the filesystem.
+
+        Raises:
+            fs.errors.ResourceNotFound: If ``dir_path`` does not exist.
+            fs.errors.DirectoryExpected: If ``dir_path`` is not a directory.
 
         Caution:
             A filesystem should never delete its root folder, so
@@ -1497,11 +1509,10 @@ class FS(object):
             str: A normalized, absolute path.
 
         Raises:
+            fs.errors.InvalidPath: If the path is invalid.
+            fs.errors.FilesystemClosed: if the filesystem is closed.
             fs.errors.InvalidCharsInPath: If the path contains
                 invalid characters.
-            fs.errors.InvalidPath: If the path is invalid.
-            fs.errors.FilesystemClosed: if the filesystem
-                is closed.
 
         """
         self.check()
@@ -1597,18 +1608,23 @@ class FS(object):
         # type: (Optional[Iterable[Text]], Text) -> bool
         """Check if a name matches any of a list of wildcards.
 
-        Arguments:
-            patterns (list): A list of patterns, e.g. ``['*.py']``
-            name (str): A file or directory name (not a path)
-
-        Returns:
-            bool: `True` if ``name`` matches any of the patterns.
-
         If a filesystem is case *insensitive* (such as Windows) then
         this method will perform a case insensitive match (i.e. ``*.py``
         will match the same names as ``*.PY``). Otherwise the match will
         be case sensitive (``*.py`` and ``*.PY`` will match different
         names).
+
+        Arguments:
+            patterns (list, optional): A list of patterns, e.g.
+                ``['*.py']``, or `None` to match everything.
+            name (str): A file or directory name (not a path)
+
+        Returns:
+            bool: `True` if ``name`` matches any of the patterns.
+
+        Raises:
+            TypeError: If ``patterns`` is a single string instead of
+                a list (or `None`).
 
         Example:
             >>> my_fs.match(['*.py'], '__init__.py')
