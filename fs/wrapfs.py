@@ -12,7 +12,7 @@ from .base import FS
 from .copy import copy_file, copy_dir
 from .info import Info
 from .move import move_file, move_dir
-from .path import abspath, normpath
+from .path import abspath, join, normpath
 from .error_tools import unwrap_errors
 
 if typing.TYPE_CHECKING:
@@ -217,11 +217,20 @@ class WrapFS(FS, typing.Generic[_F]):
         # type: (Text) -> None
         self.check()
         _path = abspath(normpath(dir_path))
-        if _path == "/":
-            raise errors.RemoveRootError()
-        _fs, _path = self.delegate_path(dir_path)
+        _delegate_fs, _delegate_path = self.delegate_path(dir_path)
         with unwrap_errors(dir_path):
-            _fs.removetree(_path)
+            if _path == "/":
+                # with root path, we must remove the contents but
+                # not the directory itself, so we can't just directly
+                # delegate
+                for info in _delegate_fs.scandir(_delegate_path):
+                    info_path = join(_delegate_path, info.name)
+                    if info.is_dir:
+                        _delegate_fs.removetree(info_path)
+                    else:
+                        _delegate_fs.remove(info_path)
+            else:
+                _delegate_fs.removetree(_delegate_path)
 
     def scandir(
         self,

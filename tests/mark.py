@@ -1,2 +1,2 @@
-def slow(self):
-    pass
+def slow(cls):
+    return cls

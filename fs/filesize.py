@@ -61,7 +61,7 @@ def traditional(size):
         `str`: A string containing an abbreviated file size and units.
 
     Example:
-        >>> filesize.traditional(30000)
+        >>> fs.filesize.traditional(30000)
         '29.3 KB'
 
     """
@@ -87,7 +87,7 @@ def binary(size):
         `str`: A string containing a abbreviated file size and units.
 
     Example:
-        >>> filesize.binary(30000)
+        >>> fs.filesize.binary(30000)
         '29.3 KiB'
 
     """
@@ -112,7 +112,7 @@ def decimal(size):
         `str`: A string containing a abbreviated file size and units.
 
     Example:
-        >>> filesize.decimal(30000)
+        >>> fs.filesize.decimal(30000)
         '30.0 kB'
 
     """

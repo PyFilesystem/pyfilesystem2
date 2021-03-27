@@ -81,3 +81,20 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
         dst_info = self.fs.getinfo("bar/file.txt", namespaces)
         self.assertEqual(dst_info.modified, src_info.modified)
         self.assertEqual(dst_info.metadata_changed, src_info.metadata_changed)
+
+        
+class TestMemoryFile(unittest.TestCase):
+
+    def setUp(self):
+        self.fs = memoryfs.MemoryFS()
+
+    def tearDown(self):
+        self.fs.close()
+
+    def test_readline_writing(self):
+        with self.fs.openbin("test.txt", "w") as f:
+            self.assertRaises(IOError, f.readline)
+
+    def test_readinto_writing(self):
+        with self.fs.openbin("test.txt", "w") as f:
+            self.assertRaises(IOError, f.readinto, bytearray(10))

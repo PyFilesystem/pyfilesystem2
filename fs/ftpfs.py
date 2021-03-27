@@ -358,22 +358,31 @@ class FTPFS(FS):
     FTPS, or FTP Secure. TLS will be enabled when using the ftps:// protocol,
     or when setting the `tls` argument to True in the constructor.
 
-
     Examples:
         Create with the constructor::
 
             >>> from fs.ftpfs import FTPFS
-            >>> ftp_fs = FTPFS()
+            >>> ftp_fs = FTPFS("demo.wftpserver.com")
 
         Or via an FS URL::
 
-            >>> import fs
-            >>> ftp_fs = fs.open_fs('ftp://')
+            >>> ftp_fs = fs.open_fs('ftp://test.rebex.net')
 
         Or via an FS URL, using TLS::
 
-            >>> import fs
-            >>> ftp_fs = fs.open_fs('ftps://')
+            >>> ftp_fs = fs.open_fs('ftps://demo.wftpserver.com')
+
+        You can also use a non-anonymous username, and optionally a
+        password, even within a FS URL::
+
+            >>> ftp_fs = FTPFS("test.rebex.net", user="demo", passwd="password")
+            >>> ftp_fs = fs.open_fs('ftp://demo:password@test.rebex.net')
+
+        Connecting via a proxy is supported. If using a FS URL, the proxy
+        URL will need to be added as a URL parameter::
+
+            >>> ftp_fs = FTPFS("ftp.ebi.ac.uk", proxy="test.rebex.net")
+            >>> ftp_fs = fs.open_fs('ftp://ftp.ebi.ac.uk/?proxy=test.rebex.net')
 
     """
 
@@ -814,11 +823,10 @@ class FTPFS(FS):
         # type: (Text, BinaryIO, Optional[int], **Any) -> None
         _path = self.validatepath(path)
         with self._lock:
-            with self._manage_ftp() as ftp:
-                with ftp_errors(self, path):
-                    ftp.storbinary(
-                        str("STOR ") + _encode(_path, self.ftp.encoding), file
-                    )
+            with ftp_errors(self, path):
+                self.ftp.storbinary(
+                    str("STOR ") + _encode(_path, self.ftp.encoding), file
+                )
 
     def writebytes(self, path, contents):
         # type: (Text, ByteString) -> None
