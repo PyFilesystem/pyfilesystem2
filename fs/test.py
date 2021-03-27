@@ -466,6 +466,7 @@ class FSTestCases(object):
         root_info = self.fs.getinfo("/")
         self.assertEqual(root_info.name, "")
         self.assertTrue(root_info.is_dir)
+        self.assertIn("basic", root_info.namespaces)
 
         # Make a file of known size
         self.fs.writebytes("foo", b"bar")
@@ -473,17 +474,20 @@ class FSTestCases(object):
 
         # Check basic namespace
         info = self.fs.getinfo("foo").raw
+        self.assertIn("basic", info)
         self.assertIsInstance(info["basic"]["name"], text_type)
         self.assertEqual(info["basic"]["name"], "foo")
         self.assertFalse(info["basic"]["is_dir"])
 
         # Check basic namespace dir
         info = self.fs.getinfo("dir").raw
+        self.assertIn("basic", info)
         self.assertEqual(info["basic"]["name"], "dir")
         self.assertTrue(info["basic"]["is_dir"])
 
         # Get the info
         info = self.fs.getinfo("foo", namespaces=["details"]).raw
+        self.assertIn("basic", info)
         self.assertIsInstance(info, dict)
         self.assertEqual(info["details"]["size"], 3)
         self.assertEqual(info["details"]["type"], int(ResourceType.file))
