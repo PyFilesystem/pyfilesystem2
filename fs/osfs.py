@@ -496,7 +496,9 @@ class OSFS(FS):
                         if requires_stat:
                             stat_result = dir_entry.stat()
                             if "details" in namespaces:
-                                info["details"] = self._make_details_from_stat(stat_result)
+                                info["details"] = self._make_details_from_stat(
+                                    stat_result
+                                )
                             if "stat" in namespaces:
                                 info["stat"] = {
                                     k: getattr(stat_result, k)
@@ -504,7 +506,9 @@ class OSFS(FS):
                                     if k.startswith("st_")
                                 }
                             if "access" in namespaces:
-                                info["access"] = self._make_access_from_stat(stat_result)
+                                info["access"] = self._make_access_from_stat(
+                                    stat_result
+                                )
                         if "lstat" in namespaces:
                             lstat_result = dir_entry.stat(follow_symlinks=False)
                             info["lstat"] = {
