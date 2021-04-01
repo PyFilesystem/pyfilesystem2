@@ -1,8 +1,9 @@
 name: Package
 
 on:
-  - push
-  - pull_request
+  push:
+    tags:
+      - 'v2.*'
 
 jobs:
 
@@ -97,7 +98,7 @@ jobs:
       with:
           name: dist
           path: dist
-    - name: Install source distribution
+    - name: Install wheel distribution
       run: python -m pip install dist/fs-*.whl
     - name: Remove source code
       run: rm -rvd fs

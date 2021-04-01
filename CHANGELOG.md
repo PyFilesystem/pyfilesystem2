@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+
+## [2.4.13] - 2021-03-27
+
 ### Added
 
 - Added FTP over TLS (FTPS) support to FTPFS.
