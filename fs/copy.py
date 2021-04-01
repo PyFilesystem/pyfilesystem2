@@ -40,8 +40,8 @@ def copy_fs(
             dst_path)``.
         workers (int): Use `worker` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
     return copy_dir(
@@ -76,8 +76,8 @@ def copy_fs_if_newer(
             dst_path)``.
         workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
     return copy_dir_if_newer(
@@ -138,8 +138,8 @@ def copy_file(
         src_path (str): Path to a file on the source filesystem.
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on the destination filesystem.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resource (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resource (defaults to `False`).
 
     """
     with manage_fs(src_fs, writeable=False) as _src_fs:
@@ -182,8 +182,8 @@ def copy_file_internal(
         src_path (str): Path to a file on the source filesystem.
         dst_fs (FS): Destination filesystem.
         dst_path (str): Path to a file on the destination filesystem.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resource (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resource (defaults to `False`).
 
     """
     if src_fs is dst_fs:
@@ -223,8 +223,8 @@ def copy_file_if_newer(
         src_path (str): Path to a file on the source filesystem.
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on the destination filesystem.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resource (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resource (defaults to `False`).
 
     Returns:
         bool: `True` if the file copy was executed, `False` otherwise.
@@ -273,8 +273,8 @@ def copy_structure(
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only
             want to consider a sub-set of the resources in ``src_fs``.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resource (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resource (defaults to `False`).
 
     """
     walker = walker or Walker()
@@ -311,8 +311,8 @@ def copy_dir(
             ``(src_fs, src_path, dst_fs, dst_path)``.
         workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
     on_copy = on_copy or (lambda *args: None)
@@ -383,8 +383,8 @@ def copy_dir_if_newer(
             ``(src_fs, src_path, dst_fs, dst_path)``.
         workers (int): Use ``worker`` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
     on_copy = on_copy or (lambda *args: None)

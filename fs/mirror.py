@@ -74,8 +74,8 @@ def mirror(
         workers (int): Number of worker threads used
             (0 for single threaded). Set to a relatively low number
             for network filesystems, 4 would be a good start.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
 

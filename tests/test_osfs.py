@@ -105,7 +105,7 @@ class TestOSFS(FSTestCases, unittest.TestCase):
             raw_info = {"details": {"accessed": now, "modified": now}}
             self.fs.setinfo("foo/file.txt", raw_info)
 
-        namespaces = ("details", "accessed", "metadata_changed", "modified")
+        namespaces = ("details", "modified")
         src_info = self.fs.getinfo("foo/file.txt", namespaces)
 
         self.fs.copy("foo/file.txt", "bar/file.txt", preserve_time=True)
@@ -113,7 +113,6 @@ class TestOSFS(FSTestCases, unittest.TestCase):
 
         dst_info = self.fs.getinfo("bar/file.txt", namespaces)
         self.assertEqual(dst_info.modified, src_info.modified)
-        self.assertEqual(dst_info.metadata_changed, src_info.metadata_changed)
 
     @unittest.skipUnless(osfs.sendfile, "sendfile not supported")
     @unittest.skipIf(

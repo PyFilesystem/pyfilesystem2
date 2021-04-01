@@ -409,8 +409,8 @@ class FS(object):
             dst_path (str): Path to destination file.
             overwrite (bool): If `True`, overwrite the destination file
                 if it exists (defaults to `False`).
-            preserve_time (bool): If `True`, try to preserve atime, ctime,
-                and mtime of the resource (defaults to `False`).
+            preserve_time (bool): If `True`, try to preserve mtime of the
+                resource (defaults to `False`).
 
         Raises:
             fs.errors.DestinationExists: If ``dst_path`` exists,
@@ -443,8 +443,8 @@ class FS(object):
             dst_path (str): Path to destination directory.
             create (bool): If `True`, then ``dst_path`` will be created
                 if it doesn't exist already (defaults to `False`).
-            preserve_time (bool): If `True`, try to preserve atime, ctime,
-                and mtime of the resource (defaults to `False`).
+            preserve_time (bool): If `True`, try to preserve mtime of the
+                resource (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: If the ``dst_path``
@@ -1054,8 +1054,8 @@ class FS(object):
             dst_path (str): Path to destination directory.
             create (bool): If `True`, then ``dst_path`` will be created
                 if it doesn't exist already (defaults to `False`).
-            preserve_time (bool): If `True`, try to preserve atime, ctime,
-                and mtime of the resources (defaults to `False`).
+            preserve_time (bool): If `True`, try to preserve mtime of the
+                resources (defaults to `False`).
 
         Raises:
             fs.errors.ResourceNotFound: if ``dst_path`` does not exist,
@@ -1122,8 +1122,8 @@ class FS(object):
                 file will be written to.
             overwrite (bool): If `True`, destination path will be
                 overwritten if it exists.
-            preserve_time (bool): If `True`, try to preserve atime, ctime,
-                and mtime of the resources (defaults to `False`).
+            preserve_time (bool): If `True`, try to preserve mtime of the
+                resources (defaults to `False`).
 
         Raises:
             fs.errors.FileExpected: If ``src_path`` maps to a

@@ -17,7 +17,7 @@ from fs import open_fs
 class TestCopy(unittest.TestCase):
     @parameterized.expand([(0,), (1,), (2,), (4,)])
     def test_copy_fs(self, workers):
-        namespaces = ("details", "accessed", "metadata_changed", "modified")
+        namespaces = ("details", "modified")
 
         src_fs = open_fs("mem://")
         src_fs.makedirs("foo/bar")
@@ -37,13 +37,7 @@ class TestCopy(unittest.TestCase):
         dst_file1_info = dst_fs.getinfo("test.txt", namespaces)
         dst_file2_info = dst_fs.getinfo("foo/bar/baz.txt", namespaces)
         self.assertEqual(dst_file1_info.modified, src_file1_info.modified)
-        self.assertEqual(
-            dst_file1_info.metadata_changed, src_file1_info.metadata_changed
-        )
         self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
-        self.assertEqual(
-            dst_file2_info.metadata_changed, src_file2_info.metadata_changed
-        )
 
     def test_copy_value_error(self):
         src_fs = open_fs("mem://")
@@ -52,7 +46,7 @@ class TestCopy(unittest.TestCase):
             fs.copy.copy_fs(src_fs, dst_fs, workers=-1)
 
     def test_copy_dir0(self):
-        namespaces = ("details", "accessed", "metadata_changed", "modified")
+        namespaces = ("details", "modified")
 
         src_fs = open_fs("mem://")
         src_fs.makedirs("foo/bar")
@@ -69,13 +63,10 @@ class TestCopy(unittest.TestCase):
 
             dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
             self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
-            self.assertEqual(
-                dst_file2_info.metadata_changed, src_file2_info.metadata_changed
-            )
 
     @parameterized.expand([(0,), (1,), (2,), (4,)])
     def test_copy_dir(self, workers):
-        namespaces = ("details", "accessed", "metadata_changed", "modified")
+        namespaces = ("details", "modified")
 
         src_fs = open_fs("mem://")
         src_fs.makedirs("foo/bar")
@@ -94,9 +85,6 @@ class TestCopy(unittest.TestCase):
 
             dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
             self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
-            self.assertEqual(
-                dst_file2_info.metadata_changed, src_file2_info.metadata_changed
-            )
 
     def test_copy_large(self):
         data1 = b"foo" * 512 * 1024

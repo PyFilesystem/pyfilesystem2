@@ -177,7 +177,7 @@ class TestWrapCachedDir(unittest.TestCase):
         ]
         with mock.patch.object(self.fs, "scandir", wraps=self.fs.scandir) as scandir:
             self.assertEqual(sorted(self.cached.scandir("/"), key=key), expected)
-            scandir.assert_has_calls([mock.call('/', namespaces=None, page=None)])
+            scandir.assert_has_calls([mock.call("/", namespaces=None, page=None)])
         with mock.patch.object(self.fs, "scandir", wraps=self.fs.scandir) as scandir:
             self.assertEqual(sorted(self.cached.scandir("/"), key=key), expected)
             scandir.assert_not_called()
@@ -187,7 +187,7 @@ class TestWrapCachedDir(unittest.TestCase):
             self.assertTrue(self.cached.isdir("foo"))
             self.assertFalse(self.cached.isdir("egg"))  # is file
             self.assertFalse(self.cached.isdir("spam"))  # doesn't exist
-            scandir.assert_has_calls([mock.call('/', namespaces=None, page=None)])
+            scandir.assert_has_calls([mock.call("/", namespaces=None, page=None)])
         with mock.patch.object(self.fs, "scandir", wraps=self.fs.scandir) as scandir:
             self.assertTrue(self.cached.isdir("foo"))
             self.assertFalse(self.cached.isdir("egg"))
@@ -199,7 +199,7 @@ class TestWrapCachedDir(unittest.TestCase):
             self.assertTrue(self.cached.isfile("egg"))
             self.assertFalse(self.cached.isfile("foo"))  # is dir
             self.assertFalse(self.cached.isfile("spam"))  # doesn't exist
-            scandir.assert_has_calls([mock.call('/', namespaces=None, page=None)])
+            scandir.assert_has_calls([mock.call("/", namespaces=None, page=None)])
         with mock.patch.object(self.fs, "scandir", wraps=self.fs.scandir) as scandir:
             self.assertTrue(self.cached.isfile("egg"))
             self.assertFalse(self.cached.isfile("foo"))
@@ -211,7 +211,7 @@ class TestWrapCachedDir(unittest.TestCase):
             self.assertEqual(self.cached.getinfo("foo"), self.fs.getinfo("foo"))
             self.assertEqual(self.cached.getinfo("/"), self.fs.getinfo("/"))
             self.assertNotFound(self.cached.getinfo, "spam")
-            scandir.assert_has_calls([mock.call('/', namespaces=None, page=None)])
+            scandir.assert_has_calls([mock.call("/", namespaces=None, page=None)])
         with mock.patch.object(self.fs, "scandir", wraps=self.fs.scandir) as scandir:
             self.assertEqual(self.cached.getinfo("foo"), self.fs.getinfo("foo"))
             self.assertEqual(self.cached.getinfo("/"), self.fs.getinfo("/"))

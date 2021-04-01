@@ -29,8 +29,8 @@ def move_fs(
         dst_fs (FS or str): Destination filesystem (instance or URL).
         workers (int): Use `worker` threads to copy data, or ``0`` (default) for
             a single-threaded copy.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
     move_dir(src_fs, "/", dst_fs, "/", workers=workers, preserve_time=preserve_time)
@@ -51,8 +51,8 @@ def move_file(
         src_path (str): Path to a file on ``src_fs``.
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a file on ``dst_fs``.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
     with manage_fs(src_fs) as _src_fs:
@@ -93,8 +93,8 @@ def move_dir(
         dst_path (str): Path to a directory on ``dst_fs``.
         workers (int): Use ``worker`` threads to copy data, or ``0``
             (default) for a single-threaded copy.
-        preserve_time (bool): If `True`, try to preserve atime, ctime,
-            and mtime of the resources (defaults to `False`).
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
 

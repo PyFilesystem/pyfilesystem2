@@ -72,7 +72,7 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
         self.fs.makedir("bar")
         self.fs.touch("foo/file.txt")
 
-        namespaces = ("details", "accessed", "metadata_changed", "modified")
+        namespaces = ("details", "modified")
         src_info = self.fs.getinfo("foo/file.txt", namespaces)
 
         self.fs.copy("foo/file.txt", "bar/file.txt", preserve_time=True)
@@ -80,11 +80,9 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
 
         dst_info = self.fs.getinfo("bar/file.txt", namespaces)
         self.assertEqual(dst_info.modified, src_info.modified)
-        self.assertEqual(dst_info.metadata_changed, src_info.metadata_changed)
 
-        
+
 class TestMemoryFile(unittest.TestCase):
-
     def setUp(self):
         self.fs = memoryfs.MemoryFS()
 

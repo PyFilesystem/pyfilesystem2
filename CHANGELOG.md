@@ -18,6 +18,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Better documentation of the `writable` parameter of `fs.open_fs`, and
   hint about using `fs.wrap.read_only` when a read-only filesystem is
   required. Closes [#441](https://github.com/PyFilesystem/pyfilesystem2/issues/441).
+- Copy and move operations now provide a parameter `preserve_time` that, when
+  passed as `True`, makes sure the "mtime" of the destination file will be
+  the same as that of the source file.
 
 ### Changed
 
