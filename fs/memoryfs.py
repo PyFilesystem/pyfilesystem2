@@ -444,7 +444,7 @@ class MemoryFS(FS):
                 parent_dir.set_entry(dir_name, new_dir)
             return self.opendir(path)
 
-    def move(self, src_path, dst_path, overwrite=False):
+    def move(self, src_path, dst_path, overwrite=False, preserve_time=False):
         src_dir, src_name = split(self.validatepath(src_path))
         dst_dir, dst_name = split(self.validatepath(dst_path))
 
@@ -465,7 +465,7 @@ class MemoryFS(FS):
             dst_dir_entry.set_entry(dst_name, src_entry)
             src_dir_entry.remove_entry(src_name)
 
-    def movedir(self, src_path, dst_path, create=False):
+    def movedir(self, src_path, dst_path, create=False, preserve_time=False):
         src_dir, src_name = split(self.validatepath(src_path))
         dst_dir, dst_name = split(self.validatepath(dst_path))
 
