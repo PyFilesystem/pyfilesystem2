@@ -100,10 +100,9 @@ class TestOSFS(FSTestCases, unittest.TestCase):
     def test_copy_preserve_time(self):
         self.fs.makedir("foo")
         self.fs.makedir("bar")
-        now = time.time() - 10000
-        if not self.fs.create("foo/file.txt"):
-            raw_info = {"details": {"accessed": now, "modified": now}}
-            self.fs.setinfo("foo/file.txt", raw_info)
+        self.fs.create("foo/file.txt")
+        raw_info = {"details": {"modified": time.time() - 10000}}
+        self.fs.setinfo("foo/file.txt", raw_info)
 
         namespaces = ("details", "modified")
         src_info = self.fs.getinfo("foo/file.txt", namespaces)

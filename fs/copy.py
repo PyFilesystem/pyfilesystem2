@@ -159,7 +159,7 @@ def copy_file(
                     else:
                         with _src_fs.openbin(src_path) as read_file:
                             _dst_fs.upload(dst_path, read_file)
-                    copy_cmtime(_src_fs, src_path, _dst_fs, dst_path)
+                    copy_mtime(_src_fs, src_path, _dst_fs, dst_path)
 
 
 def copy_file_internal(
@@ -199,7 +199,7 @@ def copy_file_internal(
         with src_fs.openbin(src_path) as read_file:
             dst_fs.upload(dst_path, read_file)
 
-    copy_cmtime(src_fs, src_path, dst_fs, dst_path)
+    copy_mtime(src_fs, src_path, dst_fs, dst_path)
 
 
 def copy_file_if_newer(
@@ -445,7 +445,7 @@ def copy_dir_if_newer(
                             on_copy(_src_fs, dir_path, _dst_fs, copy_path)
 
 
-def copy_cmtime(
+def copy_mtime(
     src_fs,  # type: Union[FS, Text]
     src_path,  # type: Text
     dst_fs,  # type: Union[FS, Text]

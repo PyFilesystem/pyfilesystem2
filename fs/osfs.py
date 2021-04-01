@@ -49,6 +49,7 @@ from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
 from .errors import FileExpected, NoURL
 from ._url_tools import url_quote
+from .copy import copy_mtime
 
 if typing.TYPE_CHECKING:
     from typing import (
@@ -452,6 +453,8 @@ class OSFS(FS):
                             while sent > 0:
                                 sent = sendfile(fd_dst, fd_src, offset, maxsize)
                                 offset += sent
+                    if preserve_time:
+                        copy_mtime(self, src_path, self, dst_path)
                 except OSError as e:
                     # the error is not a simple "sendfile not supported" error
                     if e.errno not in self._sendfile_error_codes:
