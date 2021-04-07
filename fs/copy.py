@@ -45,7 +45,14 @@ def copy_fs(
 
     """
     return copy_dir(
-        src_fs, "/", dst_fs, "/", walker=walker, on_copy=on_copy, workers=workers
+        src_fs,
+        "/",
+        dst_fs,
+        "/",
+        walker=walker,
+        on_copy=on_copy,
+        workers=workers,
+        preserve_time=preserve_time,
     )
 
 
@@ -199,7 +206,8 @@ def copy_file_internal(
         with src_fs.openbin(src_path) as read_file:
             dst_fs.upload(dst_path, read_file)
 
-    copy_mtime(src_fs, src_path, dst_fs, dst_path)
+    if preserve_time:
+        copy_mtime(src_fs, src_path, dst_fs, dst_path)
 
 
 def copy_file_if_newer(
@@ -262,7 +270,6 @@ def copy_structure(
     src_fs,  # type: Union[FS, Text]
     dst_fs,  # type: Union[FS, Text]
     walker=None,  # type: Optional[Walker]
-    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Copy directories (but not files) from ``src_fs`` to ``dst_fs``.
@@ -273,8 +280,6 @@ def copy_structure(
         walker (~fs.walk.Walker, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only
             want to consider a sub-set of the resources in ``src_fs``.
-        preserve_time (bool): If `True`, try to preserve mtime of the
-            resource (defaults to `False`).
 
     """
     walker = walker or Walker()

@@ -21,7 +21,7 @@ class TestMove(unittest.TestCase):
         src_file2_info = src_fs.getinfo("foo/bar/baz.txt", namespaces)
 
         dst_fs = open_fs("mem://")
-        fs.move.move_fs(src_fs, dst_fs)
+        fs.move.move_fs(src_fs, dst_fs, preserve_time=self.preserve_time)
 
         self.assertTrue(dst_fs.isdir("foo/bar"))
         self.assertTrue(dst_fs.isfile("test.txt"))
@@ -44,7 +44,7 @@ class TestMove(unittest.TestCase):
         src_file2_info = src_fs.getinfo("foo/bar/baz.txt", namespaces)
 
         dst_fs = open_fs("mem://")
-        fs.move.move_dir(src_fs, "/foo", dst_fs, "/")
+        fs.move.move_dir(src_fs, "/foo", dst_fs, "/", preserve_time=self.preserve_time)
 
         self.assertTrue(dst_fs.isdir("bar"))
         self.assertTrue(dst_fs.isfile("bar/baz.txt"))
