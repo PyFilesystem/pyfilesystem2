@@ -139,13 +139,14 @@ class PathError(FSError):
 
     default_message = "path '{path}' is invalid"
 
-    def __init__(self, path, msg=None):  # noqa: D107
-        # type: (Text, Optional[Text]) -> None
+    def __init__(self, path, msg=None, exc=None):  # noqa: D107
+        # type: (Text, Optional[Text], Optional[Exception]) -> None
         self.path = path
+        self.exc = exc
         super(PathError, self).__init__(msg=msg)
 
     def __reduce__(self):
-        return type(self), (self.path, self._msg)
+        return type(self), (self.path, self._msg, self.exc)
 
 
 class NoSysPath(PathError):

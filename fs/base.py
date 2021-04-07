@@ -152,11 +152,15 @@ class FS(object):
 
         Arguments:
             path (str): A path to a resource on the filesystem.
-            namespaces (list, optional): Info namespaces to query
-                (defaults to *[basic]*).
+            namespaces (list, optional): Info namespaces to query. The
+                `"basic"` namespace is alway included in the returned
+                info, whatever the value of `namespaces` may be.
 
         Returns:
             ~fs.info.Info: resource information object.
+
+        Raises:
+            fs.errors.ResourceNotFound: If ``path`` does not exist.
 
         For more information regarding resource information, see :ref:`info`.
 
@@ -235,10 +239,12 @@ class FS(object):
             io.IOBase: a *file-like* object.
 
         Raises:
-            fs.errors.FileExpected: If the path is not a file.
-            fs.errors.FileExists: If the file exists, and *exclusive mode*
-                is specified (``x`` in the mode).
-            fs.errors.ResourceNotFound: If the path does not exist.
+            fs.errors.FileExpected: If ``path`` exists and is not a file.
+            fs.errors.FileExists: If the ``path`` exists, and
+                *exclusive mode* is specified (``x`` in the mode).
+            fs.errors.ResourceNotFound: If ``path`` does not exist and
+                ``mode`` does not imply creating the file, or if any
+                ancestor of ``path`` does not exist.
 
         """
 
@@ -267,7 +273,7 @@ class FS(object):
         Raises:
             fs.errors.DirectoryNotEmpty: If the directory is not empty (
                 see `~fs.base.FS.removetree` for a way to remove the
-                directory contents.).
+                directory contents).
             fs.errors.DirectoryExpected: If the path does not refer to
                 a directory.
             fs.errors.ResourceNotFound: If no resource exists at the
@@ -402,6 +408,7 @@ class FS(object):
                 and ``overwrite`` is `False`.
             fs.errors.ResourceNotFound: If a parent directory of
                 ``dst_path`` does not exist.
+            fs.errors.FileExpected: If ``src_path`` is not a file.
 
         """
         with self._lock:
@@ -424,6 +431,8 @@ class FS(object):
         Raises:
             fs.errors.ResourceNotFound: If the ``dst_path``
                 does not exist, and ``create`` is not `True`.
+            fs.errors.DirectoryExpected: If ``src_path`` is not a
+                directory.
 
         """
         with self._lock:
@@ -466,6 +475,9 @@ class FS(object):
 
         Returns:
             str: a short description of the path.
+
+        Raises:
+            fs.errors.ResourceNotFound: If ``path`` does not exist.
 
         """
         if not self.exists(path):
@@ -587,6 +599,7 @@ class FS(object):
             bytes: the file contents.
 
         Raises:
+            fs.errors.FileExpected: if ``path`` exists but is not a file.
             fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         """
@@ -603,6 +616,10 @@ class FS(object):
         This may be more efficient that opening and copying files
         manually if the filesystem supplies an optimized method.
 
+        Note that the file object ``file`` will *not* be closed by this
+        method. Take care to close it after this method completes
+        (ideally with a context manager).
+
         Arguments:
             path (str): Path to a resource.
             file (file-like): A file-like object open for writing in
@@ -613,13 +630,12 @@ class FS(object):
             **options: Implementation specific options required to open
                 the source file.
 
-        Note that the file object ``file`` will *not* be closed by this
-        method. Take care to close it after this method completes
-        (ideally with a context manager).
-
         Example:
             >>> with open('starwars.mov', 'wb') as write_file:
-            ...     my_fs.download('/movies/starwars.mov', write_file)
+            ...     my_fs.download('/Videos/starwars.mov', write_file)
+
+        Raises:
+            fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         """
         with self._lock:
@@ -726,6 +742,9 @@ class FS(object):
         Returns:
             int: the *size* of the resource.
 
+        Raises:
+            fs.errors.ResourceNotFound: if ``path`` does not exist.
+
         The *size* of a file is the total number of readable bytes,
         which may not reflect the exact number of bytes of reserved
         disk space (or other storage medium).
@@ -813,6 +832,9 @@ class FS(object):
 
         Returns:
             ~fs.enums.ResourceType: the type of the resource.
+
+        Raises:
+            fs.errors.ResourceNotFound: if ``path`` does not exist.
 
         A type of a resource is an integer that identifies the what
         the resource references. The standard type integers may be one
@@ -986,6 +1008,7 @@ class FS(object):
         Example:
             >>> with my_fs.lock():  # May block
             ...    # code here has exclusive access to the filesystem
+            ...    pass
 
         It is a good idea to put a lock around any operations that you
         would like to be *atomic*. For instance if you are copying
@@ -1017,6 +1040,8 @@ class FS(object):
         Raises:
             fs.errors.ResourceNotFound: if ``dst_path`` does not exist,
                 and ``create`` is `False`.
+            fs.errors.DirectoryExpected: if ``src_path`` or one of its
+                ancestors is not a directory.
 
         """
         with self._lock:
@@ -1184,27 +1209,55 @@ class FS(object):
             ~fs.subfs.SubFS: A filesystem representing a sub-directory.
 
         Raises:
-            fs.errors.DirectoryExpected: If ``dst_path`` does not
-                exist or is not a directory.
+            fs.errors.ResourceNotFound: If ``path`` does not exist.
+            fs.errors.DirectoryExpected: If ``path`` is not a directory.
 
         """
         from .subfs import SubFS
 
         _factory = factory or self.subfs_class or SubFS
 
-        if not self.getbasic(path).is_dir:
+        if not self.getinfo(path).is_dir:
             raise errors.DirectoryExpected(path=path)
         return _factory(self, path)
 
     def removetree(self, dir_path):
         # type: (Text) -> None
-        """Recursively remove the contents of a directory.
+        """Recursively remove a directory and all its contents.
 
-        This method is similar to `~fs.base.removedir`, but will
+        This method is similar to `~fs.base.FS.removedir`, but will
         remove the contents of the directory if it is not empty.
 
         Arguments:
             dir_path (str): Path to a directory on the filesystem.
+
+        Raises:
+            fs.errors.ResourceNotFound: If ``dir_path`` does not exist.
+            fs.errors.DirectoryExpected: If ``dir_path`` is not a directory.
+
+        Caution:
+            A filesystem should never delete its root folder, so
+            ``FS.removetree("/")`` has different semantics: the
+            contents of the root folder will be deleted, but the
+            root will be untouched::
+
+                >>> home_fs = fs.open_fs("~")
+                >>> home_fs.removetree("/")
+                >>> home_fs.exists("/")
+                True
+                >>> home_fs.isempty("/")
+                True
+
+            Combined with `~fs.base.FS.opendir`, this can be used
+            to clear a directory without removing the directory
+            itself::
+
+                >>> home_fs = fs.open_fs("~")
+                >>> home_fs.opendir("/Videos").removetree("/")
+                >>> home_fs.exists("/Videos")
+                True
+                >>> home_fs.isempty("/Videos")
+                True
 
         """
         _dir_path = abspath(normpath(dir_path))
@@ -1456,11 +1509,10 @@ class FS(object):
             str: A normalized, absolute path.
 
         Raises:
+            fs.errors.InvalidPath: If the path is invalid.
+            fs.errors.FilesystemClosed: if the filesystem is closed.
             fs.errors.InvalidCharsInPath: If the path contains
                 invalid characters.
-            fs.errors.InvalidPath: If the path is invalid.
-            fs.errors.FilesystemClosed: if the filesystem
-                is closed.
 
         """
         self.check()
@@ -1512,7 +1564,16 @@ class FS(object):
         Returns:
             ~fs.info.Info: Resource information object for ``path``.
 
+        Note:
+            .. deprecated:: 2.4.13
+                Please use `~FS.getinfo` directly, which is
+                required to always return the *basic* namespace.
+
         """
+        warnings.warn(
+            "method 'getbasic' has been deprecated, please use 'getinfo'",
+            DeprecationWarning,
+        )
         return self.getinfo(path, namespaces=["basic"])
 
     def getdetails(self, path):
@@ -1547,23 +1608,28 @@ class FS(object):
         # type: (Optional[Iterable[Text]], Text) -> bool
         """Check if a name matches any of a list of wildcards.
 
-        Arguments:
-            patterns (list): A list of patterns, e.g. ``['*.py']``
-            name (str): A file or directory name (not a path)
-
-        Returns:
-            bool: `True` if ``name`` matches any of the patterns.
-
         If a filesystem is case *insensitive* (such as Windows) then
         this method will perform a case insensitive match (i.e. ``*.py``
         will match the same names as ``*.PY``). Otherwise the match will
         be case sensitive (``*.py`` and ``*.PY`` will match different
         names).
 
+        Arguments:
+            patterns (list, optional): A list of patterns, e.g.
+                ``['*.py']``, or `None` to match everything.
+            name (str): A file or directory name (not a path)
+
+        Returns:
+            bool: `True` if ``name`` matches any of the patterns.
+
+        Raises:
+            TypeError: If ``patterns`` is a single string instead of
+                a list (or `None`).
+
         Example:
-            >>> home_fs.match(['*.py'], '__init__.py')
+            >>> my_fs.match(['*.py'], '__init__.py')
             True
-            >>> home_fs.match(['*.jpg', '*.png'], 'foo.gif')
+            >>> my_fs.match(['*.jpg', '*.png'], 'foo.gif')
             False
 
         Note:
@@ -1616,13 +1682,16 @@ class FS(object):
         Arguments:
             path(str): A path on the filesystem.
             name(str):
-                One of the algorithms supported by the hashlib module, e.g. `"md5"`
+                One of the algorithms supported by the `hashlib` module,
+                e.g. `"md5"` or `"sha256"`.
 
         Returns:
             str: The hex digest of the hash.
 
         Raises:
             fs.errors.UnsupportedHash: If the requested hash is not supported.
+            fs.errors.ResourceNotFound: If ``path`` does not exist.
+            fs.errors.FileExpected: If ``path`` exists but is not a file.
 
         """
         self.validatepath(path)

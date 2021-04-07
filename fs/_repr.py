@@ -27,7 +27,7 @@ def make_repr(class_name, *args, **kwargs):
         >>> MyClass('Will')
         MyClass('foo', name='Will')
         >>> MyClass(None)
-        MyClass()
+        MyClass('foo')
 
     """
     arguments = [repr(arg) for arg in args]

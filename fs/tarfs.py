@@ -66,10 +66,10 @@ else:
 class TarFS(WrapFS):
     """Read and write tar files.
 
-    There are two ways to open a TarFS for the use cases of reading
+    There are two ways to open a `TarFS` for the use cases of reading
     a tar file, and creating a new one.
 
-    If you open the TarFS with  ``write`` set to `False` (the
+    If you open the `TarFS` with  ``write`` set to `False` (the
     default), then the filesystem will be a read only filesystem which
     maps to the files and directories within the tar file. Files are
     decompressed on the fly when you open them.
@@ -79,9 +79,9 @@ class TarFS(WrapFS):
         with TarFS('foo.tar.gz') as tar_fs:
             readme = tar_fs.readtext('readme.txt')
 
-    If you open the TarFS with ``write`` set to `True`, then the TarFS
+    If you open the TarFS with ``write`` set to `True`, then the `TarFS`
     will be a empty temporary filesystem. Any files / directories you
-    create in the TarFS will be written in to a tar file when the TarFS
+    create in the `TarFS` will be written in to a tar file when the `TarFS`
     is closed. The compression is set from the new file name but may be
     set manually with the ``compression`` argument.
 
@@ -100,8 +100,9 @@ class TarFS(WrapFS):
             use default (`False`) to read an existing tar file.
         compression (str, optional): Compression to use (one of the formats
             supported by `tarfile`: ``xz``, ``gz``, ``bz2``, or `None`).
-        temp_fs (str): An FS URL for the temporary filesystem
-            used to store data prior to tarring.
+        temp_fs (str): An FS URL or an FS instance to use to store
+            data prior to tarring. Defaults to creating a new
+            `~fs.tempfs.TempFS`.
 
     """
 
@@ -118,7 +119,7 @@ class TarFS(WrapFS):
         write=False,  # type: bool
         compression=None,  # type: Optional[Text]
         encoding="utf-8",  # type: Text
-        temp_fs="temp://__tartemp__",  # type: Text
+        temp_fs="temp://__tartemp__",  # type: Union[Text, FS]
     ):
         # type: (...) -> FS
         if isinstance(file, (six.text_type, six.binary_type)):
@@ -164,7 +165,7 @@ class WriteTarFS(WrapFS):
         file,  # type: Union[Text, BinaryIO]
         compression=None,  # type: Optional[Text]
         encoding="utf-8",  # type: Text
-        temp_fs="temp://__tartemp__",  # type: Text
+        temp_fs="temp://__tartemp__",  # type: Union[Text, FS]
     ):  # noqa: D107
         # type: (...) -> None
         self._file = file  # type: Union[Text, BinaryIO]

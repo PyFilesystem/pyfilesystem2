@@ -27,7 +27,31 @@ if typing.TYPE_CHECKING:
 
 @six.python_2_unicode_compatible
 class TempFS(OSFS):
-    """A temporary filesystem on the OS."""
+    """A temporary filesystem on the OS.
+
+    Temporary filesystems are created using the `tempfile.mkdtemp`
+    function to obtain a temporary folder in an OS-specific location.
+    You can provide an alternative location with the ``temp_dir``
+    argument of the constructor.
+
+    Examples:
+        Create with the constructor::
+
+            >>> from fs.tempfs import TempFS
+            >>> tmp_fs = TempFS()
+
+        Or via an FS URL::
+
+            >>> import fs
+            >>> tmp_fs = fs.open_fs("temp://")
+
+        Use a specific identifier for the temporary folder to better
+        illustrate its purpose::
+
+            >>> named_tmp_fs = fs.open_fs("temp://local_copy")
+            >>> named_tmp_fs = TempFS(identifier="local_copy")
+
+    """
 
     def __init__(
         self,
@@ -43,7 +67,7 @@ class TempFS(OSFS):
             identifier (str): A string to distinguish the directory within
                 the OS temp location, used as part of the directory name.
             temp_dir (str, optional): An OS path to your temp directory
-                (leave as `None` to auto-detect)
+                (leave as `None` to auto-detect).
             auto_clean (bool): If `True` (the default), the directory
                 contents will be wiped on close.
             ignore_clean_errors (bool): If `True` (the default), any errors
@@ -71,6 +95,28 @@ class TempFS(OSFS):
 
     def close(self):
         # type: () -> None
+        """Close the filesystem and release any resources.
+
+        It is important to call this method when you have finished
+        working with the filesystem. Some filesystems may not finalize
+        changes until they are closed (archives for example). You may
+        call this method explicitly (it is safe to call close multiple
+        times), or you can use the filesystem as a context manager to
+        automatically close.
+
+        Hint:
+            Depending on the value of ``auto_clean`` passed when creating
+            the `TempFS`, the underlying temporary folder may be removed
+            or not.
+
+        Example:
+            >>> tmp_fs = TempFS(auto_clean=False)
+            >>> syspath = tmp_fs.getsyspath("/")
+            >>> tmp_fs.close()
+            >>> os.path.exists(syspath)
+            True
+
+        """
         if self._auto_clean:
             self.clean()
         super(TempFS, self).close()

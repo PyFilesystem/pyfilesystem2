@@ -16,6 +16,7 @@ import math
 import os
 import time
 import unittest
+import warnings
 
 import fs.copy
 import fs.move
@@ -291,6 +292,15 @@ class FSTestCases(object):
         """
         self.assertFalse(self.fs.exists(path))
 
+    def assert_isempty(self, path):
+        """Assert a path is an empty directory.
+
+        Arguments:
+            path (str): A path on the filesystem.
+
+        """
+        self.assertTrue(self.fs.isempty(path))
+
     def assert_isfile(self, path):
         """Assert a path is a file.
 
@@ -456,6 +466,7 @@ class FSTestCases(object):
         root_info = self.fs.getinfo("/")
         self.assertEqual(root_info.name, "")
         self.assertTrue(root_info.is_dir)
+        self.assertIn("basic", root_info.namespaces)
 
         # Make a file of known size
         self.fs.writebytes("foo", b"bar")
@@ -463,17 +474,20 @@ class FSTestCases(object):
 
         # Check basic namespace
         info = self.fs.getinfo("foo").raw
+        self.assertIn("basic", info)
         self.assertIsInstance(info["basic"]["name"], text_type)
         self.assertEqual(info["basic"]["name"], "foo")
         self.assertFalse(info["basic"]["is_dir"])
 
         # Check basic namespace dir
         info = self.fs.getinfo("dir").raw
+        self.assertIn("basic", info)
         self.assertEqual(info["basic"]["name"], "dir")
         self.assertTrue(info["basic"]["is_dir"])
 
         # Get the info
         info = self.fs.getinfo("foo", namespaces=["details"]).raw
+        self.assertIn("basic", info)
         self.assertIsInstance(info, dict)
         self.assertEqual(info["details"]["size"], 3)
         self.assertEqual(info["details"]["type"], int(ResourceType.file))
@@ -884,8 +898,9 @@ class FSTestCases(object):
             self.assertFalse(f.closed)
         self.assertTrue(f.closed)
 
-        iter_lines = iter(self.fs.open("text"))
-        self.assertEqual(next(iter_lines), "Hello\n")
+        with self.fs.open("text") as f:
+            iter_lines = iter(f)
+            self.assertEqual(next(iter_lines), "Hello\n")
 
         with self.fs.open("unicode", "w") as f:
             self.assertEqual(12, f.write("Héllo\nWörld\n"))
@@ -1099,6 +1114,7 @@ class FSTestCases(object):
             self.fs.removedir("foo/bar")
 
     def test_removetree(self):
+        self.fs.makedirs("spam")
         self.fs.makedirs("foo/bar/baz")
         self.fs.makedirs("foo/egg")
         self.fs.makedirs("foo/a/b/c/d/e")
@@ -1114,6 +1130,44 @@ class FSTestCases(object):
 
         self.fs.removetree("foo")
         self.assert_not_exists("foo")
+        self.assert_exists("spam")
+
+        # Errors on files
+        self.fs.create("bar")
+        with self.assertRaises(errors.DirectoryExpected):
+            self.fs.removetree("bar")
+
+        # Errors on non-existing path
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.removetree("foofoo")
+
+    def test_removetree_root(self):
+        self.fs.makedirs("foo/bar/baz")
+        self.fs.makedirs("foo/egg")
+        self.fs.makedirs("foo/a/b/c/d/e")
+        self.fs.create("foo/egg.txt")
+        self.fs.create("foo/bar/egg.bin")
+        self.fs.create("foo/a/b/c/1.txt")
+        self.fs.create("foo/a/b/c/2.txt")
+        self.fs.create("foo/a/b/c/3.txt")
+
+        self.assert_exists("foo/egg.txt")
+        self.assert_exists("foo/bar/egg.bin")
+
+        # removetree("/") removes the contents,
+        # but not the root folder itself
+        self.fs.removetree("/")
+        self.assert_exists("/")
+        self.assert_isempty("/")
+
+        # we check we can create a file after
+        # to catch potential issues with the
+        # root folder being deleted on faulty
+        # implementations
+        self.fs.create("egg")
+        self.fs.makedir("yolk")
+        self.assert_exists("egg")
+        self.assert_exists("yolk")
 
     def test_setinfo(self):
         self.fs.create("birthday.txt")
@@ -1585,8 +1639,10 @@ class FSTestCases(object):
         self.assert_bytes("foo2", b"help")
 
         # Test __del__ doesn't throw traceback
-        f = self.fs.open("foo2", "r")
-        del f
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            f = self.fs.open("foo2", "r")
+            del f
 
         with self.assertRaises(IOError):
             with self.fs.open("foo2", "r") as f:

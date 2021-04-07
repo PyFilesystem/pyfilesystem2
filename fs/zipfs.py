@@ -124,11 +124,11 @@ class _ZipExtFile(RawWrapper):
 class ZipFS(WrapFS):
     """Read and write zip files.
 
-    There are two ways to open a ZipFS for the use cases of reading
+    There are two ways to open a `ZipFS` for the use cases of reading
     a zip file, and creating a new one.
 
-    If you open the ZipFS with  ``write`` set to `False` (the default)
-    then the filesystem will be a read only filesystem which maps to
+    If you open the `ZipFS` with  ``write`` set to `False` (the default)
+    then the filesystem will be a read-only filesystem which maps to
     the files and directories within the zip file. Files are
     decompressed on the fly when you open them.
 
@@ -137,12 +137,12 @@ class ZipFS(WrapFS):
         with ZipFS('foo.zip') as zip_fs:
             readme = zip_fs.readtext('readme.txt')
 
-    If you open the ZipFS with ``write`` set to `True`, then the ZipFS
-    will be a empty temporary filesystem. Any files / directories you
-    create in the ZipFS will be written in to a zip file when the ZipFS
+    If you open the `ZipFS` with ``write`` set to `True`, then the `ZipFS`
+    will be an empty temporary filesystem. Any files / directories you
+    create in the `ZipFS` will be written in to a zip file when the `ZipFS`
     is closed.
 
-    Here's how you might write a new zip file containing a readme.txt
+    Here's how you might write a new zip file containing a ``readme.txt``
     file::
 
         with ZipFS('foo.zip', write=True) as new_zip:
@@ -158,8 +158,9 @@ class ZipFS(WrapFS):
             (default) to read an existing zip file.
         compression (int): Compression to use (one of the constants
             defined in the `zipfile` module in the stdlib).
-        temp_fs (str): An FS URL for the temporary filesystem used to
-            store data prior to zipping.
+        temp_fs (str or FS): An FS URL or an FS instance to use to
+            store data prior to zipping. Defaults to creating a new
+            `~fs.tempfs.TempFS`.
 
     """
 
@@ -170,7 +171,7 @@ class ZipFS(WrapFS):
         write=False,  # type: bool
         compression=zipfile.ZIP_DEFLATED,  # type: int
         encoding="utf-8",  # type: Text
-        temp_fs="temp://__ziptemp__",  # type: Text
+        temp_fs="temp://__ziptemp__",  # type: Union[Text, FS]
     ):
         # type: (...) -> FS
         # This magic returns a different class instance based on the
@@ -205,7 +206,7 @@ class WriteZipFS(WrapFS):
         file,  # type: Union[Text, BinaryIO]
         compression=zipfile.ZIP_DEFLATED,  # type: int
         encoding="utf-8",  # type: Text
-        temp_fs="temp://__ziptemp__",  # type: Text
+        temp_fs="temp://__ziptemp__",  # type: Union[Text, FS]
     ):  # noqa: D107
         # type: (...) -> None
         self._file = file

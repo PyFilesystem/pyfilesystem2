@@ -172,9 +172,8 @@ class Globber(object):
         """Count files / directories / data in matched paths.
 
         Example:
-            >>> import fs
-            >>> fs.open_fs('~/projects').glob('**/*.py').count()
-            Counts(files=18519, directories=0, data=206690458)
+            >>> my_fs.glob('**/*.py').count()
+            Counts(files=2, directories=0, data=55)
 
         Returns:
             `~Counts`: A named tuple containing results.
@@ -199,9 +198,8 @@ class Globber(object):
             `~LineCounts`: A named tuple containing line counts.
 
         Example:
-            >>> import fs
-            >>> fs.open_fs('~/projects').glob('**/*.py').count_lines()
-            LineCounts(lines=5767102, non_blank=4915110)
+            >>> my_fs.glob('**/*.py').count_lines()
+            LineCounts(lines=4, non_blank=3)
 
         """
         lines = 0
@@ -222,9 +220,8 @@ class Globber(object):
             int: Number of file and directories removed.
 
         Example:
-            >>> import fs
-            >>> fs.open_fs('~/projects/my_project').glob('**/*.pyc').remove()
-            29
+            >>> my_fs.glob('**/*.pyc').remove()
+            2
 
         """
         removes = 0
