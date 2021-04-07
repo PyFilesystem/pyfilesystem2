@@ -11,6 +11,7 @@ import tempfile
 import time
 import unittest
 import uuid
+import datetime
 
 try:
     from unittest import mock
@@ -144,7 +145,6 @@ class TestFTPErrors(unittest.TestCase):
 @mark.slow
 @unittest.skipIf(platform.python_implementation() == "PyPy", "ftp unreliable with PyPy")
 class TestFTPFS(FSTestCases, unittest.TestCase):
-
     user = "user"
     pasw = "1234"
 
@@ -162,7 +162,7 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         cls.server.shutdown_after = -1
         cls.server.handler.authorizer = DummyAuthorizer()
         cls.server.handler.authorizer.add_user(
-            cls.user, cls.pasw, cls._temp_path, perm="elradfmw"
+            cls.user, cls.pasw, cls._temp_path, perm="elradfmwT"
         )
         cls.server.handler.authorizer.add_anonymous(cls._temp_path)
         cls.server.start()
@@ -221,6 +221,27 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
             "ftp://{}:{}@{}:{}/foo/bar".format(
                 self.user, self.pasw, self.server.host, self.server.port
             ),
+        )
+
+    def test_setinfo(self):
+        # TODO: temporary test, since FSTestCases.test_setinfo is broken.
+        self.fs.create("bar")
+        time1 = time.mktime(datetime.datetime.now().timetuple())
+        time2 = time1 + 60
+        self.fs.setinfo("bar", {"details": {"modified": time1}})
+        mtime1 = self.fs.getinfo("bar", ("details",)).modified
+        self.fs.setinfo("bar", {"details": {"modified": time2}})
+        mtime2 = self.fs.getinfo("bar", ("details",)).modified
+        replacement = {}
+        if mtime1.microsecond == 0 or mtime2.microsecond == 0:
+            mtime1 = mtime1.replace(microsecond=0)
+            mtime2 = mtime2.replace(microsecond=0)
+        if mtime1.second == 0 or mtime2.second == 0:
+            mtime1 = mtime1.replace(second=0)
+            mtime2 = mtime2.replace(second=0)
+        mtime2_modified = mtime2.replace(minute=mtime2.minute - 1)
+        self.assertEqual(
+            mtime1.replace(**replacement), mtime2_modified.replace(**replacement)
         )
 
     def test_host(self):
@@ -301,7 +322,6 @@ class TestFTPFSNoMLSD(TestFTPFS):
 @mark.slow
 @unittest.skipIf(platform.python_implementation() == "PyPy", "ftp unreliable with PyPy")
 class TestAnonFTPFS(FSTestCases, unittest.TestCase):
-
     user = "anonymous"
     pasw = ""
 

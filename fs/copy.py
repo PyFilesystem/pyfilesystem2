@@ -461,7 +461,7 @@ def copy_mtime(
         dst_path (str): Path to a directory on the destination filesystem.
 
     """
-    namespaces = ("details", "metadata_changed", "modified")
+    namespaces = ("details",)
     with manage_fs(src_fs, writeable=False) as _src_fs:
         with manage_fs(dst_fs, create=True) as _dst_fs:
             src_meta = _src_fs.getinfo(src_path, namespaces)

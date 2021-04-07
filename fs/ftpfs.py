@@ -6,6 +6,7 @@ from __future__ import unicode_literals
 
 import array
 import calendar
+import datetime
 import io
 import itertools
 import socket
@@ -19,8 +20,7 @@ try:
     from ftplib import FTP_TLS
 except ImportError as err:
     FTP_TLS = err  # type: ignore
-from ftplib import error_perm
-from ftplib import error_temp
+from ftplib import error_perm, error_temp
 from typing import cast
 
 from six import PY2
@@ -836,8 +836,27 @@ class FTPFS(FS):
 
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
-        if not self.exists(path):
-            raise errors.ResourceNotFound(path)
+        current_info = self.getinfo(path)
+        if current_info.is_file and "MFMT" in self.features:
+            mtime = 0.0
+            if "modified" in info:
+                mtime = float(cast(float, info["modified"]["modified"]))
+            if "details" in info:
+                mtime = float(cast(float, info["details"]["modified"]))
+            if mtime:
+                with ftp_errors(self, path):
+                    cmd = (
+                        "MFMT "
+                        + datetime.datetime.fromtimestamp(mtime).strftime(
+                            "%Y%m%d%H%M%S"
+                        )
+                        + " "
+                        + _encode(path, self.ftp.encoding)
+                    )
+                    try:
+                        self.ftp.sendcmd(cmd)
+                    except error_perm:
+                        pass
 
     def readbytes(self, path):
         # type: (Text) -> bytes
