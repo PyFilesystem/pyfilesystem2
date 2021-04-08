@@ -87,7 +87,9 @@ def mirror(
 
     with src() as _src_fs, dst() as _dst_fs:
         _thread_safe = is_thread_safe(_src_fs, _dst_fs)
-        with Copier(num_workers=workers if _thread_safe else 0) as copier:
+        with Copier(
+            num_workers=workers if _thread_safe else 0, preserve_time=preserve_time
+        ) as copier:
             with _src_fs.lock(), _dst_fs.lock():
                 _mirror(
                     _src_fs,

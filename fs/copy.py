@@ -166,7 +166,7 @@ def copy_file(
                     else:
                         with _src_fs.openbin(src_path) as read_file:
                             _dst_fs.upload(dst_path, read_file)
-                    copy_mtime(_src_fs, src_path, _dst_fs, dst_path)
+                    copy_modified_time(_src_fs, src_path, _dst_fs, dst_path)
 
 
 def copy_file_internal(
@@ -207,7 +207,7 @@ def copy_file_internal(
             dst_fs.upload(dst_path, read_file)
 
     if preserve_time:
-        copy_mtime(src_fs, src_path, dst_fs, dst_path)
+        copy_modified_time(src_fs, src_path, dst_fs, dst_path)
 
 
 def copy_file_if_newer(
@@ -334,10 +334,11 @@ def copy_dir(
     from ._bulk import Copier
 
     with src() as _src_fs, dst() as _dst_fs:
-        _thread_safe = is_thread_safe(_src_fs, _dst_fs)
-        copier = Copier(num_workers=workers if _thread_safe else 0)
-        with copier:
-            with _src_fs.lock(), _dst_fs.lock():
+        with _src_fs.lock(), _dst_fs.lock():
+            _thread_safe = is_thread_safe(_src_fs, _dst_fs)
+            with Copier(
+                num_workers=workers if _thread_safe else 0, preserve_time=preserve_time
+            ) as copier:
                 _dst_fs.makedir(_dst_path, recreate=True)
                 for dir_path, dirs, files in walker.walk(_src_fs, _src_path):
                     copy_path = combine(_dst_path, frombase(_src_path, dir_path))
@@ -351,7 +352,6 @@ def copy_dir(
                             src_path,
                             _dst_fs,
                             dst_path,
-                            preserve_time=preserve_time,
                         )
                         on_copy(_src_fs, src_path, _dst_fs, dst_path)
             pass
@@ -408,7 +408,9 @@ def copy_dir_if_newer(
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
             _thread_safe = is_thread_safe(_src_fs, _dst_fs)
-            with Copier(num_workers=workers if _thread_safe else 0) as copier:
+            with Copier(
+                num_workers=workers if _thread_safe else 0, preserve_time=preserve_time
+            ) as copier:
                 _dst_fs.makedir(_dst_path, recreate=True)
                 namespace = ("details", "modified")
                 dst_state = {
@@ -445,12 +447,11 @@ def copy_dir_if_newer(
                                 dir_path,
                                 _dst_fs,
                                 copy_path,
-                                preserve_time=preserve_time,
                             )
                             on_copy(_src_fs, dir_path, _dst_fs, copy_path)
 
 
-def copy_mtime(
+def copy_modified_time(
     src_fs,  # type: Union[FS, Text]
     src_path,  # type: Text
     dst_fs,  # type: Union[FS, Text]

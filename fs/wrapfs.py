@@ -186,7 +186,7 @@ class WrapFS(FS, typing.Generic[_F]):
                 raise errors.ResourceNotFound(dst_path)
             if not src_fs.getinfo(_src_path).is_dir:
                 raise errors.DirectoryExpected(src_path)
-            move_dir(src_fs, _src_path, dst_fs, _dst_path)
+            move_dir(src_fs, _src_path, dst_fs, _dst_path, preserve_time=preserve_time)
 
     def openbin(self, path, mode="r", buffering=-1, **options):
         # type: (Text, Text, int, **Any) -> BinaryIO
