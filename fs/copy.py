@@ -258,7 +258,7 @@ def copy_file_internal(
     if src_fs is dst_fs:
         # Same filesystem, so we can do a potentially optimized
         # copy
-        src_fs.copy(src_path, dst_path, overwrite=True)
+        src_fs.copy(src_path, dst_path, overwrite=True, preserve_time=preserve_time)
         return
 
     def _copy_locked():
