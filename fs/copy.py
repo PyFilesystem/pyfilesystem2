@@ -45,7 +45,9 @@ def copy_fs(
             resources (defaults to `False`).
 
     """
-    return copy_fs_if(src_fs, dst_fs, "always", walker, on_copy, workers, preserve_time=preserve_time)
+    return copy_fs_if(
+        src_fs, dst_fs, "always", walker, on_copy, workers, preserve_time=preserve_time
+    )
 
 
 def copy_fs_if_newer(
@@ -66,7 +68,9 @@ def copy_fs_if_newer(
     warnings.warn(
         "copy_fs_if_newer is deprecated. Use copy_fs_if instead.", DeprecationWarning
     )
-    return copy_fs_if(src_fs, dst_fs, "newer", walker, on_copy, workers, preserve_time=preserve_time)
+    return copy_fs_if(
+        src_fs, dst_fs, "newer", walker, on_copy, workers, preserve_time=preserve_time
+    )
 
 
 def copy_fs_if(
@@ -135,7 +139,9 @@ def copy_file(
             resource (defaults to `False`).
 
     """
-    copy_file_if(src_fs, src_path, dst_fs, dst_path, "always", preserve_time=preserve_time)
+    copy_file_if(
+        src_fs, src_path, dst_fs, dst_path, "always", preserve_time=preserve_time
+    )
 
 
 def copy_file_if_newer(
@@ -156,7 +162,9 @@ def copy_file_if_newer(
         "copy_file_if_newer is deprecated. Use copy_file_if instead.",
         DeprecationWarning,
     )
-    return copy_file_if(src_fs, src_path, dst_fs, dst_path, "newer", preserve_time=preserve_time)
+    return copy_file_if(
+        src_fs, src_path, dst_fs, dst_path, "newer", preserve_time=preserve_time
+    )
 
 
 def copy_file_if(
@@ -210,7 +218,14 @@ def copy_file_if(
                 _src_fs, src_path, _dst_fs, dst_path, condition
             )
             if do_copy:
-                copy_file_internal(_src_fs, src_path, _dst_fs, dst_path, preserve_time=preserve_time, lock=True,)
+                copy_file_internal(
+                    _src_fs,
+                    src_path,
+                    _dst_fs,
+                    dst_path,
+                    preserve_time=preserve_time,
+                    lock=True,
+                )
             return do_copy
 
 
@@ -262,7 +277,6 @@ def copy_file_internal(
             _copy_locked()
     else:
         _copy_locked()
-
 
 
 def copy_structure(
@@ -327,7 +341,17 @@ def copy_dir(
             resources (defaults to `False`).
 
     """
-    copy_dir_if(src_fs, src_path, dst_fs, dst_path, "always", walker, on_copy, workers, preserve_time=preserve_time)
+    copy_dir_if(
+        src_fs,
+        src_path,
+        dst_fs,
+        dst_path,
+        "always",
+        walker,
+        on_copy,
+        workers,
+        preserve_time=preserve_time,
+    )
 
 
 def copy_dir_if_newer(
@@ -350,7 +374,17 @@ def copy_dir_if_newer(
     warnings.warn(
         "copy_dir_if_newer is deprecated. Use copy_dir_if instead.", DeprecationWarning
     )
-    copy_dir_if(src_fs, src_path, dst_fs, dst_path, "newer", walker, on_copy, workers, preserve_time=preserve_time)
+    copy_dir_if(
+        src_fs,
+        src_path,
+        dst_fs,
+        dst_path,
+        "newer",
+        walker,
+        on_copy,
+        workers,
+        preserve_time=preserve_time,
+    )
 
 
 def copy_dir_if(
