@@ -332,7 +332,7 @@ def copy_dir_if(
     src_path,  # type: Text
     dst_fs,  # type: Union[FS, Text]
     dst_path,  # type: Text
-    condition="always",  # type: Text
+    condition,  # type: Text
     walker=None,  # type: Optional[Walker]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
@@ -398,7 +398,7 @@ def _copy_is_necessary(
 
     elif condition == "newer":
         try:
-            namespace = ("details", "modified")
+            namespace = ("details",)
             src_modified = src_fs.getinfo(src_path, namespace).modified
             dst_modified = dst_fs.getinfo(dst_path, namespace).modified
         except ResourceNotFound:
@@ -412,7 +412,7 @@ def _copy_is_necessary(
 
     elif condition == "older":
         try:
-            namespace = ("details", "modified")
+            namespace = ("details",)
             src_modified = src_fs.getinfo(src_path, namespace).modified
             dst_modified = dst_fs.getinfo(dst_path, namespace).modified
         except ResourceNotFound:
