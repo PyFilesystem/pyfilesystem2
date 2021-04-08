@@ -605,7 +605,7 @@ class OSFS(FS):
         self.check()
         sys_path = self._to_sys_path(path)
         with convert_os_errors("gettype", path):
-            stat = os.stat(sys_path)
+            stat = os.lstat(sys_path)
         resource_type = self._get_type_from_stat(stat)
         return resource_type
 
@@ -614,8 +614,6 @@ class OSFS(FS):
         self.check()
         _path = self.validatepath(path)
         sys_path = self._to_sys_path(_path)
-        if not self.exists(path):
-            raise errors.ResourceNotFound(path)
         with convert_os_errors("islink", path):
             return os.path.islink(sys_path)
 

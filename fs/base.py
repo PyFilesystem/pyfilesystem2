@@ -22,6 +22,7 @@ import warnings
 import six
 
 from . import copy, errors, fsencode, iotools, move, tools, walk, wildcard
+from .enums import ResourceType
 from .glob import BoundGlobber
 from .mode import validate_open_mode
 from .path import abspath, join, normpath
@@ -49,7 +50,6 @@ if typing.TYPE_CHECKING:
         Union,
     )
     from types import TracebackType
-    from .enums import ResourceType
     from .info import Info, RawInfo
     from .subfs import SubFS
     from .permissions import Permissions
@@ -991,8 +991,10 @@ class FS(object):
             bool: `True` if ``path`` maps to a symlink.
 
         """
-        self.getinfo(path)
-        return False
+        try:
+            return self.gettype(path) == ResourceType.symlink
+        except errors.ResourceNotFound:
+            return False
 
     def lock(self):
         # type: () -> RLock
