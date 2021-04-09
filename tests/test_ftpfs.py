@@ -3,6 +3,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import calendar
 import os
 import platform
 import shutil
@@ -226,23 +227,19 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
     def test_setinfo(self):
         # TODO: temporary test, since FSTestCases.test_setinfo is broken.
         self.fs.create("bar")
-        time1 = time.mktime(datetime.datetime.now().timetuple())
-        time2 = time1 + 60
-        self.fs.setinfo("bar", {"details": {"modified": time1}})
-        mtime1 = self.fs.getinfo("bar", ("details",)).modified
-        self.fs.setinfo("bar", {"details": {"modified": time2}})
-        mtime2 = self.fs.getinfo("bar", ("details",)).modified
-        replacement = {}
-        if mtime1.microsecond == 0 or mtime2.microsecond == 0:
-            mtime1 = mtime1.replace(microsecond=0)
-            mtime2 = mtime2.replace(microsecond=0)
-        if mtime1.second == 0 or mtime2.second == 0:
-            mtime1 = mtime1.replace(second=0)
-            mtime2 = mtime2.replace(second=0)
-        mtime2_modified = mtime2.replace(minute=mtime2.minute - 1)
-        self.assertEqual(
-            mtime1.replace(**replacement), mtime2_modified.replace(**replacement)
-        )
+        original_modified = self.fs.getinfo("bar", ("details",)).modified
+        new_modified = original_modified - datetime.timedelta(hours=1)
+        new_modified_stamp = calendar.timegm(new_modified.timetuple())
+        self.fs.setinfo("bar", {"details": {"modified": new_modified_stamp}})
+        new_modified_get = self.fs.getinfo("bar", ("details",)).modified
+        if original_modified.microsecond == 0 or new_modified_get.microsecond == 0:
+            original_modified = original_modified.replace(microsecond=0)
+            new_modified_get = new_modified_get.replace(microsecond=0)
+        if original_modified.second == 0 or new_modified_get.second == 0:
+            original_modified = original_modified.replace(second=0)
+            new_modified_get = new_modified_get.replace(second=0)
+        new_modified_get = new_modified_get + datetime.timedelta(hours=1)
+        self.assertEqual(original_modified, new_modified_get)
 
     def test_host(self):
         self.assertEqual(self.fs.host, self.server.host)

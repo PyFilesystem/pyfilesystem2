@@ -836,27 +836,32 @@ class FTPFS(FS):
 
     def setinfo(self, path, info):
         # type: (Text, RawInfo) -> None
-        current_info = self.getinfo(path)
-        if current_info.is_file and "MFMT" in self.features:
-            mtime = 0.0
+        use_mfmt = False
+        if "MFMT" in self.features:
+            info_details = None
             if "modified" in info:
-                mtime = float(cast(float, info["modified"]["modified"]))
-            if "details" in info:
-                mtime = float(cast(float, info["details"]["modified"]))
-            if mtime:
-                with ftp_errors(self, path):
-                    cmd = (
-                        "MFMT "
-                        + datetime.datetime.fromtimestamp(mtime).strftime(
-                            "%Y%m%d%H%M%S"
-                        )
-                        + " "
-                        + _encode(path, self.ftp.encoding)
-                    )
-                    try:
-                        self.ftp.sendcmd(cmd)
-                    except error_perm:
-                        pass
+                info_details = info["modified"]
+            elif "details" in info:
+                info_details = info["details"]
+            if info_details and "modified" in info_details:
+                use_mfmt = True
+                mtime = cast(float, info_details["modified"])
+
+        if use_mfmt:
+            with ftp_errors(self, path):
+                cmd = (
+                    "MFMT "
+                    + datetime.datetime.utcfromtimestamp(mtime).strftime("%Y%m%d%H%M%S")
+                    + " "
+                    + _encode(path, self.ftp.encoding)
+                )
+                try:
+                    self.ftp.sendcmd(cmd)
+                except error_perm:
+                    pass
+        else:
+            if not self.exists(path):
+                raise errors.ResourceNotFound(path)
 
     def readbytes(self, path):
         # type: (Text) -> bytes
