@@ -8,6 +8,8 @@ import tempfile
 import shutil
 import calendar
 
+from parameterized import parameterized
+
 import fs.copy
 from fs import open_fs
 
@@ -61,20 +63,29 @@ def mkdirp(path):
 
 
 class TestCopySimple(unittest.TestCase):
-    def test_copy_fs(self):
-        for workers in (0, 1, 2, 4):
-            src_fs = open_fs("mem://")
-            src_fs.makedirs("foo/bar")
-            src_fs.makedirs("foo/empty")
-            src_fs.touch("test.txt")
-            src_fs.touch("foo/bar/baz.txt")
+    @parameterized.expand([(0,), (1,), (2,), (4,)])
+    def test_copy_fs(self, workers):
+        namespaces = ("details", "modified")
 
-            dst_fs = open_fs("mem://")
-            fs.copy.copy_fs(src_fs, dst_fs, workers=workers)
+        src_fs = open_fs("mem://")
+        src_fs.makedirs("foo/bar")
+        src_fs.makedirs("foo/empty")
+        src_fs.touch("test.txt")
+        src_fs.touch("foo/bar/baz.txt")
+        src_file1_info = src_fs.getinfo("test.txt", namespaces)
+        src_file2_info = src_fs.getinfo("foo/bar/baz.txt", namespaces)
 
-            self.assertTrue(dst_fs.isdir("foo/empty"))
-            self.assertTrue(dst_fs.isdir("foo/bar"))
-            self.assertTrue(dst_fs.isfile("test.txt"))
+        dst_fs = open_fs("mem://")
+        fs.copy.copy_fs(src_fs, dst_fs, workers=workers, preserve_time=True)
+
+        self.assertTrue(dst_fs.isdir("foo/empty"))
+        self.assertTrue(dst_fs.isdir("foo/bar"))
+        self.assertTrue(dst_fs.isfile("test.txt"))
+
+        dst_file1_info = dst_fs.getinfo("test.txt", namespaces)
+        dst_file2_info = dst_fs.getinfo("foo/bar/baz.txt", namespaces)
+        self.assertEqual(dst_file1_info.modified, src_file1_info.modified)
+        self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
 
     def test_copy_value_error(self):
         src_fs = open_fs("mem://")
@@ -82,18 +93,46 @@ class TestCopySimple(unittest.TestCase):
         with self.assertRaises(ValueError):
             fs.copy.copy_fs(src_fs, dst_fs, workers=-1)
 
-    def test_copy_dir(self):
+    def test_copy_dir0(self):
+        namespaces = ("details", "modified")
+
         src_fs = open_fs("mem://")
         src_fs.makedirs("foo/bar")
         src_fs.makedirs("foo/empty")
         src_fs.touch("test.txt")
         src_fs.touch("foo/bar/baz.txt")
-        for workers in (0, 1, 2, 4):
-            with open_fs("mem://") as dst_fs:
-                fs.copy.copy_dir(src_fs, "/foo", dst_fs, "/", workers=workers)
-                self.assertTrue(dst_fs.isdir("bar"))
-                self.assertTrue(dst_fs.isdir("empty"))
-                self.assertTrue(dst_fs.isfile("bar/baz.txt"))
+        src_file2_info = src_fs.getinfo("foo/bar/baz.txt", namespaces)
+
+        with open_fs("mem://") as dst_fs:
+            fs.copy.copy_dir(src_fs, "/foo", dst_fs, "/", workers=0, preserve_time=True)
+            self.assertTrue(dst_fs.isdir("bar"))
+            self.assertTrue(dst_fs.isdir("empty"))
+            self.assertTrue(dst_fs.isfile("bar/baz.txt"))
+
+            dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
+            self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
+
+    @parameterized.expand([(0,), (1,), (2,), (4,)])
+    def test_copy_dir(self, workers):
+        namespaces = ("details", "modified")
+
+        src_fs = open_fs("mem://")
+        src_fs.makedirs("foo/bar")
+        src_fs.makedirs("foo/empty")
+        src_fs.touch("test.txt")
+        src_fs.touch("foo/bar/baz.txt")
+        src_file2_info = src_fs.getinfo("foo/bar/baz.txt", namespaces)
+
+        with open_fs("mem://") as dst_fs:
+            fs.copy.copy_dir(
+                src_fs, "/foo", dst_fs, "/", workers=workers, preserve_time=True
+            )
+            self.assertTrue(dst_fs.isdir("bar"))
+            self.assertTrue(dst_fs.isdir("empty"))
+            self.assertTrue(dst_fs.isfile("bar/baz.txt"))
+
+            dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
+            self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
 
     def test_copy_large(self):
         data1 = b"foo" * 512 * 1024

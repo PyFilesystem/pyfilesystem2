@@ -11,14 +11,14 @@ import typing
 
 from six.moves.queue import Queue
 
-from .copy import copy_file_internal
+from .copy import copy_file_internal, copy_modified_time
 from .errors import BulkCopyFailed
 from .tools import copy_file_data
 
 if typing.TYPE_CHECKING:
     from .base import FS
     from types import TracebackType
-    from typing import IO, List, Optional, Text, Type
+    from typing import List, Optional, Text, Type, IO, Tuple
 
 
 class _Worker(threading.Thread):
@@ -75,11 +75,13 @@ class _CopyTask(_Task):
 class Copier(object):
     """Copy files in worker threads."""
 
-    def __init__(self, num_workers=4):
-        # type: (int) -> None
+    def __init__(self, num_workers=4, preserve_time=False):
+        # type: (int, bool) -> None
         if num_workers < 0:
             raise ValueError("num_workers must be >= 0")
         self.num_workers = num_workers
+        self.preserve_time = preserve_time
+        self.all_tasks = []  # type: List[Tuple[FS, Text, FS, Text]]
         self.queue = None  # type: Optional[Queue[_Task]]
         self.workers = []  # type: List[_Worker]
         self.errors = []  # type: List[Exception]
@@ -97,10 +99,18 @@ class Copier(object):
     def stop(self):
         """Stop the workers (will block until they are finished)."""
         if self.running and self.num_workers:
+            # Notify the workers that all tasks have arrived
+            # and wait for them to finish.
             for _worker in self.workers:
                 self.queue.put(None)
             for worker in self.workers:
                 worker.join()
+
+            # If the "last modified" time is to be preserved, do it now.
+            if self.preserve_time:
+                for args in self.all_tasks:
+                    copy_modified_time(*args)
+
             # Free up references held by workers
             del self.workers[:]
             self.queue.join()
@@ -124,13 +134,16 @@ class Copier(object):
         if traceback is None and self.errors:
             raise BulkCopyFailed(self.errors)
 
-    def copy(self, src_fs, src_path, dst_fs, dst_path):
-        # type: (FS, Text, FS, Text) -> None
+    def copy(self, src_fs, src_path, dst_fs, dst_path, preserve_time=False):
+        # type: (FS, Text, FS, Text, bool) -> None
         """Copy a file from one fs to another."""
         if self.queue is None:
             # This should be the most performant for a single-thread
-            copy_file_internal(src_fs, src_path, dst_fs, dst_path)
+            copy_file_internal(
+                src_fs, src_path, dst_fs, dst_path, preserve_time=self.preserve_time
+            )
         else:
+            self.all_tasks.append((src_fs, src_path, dst_fs, dst_path))
             src_file = src_fs.openbin(src_path, "r")
             try:
                 dst_file = dst_fs.openbin(dst_path, "w")

@@ -300,14 +300,26 @@ class TestOpeners(unittest.TestCase):
     def test_open_ftp(self, mock_FTPFS):
         open_fs("ftp://foo:bar@ftp.example.org")
         mock_FTPFS.assert_called_once_with(
-            "ftp.example.org", passwd="bar", port=21, user="foo", proxy=None, timeout=10, tls=False
+            "ftp.example.org",
+            passwd="bar",
+            port=21,
+            user="foo",
+            proxy=None,
+            timeout=10,
+            tls=False,
         )
 
     @mock.patch("fs.ftpfs.FTPFS")
     def test_open_ftps(self, mock_FTPFS):
         open_fs("ftps://foo:bar@ftp.example.org")
         mock_FTPFS.assert_called_once_with(
-            "ftp.example.org", passwd="bar", port=21, user="foo", proxy=None, timeout=10, tls=True
+            "ftp.example.org",
+            passwd="bar",
+            port=21,
+            user="foo",
+            proxy=None,
+            timeout=10,
+            tls=True,
         )
 
     @mock.patch("fs.ftpfs.FTPFS")

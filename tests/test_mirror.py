@@ -2,15 +2,17 @@ from __future__ import unicode_literals
 
 import unittest
 
+from parameterized import parameterized_class
+
 from fs.mirror import mirror
 from fs import open_fs
 
 
+@parameterized_class(("WORKERS",), [(0,), (1,), (2,), (4,)])
 class TestMirror(unittest.TestCase):
-    WORKERS = 0  # Single threaded
-
     def _contents(self, fs):
         """Extract an FS in to a simple data structure."""
+        namespaces = ("details", "metadata_changed", "modified")
         contents = []
         for path, dirs, files in fs.walk():
             for info in dirs:
@@ -18,7 +20,17 @@ class TestMirror(unittest.TestCase):
                 contents.append((_path, "dir", b""))
             for info in files:
                 _path = info.make_path(path)
-                contents.append((_path, "file", fs.readbytes(_path)))
+                _bytes = fs.readbytes(_path)
+                _info = fs.getinfo(_path, namespaces)
+                contents.append(
+                    (
+                        _path,
+                        "file",
+                        _bytes,
+                        _info.modified,
+                        _info.metadata_changed,
+                    )
+                )
         return sorted(contents)
 
     def assert_compare_fs(self, fs1, fs2):
@@ -28,14 +40,14 @@ class TestMirror(unittest.TestCase):
     def test_empty_mirror(self):
         m1 = open_fs("mem://")
         m2 = open_fs("mem://")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
 
     def test_mirror_one_file(self):
         m1 = open_fs("mem://")
         m1.writetext("foo", "hello")
         m2 = open_fs("mem://")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
 
     def test_mirror_one_file_one_dir(self):
@@ -43,7 +55,7 @@ class TestMirror(unittest.TestCase):
         m1.writetext("foo", "hello")
         m1.makedir("bar")
         m2 = open_fs("mem://")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
 
     def test_mirror_delete_replace(self):
@@ -51,13 +63,13 @@ class TestMirror(unittest.TestCase):
         m1.writetext("foo", "hello")
         m1.makedir("bar")
         m2 = open_fs("mem://")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
         m2.remove("foo")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
         m2.removedir("bar")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
 
     def test_mirror_extra_dir(self):
@@ -66,7 +78,7 @@ class TestMirror(unittest.TestCase):
         m1.makedir("bar")
         m2 = open_fs("mem://")
         m2.makedir("baz")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
 
     def test_mirror_extra_file(self):
@@ -76,7 +88,7 @@ class TestMirror(unittest.TestCase):
         m2 = open_fs("mem://")
         m2.makedir("baz")
         m2.touch("egg")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
 
     def test_mirror_wrong_type(self):
@@ -86,7 +98,7 @@ class TestMirror(unittest.TestCase):
         m2 = open_fs("mem://")
         m2.makedir("foo")
         m2.touch("bar")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
 
     def test_mirror_update(self):
@@ -94,20 +106,8 @@ class TestMirror(unittest.TestCase):
         m1.writetext("foo", "hello")
         m1.makedir("bar")
         m2 = open_fs("mem://")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
         m2.appendtext("foo", " world!")
-        mirror(m1, m2, workers=self.WORKERS)
+        mirror(m1, m2, workers=self.WORKERS, preserve_time=True)
         self.assert_compare_fs(m1, m2)
-
-
-class TestMirrorWorkers1(TestMirror):
-    WORKERS = 1
-
-
-class TestMirrorWorkers2(TestMirror):
-    WORKERS = 2
-
-
-class TestMirrorWorkers4(TestMirror):
-    WORKERS = 4

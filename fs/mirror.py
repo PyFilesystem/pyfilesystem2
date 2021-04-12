@@ -57,6 +57,7 @@ def mirror(
     walker=None,  # type: Optional[Walker]
     copy_if_newer=True,  # type: bool
     workers=0,  # type: int
+    preserve_time=False,  # type: bool
 ):
     # type: (...) -> None
     """Mirror files / directories from one filesystem to another.
@@ -73,6 +74,8 @@ def mirror(
         workers (int): Number of worker threads used
             (0 for single threaded). Set to a relatively low number
             for network filesystems, 4 would be a good start.
+        preserve_time (bool): If `True`, try to preserve mtime of the
+            resources (defaults to `False`).
 
     """
 
@@ -83,22 +86,30 @@ def mirror(
         return manage_fs(dst_fs, create=True)
 
     with src() as _src_fs, dst() as _dst_fs:
-        with _src_fs.lock(), _dst_fs.lock():
-            _thread_safe = is_thread_safe(_src_fs, _dst_fs)
-            with Copier(num_workers=workers if _thread_safe else 0) as copier:
+        _thread_safe = is_thread_safe(_src_fs, _dst_fs)
+        with Copier(
+            num_workers=workers if _thread_safe else 0, preserve_time=preserve_time
+        ) as copier:
+            with _src_fs.lock(), _dst_fs.lock():
                 _mirror(
                     _src_fs,
                     _dst_fs,
                     walker=walker,
                     copy_if_newer=copy_if_newer,
                     copy_file=copier.copy,
+                    preserve_time=preserve_time,
                 )
 
 
 def _mirror(
-    src_fs, dst_fs, walker=None, copy_if_newer=True, copy_file=copy_file_internal
+    src_fs,  # type: FS
+    dst_fs,  # type: FS
+    walker=None,  # type: Optional[Walker]
+    copy_if_newer=True,  # type: bool
+    copy_file=copy_file_internal,  # type: Callable[[FS, str, FS, str, bool], None]
+    preserve_time=False,  # type: bool
 ):
-    # type: (FS, FS, Optional[Walker], bool, Callable[[FS, str, FS, str], None]) -> None
+    # type: (...) -> None
     walker = walker or Walker()
     walk = walker.walk(src_fs, namespaces=["details"])
     for path, dirs, files in walk:
@@ -122,7 +133,7 @@ def _mirror(
                     # Compare file info
                     if copy_if_newer and not _compare(_file, dst_file):
                         continue
-            copy_file(src_fs, _path, dst_fs, _path)
+            copy_file(src_fs, _path, dst_fs, _path, preserve_time)
 
         # Make directories
         for _dir in dirs:

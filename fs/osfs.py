@@ -49,6 +49,7 @@ from .error_tools import convert_os_errors
 from .mode import Mode, validate_open_mode
 from .errors import FileExpected, NoURL
 from ._url_tools import url_quote
+from .copy import copy_modified_time
 
 if typing.TYPE_CHECKING:
     from typing import (
@@ -431,8 +432,8 @@ class OSFS(FS):
         if hasattr(errno, "ENOTSUP"):
             _sendfile_error_codes.add(errno.ENOTSUP)
 
-        def copy(self, src_path, dst_path, overwrite=False):
-            # type: (Text, Text, bool) -> None
+        def copy(self, src_path, dst_path, overwrite=False, preserve_time=False):
+            # type: (Text, Text, bool, bool) -> None
             with self._lock:
                 # validate and canonicalise paths
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
@@ -452,6 +453,8 @@ class OSFS(FS):
                             while sent > 0:
                                 sent = sendfile(fd_dst, fd_src, offset, maxsize)
                                 offset += sent
+                    if preserve_time:
+                        copy_modified_time(self, src_path, self, dst_path)
                 except OSError as e:
                     # the error is not a simple "sendfile not supported" error
                     if e.errno not in self._sendfile_error_codes:
@@ -461,8 +464,8 @@ class OSFS(FS):
 
     else:
 
-        def copy(self, src_path, dst_path, overwrite=False):
-            # type: (Text, Text, bool) -> None
+        def copy(self, src_path, dst_path, overwrite=False, preserve_time=False):
+            # type: (Text, Text, bool, bool) -> None
             with self._lock:
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
                 shutil.copy2(self.getsyspath(_src_path), self.getsyspath(_dst_path))
