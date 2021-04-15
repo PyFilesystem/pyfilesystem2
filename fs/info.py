@@ -317,9 +317,12 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        self._require_namespace("details")
-        _time = self._make_datetime(self.get("details", "modified"))
-        return _time
+        try:
+            self._require_namespace("details")
+            return self._make_datetime(self.get("details", "modified"))
+        except MissingInfoNamespace:
+            self._require_namespace("modified")
+            return self._make_datetime(self.get("modified", "modified"))
 
     @property
     def created(self):
