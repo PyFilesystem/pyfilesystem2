@@ -398,9 +398,8 @@ def _copy_is_necessary(
 
     elif condition == "newer":
         try:
-            namespace = ("details",)
-            src_modified = src_fs.getinfo(src_path, namespace).modified
-            dst_modified = dst_fs.getinfo(dst_path, namespace).modified
+            src_modified = src_fs.getmodified(src_path)
+            dst_modified = dst_fs.getmodified(dst_path)
         except ResourceNotFound:
             return True
         else:
@@ -412,9 +411,8 @@ def _copy_is_necessary(
 
     elif condition == "older":
         try:
-            namespace = ("details",)
-            src_modified = src_fs.getinfo(src_path, namespace).modified
-            dst_modified = dst_fs.getinfo(dst_path, namespace).modified
+            src_modified = src_fs.getmodified(src_path)
+            dst_modified = dst_fs.getmodified(dst_path)
         except ResourceNotFound:
             return True
         else:

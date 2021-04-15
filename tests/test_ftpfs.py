@@ -144,7 +144,6 @@ class TestFTPErrors(unittest.TestCase):
 @mark.slow
 @unittest.skipIf(platform.python_implementation() == "PyPy", "ftp unreliable with PyPy")
 class TestFTPFS(FSTestCases, unittest.TestCase):
-
     user = "user"
     pasw = "1234"
 
@@ -243,6 +242,23 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         del self.fs.features["UTF8"]
         self.assertFalse(self.fs.getmeta().get("unicode_paths"))
 
+    def test_getinfo_modified(self):
+        self.assertIn("MDTM", self.fs.features)
+        self.fs.create("bar")
+        mtime_detail = self.fs.getinfo("bar", ("basic", "details")).modified
+        mtime_modified = self.fs.getinfo("bar", ("modified",)).modified
+        # Microsecond and seconds might not actually be supported by all
+        # FTP commands, so we strip them before comparing if it looks
+        # like at least one of the two values does not contain them.
+        replacement = {}
+        if mtime_detail.microsecond == 0 or mtime_modified.microsecond == 0:
+            replacement["microsecond"] = 0
+        if mtime_detail.second == 0 or mtime_modified.second == 0:
+            replacement["second"] = 0
+        self.assertEqual(
+            mtime_detail.replace(**replacement), mtime_modified.replace(**replacement)
+        )
+
     def test_opener_path(self):
         self.fs.makedir("foo")
         self.fs.writetext("foo/bar", "baz")
@@ -301,7 +317,6 @@ class TestFTPFSNoMLSD(TestFTPFS):
 @mark.slow
 @unittest.skipIf(platform.python_implementation() == "PyPy", "ftp unreliable with PyPy")
 class TestAnonFTPFS(FSTestCases, unittest.TestCase):
-
     user = "anonymous"
     pasw = ""
 

@@ -678,6 +678,25 @@ class FS(object):
 
     gettext = _new_name(readtext, "gettext")
 
+    def getmodified(self, path):
+        # type: (Text) -> Optional[datetime]
+        """Get the timestamp of the last modifying access of a resource.
+
+        Arguments:
+            path (str): A path to a resource.
+
+        Returns:
+            datetime: The timestamp of the last modification.
+
+        The *modified timestamp* of a file is the point in time
+        that the file was last changed. Depending on the file system,
+        it might only have limited accuracy.
+
+        """
+        if self.getmeta().get("supports_mtime", False):
+            return self.getinfo(path, namespaces=["modified"]).modified
+        return self.getinfo(path, namespaces=["details"]).modified
+
     def getmeta(self, namespace="standard"):
         # type: (Text) -> Mapping[Text, object]
         """Get meta information regarding a filesystem.
@@ -715,6 +734,8 @@ class FS(object):
         read_only           `True` if this filesystem is read only.
         supports_rename     `True` if this filesystem supports an
                             `os.rename` operation.
+        supports_mtime      `True` if this filesystem supports a native
+                            operation to retreive the "last modified" time.
         =================== ============================================
 
         Most builtin filesystems will provide all these keys, and third-

@@ -69,7 +69,6 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
 
 
 class TestMemoryFile(unittest.TestCase):
-
     def setUp(self):
         self.fs = memoryfs.MemoryFS()
 

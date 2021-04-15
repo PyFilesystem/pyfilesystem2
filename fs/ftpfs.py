@@ -15,6 +15,7 @@ from collections import OrderedDict
 from contextlib import contextmanager
 from ftplib import FTP
 
+
 try:
     from ftplib import FTP_TLS
 except ImportError as err:
@@ -667,6 +668,18 @@ class FTPFS(FS):
                 }
             )
 
+        if "modified" in namespaces:
+            if "basic" in namespaces or "details" in namespaces:
+                raise ValueError(
+                    'Cannot use the "modified" namespace in combination with others.'
+                )
+            with self._lock:
+                with ftp_errors(self, path=path):
+                    cmd = "MDTM " + _encode(self.validatepath(path), self.ftp.encoding)
+                    response = self.ftp.sendcmd(cmd)
+                modified_info = {"modified": self._parse_ftp_time(response.split()[1])}
+                return Info({"modified": modified_info})
+
         if self.supports_mlst:
             with self._lock:
                 with ftp_errors(self, path=path):
@@ -692,6 +705,7 @@ class FTPFS(FS):
         if namespace == "standard":
             _meta = self._meta.copy()
             _meta["unicode_paths"] = "UTF8" in self.features
+            _meta["supports_mtime"] = "MDTM" in self.features
         return _meta
 
     def listdir(self, path):
