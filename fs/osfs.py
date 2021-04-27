@@ -665,10 +665,10 @@ class OSFS(FS):
         if "details" in info:
             details = info["details"]
             if "accessed" in details or "modified" in details:
-                _accessed = typing.cast(int, details.get("accessed"))
-                _modified = typing.cast(int, details.get("modified", _accessed))
-                accessed = int(_modified if _accessed is None else _accessed)
-                modified = int(_modified)
+                _accessed = typing.cast(float, details.get("accessed"))
+                _modified = typing.cast(float, details.get("modified", _accessed))
+                accessed = float(_modified if _accessed is None else _accessed)
+                modified = float(_modified)
                 if accessed is not None or modified is not None:
                     with convert_os_errors("setinfo", path):
                         os.utime(sys_path, (accessed, modified))

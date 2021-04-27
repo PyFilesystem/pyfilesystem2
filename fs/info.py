@@ -135,6 +135,9 @@ class Info(object):
         When creating an `Info` object, you can add a ``_write`` key to
         each raw namespace that lists which keys are writable or not.
 
+        In general, this means they are compatible with the `setinfo`
+        function of filesystem objects.
+
         Arguments:
             namespace (str): A namespace identifier.
             key (str): A key within the namespace.

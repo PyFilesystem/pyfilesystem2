@@ -12,7 +12,6 @@ from datetime import datetime
 import io
 import itertools
 import json
-import math
 import os
 import time
 import unittest
@@ -1171,15 +1170,21 @@ class FSTestCases(object):
 
     def test_setinfo(self):
         self.fs.create("birthday.txt")
-        now = math.floor(time.time())
+        now = time.time()
 
         change_info = {"details": {"accessed": now + 60, "modified": now + 60 * 60}}
         self.fs.setinfo("birthday.txt", change_info)
-        new_info = self.fs.getinfo("birthday.txt", namespaces=["details"]).raw
-        if "accessed" in new_info.get("_write", []):
-            self.assertEqual(new_info["details"]["accessed"], now + 60)
-        if "modified" in new_info.get("_write", []):
-            self.assertEqual(new_info["details"]["modified"], now + 60 * 60)
+        new_info = self.fs.getinfo("birthday.txt", namespaces=["details"])
+        can_write_acccess = new_info.is_writeable("details", "accessed")
+        can_write_modified = new_info.is_writeable("details", "modified")
+        if can_write_acccess:
+            self.assertAlmostEqual(
+                new_info.get("details", "accessed"), now + 60, places=4
+            )
+        if can_write_modified:
+            self.assertAlmostEqual(
+                new_info.get("details", "modified"), now + 60 * 60, places=4
+            )
 
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.setinfo("nothing", {})
@@ -1188,10 +1193,11 @@ class FSTestCases(object):
         self.fs.create("birthday.txt")
         self.fs.settimes("birthday.txt", accessed=datetime(2016, 7, 5))
         info = self.fs.getinfo("birthday.txt", namespaces=["details"])
-        writeable = info.get("details", "_write", [])
-        if "accessed" in writeable:
+        can_write_acccess = info.is_writeable("details", "accessed")
+        can_write_modified = info.is_writeable("details", "modified")
+        if can_write_acccess:
             self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
-        if "modified" in writeable:
+        if can_write_modified:
             self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=pytz.UTC))
 
     def test_touch(self):
