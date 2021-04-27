@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 
 - Fixed performance bugs in `fs.copy.copy_dir_if_newer`. Test cases were adapted to catch those bugs in the future.
+- Fixed precision bug for timestamps in `fs.OSFS.setinfo`.
 
 
 ## [2.4.13] - 2021-03-27
