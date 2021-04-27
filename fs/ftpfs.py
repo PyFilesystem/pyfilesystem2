@@ -12,6 +12,7 @@ import itertools
 import socket
 import threading
 import typing
+import warnings
 from collections import OrderedDict
 from contextlib import contextmanager
 from ftplib import FTP
@@ -669,16 +670,23 @@ class FTPFS(FS):
             )
 
         if "modified" in namespaces:
-            if "basic" in namespaces or "details" in namespaces:
-                raise ValueError(
-                    'Cannot use the "modified" namespace in combination with others.'
+            if "details" in namespaces:
+                warnings.warn(
+                    "FTPFS.getinfo called with both 'modified' and 'details'"
+                    " namespace. The former will be ignored.",
+                    UserWarning,
                 )
-            with self._lock:
-                with ftp_errors(self, path=path):
-                    cmd = "MDTM " + _encode(self.validatepath(path), self.ftp.encoding)
-                    response = self.ftp.sendcmd(cmd)
-                modified_info = {"modified": self._parse_ftp_time(response.split()[1])}
-                return Info({"modified": modified_info})
+            else:
+                with self._lock:
+                    with ftp_errors(self, path=path):
+                        cmd = "MDTM " + _encode(
+                            self.validatepath(path), self.ftp.encoding
+                        )
+                        response = self.ftp.sendcmd(cmd)
+                    modified_info = {
+                        "modified": self._parse_ftp_time(response.split()[1])
+                    }
+                    return Info({"modified": modified_info})
 
         if self.supports_mlst:
             with self._lock:
