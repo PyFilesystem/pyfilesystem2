@@ -111,7 +111,8 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         self.assertTrue(self.fs.exists("bar/file.txt"))
 
         dst_info = self.fs.getinfo("bar/file.txt", namespaces)
-        self.assertAlmostEqual(dst_info.modified, src_info.modified, places=2)
+        delta = dst_info.modified - src_info.modified
+        self.assertAlmostEqual(delta.total_seconds(), 0, places=2)
 
     @unittest.skipUnless(osfs.sendfile, "sendfile not supported")
     @unittest.skipIf(
