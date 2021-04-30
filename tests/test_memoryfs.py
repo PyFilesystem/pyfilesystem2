@@ -72,14 +72,13 @@ class TestMemoryFS(FSTestCases, unittest.TestCase):
         self.fs.makedir("bar")
         self.fs.touch("foo/file.txt")
 
-        namespaces = ("details", "modified")
-        src_info = self.fs.getinfo("foo/file.txt", namespaces)
+        src_datetime = self.fs.getmodified("foo/file.txt")
 
         self.fs.copy("foo/file.txt", "bar/file.txt", preserve_time=True)
         self.assertTrue(self.fs.exists("bar/file.txt"))
 
-        dst_info = self.fs.getinfo("bar/file.txt", namespaces)
-        self.assertEqual(dst_info.modified, src_info.modified)
+        dst_datetime = self.fs.getmodified("bar/file.txt")
+        self.assertEqual(dst_datetime, src_datetime)
 
 
 class TestMemoryFile(unittest.TestCase):
