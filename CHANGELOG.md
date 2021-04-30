@@ -10,11 +10,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
+- To `fs.walk.Walker`, added parameters `filter_glob` and `exclude_glob`.
+  Closes [#459](https://github.com/PyFilesystem/pyfilesystem2/issues/459).
 - Added `fs.copy.copy_file_if`, `fs.copy.copy_dir_if`, and `fs.copy.copy_fs_if`. 
   Closes [#458](https://github.com/PyFilesystem/pyfilesystem2/issues/458).
   
 ### Fixed
 
+- Elaborated documentation of `filter_dirs` and `exclude_dirs` in `fs.walk.Walker`.
+  Closes [#371](https://github.com/PyFilesystem/pyfilesystem2/issues/371).
 - Fixed performance bugs in `fs.copy.copy_dir_if_newer`. Test cases were adapted to catch those bugs in the future.
 - Fixed precision bug for timestamps in `fs.OSFS.setinfo`.
 
