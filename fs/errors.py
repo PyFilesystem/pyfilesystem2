@@ -68,7 +68,7 @@ class MissingInfoNamespace(AttributeError):
 
 
 @six.python_2_unicode_compatible
-class FSError(Exception):
+class FSError(OSError):
     """Base exception for the `fs` module."""
 
     default_message = "Unspecified error"
