@@ -12,11 +12,9 @@ import itertools
 import socket
 import threading
 import typing
-import warnings
 from collections import OrderedDict
 from contextlib import contextmanager
 from ftplib import FTP
-
 
 try:
     from ftplib import FTP_TLS
@@ -705,7 +703,7 @@ class FTPFS(FS):
         return _meta
 
     def getmodified(self, path):
-        # type: (Text) -> Optional[datetime]
+        # type: (Text) -> Optional[datetime.datetime]
         if self.supports_mdtm:
             _path = self.validatepath(path)
             with self._lock:
@@ -714,7 +712,7 @@ class FTPFS(FS):
                     response = self.ftp.sendcmd(cmd)
                     mtime = self._parse_ftp_time(response.split()[1])
                     return epoch_to_datetime(mtime)
-        return super().getmodified(self, path)
+        return super(FTPFS, self).getmodified(path)
 
     def listdir(self, path):
         # type: (Text) -> List[Text]
