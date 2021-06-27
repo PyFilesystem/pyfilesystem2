@@ -317,9 +317,9 @@ class Info(object):
                 namespace is not in the Info.
 
         """
-        namespace = "modified" if self.has_namespace("modified") else "details"
-        self._require_namespace(namespace)
-        return self._make_datetime(self.get(namespace, "modified"))
+        self._require_namespace("details")
+        _time = self._make_datetime(self.get("details", "modified"))
+        return _time
 
     @property
     def created(self):
