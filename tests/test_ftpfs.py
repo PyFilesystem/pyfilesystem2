@@ -265,7 +265,8 @@ class TestFTPFS(FSTestCases, unittest.TestCase):
         self.assertIn("MDTM", self.fs.features)
         self.fs.create("bar")
         mtime_detail = self.fs.getinfo("bar", ("basic", "details")).modified
-        mtime_modified = self.fs.getinfo("bar", ("modified",)).modified
+        mtime_modified = self.fs.getmodified("bar")
+        print(mtime_detail, mtime_modified)
         # Microsecond and seconds might not actually be supported by all
         # FTP commands, so we strip them before comparing if it looks
         # like at least one of the two values does not contain them.
