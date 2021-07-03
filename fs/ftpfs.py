@@ -40,6 +40,7 @@ from .path import dirname
 from .path import basename
 from .path import normpath
 from .path import split
+from .time import epoch_to_datetime
 from . import _ftp_parse as ftp_parse
 
 if typing.TYPE_CHECKING:
@@ -572,6 +573,12 @@ class FTPFS(FS):
         """bool: whether the server supports MLST feature."""
         return "MLST" in self.features
 
+    @property
+    def supports_mdtm(self):
+        # type: () -> bool
+        """bool: whether the server supports the MDTM feature."""
+        return "MDTM" in self.features
+
     def create(self, path, wipe=False):
         # type: (Text, bool) -> bool
         _path = self.validatepath(path)
@@ -692,7 +699,20 @@ class FTPFS(FS):
         if namespace == "standard":
             _meta = self._meta.copy()
             _meta["unicode_paths"] = "UTF8" in self.features
+            _meta["supports_mtime"] = "MDTM" in self.features
         return _meta
+
+    def getmodified(self, path):
+        # type: (Text) -> Optional[datetime.datetime]
+        if self.supports_mdtm:
+            _path = self.validatepath(path)
+            with self._lock:
+                with ftp_errors(self, path=path):
+                    cmd = "MDTM " + _encode(_path, self.ftp.encoding)
+                    response = self.ftp.sendcmd(cmd)
+                    mtime = self._parse_ftp_time(response.split()[1])
+                    return epoch_to_datetime(mtime)
+        return super(FTPFS, self).getmodified(path)
 
     def listdir(self, path):
         # type: (Text) -> List[Text]

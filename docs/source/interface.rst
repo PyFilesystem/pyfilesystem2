@@ -20,6 +20,7 @@ The following is a complete list of methods on PyFilesystem objects.
 * :meth:`~fs.base.FS.getdetails` Get details info namespace for a resource.
 * :meth:`~fs.base.FS.getinfo` Get info regarding a file or directory.
 * :meth:`~fs.base.FS.getmeta` Get meta information for a resource.
+* :meth:`~fs.base.FS.getmodified` Get info regarding the last modified time of a resource.
 * :meth:`~fs.base.FS.getospath` Get path with encoding expected by the OS.
 * :meth:`~fs.base.FS.getsize` Get the size of a file.
 * :meth:`~fs.base.FS.getsyspath` Get the system path of a resource, if one exists.
