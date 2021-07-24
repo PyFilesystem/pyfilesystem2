@@ -4,22 +4,31 @@
 from __future__ import unicode_literals
 
 import typing
+from functools import partial
 
 import re
 from collections import namedtuple
 
-from . import wildcard
 from ._repr import make_repr
 from .lrucache import LRUCache
 from .path import iteratepath
+
 
 GlobMatch = namedtuple("GlobMatch", ["path", "info"])
 Counts = namedtuple("Counts", ["files", "directories", "data"])
 LineCounts = namedtuple("LineCounts", ["lines", "non_blank"])
 
 if typing.TYPE_CHECKING:
-    from typing import Iterator, List, Optional, Pattern, Text, Tuple
-
+    from typing import (
+        Iterator,
+        List,
+        Optional,
+        Pattern,
+        Text,
+        Tuple,
+        Iterable,
+        Callable,
+    )
     from .base import FS
 
 
@@ -28,17 +37,87 @@ _PATTERN_CACHE = LRUCache(
 )  # type: LRUCache[Tuple[Text, bool], Tuple[int, bool, Pattern]]
 
 
+def _split_pattern_by_rec(pattern):
+    # type: (Text) -> List[Text]
+    """Split a glob pattern at its directory seperators (/).
+
+    Takes into account escaped cases like [/].
+    """
+    indices = [-1]
+    bracket_open = False
+    for i, c in enumerate(pattern):
+        if c == "/" and not bracket_open:
+            indices.append(i)
+        elif c == "[":
+            bracket_open = True
+        elif c == "]":
+            bracket_open = False
+
+    indices.append(len(pattern))
+    return [pattern[i + 1 : j] for i, j in zip(indices[:-1], indices[1:])]
+
+
+def _translate(pattern, case_sensitive=True):
+    # type: (Text, bool) -> Text
+    """Translate a wildcard pattern to a regular expression.
+
+    There is no way to quote meta-characters.
+    Arguments:
+        pattern (str): A wildcard pattern.
+        case_sensitive (bool): Set to `False` to use a case
+            insensitive regex (default `True`).
+
+    Returns:
+        str: A regex equivalent to the given pattern.
+
+    """
+    if not case_sensitive:
+        pattern = pattern.lower()
+    i, n = 0, len(pattern)
+    res = []
+    while i < n:
+        c = pattern[i]
+        i = i + 1
+        if c == "*":
+            res.append("[^/]*")
+        elif c == "?":
+            res.append("[^/]")
+        elif c == "[":
+            j = i
+            if j < n and pattern[j] == "!":
+                j = j + 1
+            if j < n and pattern[j] == "]":
+                j = j + 1
+            while j < n and pattern[j] != "]":
+                j = j + 1
+            if j >= n:
+                res.append("\\[")
+            else:
+                stuff = pattern[i:j].replace("\\", "\\\\")
+                i = j + 1
+                if stuff[0] == "!":
+                    stuff = "^" + stuff[1:]
+                elif stuff[0] == "^":
+                    stuff = "\\" + stuff
+                res.append("[%s]" % stuff)
+        else:
+            res.append(re.escape(c))
+    return "".join(res)
+
+
 def _translate_glob(pattern, case_sensitive=True):
     levels = 0
     recursive = False
     re_patterns = [""]
     for component in iteratepath(pattern):
-        if component == "**":
-            re_patterns.append(".*/?")
+        if "**" in component:
             recursive = True
+            split = component.split("**")
+            split_re = [_translate(s, case_sensitive=case_sensitive) for s in split]
+            re_patterns.append("/?" + ".*/?".join(split_re))
         else:
             re_patterns.append(
-                "/" + wildcard._translate(component, case_sensitive=case_sensitive)
+                "/" + _translate(component, case_sensitive=case_sensitive)
             )
         levels += 1
     re_glob = "(?ms)^" + "".join(re_patterns) + ("/$" if pattern.endswith("/") else "$")
@@ -72,6 +151,8 @@ def match(pattern, path):
     except KeyError:
         levels, recursive, re_pattern = _translate_glob(pattern, case_sensitive=True)
         _PATTERN_CACHE[(pattern, True)] = (levels, recursive, re_pattern)
+    if path and path[0] != "/":
+        path = "/" + path
     return bool(re_pattern.match(path))
 
 
@@ -92,7 +173,93 @@ def imatch(pattern, path):
     except KeyError:
         levels, recursive, re_pattern = _translate_glob(pattern, case_sensitive=True)
         _PATTERN_CACHE[(pattern, False)] = (levels, recursive, re_pattern)
+    if path and path[0] != "/":
+        path = "/" + path
     return bool(re_pattern.match(path))
+
+
+def match_any(patterns, path):
+    # type: (Iterable[Text], Text) -> bool
+    """Test if a path matches any of a list of patterns.
+
+    Will return `True` if ``patterns`` is an empty list.
+
+    Arguments:
+        patterns (list): A list of wildcard pattern, e.g ``["*.py",
+            "*.pyc"]``
+        name (str): A filename.
+
+    Returns:
+        bool: `True` if the path matches at least one of the patterns.
+
+    """
+    if not patterns:
+        return True
+    return any(match(pattern, path) for pattern in patterns)
+
+
+def imatch_any(patterns, path):
+    # type: (Iterable[Text], Text) -> bool
+    """Test if a path matches any of a list of patterns (case insensitive).
+
+    Will return `True` if ``patterns`` is an empty list.
+
+    Arguments:
+        patterns (list): A list of wildcard pattern, e.g ``["*.py",
+            "*.pyc"]``
+        name (str): A filename.
+
+    Returns:
+        bool: `True` if the path matches at least one of the patterns.
+
+    """
+    if not patterns:
+        return True
+    return any(imatch(pattern, path) for pattern in patterns)
+
+
+def get_matcher(patterns, case_sensitive, accept_prefix=False):
+    # type: (Iterable[Text], bool, bool) -> Callable[[Text], bool]
+    """Get a callable that matches paths against the given patterns.
+
+    Arguments:
+        patterns (list): A list of wildcard pattern. e.g. ``["*.py",
+            "*.pyc"]``
+        case_sensitive (bool): If ``True``, then the callable will be case
+            sensitive, otherwise it will be case insensitive.
+        accept_prefix (bool): If ``True``, the name is
+            not required to match the wildcards themselves
+            but only need to be a prefix of a string that does.
+
+    Returns:
+        callable: a matcher that will return `True` if the paths given as
+        an argument matches any of the given patterns.
+
+    Example:
+        >>> from fs import wildcard
+        >>> is_python = wildcard.get_matcher(['*.py'], True)
+        >>> is_python('__init__.py')
+        True
+        >>> is_python('foo.txt')
+        False
+
+    """
+    if not patterns:
+        return lambda name: True
+
+    if accept_prefix:
+        new_patterns = []
+        for pattern in patterns:
+            split = _split_pattern_by_rec(pattern)
+            for i in range(1, len(split)):
+                new_pattern = "/".join(split[:i])
+                new_patterns.append(new_pattern)
+                new_patterns.append(new_pattern + "/")
+            new_patterns.append(pattern)
+        patterns = new_patterns
+
+    matcher = match_any if case_sensitive else imatch_any
+    return partial(matcher, patterns)
 
 
 class Globber(object):

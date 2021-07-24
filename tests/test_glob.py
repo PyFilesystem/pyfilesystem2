@@ -21,6 +21,7 @@ class TestGlob(unittest.TestCase):
         tests = [
             ("*.?y", "/test.py", True),
             ("*.py", "/test.py", True),
+            ("*.py", "__init__.py", True),
             ("*.py", "/test.pc", False),
             ("*.py", "/foo/test.py", False),
             ("foo/*.py", "/foo/test.py", True),
@@ -28,21 +29,23 @@ class TestGlob(unittest.TestCase):
             ("?oo/*.py", "/foo/test.py", True),
             ("*/*.py", "/foo/test.py", True),
             ("foo/*.py", "/bar/foo/test.py", False),
+            ("/foo/**", "/foo/test.py", True),
             ("**/foo/*.py", "/bar/foo/test.py", True),
             ("foo/**/bar/*.py", "/foo/bar/test.py", True),
             ("foo/**/bar/*.py", "/foo/baz/egg/bar/test.py", True),
             ("foo/**/bar/*.py", "/foo/baz/egg/bar/egg/test.py", False),
             ("**", "/test.py", True),
+            ("/**", "/test.py", True),
             ("**", "/test", True),
             ("**", "/test/", True),
             ("**/", "/test/", True),
             ("**/", "/test.py", False),
         ]
         for pattern, path, expected in tests:
-            self.assertEqual(glob.match(pattern, path), expected)
+            self.assertEqual(glob.match(pattern, path), expected, msg=(pattern, path))
         # Run a second time to test cache
         for pattern, path, expected in tests:
-            self.assertEqual(glob.match(pattern, path), expected)
+            self.assertEqual(glob.match(pattern, path), expected, msg=(pattern, path))
 
     def test_count_1dir(self):
         globber = glob.BoundGlobber(self.fs)

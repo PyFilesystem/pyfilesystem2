@@ -21,7 +21,7 @@ import warnings
 from contextlib import closing
 from functools import partial, wraps
 
-from . import copy, errors, fsencode, iotools, tools, walk, wildcard
+from . import copy, errors, fsencode, iotools, tools, walk, wildcard, glob
 from .copy import copy_modified_time
 from .glob import BoundGlobber
 from .mode import validate_open_mode
@@ -1653,8 +1653,8 @@ class FS(object):
         if self.isclosed():
             raise errors.FilesystemClosed()
 
-    def match(self, patterns, name):
-        # type: (Optional[Iterable[Text]], Text) -> bool
+    def match(self, patterns, name, accept_prefix=False):
+        # type: (Optional[Iterable[Text]], Text, bool) -> bool
         """Check if a name matches any of a list of wildcards.
 
         If a filesystem is case *insensitive* (such as Windows) then
@@ -1695,6 +1695,61 @@ class FS(object):
         )
         matcher = wildcard.get_matcher(patterns, case_sensitive)
         return matcher(name)
+
+    def match_glob(self, patterns, path, accept_prefix=False):
+        # type: (Optional[Iterable[Text]], Text, bool) -> bool
+        """Check if a path matches any of a list of glob patterns.
+
+        If a filesystem is case *insensitive* (such as Windows) then
+        this method will perform a case insensitive match (i.e. ``*.py``
+        will match the same names as ``*.PY``). Otherwise the match will
+        be case sensitive (``*.py`` and ``*.PY`` will match different
+        names).
+
+        Arguments:
+            patterns (list, optional): A list of patterns, e.g.
+                ``['*.py']``, or `None` to match everything.
+            path (str): A resource path, starting with "/".
+            accept_prefix (bool): If ``True``, the path is
+                not required to match the wildcards themselves
+                but only need to be a prefix of a string that does.
+
+        Returns:
+            bool: `True` if ``path`` matches any of the patterns.
+
+        Raises:
+            TypeError: If ``patterns`` is a single string instead of
+                a list (or `None`).
+            ValueError: If ``path`` is not a string starting with "/".
+
+        Example:
+            >>> my_fs.match_glob(['*.py'], '/__init__.py')
+            True
+            >>> my_fs.match_glob(['*.jpg', '*.png'], '/foo.gif')
+            False
+            >>> my_fs.match_glob(['dir/file.txt'], '/dir/', accept_prefix=True)
+            True
+            >>> my_fs.match_glob(['dir/file.txt'], '/dir/gile.txt', accept_prefix=True)
+            False
+
+        Note:
+            If ``patterns`` is `None` (or ``['*']``), then this
+            method will always return `True`.
+
+        """
+        if patterns is None:
+            return True
+        if not path or path[0] != "/":
+            raise ValueError("%s needs to be a string starting with /" % path)
+        if isinstance(patterns, six.text_type):
+            raise TypeError("patterns must be a list or sequence")
+        case_sensitive = not typing.cast(
+            bool, self.getmeta().get("case_insensitive", False)
+        )
+        matcher = glob.get_matcher(
+            patterns, case_sensitive, accept_prefix=accept_prefix
+        )
+        return matcher(path)
 
     def tree(self, **kwargs):
         # type: (**Any) -> None
