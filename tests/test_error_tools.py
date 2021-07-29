@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 import errno
+import sys
 import unittest
 
 import fs.errors
@@ -21,5 +22,15 @@ class TestErrorTools(unittest.TestCase):
         with self.assertRaises(fs.errors.PathError) as ctx:
             with convert_os_errors("stat", "/tmp/test"):
                 raise exception
+        self.assertEqual(ctx.exception.exc, exception)
+        self.assertEqual(ctx.exception.path, "/tmp/test")
+
+    @unittest.skipIf(sys.platform != "win32", "requires Windows")
+    def test_convert_resourcelocked_windows(self):
+        exception = OSError(32, "resource locked")
+        with self.assertRaises(fs.errors.ResourceLocked) as ctx:
+            with convert_os_errors("stat", "/tmp/test"):
+                raise exception
+
         self.assertEqual(ctx.exception.exc, exception)
         self.assertEqual(ctx.exception.path, "/tmp/test")
