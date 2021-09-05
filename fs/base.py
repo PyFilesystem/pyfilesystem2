@@ -1653,8 +1653,8 @@ class FS(object):
         if self.isclosed():
             raise errors.FilesystemClosed()
 
-    def match(self, patterns, name, accept_prefix=False):
-        # type: (Optional[Iterable[Text]], Text, bool) -> bool
+    def match(self, patterns, name):
+        # type: (Optional[Iterable[Text]], Text) -> bool
         """Check if a name matches any of a list of wildcards.
 
         If a filesystem is case *insensitive* (such as Windows) then
@@ -1711,7 +1711,7 @@ class FS(object):
                 ``['*.py']``, or `None` to match everything.
             path (str): A resource path, starting with "/".
             accept_prefix (bool): If ``True``, the path is
-                not required to match the wildcards themselves
+                not required to match the patterns themselves
                 but only need to be a prefix of a string that does.
 
         Returns:
@@ -1729,6 +1729,8 @@ class FS(object):
             False
             >>> my_fs.match_glob(['dir/file.txt'], '/dir/', accept_prefix=True)
             True
+            >>> my_fs.match_glob(['dir/file.txt'], '/dir/', accept_prefix=False)
+            False
             >>> my_fs.match_glob(['dir/file.txt'], '/dir/gile.txt', accept_prefix=True)
             False
 

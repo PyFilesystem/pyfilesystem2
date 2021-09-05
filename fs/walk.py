@@ -84,13 +84,13 @@ class Walker(object):
                 a list of filename patterns, e.g. ``["~*"]``. Files matching
                 any of these patterns will be removed from the walk.
             filter_dirs (list, optional): A list of patterns that will be used
-                to match directories paths. The walk will only open directories
+                to match directories names. The walk will only open directories
                 that match at least one of these patterns. Directories will
                 only be returned if the final component matches one of the
                 patterns.
             exclude_dirs (list, optional): A list of patterns that will be
                 used to filter out directories from the walk. e.g.
-                ``['*.svn', '*.git']``. Directories matching any of these
+                ``['*.svn', '*.git']``. Directory names matching any of these
                 patterns will be removed from the walk.
             max_depth (int, optional): Maximum directory depth to walk.
             filter_glob (list, optional): If supplied, this parameter
@@ -98,7 +98,7 @@ class Walker(object):
                 Resources will only be returned if their global path or
                 an extension of it matches one of the patterns.
             exclude_glob (list, optional): If supplied, this parameter
-                should be a list of path patterns e.g. ``["foo/**/*.py"]``.
+                should be a list of path patterns e.g. ``["foo/**/*.pyc"]``.
                 Resources will not be returned if their global path or
                 an extension of it  matches one of the patterns.
 
@@ -213,7 +213,7 @@ class Walker(object):
     def _check_open_dir(self, fs, path, info):
         # type: (FS, Text, Info) -> bool
         """Check if a directory should be considered in the walk."""
-        full_path = ("" if path == "/" else path) + "/" + info.name
+        full_path = combine(path, info.name)
         if self.exclude_dirs is not None and fs.match(self.exclude_dirs, info.name):
             return False
         if self.exclude_glob is not None and fs.match_glob(

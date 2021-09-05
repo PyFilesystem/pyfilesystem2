@@ -34,10 +34,10 @@ if typing.TYPE_CHECKING:
 
 _PATTERN_CACHE = LRUCache(
     1000
-)  # type: LRUCache[Tuple[Text, bool], Tuple[int, bool, Pattern]]
+)  # type: LRUCache[Tuple[Text, bool], Tuple[Optional[int], Pattern]]
 
 
-def _split_pattern_by_rec(pattern):
+def _split_pattern_by_sep(pattern):
     # type: (Text) -> List[Text]
     """Split a glob pattern at its directory seperators (/).
 
@@ -57,28 +57,27 @@ def _split_pattern_by_rec(pattern):
     return [pattern[i + 1 : j] for i, j in zip(indices[:-1], indices[1:])]
 
 
-def _translate(pattern, case_sensitive=True):
-    # type: (Text, bool) -> Text
-    """Translate a wildcard pattern to a regular expression.
+def _translate(pattern):
+    # type: (Text) -> Text
+    """Translate a glob pattern without '**' to a regular expression.
 
     There is no way to quote meta-characters.
+
     Arguments:
-        pattern (str): A wildcard pattern.
-        case_sensitive (bool): Set to `False` to use a case
-            insensitive regex (default `True`).
+        pattern (str): A glob pattern.
 
     Returns:
         str: A regex equivalent to the given pattern.
 
     """
-    if not case_sensitive:
-        pattern = pattern.lower()
     i, n = 0, len(pattern)
     res = []
     while i < n:
         c = pattern[i]
         i = i + 1
         if c == "*":
+            if i < n and pattern[i] == "*":
+                raise ValueError("glob._translate does not support '**' patterns.")
             res.append("[^/]*")
         elif c == "?":
             res.append("[^/]")
@@ -96,7 +95,7 @@ def _translate(pattern, case_sensitive=True):
                 stuff = pattern[i:j].replace("\\", "\\\\")
                 i = j + 1
                 if stuff[0] == "!":
-                    stuff = "^" + stuff[1:]
+                    stuff = "^/" + stuff[1:]
                 elif stuff[0] == "^":
                     stuff = "\\" + stuff
                 res.append("[%s]" % stuff)
@@ -105,27 +104,35 @@ def _translate(pattern, case_sensitive=True):
     return "".join(res)
 
 
-def _translate_glob(pattern, case_sensitive=True):
-    levels = 0
+def _translate_glob(pattern):
+    # type: (Text) -> Tuple[Optional[int], Text]
+    """Translate a glob pattern to a regular expression.
+
+    There is no way to quote meta-characters.
+
+    Arguments:
+        pattern (str): A glob pattern.
+
+    Returns:
+        Tuple[Optional[int], Text]: The first component describes the levels
+            of depth this glob pattern goes to; basically the number of "/" in
+            the pattern. If there is a "**" in the glob pattern, the depth is
+            basically unbounded, and this component is `None` instead.
+            The second component is the regular expression.
+
+    """
     recursive = False
     re_patterns = [""]
     for component in iteratepath(pattern):
         if "**" in component:
             recursive = True
             split = component.split("**")
-            split_re = [_translate(s, case_sensitive=case_sensitive) for s in split]
+            split_re = [_translate(s) for s in split]
             re_patterns.append("/?" + ".*/?".join(split_re))
         else:
-            re_patterns.append(
-                "/" + _translate(component, case_sensitive=case_sensitive)
-            )
-        levels += 1
+            re_patterns.append("/" + _translate(component))
     re_glob = "(?ms)^" + "".join(re_patterns) + ("/$" if pattern.endswith("/") else "$")
-    return (
-        levels,
-        recursive,
-        re.compile(re_glob, 0 if case_sensitive else re.IGNORECASE),
-    )
+    return pattern.count("/") + 1 if not recursive else None, re_glob
 
 
 def match(pattern, path):
@@ -147,10 +154,11 @@ def match(pattern, path):
 
     """
     try:
-        levels, recursive, re_pattern = _PATTERN_CACHE[(pattern, True)]
+        levels, re_pattern = _PATTERN_CACHE[(pattern, True)]
     except KeyError:
-        levels, recursive, re_pattern = _translate_glob(pattern, case_sensitive=True)
-        _PATTERN_CACHE[(pattern, True)] = (levels, recursive, re_pattern)
+        levels, re_str = _translate_glob(pattern)
+        re_pattern = re.compile(re_str)
+        _PATTERN_CACHE[(pattern, True)] = (levels, re_pattern)
     if path and path[0] != "/":
         path = "/" + path
     return bool(re_pattern.match(path))
@@ -169,10 +177,11 @@ def imatch(pattern, path):
 
     """
     try:
-        levels, recursive, re_pattern = _PATTERN_CACHE[(pattern, False)]
+        levels, re_pattern = _PATTERN_CACHE[(pattern, False)]
     except KeyError:
-        levels, recursive, re_pattern = _translate_glob(pattern, case_sensitive=True)
-        _PATTERN_CACHE[(pattern, False)] = (levels, recursive, re_pattern)
+        levels, re_str = _translate_glob(pattern)
+        re_pattern = re.compile(re_str, re.IGNORECASE)
+        _PATTERN_CACHE[(pattern, False)] = (levels, re_pattern)
     if path and path[0] != "/":
         path = "/" + path
     return bool(re_pattern.match(path))
@@ -187,7 +196,7 @@ def match_any(patterns, path):
     Arguments:
         patterns (list): A list of wildcard pattern, e.g ``["*.py",
             "*.pyc"]``
-        name (str): A filename.
+        path (str): A resource path.
 
     Returns:
         bool: `True` if the path matches at least one of the patterns.
@@ -207,7 +216,7 @@ def imatch_any(patterns, path):
     Arguments:
         patterns (list): A list of wildcard pattern, e.g ``["*.py",
             "*.pyc"]``
-        name (str): A filename.
+        path (str): A resource path.
 
     Returns:
         bool: `True` if the path matches at least one of the patterns.
@@ -228,16 +237,17 @@ def get_matcher(patterns, case_sensitive, accept_prefix=False):
         case_sensitive (bool): If ``True``, then the callable will be case
             sensitive, otherwise it will be case insensitive.
         accept_prefix (bool): If ``True``, the name is
-            not required to match the wildcards themselves
+            not required to match the patterns themselves
             but only need to be a prefix of a string that does.
 
     Returns:
         callable: a matcher that will return `True` if the paths given as
-        an argument matches any of the given patterns.
+        an argument matches any of the given patterns, or if no patterns
+        exist.
 
     Example:
-        >>> from fs import wildcard
-        >>> is_python = wildcard.get_matcher(['*.py'], True)
+        >>> from fs import glob
+        >>> is_python = glob.get_matcher(['*.py'], True)
         >>> is_python('__init__.py')
         True
         >>> is_python('foo.txt')
@@ -245,12 +255,12 @@ def get_matcher(patterns, case_sensitive, accept_prefix=False):
 
     """
     if not patterns:
-        return lambda name: True
+        return lambda path: True
 
     if accept_prefix:
         new_patterns = []
         for pattern in patterns:
-            split = _split_pattern_by_rec(pattern)
+            split = _split_pattern_by_sep(pattern)
             for i in range(1, len(split)):
                 new_pattern = "/".join(split[:i])
                 new_patterns.append(new_pattern)
@@ -310,18 +320,15 @@ class Globber(object):
     def _make_iter(self, search="breadth", namespaces=None):
         # type: (str, List[str]) -> Iterator[GlobMatch]
         try:
-            levels, recursive, re_pattern = _PATTERN_CACHE[
-                (self.pattern, self.case_sensitive)
-            ]
+            levels, re_pattern = _PATTERN_CACHE[(self.pattern, self.case_sensitive)]
         except KeyError:
-            levels, recursive, re_pattern = _translate_glob(
-                self.pattern, case_sensitive=self.case_sensitive
-            )
+            levels, re_str = _translate_glob(self.pattern)
+            re_pattern = re.compile(re_str, 0 if self.case_sensitive else re.IGNORECASE)
 
         for path, info in self.fs.walk.info(
             path=self.path,
             namespaces=namespaces or self.namespaces,
-            max_depth=None if recursive else levels,
+            max_depth=levels,
             search=search,
             exclude_dirs=self.exclude_dirs,
         ):
