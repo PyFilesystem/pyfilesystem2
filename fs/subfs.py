@@ -21,7 +21,7 @@ _F = typing.TypeVar("_F", bound="FS", covariant=True)
 
 @six.python_2_unicode_compatible
 class SubFS(WrapFS[_F], typing.Generic[_F]):
-    """A sub-directory on another filesystem.
+    """A sub-directory on a parent filesystem.
 
     A SubFS is a filesystem object that maps to a sub-directory of
     another filesystem. This is the object that is returned by
