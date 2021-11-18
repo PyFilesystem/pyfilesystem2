@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Added
+
+### Changed
+
+### Fixed
+
+- Fixed `ResourceLocked` error translation on Windows [#484](https://github.com/PyFilesystem/pyfilesystem2/issues/484).
+
 
 ## [2.4.14] - 2021-11-16
 
