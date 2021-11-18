@@ -35,7 +35,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Fixed performance bugs in `fs.copy.copy_dir_if_newer`. Test cases were adapted to catch those bugs in the future.
 - Fixed precision bug for timestamps in `fs.OSFS.setinfo`.
-- Fixed `ResourceLocked` error translation on Windows [#484](https://github.com/PyFilesystem/pyfilesystem2/issues/484).
 
 
 ## [2.4.13] - 2021-03-27
