@@ -29,7 +29,8 @@ Here's an example taken from an Amazon S3 Filesystem::
 
   __all__ = ['S3FSOpener']
 
-  from fs.opener import Opener, OpenerError
+  from fs.opener import Opener
+  from fs.opener.errors import OpenerError
 
   from ._s3fs import S3FS
 

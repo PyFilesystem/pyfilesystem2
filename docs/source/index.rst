@@ -25,7 +25,7 @@ Contents:
    external.rst
    interface.rst
    reference.rst
-
+   contributing.md
 
 
 Indices and tables
