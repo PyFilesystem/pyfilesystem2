@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- Support more leniant usernames and group names in FTP servers [#507](https://github.com/PyFilesystem/pyfilesystem2/pull/507). Closes [#506](https://github.com/PyFilesystem/pyfilesystem2/pull/506).
 
 ## [2.4.14] - 2021-11-16
 
