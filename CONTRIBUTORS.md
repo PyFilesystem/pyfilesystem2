@@ -2,6 +2,7 @@
 
 Many thanks to the following developers for contributing to this project:
 
+- [Adrian Garcia Badaracco](https://github.com/adriangb)
 - [Alex Povel](https://github.com/alexpovel)
 - [Andreas Tollkötter](https://github.com/atollk)
 - [Andrew Scheller](https://github.com/lurch)

@@ -50,7 +50,9 @@ class TestFTPParse(unittest.TestCase):
             drwxr-xr-x   12 0        0            4096 Sep 29 13:13 pub
             -rw-r--r--    1 0        0              26 Mar 04  2010 robots.txt
             drwxr-xr-x   8 foo      bar          4096 Oct  4 09:05 test
+            drwxr-xr-x   8 f      b          4096 Oct  4 09:05 test
             drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485
+            drwxr-xr-x   2 foo.user$ foo@group_         0 Jan  5 11:59 240485
             """
         )
 
@@ -149,6 +151,18 @@ class TestFTPParse(unittest.TestCase):
             },
             {
                 "access": {
+                    "group": "b",
+                    "permissions": ["g_r", "g_x", "o_r", "o_x", "u_r", "u_w", "u_x"],
+                    "user": "f",
+                },
+                "basic": {"is_dir": True, "name": "test"},
+                "details": {"modified": 1507107900.0, "size": 4096, "type": 1},
+                "ftp": {
+                    "ls": "drwxr-xr-x   8 f      b          4096 Oct  4 09:05 test"
+                },
+            },
+            {
+                "access": {
                     "group": "foo-group",
                     "permissions": ["g_r", "g_x", "o_r", "o_x", "u_r", "u_w", "u_x"],
                     "user": "foo-user",
@@ -157,6 +171,18 @@ class TestFTPParse(unittest.TestCase):
                 "details": {"modified": 1483617540.0, "size": 0, "type": 1},
                 "ftp": {
                     "ls": "drwxr-xr-x   2 foo-user foo-group         0 Jan  5 11:59 240485"
+                },
+            },
+            {
+                "access": {
+                    "group": "foo@group_",
+                    "permissions": ["g_r", "g_x", "o_r", "o_x", "u_r", "u_w", "u_x"],
+                    "user": "foo.user$",
+                },
+                "basic": {"is_dir": True, "name": "240485"},
+                "details": {"modified": 1483617540.0, "size": 0, "type": 1},
+                "ftp": {
+                    "ls": "drwxr-xr-x   2 foo.user$ foo@group_         0 Jan  5 11:59 240485"
                 },
             },
         ]
