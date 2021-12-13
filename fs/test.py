@@ -1752,7 +1752,9 @@ class FSTestCases(object):
         self.assert_text("/foo2/bar/baz/test.txt", "Goodbye, World")
 
         self.assertEqual(sorted(self.fs.listdir("/")), ["egg", "foo2", "top.txt"])
-        self.assertEqual(sorted(x.name for x in self.fs.scandir("/")), ["egg", "foo2", "top.txt"])
+        self.assertEqual(
+            sorted(x.name for x in self.fs.scandir("/")), ["egg", "foo2", "top.txt"]
+        )
 
     def _test_move_dir_write(self, protocol):
         # Test moving to this filesystem from another.
