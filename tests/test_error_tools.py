@@ -27,7 +27,8 @@ class TestErrorTools(unittest.TestCase):
 
     @unittest.skipIf(sys.platform != "win32", "requires Windows")
     def test_convert_resourcelocked_windows(self):
-        exception = OSError(32, "resource locked")
+        # errno should be ignored on Windows so we pass in a bogus number.
+        exception = OSError(123456, "resource locked", None, 32)
         with self.assertRaises(fs.errors.ResourceLocked) as ctx:
             with convert_os_errors("stat", "/tmp/test"):
                 raise exception
