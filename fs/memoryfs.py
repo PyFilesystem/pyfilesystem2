@@ -463,8 +463,11 @@ class MemoryFS(FS):
             elif not overwrite and dst_name in dst_dir_entry:
                 raise errors.DestinationExists(dst_path)
 
+            # move the entry from the src folder to the dst folder
             dst_dir_entry.set_entry(dst_name, src_entry)
             src_dir_entry.remove_entry(src_name)
+            # make sure to update the entry name itself (see #509)
+            src_entry.name = dst_name
 
             if preserve_time:
                 copy_modified_time(self, src_path, self, dst_path)
@@ -481,12 +484,16 @@ class MemoryFS(FS):
             if not src_entry.is_dir:
                 raise errors.DirectoryExpected(src_path)
 
+            # move the entry from the src folder to the dst folder
             dst_dir_entry = self._get_dir_entry(dst_dir)
             if dst_dir_entry is None or (not create and dst_name not in dst_dir_entry):
                 raise errors.ResourceNotFound(dst_path)
 
+            # move the entry from the src folder to the dst folder
             dst_dir_entry.set_entry(dst_name, src_entry)
             src_dir_entry.remove_entry(src_name)
+            # make sure to update the entry name itself (see #509)
+            src_entry.name = dst_name
 
             if preserve_time:
                 copy_modified_time(self, src_path, self, dst_path)
