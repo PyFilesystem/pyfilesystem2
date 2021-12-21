@@ -20,6 +20,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   resources, causing `MemoryFS.scandir` to use the old name.
   ([#510](https://github.com/PyFilesystem/pyfilesystem2/pull/510)).
   Closes [#509](https://github.com/PyFilesystem/pyfilesystem2/issues/509).
+- Make `WrapFS.move` and `WrapFS.movedir` use the delegate FS methods instead
+  of `fs.move` functions, which was causing optimized implementation of 
+  `movedir` to be always skipped.
+  ([#511](https://github.com/PyFilesystem/pyfilesystem2/pull/511)).
 
 
 ## [2.4.14] - 2021-11-16
