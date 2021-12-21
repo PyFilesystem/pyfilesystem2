@@ -11,7 +11,6 @@ from . import errors
 from .base import FS
 from .copy import copy_file, copy_dir
 from .info import Info
-from .move import move_file, move_dir
 from .path import abspath, join, normpath
 from .error_tools import unwrap_errors
 
