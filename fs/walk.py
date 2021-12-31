@@ -7,10 +7,13 @@ searching etc. See :ref:`walking` for details.
 
 from __future__ import unicode_literals
 
+import abc
 import typing
 from collections import defaultdict
 from collections import deque
 from collections import namedtuple
+
+import six
 
 from ._repr import make_repr
 from .errors import FSError
@@ -45,11 +48,89 @@ Step = namedtuple("Step", "path, dirs, files")
 """
 
 
-# TODO(@althonos): It could be a good idea to create an Abstract Base Class
-#                  BaseWalker (with methods walk, files, dirs and info) ?
+@six.add_metaclass(abc.ABCMeta)
+class WalkerBase(object):
+    """A walker object recursively lists directories in a filesystem."""
+
+    @abc.abstractmethod
+    def walk(
+        self,
+        fs,  # type: FS
+        path="/",  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
+        # type: (...) -> Iterator[Step]
+        """Walk the directory structure of a filesystem.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str): A path to a directory on the filesystem.
+            namespaces (list, optional): A list of additional namespaces
+                to add to the `Info` objects.
+
+        Returns:
+            collections.Iterator: an iterator of `~fs.walk.Step` instances.
+
+        The return value is an iterator of ``(<path>, <dirs>, <files>)``
+        named tuples,  where ``<path>`` is an absolute path to a
+        directory, and ``<dirs>`` and ``<files>`` are a list of
+        `~fs.info.Info` objects for directories and files in ``<path>``.
+
+        """
+
+    @abc.abstractmethod
+    def files(self, fs, path="/"):
+        # type: (FS, Text) -> Iterator[Text]
+        """Walk a filesystem, yielding absolute paths to files.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str): A path to a directory on the filesystem.
+
+        Yields:
+            str: absolute path to files on the filesystem found
+            recursively within the given directory.
+
+        """
+
+    @abc.abstractmethod
+    def dirs(self, fs, path="/"):
+        # type: (FS, Text) -> Iterator[Text]
+        """Walk a filesystem, yielding absolute paths to directories.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str): A path to a directory on the filesystem.
+
+        Yields:
+            str: absolute path to directories on the filesystem found
+            recursively within the given directory.
+
+        """
+
+    @abc.abstractmethod
+    def info(
+        self,
+        fs,  # type: FS
+        path="/",  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
+        # type: (...) -> Iterator[Tuple[Text, Info]]
+        """Walk a filesystem, yielding tuples of ``(<path>, <info>)``.
+
+        Arguments:
+            fs (FS): A filesystem instance.
+            path (str): A path to a directory on the filesystem.
+            namespaces (list, optional): A list of additional namespaces
+                to add to the `Info` objects.
+
+        Yields:
+            (str, Info): a tuple of ``(<absolute path>, <resource info>)``.
+
+        """
 
 
-class Walker(object):
+class Walker(WalkerBase):
     """A walker object recursively lists directories in a filesystem."""
 
     def __init__(

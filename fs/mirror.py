@@ -26,7 +26,7 @@ from .copy import copy_file_internal
 from .errors import ResourceNotFound
 from .opener import manage_fs
 from .tools import is_thread_safe
-from .walk import Walker
+from .walk import Walker, WalkerBase
 
 if typing.TYPE_CHECKING:
     from typing import Callable, Optional, Text, Union
@@ -54,7 +54,7 @@ def _compare(info1, info2):
 def mirror(
     src_fs,  # type: Union[FS, Text]
     dst_fs,  # type: Union[FS, Text]
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     copy_if_newer=True,  # type: bool
     workers=0,  # type: int
     preserve_time=False,  # type: bool
@@ -104,7 +104,7 @@ def mirror(
 def _mirror(
     src_fs,  # type: FS
     dst_fs,  # type: FS
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     copy_if_newer=True,  # type: bool
     copy_file=copy_file_internal,  # type: Callable[[FS, str, FS, str, bool], None]
     preserve_time=False,  # type: bool
