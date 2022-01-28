@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support more lenient usernames and group names in FTP servers
   ([#507](https://github.com/PyFilesystem/pyfilesystem2/pull/507)).
   Closes [#506](https://github.com/PyFilesystem/pyfilesystem2/issues/506).
+- Removed dependency on pytz ([#518](https://github.com/PyFilesystem/pyfilesystem2/pull/518)).
+  Closes [#516](https://github.com/PyFilesystem/pyfilesystem2/issues/518).
 
 ### Fixed
 

@@ -6,16 +6,10 @@ from __future__ import unicode_literals
 
 import typing
 from calendar import timegm
-from datetime import datetime
-from pytz import UTC, timezone
+from datetime import datetime, timezone
 
 if typing.TYPE_CHECKING:
     from typing import Optional
-
-
-utcfromtimestamp = datetime.utcfromtimestamp
-utclocalize = UTC.localize
-GMT = timezone("GMT")
 
 
 def datetime_to_epoch(d):
@@ -39,4 +33,6 @@ def epoch_to_datetime(t):  # noqa: D103
 def epoch_to_datetime(t):
     # type: (Optional[int]) -> Optional[datetime]
     """Convert epoch time to a UTC datetime."""
-    return utclocalize(utcfromtimestamp(t)) if t is not None else None
+    if t is None:
+        return None
+    return datetime.fromtimestamp(t, tz=timezone.utc)
