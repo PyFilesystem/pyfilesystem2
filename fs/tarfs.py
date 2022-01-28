@@ -185,6 +185,9 @@ class WriteTarFS(WrapFS):
         # type: () -> Text
         return "<TarFS-write '{}'>".format(self._file)
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self._file == other._file
+
     def delegate_path(self, path):
         # type: (Text) -> Tuple[FS, Text]
         return self._temp_fs, path
@@ -302,6 +305,9 @@ class ReadTarFS(FS):
     def __str__(self):
         # type: () -> Text
         return "<TarFS '{}'>".format(self._file)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self._file == other._file
 
     if six.PY2:
 

@@ -130,6 +130,18 @@ class FS(object):
         """Close filesystem on exit."""
         self.close()
 
+    def __eq__(self, other):
+        if isinstance(other, self.__class__):
+            try:
+                return self.getsyspath("/") == other.getsyspath("/")
+            except errors.NoSysPath:
+                pass
+            try:
+                return self.geturl("/") == other.geturl("/")
+            except errors.NoURL:
+                pass
+        return False
+
     @property
     def glob(self):
         """`~fs.glob.BoundGlobber`: a globber object.."""
