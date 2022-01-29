@@ -6,7 +6,12 @@ from __future__ import unicode_literals
 
 import typing
 from calendar import timegm
-from datetime import datetime, timezone
+from datetime import datetime
+
+try:
+    from datetime import timezone
+except ImportError:
+    from ._tzcompat import timezone  # type: ignore
 
 if typing.TYPE_CHECKING:
     from typing import Optional

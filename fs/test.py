@@ -8,7 +8,7 @@ All Filesystems should be able to pass these.
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-from datetime import datetime, timezone
+from datetime import datetime
 import io
 import itertools
 import json
@@ -33,6 +33,11 @@ if six.PY2:
     import collections as collections_abc
 else:
     import collections.abc as collections_abc
+
+try:
+    from datetime import timezone
+except ImportError:
+    from ._tzcompat import timezone  # type: ignore
 
 
 UNICODE_TEXT = """

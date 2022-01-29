@@ -5,7 +5,12 @@ from __future__ import unicode_literals
 import unicodedata
 import re
 import time
-from datetime import datetime, timezone
+from datetime import datetime
+
+try:
+    from datetime import timezone
+except ImportError:
+    from ._tzcompat import timezone  # type: ignore
 
 from .enums import ResourceType
 from .permissions import Permissions
