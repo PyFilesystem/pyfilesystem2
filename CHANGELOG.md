@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+
+## [2.4.15] - 2022-02-07
+
 ### Changed
 
 - Support more lenient usernames and group names in FTP servers
