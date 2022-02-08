@@ -6,6 +6,7 @@ from parameterized import parameterized_class
 
 import fs.move
 from fs import open_fs
+from fs.path import join
 
 
 @parameterized_class(("preserve_time",), [(True,), (False,)])
@@ -36,6 +37,17 @@ class TestMove(unittest.TestCase):
             dst_file2_info = dst_fs.getinfo("foo/bar/baz.txt", namespaces)
             self.assertEqual(dst_file1_info.modified, src_file1_info.modified)
             self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
+
+    def test_move_file(self):
+        with open_fs("temp://") as temp:
+            syspath = temp.getsyspath("/")
+            a = open_fs(syspath)
+            a.makedir("dir")
+            b = open_fs(join(syspath, "dir"))
+            b.writetext("file.txt", "Content")
+            fs.move.move_file(b, "file.txt", a, "here.txt")
+            self.assertEqual(a.readtext("here.txt"), "Content")
+            self.assertFalse(b.exists("file.txt"))
 
     def test_move_dir(self):
         namespaces = ("details", "modified")
