@@ -4,6 +4,7 @@
 from __future__ import print_function
 from __future__ import unicode_literals
 
+import sys
 import typing
 import zipfile
 from datetime import datetime
@@ -51,74 +52,126 @@ class _ZipExtFile(RawWrapper):
         self._pos = 0
         super(_ZipExtFile, self).__init__(_zip.open(name), "r", name)
 
-    def read(self, size=-1):
-        # type: (int) -> bytes
-        buf = self._f.read(-1 if size is None else size)
-        self._pos += len(buf)
-        return buf
+    # NOTE(@althonos): Starting from Python 3.7, files inside a Zip archive are
+    #                  seekable provided they were opened from a seekable file
+    #                  handle. Before that, we can emulate a seek using the
+    #                  read method, although it adds a ton of overhead and is
+    #                  way less efficient than extracting once to a BytesIO.
+    if sys.version_info < (3, 7):
 
-    def read1(self, size=-1):
-        # type: (int) -> bytes
-        buf = self._f.read1(-1 if size is None else size)  # type: ignore
-        self._pos += len(buf)
-        return buf
+        def read(self, size=-1):
+            # type: (int) -> bytes
+            buf = self._f.read(-1 if size is None else size)
+            self._pos += len(buf)
+            return buf
 
-    def seek(self, offset, whence=Seek.set):
-        # type: (int, SupportsInt) -> int
-        """Change stream position.
+        def read1(self, size=-1):
+            # type: (int) -> bytes
+            buf = self._f.read1(-1 if size is None else size)  # type: ignore
+            self._pos += len(buf)
+            return buf
 
-        Change the stream position to the given byte offset. The
-        offset is interpreted relative to the position indicated by
-        ``whence``.
+        def tell(self):
+            # type: () -> int
+            return self._pos
 
-        Arguments:
-            offset (int): the offset to the new position, in bytes.
-            whence (int): the position reference. Possible values are:
-                * `Seek.set`: start of stream (the default).
-                * `Seek.current`: current position; offset may be negative.
-                * `Seek.end`: end of stream; offset must be negative.
+        def seekable(self):
+            return True
 
-        Returns:
-            int: the new absolute position.
+        def seek(self, offset, whence=Seek.set):
+            # type: (int, SupportsInt) -> int
+            """Change stream position.
 
-        Raises:
-            ValueError: when ``whence`` is not known, or ``offset``
-                is invalid.
+            Change the stream position to the given byte offset. The
+            offset is interpreted relative to the position indicated by
+            ``whence``.
 
-        Note:
-            Zip compression does not support seeking, so the seeking
-            is emulated. Seeking somewhere else than the current position
-            will need to either:
-                * reopen the file and restart decompression
-                * read and discard data to advance in the file
+            Arguments:
+                offset (int): the offset to the new position, in bytes.
+                whence (int): the position reference. Possible values are:
+                    * `Seek.set`: start of stream (the default).
+                    * `Seek.current`: current position; offset may be negative.
+                    * `Seek.end`: end of stream; offset must be negative.
 
-        """
-        _whence = int(whence)
-        if _whence == Seek.current:
-            offset += self._pos
-        if _whence == Seek.current or _whence == Seek.set:
-            if offset < 0:
-                raise ValueError("Negative seek position {}".format(offset))
-        elif _whence == Seek.end:
-            if offset > 0:
-                raise ValueError("Positive seek position {}".format(offset))
-            offset += self._end
-        else:
-            raise ValueError(
-                "Invalid whence ({}, should be {}, {} or {})".format(
-                    _whence, Seek.set, Seek.current, Seek.end
+            Returns:
+                int: the new absolute position.
+
+            Raises:
+                ValueError: when ``whence`` is not known, or ``offset``
+                    is invalid.
+
+            Note:
+                Zip compression does not support seeking, so the seeking
+                is emulated. Seeking somewhere else than the current position
+                will need to either:
+                    * reopen the file and restart decompression
+                    * read and discard data to advance in the file
+
+            """
+            _whence = int(whence)
+            if _whence == Seek.current:
+                offset += self._pos
+            if _whence == Seek.current or _whence == Seek.set:
+                if offset < 0:
+                    raise ValueError("Negative seek position {}".format(offset))
+            elif _whence == Seek.end:
+                if offset > 0:
+                    raise ValueError("Positive seek position {}".format(offset))
+                offset += self._end
+            else:
+                raise ValueError(
+                    "Invalid whence ({}, should be {}, {} or {})".format(
+                        _whence, Seek.set, Seek.current, Seek.end
+                    )
                 )
-            )
 
-        if offset < self._pos:
-            self._f = self._zip.open(self.name)  # type: ignore
-            self._pos = 0
-        self.read(offset - self._pos)
-        return self._pos
+            if offset < self._pos:
+                self._f = self._zip.open(self.name)  # type: ignore
+                self._pos = 0
+            self.read(offset - self._pos)
+            return self._pos
 
-    def tell(self):
-        # type: () -> int
-        return self._pos
+    else:
+
+        def seek(self, offset, whence=Seek.set):
+            # type: (int, SupportsInt) -> int
+            """Change stream position.
+
+            Change the stream position to the given byte offset. The
+            offset is interpreted relative to the position indicated by
+            ``whence``.
+
+            Arguments:
+                offset (int): the offset to the new position, in bytes.
+                whence (int): the position reference. Possible values are:
+                    * `Seek.set`: start of stream (the default).
+                    * `Seek.current`: current position; offset may be negative.
+                    * `Seek.end`: end of stream; offset must be negative.
+
+            Returns:
+                int: the new absolute position.
+
+            Raises:
+                ValueError: when ``whence`` is not known, or ``offset``
+                    is invalid.
+
+            """
+            _whence = int(whence)
+            _pos = self.tell()
+            if _whence == Seek.current or _whence == Seek.set:
+                if _pos + offset < 0:
+                    raise ValueError("Negative seek position {}".format(offset))
+            elif _whence == Seek.end:
+                if _pos + offset > 0:
+                    raise ValueError("Positive seek position {}".format(offset))
+            else:
+                raise ValueError(
+                    "Invalid whence ({}, should be {}, {} or {})".format(
+                        _whence, Seek.set, Seek.current, Seek.end
+                    )
+                )
+
+            return self._f.seek(offset, _whence)
 
 
 class ZipFS(WrapFS):
@@ -279,7 +332,7 @@ class ReadZipFS(FS):
     """A readable zip file."""
 
     _meta = {
-        "case_insensitive": True,
+        "case_insensitive": False,
         "network": False,
         "read_only": True,
         "supports_rename": False,
