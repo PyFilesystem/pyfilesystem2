@@ -332,7 +332,7 @@ class ReadZipFS(FS):
     """A readable zip file."""
 
     _meta = {
-        "case_insensitive": True,
+        "case_insensitive": False,
         "network": False,
         "read_only": True,
         "supports_rename": False,
