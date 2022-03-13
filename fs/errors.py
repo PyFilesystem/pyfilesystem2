@@ -51,6 +51,7 @@ __all__ = [
     "ResourceNotFound",
     "ResourceReadOnly",
     "Unsupported",
+    "UnsupportedHash",
 ]
 
 

@@ -39,7 +39,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx'
+    'sphinx.ext.intersphinx',
+    "recommonmark",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -63,7 +64,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'PyFilesystem'
-copyright = u'2016-2017, Will McGugan'
+copyright = u'2016-2021, Will McGugan and the PyFilesystem2 contributors'
 author = u'Will McGugan'
 
 # The version info for the project you're documenting, acts as replacement for

@@ -8,6 +8,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         python-version:
           - 2.7
@@ -16,6 +17,7 @@ jobs:
           - 3.7
           - 3.8
           - 3.9
+          - '3.10'
           - pypy-2.7
           - pypy-3.6
           - pypy-3.7
@@ -44,10 +46,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v1
-    - name: Setup Python 3.9
+    - name: Setup Python 3.10
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: '3.10'
     - name: Install coverage package
       run: python -m pip install -U coverage
     - name: Download partial coverage reports
@@ -76,10 +78,10 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v1
-    - name: Setup Python 3.9
+    - name: Setup Python '3.10'
       uses: actions/setup-python@v2
       with:
-        python-version: 3.9
+        python-version: '3.10'
     - name: Update pip
       run: python -m pip install -U pip wheel setuptools
     - name: Install tox

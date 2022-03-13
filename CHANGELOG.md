@@ -8,18 +8,43 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+
+## [2.4.15] - 2022-02-07
+
+### Changed
+
+- Support more lenient usernames and group names in FTP servers
+  ([#507](https://github.com/PyFilesystem/pyfilesystem2/pull/507)).
+  Closes [#506](https://github.com/PyFilesystem/pyfilesystem2/issues/506).
+- Removed dependency on pytz ([#518](https://github.com/PyFilesystem/pyfilesystem2/pull/518)).
+  Closes [#516](https://github.com/PyFilesystem/pyfilesystem2/issues/518).
+
+### Fixed
+
+- Fixed `MemoryFS.move` and `MemoryFS.movedir` not updating the name of moved
+  resources, causing `MemoryFS.scandir` to use the old name.
+  ([#510](https://github.com/PyFilesystem/pyfilesystem2/pull/510)).
+  Closes [#509](https://github.com/PyFilesystem/pyfilesystem2/issues/509).
+- Make `WrapFS.move` and `WrapFS.movedir` use the delegate FS methods instead
+  of `fs.move` functions, which was causing optimized implementation of 
+  `movedir` to be always skipped.
+  ([#511](https://github.com/PyFilesystem/pyfilesystem2/pull/511)).
+
+
+## [2.4.14] - 2021-11-16
+
 ### Added
 
-- Added `fs.copy.copy_file_if`, `fs.copy.copy_dir_if`, and `fs.copy.copy_fs_if`. 
+- Added `fs.copy.copy_file_if`, `fs.copy.copy_dir_if`, and `fs.copy.copy_fs_if`.
   Closes [#458](https://github.com/PyFilesystem/pyfilesystem2/issues/458).
 - Added `fs.base.FS.getmodified`.
-  
+
 ### Changed
 
 - FTP servers that do not support the MLST command now try to use the MDTM command to
-  retrieve the last modification timestamp of a resource. 
+  retrieve the last modification timestamp of a resource.
   Closes [#456](https://github.com/PyFilesystem/pyfilesystem2/pull/456).
-  
+
 ### Fixed
 
 - Fixed performance bugs in `fs.copy.copy_dir_if_newer`. Test cases were adapted to catch those bugs in the future.

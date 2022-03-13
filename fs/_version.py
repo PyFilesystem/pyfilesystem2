@@ -1,3 +1,3 @@
 """Version, used in module and setup.py.
 """
-__version__ = "2.4.13"
+__version__ = "2.4.15"

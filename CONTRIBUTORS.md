@@ -2,10 +2,12 @@
 
 Many thanks to the following developers for contributing to this project:
 
+- [Adrian Garcia Badaracco](https://github.com/adriangb)
 - [Alex Povel](https://github.com/alexpovel)
 - [Andreas Tollkötter](https://github.com/atollk)
 - [Andrew Scheller](https://github.com/lurch)
 - [Andrey Serov](https://github.com/zmej-serow)
+- [Ben Lindsay](https://github.com/benlindsay)
 - [Bernhard M. Wiedemann](https://github.com/bmwiedemann)
 - [@chfw](https://github.com/chfw)
 - [Dafna Hirschfeld](https://github.com/kamomil)
@@ -17,6 +19,7 @@ Many thanks to the following developers for contributing to this project:
 - [George Macon](https://github.com/gmacon)
 - [Giampaolo Cimino](https://github.com/gpcimino)
 - [@Hoboneer](https://github.com/Hoboneer)
+- [Jon Hagg](https://github.com/jon-hagg)
 - [Joseph Atkins-Turkish](https://github.com/Spacerat)
 - [Joshua Tauberer](https://github.com/JoshData)
 - [Justin Charlong](https://github.com/jcharlong)

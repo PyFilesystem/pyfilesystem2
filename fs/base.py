@@ -910,7 +910,8 @@ class FS(object):
                 to retrieve for the given path (if there is more than
                 one). The default is ``'download'``, which should return
                 a URL that serves the file. Other filesystems may support
-                other values for ``purpose``.
+                other values for ``purpose``: for instance, `OSFS` supports
+                ``'fs'``, which returns a FS URL (see :ref:`fs-urls`).
 
         Returns:
             str: a URL.

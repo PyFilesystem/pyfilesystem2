@@ -26,7 +26,6 @@ from fs import glob
 from fs.opener import open_fs
 from fs.subfs import ClosingSubFS, SubFS
 
-import pytz
 import six
 from six import text_type
 
@@ -34,6 +33,11 @@ if six.PY2:
     import collections as collections_abc
 else:
     import collections.abc as collections_abc
+
+try:
+    from datetime import timezone
+except ImportError:
+    from ._tzcompat import timezone  # type: ignore
 
 
 UNICODE_TEXT = """
@@ -1196,9 +1200,9 @@ class FSTestCases(object):
         can_write_acccess = info.is_writeable("details", "accessed")
         can_write_modified = info.is_writeable("details", "modified")
         if can_write_acccess:
-            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=timezone.utc))
         if can_write_modified:
-            self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+            self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=timezone.utc))
 
     def test_touch(self):
         self.fs.touch("new.txt")
@@ -1206,7 +1210,7 @@ class FSTestCases(object):
         self.fs.settimes("new.txt", datetime(2016, 7, 5))
         info = self.fs.getinfo("new.txt", namespaces=["details"])
         if info.is_writeable("details", "accessed"):
-            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=timezone.utc))
             now = time.time()
             self.fs.touch("new.txt")
             accessed = self.fs.getinfo("new.txt", namespaces=["details"]).raw[
@@ -1738,6 +1742,24 @@ class FSTestCases(object):
         self._test_copy_dir("temp://")
         self._test_copy_dir_write("temp://")
 
+    def test_move_dir_same_fs(self):
+        self.fs.makedirs("foo/bar/baz")
+        self.fs.makedir("egg")
+        self.fs.writetext("top.txt", "Hello, World")
+        self.fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
+
+        fs.move.move_dir(self.fs, "foo", self.fs, "foo2")
+
+        expected = {"/egg", "/foo2", "/foo2/bar", "/foo2/bar/baz"}
+        self.assertEqual(set(walk.walk_dirs(self.fs)), expected)
+        self.assert_text("top.txt", "Hello, World")
+        self.assert_text("/foo2/bar/baz/test.txt", "Goodbye, World")
+
+        self.assertEqual(sorted(self.fs.listdir("/")), ["egg", "foo2", "top.txt"])
+        self.assertEqual(
+            sorted(x.name for x in self.fs.scandir("/")), ["egg", "foo2", "top.txt"]
+        )
+
     def _test_move_dir_write(self, protocol):
         # Test moving to this filesystem from another.
         other_fs = open_fs(protocol)
@@ -1760,19 +1782,6 @@ class FSTestCases(object):
     def test_move_dir_temp(self):
         self._test_move_dir_write("temp://")
 
-    def test_move_same_fs(self):
-        self.fs.makedirs("foo/bar/baz")
-        self.fs.makedir("egg")
-        self.fs.writetext("top.txt", "Hello, World")
-        self.fs.writetext("/foo/bar/baz/test.txt", "Goodbye, World")
-
-        fs.move.move_dir(self.fs, "foo", self.fs, "foo2")
-
-        expected = {"/egg", "/foo2", "/foo2/bar", "/foo2/bar/baz"}
-        self.assertEqual(set(walk.walk_dirs(self.fs)), expected)
-        self.assert_text("top.txt", "Hello, World")
-        self.assert_text("/foo2/bar/baz/test.txt", "Goodbye, World")
-
     def test_move_file_same_fs(self):
         text = "Hello, World"
         self.fs.makedir("foo").writetext("test.txt", text)
@@ -1781,6 +1790,9 @@ class FSTestCases(object):
         fs.move.move_file(self.fs, "foo/test.txt", self.fs, "foo/test2.txt")
         self.assert_not_exists("foo/test.txt")
         self.assert_text("foo/test2.txt", text)
+
+        self.assertEqual(self.fs.listdir("foo"), ["test2.txt"])
+        self.assertEqual(next(self.fs.scandir("foo")).name, "test2.txt")
 
     def _test_move_file(self, protocol):
         other_fs = open_fs(protocol)

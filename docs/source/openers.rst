@@ -56,3 +56,25 @@ To open a filesysem with a FS URL, you can use :meth:`~fs.opener.registry.Regist
 
     from fs import open_fs
     projects_fs = open_fs('osfs://~/projects')
+
+
+Manually registering Openers
+----------------------------
+
+The ``fs.opener`` registry uses an entry point to install external openers
+(see :ref:`extension`), and it does so once, when you import `fs` for the first
+time. In some rare cases where entry points are not available (for instance,
+when running an embedded interpreter) or when extensions are installed *after*
+the interpreter has started (for instance in a notebook, see
+`PyFilesystem2#485 <https://github.com/PyFilesystem/pyfilesystem2/issues/485>`_).
+
+However, a new opener can be installed manually at any time with the
+`fs.opener.registry.install` method. For instance, here's how the opener for
+the `s3fs <https://github.com/PyFilesystem/s3fs>`_ extension can be added to
+the registry::
+
+    import fs.opener
+    from fs_s3fs.opener import S3FSOpener
+
+    fs.opener.registry.install(S3FSOpener)
+    # fs.open_fs("s3fs://...") should now work
