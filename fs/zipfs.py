@@ -158,11 +158,14 @@ class _ZipExtFile(RawWrapper):
             """
             _whence = int(whence)
             _pos = self.tell()
-            if _whence == Seek.current or _whence == Seek.set:
+            if _whence == Seek.set:
+                if offset < 0:
+                    raise ValueError("Negative seek position {}".format(offset))
+            elif _whence == Seek.current:
                 if _pos + offset < 0:
                     raise ValueError("Negative seek position {}".format(offset))
             elif _whence == Seek.end:
-                if _pos + offset > 0:
+                if offset > 0:
                     raise ValueError("Positive seek position {}".format(offset))
             else:
                 raise ValueError(
