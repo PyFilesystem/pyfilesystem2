@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Changed
+
+- Replaced `appdirs` with `platformdirs` dependency 
+  ([#489](https://github.com/PyFilesystem/pyfilesystem2/pull/489)).
+
 
 ## [2.4.15] - 2022-02-07
 
