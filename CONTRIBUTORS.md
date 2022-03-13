@@ -27,6 +27,7 @@ Many thanks to the following developers for contributing to this project:
 - [Martin Durant](https://github.com/martindurant)
 - [Martin Larralde](https://github.com/althonos)
 - [Masaya Nakamura](https://github.com/mashabow)
+- [Matthew Gamble](https://github.com/djmattyg007)
 - [Morten Engelhardt Olsen](https://github.com/xoriath)
 - [@mrg0029](https://github.com/mrg0029)
 - [Nathan Goldbaum](https://github.com/ngoldbaum)
