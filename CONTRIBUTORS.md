@@ -14,6 +14,7 @@ Many thanks to the following developers for contributing to this project:
 - [Diego Argueta](https://github.com/dargueta)
 - [Eelke van den Bos](https://github.com/eelkevdbos)
 - [Egor Namakonov](https://github.com/fresheed)
+- [Felix Yan](https://github.com/felixonmars)
 - [@FooBarQuaxx](https://github.com/FooBarQuaxx)
 - [Geoff Jukes](https://github.com/geoffjukes)
 - [George Macon](https://github.com/gmacon)
