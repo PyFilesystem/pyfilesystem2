@@ -12,6 +12,7 @@ import abc
 import hashlib
 import itertools
 import os
+import shutil
 import threading
 import time
 import typing
@@ -1305,17 +1306,20 @@ class FS(object):
                 True
 
         """
-        _dir_path = abspath(normpath(dir_path))
         with self._lock:
-            walker = walk.Walker(search="depth")
-            gen_info = walker.info(self, _dir_path)
-            for _path, info in gen_info:
-                if info.is_dir:
-                    self.removedir(_path)
-                else:
-                    self.remove(_path)
-            if _dir_path != "/":
-                self.removedir(dir_path)
+            if self.hassyspath(path):
+                shutil.rmtree(self.getsyspath(path))
+            else:
+                _dir_path = abspath(normpath(dir_path))
+                walker = walk.Walker(search="depth")
+                gen_info = walker.info(self, _dir_path)
+                for _path, info in gen_info:
+                    if info.is_dir:
+                        self.removedir(_path)
+                    else:
+                        self.remove(_path)
+                if _dir_path != "/":
+                    self.removedir(dir_path)
 
     def scandir(
         self,
