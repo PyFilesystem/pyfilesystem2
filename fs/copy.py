@@ -10,7 +10,7 @@ from .errors import ResourceNotFound
 from .opener import manage_fs
 from .path import abspath, combine, frombase, normpath
 from .tools import is_thread_safe
-from .walk import Walker
+from .walk import Walker, WalkerBase
 
 if typing.TYPE_CHECKING:
     from typing import Callable, Optional, Text, Union
@@ -22,7 +22,7 @@ if typing.TYPE_CHECKING:
 def copy_fs(
     src_fs,  # type: Union[FS, Text]
     dst_fs,  # type: Union[FS, Text]
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
     preserve_time=False,  # type: bool
@@ -53,7 +53,7 @@ def copy_fs(
 def copy_fs_if_newer(
     src_fs,  # type: Union[FS, Text]
     dst_fs,  # type: Union[FS, Text]
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
     preserve_time=False,  # type: bool
@@ -77,7 +77,7 @@ def copy_fs_if(
     src_fs,  # type: Union[FS, Text]
     dst_fs,  # type: Union[FS, Text]
     condition="always",  # type: Text
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
     preserve_time=False,  # type: bool
@@ -282,7 +282,7 @@ def copy_file_internal(
 def copy_structure(
     src_fs,  # type: Union[FS, Text]
     dst_fs,  # type: Union[FS, Text]
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     src_root="/",  # type: Text
     dst_root="/",  # type: Text
 ):
@@ -316,7 +316,7 @@ def copy_dir(
     src_path,  # type: Text
     dst_fs,  # type: Union[FS, Text]
     dst_path,  # type: Text
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
     preserve_time=False,  # type: bool
@@ -359,7 +359,7 @@ def copy_dir_if_newer(
     src_path,  # type: Text
     dst_fs,  # type: Union[FS, Text]
     dst_path,  # type: Text
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
     preserve_time=False,  # type: bool
@@ -393,7 +393,7 @@ def copy_dir_if(
     dst_fs,  # type: Union[FS, Text]
     dst_path,  # type: Text
     condition,  # type: Text
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
     on_copy=None,  # type: Optional[_OnCopy]
     workers=0,  # type: int
     preserve_time=False,  # type: bool
@@ -407,7 +407,7 @@ def copy_dir_if(
         dst_fs (FS or str): Destination filesystem (instance or URL).
         dst_path (str): Path to a directory on the destination filesystem.
         condition (str): Name of the condition to check for each file.
-        walker (~fs.walk.Walker, optional): A walker object that will be
+        walker (~fs.walk.WalkerBase, optional): A walker object that will be
             used to scan for files in ``src_fs``. Set this if you only want
             to consider a sub-set of the resources in ``src_fs``.
         on_copy (callable):A function callback called after a single file copy

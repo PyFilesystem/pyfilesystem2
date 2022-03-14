@@ -20,7 +20,7 @@ from .enums import ResourceType
 from .path import relpath
 from .time import datetime_to_epoch
 from .errors import NoSysPath, MissingInfoNamespace
-from .walk import Walker
+from .walk import Walker, WalkerBase
 
 if typing.TYPE_CHECKING:
     from typing import BinaryIO, Optional, Text, Tuple, Union
@@ -34,7 +34,7 @@ def write_zip(
     file,  # type: Union[Text, BinaryIO]
     compression=zipfile.ZIP_DEFLATED,  # type: int
     encoding="utf-8",  # type: Text
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
 ):
     # type: (...) -> None
     """Write the contents of a filesystem to a zip file.
@@ -110,7 +110,7 @@ def write_tar(
     file,  # type: Union[Text, BinaryIO]
     compression=None,  # type: Optional[Text]
     encoding="utf-8",  # type: Text
-    walker=None,  # type: Optional[Walker]
+    walker=None,  # type: Optional[WalkerBase]
 ):
     # type: (...) -> None
     """Write the contents of a filesystem to a tar file.
