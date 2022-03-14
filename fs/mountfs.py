@@ -13,8 +13,10 @@ from . import errors
 from .base import FS
 from .memoryfs import MemoryFS
 from .path import abspath
+from .path import dirname
 from .path import forcedir
 from .path import normpath
+from .path import recursepath
 from .mode import validate_open_mode
 from .mode import validate_openbin_mode
 
@@ -23,10 +25,10 @@ if typing.TYPE_CHECKING:
         Any,
         BinaryIO,
         Collection,
+        Dict,
         Iterator,
         IO,
         List,
-        MutableSequence,
         Optional,
         Text,
         Tuple,
@@ -67,7 +69,7 @@ class MountFS(FS):
         super(MountFS, self).__init__()
         self.auto_close = auto_close
         self.default_fs = MemoryFS()  # type: FS
-        self.mounts = []  # type: MutableSequence[Tuple[Text, FS]]
+        self.mounts = {}  # type: Dict[Text, FS]
 
     def __repr__(self):
         # type: () -> str
@@ -85,19 +87,26 @@ class MountFS(FS):
             path (str): A path.
 
         Returns:
-            (FS, str): a tuple of ``(<fs>, <path>)`` for a mounted filesystem,
-            or ``(None, None)`` if no filesystem is mounted on the
+            (FS, str): a tuple of ``(<fs>, <path>)`` for a mounted filesystem.
+            Raises  ``ResourceNotFound`` if no filesystem is mounted on the
             given ``path``.
 
         """
         _path = forcedir(abspath(normpath(path)))
         is_mounted = _path.startswith
 
-        for mount_path, fs in self.mounts:
-            if is_mounted(mount_path):
-                return fs, _path[len(mount_path) :].rstrip("/")
+        if _path == "/":
+            return self.default_fs, path
 
-        return self.default_fs, path
+        for mount_path in self.mounts:
+            if is_mounted(mount_path):
+                return self.mounts[mount_path], _path[len(mount_path) :].rstrip("/")
+
+        for mount_path in self.mounts:
+            if mount_path.startswith(_path):
+                return self.default_fs, path
+
+        raise errors.ResourceNotFound(path)
 
     def mount(self, path, fs):
         # type: (Text, Union[FS, Text]) -> None
@@ -120,28 +129,53 @@ class MountFS(FS):
             raise ValueError("Unable to mount self")
         _path = forcedir(abspath(normpath(path)))
 
-        for mount_path, _ in self.mounts:
+        if _path == "/":
+            raise MountError("mount point can't be empty")
+
+        for mount_path in self.mounts:
             if _path.startswith(mount_path):
                 raise MountError("mount point overlaps existing mount")
 
-        self.mounts.append((_path, fs))
+        self.mounts[_path] = fs
         self.default_fs.makedirs(_path, recreate=True)
+
+    def unmount(self, path):
+        # type: (Text) -> None
+        """Unmounts a previously-mounted FS.
+
+        Arguments:
+            path (str): A mount-path previously used with ``mount``.
+
+        """
+        _path = forcedir(abspath(normpath(path)))
+        if _path not in self.mounts:
+            raise ValueError("not a current mount point")
+
+        if self.auto_close:
+            self.mounts[_path].close()
+        del self.mounts[_path]
+        self.default_fs.removedir(_path)
+        for parent in recursepath(dirname(_path.rstrip("/")), reverse=True):
+            if parent == "/" or not self.default_fs.isempty(parent):
+                break
+            else:
+                self.default_fs.removedir(parent)
 
     def close(self):
         # type: () -> None
         # Explicitly closes children if requested
         if self.auto_close:
-            for _path, fs in self.mounts:
+            for fs in self.mounts.values():
                 fs.close()
-            del self.mounts[:]
+            self.mounts.clear()
         self.default_fs.close()
         super(MountFS, self).close()
 
     def desc(self, path):
         # type: (Text) -> Text
+        fs, delegate_path = self._delegate(path)
         if not self.exists(path):
             raise errors.ResourceNotFound(path)
-        fs, delegate_path = self._delegate(path)
         if fs is self.default_fs:
             fs = self
         return "{path} on {fs}".format(fs=fs, path=delegate_path)
