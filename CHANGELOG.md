@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- ZipFS and TarFS no longer return a syspath.
+  Closes [#528](https://github.com/PyFilesystem/pyfilesystem2/issues/528).
+
 
 ## [2.4.15] - 2022-02-07
 
