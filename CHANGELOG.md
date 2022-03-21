@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Changed
+
+- Replaced `appdirs` with `platformdirs` dependency 
+  ([#489](https://github.com/PyFilesystem/pyfilesystem2/pull/489)).
+- Make `fs.zipfs._ZipExtFile` use the seeking mechanism implemented
+  in the Python standard library in Python version 3.7 and later
+  ([#527](https://github.com/PyFilesystem/pyfilesystem2/pull/527)).
+- Mark `fs.zipfs.ReadZipFS` as a case-sensitive filesystem
+  ([#527](https://github.com/PyFilesystem/pyfilesystem2/pull/527)). 
 - ZipFS and TarFS no longer return a syspath.
   Closes [#528](https://github.com/PyFilesystem/pyfilesystem2/issues/528).
 
