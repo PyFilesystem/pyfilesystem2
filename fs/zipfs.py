@@ -226,6 +226,9 @@ class WriteZipFS(WrapFS):
         # type: () -> Text
         return "<zipfs-write '{}'>".format(self._file)
 
+    def getsyspath(self, path):
+        raise errors.NoSysPath(path=path)
+
     def delegate_path(self, path):
         # type: (Text) -> Tuple[FS, Text]
         return self._temp_fs, path
@@ -453,3 +456,6 @@ class ReadZipFS(FS):
             return "zip://{}!/{}".format(quoted_file, quoted_path)
         else:
             raise errors.NoURL(path, purpose)
+
+    def getsyspath(self, path):
+        raise errors.NoSysPath(path=path)
