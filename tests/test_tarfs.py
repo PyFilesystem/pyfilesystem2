@@ -13,7 +13,7 @@ from fs.enums import ResourceType
 from fs.compress import write_tar
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
-from fs.errors import NoURL
+from fs.errors import NoURL, NoSysPath
 from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases
@@ -63,6 +63,10 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
         fs.close()
         os.remove(fs._tar_file)
         del fs._tar_file
+
+    def test_nosyspath(self):
+        with self.assertRaises(NoSysPath):
+            self.fs.getsyspath("/test")
 
 
 class TestWriteTarFSToFileobj(FSTestCases, unittest.TestCase):
@@ -215,6 +219,10 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         test_file = "foo/bar/egg/foofoo"
         with self.assertRaises(NoURL):
             self.fs.geturl(test_file)
+
+    def test_nosyspath(self):
+        with self.assertRaises(NoSysPath):
+            self.fs.getsyspath("/test")
 
 
 class TestBrokenPaths(unittest.TestCase):

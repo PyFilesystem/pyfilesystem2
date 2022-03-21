@@ -13,7 +13,7 @@ from fs import zipfs
 from fs.compress import write_zip
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
-from fs.errors import NoURL
+from fs.errors import NoURL, NoSysPath
 from fs.test import FSTestCases
 from fs.enums import Seek
 
@@ -58,6 +58,10 @@ class TestWriteZipFS(FSTestCases, unittest.TestCase):
     def destroy_fs(self, fs):
         fs.close()
         del fs._zip_file
+
+    def test_nosyspath(self):
+        with self.assertRaises(NoSysPath):
+            self.fs.getsyspath("/test")
 
 
 class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
@@ -195,6 +199,10 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
             self.fail("Could not close tar fs properly")
         except Exception:
             self.fail("Strange exception in closing fs")
+
+    def test_nosyspath(self):
+        with self.assertRaises(NoSysPath):
+            self.fs.getsyspath("/test")
 
 
 class TestReadZipFSMem(TestReadZipFS):

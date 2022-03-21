@@ -53,7 +53,6 @@ if six.PY2:
         # type: (TarInfo, Text) -> Dict[Text, object]
         return member.get_info(encoding, None)
 
-
 else:
 
     def _get_member_info(member, encoding):
@@ -231,6 +230,12 @@ class WriteTarFS(WrapFS):
                 compression=compression or self.compression,
                 encoding=encoding or self.encoding,
             )
+
+    def getsyspath(self, path):
+        raise errors.NoSysPath(path=path)
+
+    def hassyspath(self, path):
+        return False
 
 
 @six.python_2_unicode_compatible
@@ -473,6 +478,9 @@ class ReadTarFS(FS):
             return "tar://{}!/{}".format(quoted_file, quoted_path)
         else:
             raise NoURL(path, purpose)
+
+    def getsyspath(self, path):
+        raise errors.NoSysPath(path=path)
 
 
 if __name__ == "__main__":  # pragma: no cover

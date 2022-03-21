@@ -229,6 +229,9 @@ class WriteZipFS(WrapFS):
     def getsyspath(self, path):
         raise errors.NoSysPath(path=path)
 
+    def hassyspath(self, path):
+        return False
+
     def delegate_path(self, path):
         # type: (Text) -> Tuple[FS, Text]
         return self._temp_fs, path
@@ -459,3 +462,6 @@ class ReadZipFS(FS):
 
     def getsyspath(self, path):
         raise errors.NoSysPath(path=path)
+
+    def hassyspath(self, path):
+        return False
