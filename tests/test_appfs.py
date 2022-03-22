@@ -30,7 +30,7 @@ class _TestAppFS(fs.test.FSTestCases):
 
     def make_fs(self):
         with mock.patch(
-            "appdirs.{}".format(self.AppFS.app_dir),
+            "platformdirs.{}".format(self.AppFS.app_dir),
             autospec=True,
             spec_set=True,
             return_value=tempfile.mkdtemp(dir=self.tmpdir),

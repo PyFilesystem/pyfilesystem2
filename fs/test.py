@@ -26,7 +26,6 @@ from fs import glob
 from fs.opener import open_fs
 from fs.subfs import ClosingSubFS, SubFS
 
-import pytz
 import six
 from six import text_type
 
@@ -34,6 +33,11 @@ if six.PY2:
     import collections as collections_abc
 else:
     import collections.abc as collections_abc
+
+try:
+    from datetime import timezone
+except ImportError:
+    from ._tzcompat import timezone  # type: ignore
 
 
 UNICODE_TEXT = """
@@ -1196,9 +1200,9 @@ class FSTestCases(object):
         can_write_acccess = info.is_writeable("details", "accessed")
         can_write_modified = info.is_writeable("details", "modified")
         if can_write_acccess:
-            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=timezone.utc))
         if can_write_modified:
-            self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+            self.assertEqual(info.modified, datetime(2016, 7, 5, tzinfo=timezone.utc))
 
     def test_touch(self):
         self.fs.touch("new.txt")
@@ -1206,7 +1210,7 @@ class FSTestCases(object):
         self.fs.settimes("new.txt", datetime(2016, 7, 5))
         info = self.fs.getinfo("new.txt", namespaces=["details"])
         if info.is_writeable("details", "accessed"):
-            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=pytz.UTC))
+            self.assertEqual(info.accessed, datetime(2016, 7, 5, tzinfo=timezone.utc))
             now = time.time()
             self.fs.touch("new.txt")
             accessed = self.fs.getinfo("new.txt", namespaces=["details"]).raw[
