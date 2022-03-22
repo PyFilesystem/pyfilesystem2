@@ -65,6 +65,7 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
         del fs._tar_file
 
     def test_no_syspath(self):
+        self.assertFalse(self.fs.hassyspath("/test"))
         with self.assertRaises(NoSysPath):
             self.fs.getsyspath("/test")
 
@@ -225,6 +226,7 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
             self.fs.geturl(test_file)
 
     def test_no_syspath(self):
+        self.assertFalse(self.fs.hassyspath("/test"))
         with self.assertRaises(NoSysPath):
             self.fs.getsyspath("/test")
 

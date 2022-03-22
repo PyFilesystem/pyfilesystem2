@@ -482,6 +482,9 @@ class ReadTarFS(FS):
     def getsyspath(self, path):
         raise errors.NoSysPath(path=path)
 
+    def hassyspath(self, path):
+        return False
+
 
 if __name__ == "__main__":  # pragma: no cover
     from fs.tree import render

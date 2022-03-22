@@ -60,6 +60,7 @@ class TestWriteZipFS(FSTestCases, unittest.TestCase):
         del fs._zip_file
 
     def test_no_syspath(self):
+        self.assertFalse(self.fs.hassyspath("/test"))
         with self.assertRaises(NoSysPath):
             self.fs.getsyspath("/test")
 
@@ -205,6 +206,7 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
             self.fail("Strange exception in closing fs")
 
     def test_no_syspath(self):
+        self.assertFalse(self.fs.hassyspath("/test"))
         with self.assertRaises(NoSysPath):
             self.fs.getsyspath("/test")
 
