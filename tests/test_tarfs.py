@@ -64,9 +64,13 @@ class TestWriteTarFS(FSTestCases, unittest.TestCase):
         os.remove(fs._tar_file)
         del fs._tar_file
 
-    def test_nosyspath(self):
+    def test_no_syspath(self):
         with self.assertRaises(NoSysPath):
             self.fs.getsyspath("/test")
+
+    def test_no_ospath(self):
+        with self.assertRaises(NoSysPath):
+            self.fs.getospath("/test")
 
 
 class TestWriteTarFSToFileobj(FSTestCases, unittest.TestCase):
@@ -220,9 +224,13 @@ class TestReadTarFS(ArchiveTestCases, unittest.TestCase):
         with self.assertRaises(NoURL):
             self.fs.geturl(test_file)
 
-    def test_nosyspath(self):
+    def test_no_syspath(self):
         with self.assertRaises(NoSysPath):
             self.fs.getsyspath("/test")
+
+    def test_no_ospath(self):
+        with self.assertRaises(NoSysPath):
+            self.fs.getospath("/test")
 
 
 class TestBrokenPaths(unittest.TestCase):

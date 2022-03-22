@@ -59,9 +59,13 @@ class TestWriteZipFS(FSTestCases, unittest.TestCase):
         fs.close()
         del fs._zip_file
 
-    def test_nosyspath(self):
+    def test_no_syspath(self):
         with self.assertRaises(NoSysPath):
             self.fs.getsyspath("/test")
+
+    def test_no_ospath(self):
+        with self.assertRaises(NoSysPath):
+            self.fs.getospath("/test")
 
 
 class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
@@ -200,9 +204,13 @@ class TestReadZipFS(ArchiveTestCases, unittest.TestCase):
         except Exception:
             self.fail("Strange exception in closing fs")
 
-    def test_nosyspath(self):
+    def test_no_syspath(self):
         with self.assertRaises(NoSysPath):
             self.fs.getsyspath("/test")
+
+    def test_no_ospath(self):
+        with self.assertRaises(NoSysPath):
+            self.fs.getospath("/test")
 
 
 class TestReadZipFSMem(TestReadZipFS):
