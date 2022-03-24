@@ -58,7 +58,7 @@ def move_file(
             resources (defaults to `False`).
 
     """
-    if _src_fs.hassyspath(src_path) and _dst_fs.hassyspath(dst_path):
+    if src_fs.hassyspath(src_path) and dst_fs.hassyspath(dst_path):
         # if both filesystems have a syspath we create a new OSFS from a
         # common parent folder and use it to move the file.
         with manage_fs(src_fs) as _src_fs:
