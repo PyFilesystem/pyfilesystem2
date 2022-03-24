@@ -59,21 +59,6 @@ def move_file(
             resources (defaults to `False`).
 
     """
-    # optimization for moving files between different OSFS instances
-    if isinstance(src_fs, OSFS) and isinstance(dst_fs, OSFS):
-        try:
-            src_syspath = src_fs.getsyspath(src_path)
-            dst_syspath = dst_fs.getsyspath(dst_path)
-            common = commonpath([src_syspath, dst_syspath])
-            rel_src = frombase(common, src_syspath)
-            rel_dst = frombase(common, dst_syspath)
-            with open_fs(common, writeable=True) as base:
-                base.move(rel_src, rel_dst, preserve_time=preserve_time)
-            return
-        except (ValueError, errors.NoSysPath):
-            # optimization cannot be applied
-            pass
-
     with manage_fs(src_fs) as _src_fs:
         with manage_fs(dst_fs, create=True) as _dst_fs:
             if _src_fs is _dst_fs:
@@ -81,6 +66,16 @@ def move_file(
                 _src_fs.move(
                     src_path, dst_path, overwrite=True, preserve_time=preserve_time
                 )
+            elif _src_fs.hassyspath(src_path) and _dst_fs.hassyspath(dst_path):
+                # if both filesystems have a syspath we create a new OSFS from a
+                # common parent folder and use it to move the file.
+                src_syspath = src_fs.getsyspath(src_path)
+                dst_syspath = dst_fs.getsyspath(dst_path)
+                common = commonpath([src_syspath, dst_syspath])
+                rel_src = frombase(common, src_syspath)
+                rel_dst = frombase(common, dst_syspath)
+                with open_fs(common, writeable=True) as base:
+                    base.move(rel_src, rel_dst, preserve_time=preserve_time)
             else:
                 # Standard copy and delete
                 with _src_fs.lock(), _dst_fs.lock():
