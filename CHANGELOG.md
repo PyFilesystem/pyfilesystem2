@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+### Changed
+
+- Replaced `appdirs` with `platformdirs` dependency 
+  ([#489](https://github.com/PyFilesystem/pyfilesystem2/pull/489)).
+- Make `fs.zipfs._ZipExtFile` use the seeking mechanism implemented
+  in the Python standard library in Python version 3.7 and later
+  ([#527](https://github.com/PyFilesystem/pyfilesystem2/pull/527)).
+- Mark `fs.zipfs.ReadZipFS` as a case-sensitive filesystem
+  ([#527](https://github.com/PyFilesystem/pyfilesystem2/pull/527)). 
+
 
 ## [2.4.15] - 2022-02-07
 
@@ -16,6 +26,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 - Support more lenient usernames and group names in FTP servers
   ([#507](https://github.com/PyFilesystem/pyfilesystem2/pull/507)).
   Closes [#506](https://github.com/PyFilesystem/pyfilesystem2/issues/506).
+- Removed dependency on pytz ([#518](https://github.com/PyFilesystem/pyfilesystem2/pull/518)).
+  Closes [#516](https://github.com/PyFilesystem/pyfilesystem2/issues/518).
 
 ### Fixed
 
