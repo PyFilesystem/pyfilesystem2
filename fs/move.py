@@ -73,7 +73,9 @@ def move_file(
                 common = commonpath([src_syspath, dst_syspath])
                 rel_src = frombase(common, src_syspath)
                 rel_dst = frombase(common, dst_syspath)
-                with open_fs(common, writeable=True) as base:
+                with _src_fs.lock(), _dst_fs.lock(), open_fs(
+                    common, writeable=True
+                ) as base:
                     base.move(rel_src, rel_dst, preserve_time=preserve_time)
             else:
                 # Standard copy and delete
