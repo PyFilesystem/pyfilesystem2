@@ -7,11 +7,10 @@ from __future__ import unicode_literals
 from os.path import commonpath
 import typing
 
-from . import open_fs, errors
+from . import open_fs
 from .copy import copy_dir
 from .copy import copy_file
 from .opener import manage_fs
-from .osfs import OSFS
 from .path import frombase
 
 if typing.TYPE_CHECKING:
