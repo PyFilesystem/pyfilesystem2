@@ -63,7 +63,12 @@ class TestMove(unittest.TestCase):
 
             tmp.writetext("file.txt", "Content")
             tmp.makedir("subdir")
-            fs.move.move_file(path, "file.txt", join(path, "subdir"), "file.txt")
+            fs.move.move_file(
+                "osfs://" + path,
+                "file.txt",
+                "osfs://" + join(path, "subdir"),
+                "file.txt",
+            )
 
             self.assertFalse(tmp.exists("file.txt"))
             self.assertEqual(tmp.readtext("subdir/file.txt"), "Content")
