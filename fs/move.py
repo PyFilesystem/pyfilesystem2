@@ -10,6 +10,7 @@ import typing
 from . import open_fs
 from .copy import copy_dir
 from .copy import copy_file
+from .errors import ResourceReadOnly
 from .opener import manage_fs
 from .path import frombase
 
@@ -59,6 +60,12 @@ def move_file(
 
     """
     if src_fs.hassyspath(src_path) and dst_fs.hassyspath(dst_path):
+        # we have to raise a ResourceReadOnly exception manually if a FS is read-only
+        if src_fs.getmeta().get("read_only", True):
+            raise ResourceReadOnly(src_fs, src_path)
+        if dst_fs.getmeta().get("read_only", True):
+            raise ResourceReadOnly(dst_fs, dst_path)
+
         # if both filesystems have a syspath we create a new OSFS from a
         # common parent folder and use it to move the file.
         with manage_fs(src_fs) as _src_fs:
