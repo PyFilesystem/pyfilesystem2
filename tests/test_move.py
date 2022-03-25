@@ -34,16 +34,11 @@ class TestMoveCheckTime(unittest.TestCase):
         self.assertTrue(dst_fs.isfile("foo/bar/baz.txt"))
         self.assertTrue(src_fs.isempty("/"))
 
-        dst_file1_info = dst_fs.getinfo("test.txt", namespaces)
-        dst_file2_info = dst_fs.getinfo("foo/bar/baz.txt", namespaces)
-        self.assertEqual(
-            dst_file1_info.modified == src_file1_info.modified,
-            self.preserve_time,
-        )
-        self.assertEqual(
-            dst_file2_info.modified == src_file2_info.modified,
-            self.preserve_time,
-        )
+        if self.preserve_time:
+            dst_file1_info = dst_fs.getinfo("test.txt", namespaces)
+            dst_file2_info = dst_fs.getinfo("foo/bar/baz.txt", namespaces)
+            self.assertEqual(dst_file1_info.modified, src_file1_info.modified)
+            self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
 
     def test_move_file(self):
         namespaces = ("details", "modified")
@@ -60,11 +55,9 @@ class TestMoveCheckTime(unittest.TestCase):
             self.assertFalse(src_fs.exists("source.txt"))
             self.assertEqual(dst_fs.readtext("dest.txt"), "Source")
 
-            dst_fs_file_info = dst_fs.getinfo("dest.txt", namespaces)
-            self.assertEqual(
-                src_fs_file_info.modified == dst_fs_file_info.modified,
-                self.preserve_time,
-            )
+            if self.preserve_time:
+                dst_fs_file_info = dst_fs.getinfo("dest.txt", namespaces)
+                self.assertEqual(src_fs_file_info.modified, dst_fs_file_info.modified)
 
     def test_move_dir(self):
         namespaces = ("details", "modified")
@@ -86,10 +79,9 @@ class TestMoveCheckTime(unittest.TestCase):
         self.assertFalse(src_fs.exists("foo"))
         self.assertTrue(src_fs.isfile("test.txt"))
 
-        dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
-        self.assertEqual(
-            dst_file2_info.modified == src_file2_info.modified, self.preserve_time
-        )
+        if self.preserve_time:
+            dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
+            self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
 
 
 class TestMove(unittest.TestCase):
