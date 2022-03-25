@@ -10,7 +10,7 @@ import typing
 from . import open_fs
 from .copy import copy_dir
 from .copy import copy_file
-from .errors import ResourceReadOnly
+from .errors import FSError, ResourceReadOnly
 from .opener import manage_fs
 from .path import frombase
 
@@ -103,7 +103,13 @@ def move_file(
                     dst_path,
                     preserve_time=preserve_time,
                 )
-                _src_fs.remove(src_path)
+                try:
+                    _src_fs.remove(src_path)
+                except FSError as e:
+                    # if the source cannot be removed we delete the copy on the
+                    # destination
+                    _dst_fs.remove(dst_path)
+                    raise e
 
 
 def move_dir(
