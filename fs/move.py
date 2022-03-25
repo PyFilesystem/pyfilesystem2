@@ -1,22 +1,21 @@
 """Functions for moving files between filesystems.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
-from os.path import commonpath
 import typing
 
 from . import open_fs
-from .copy import copy_dir
-from .copy import copy_file
+from ._pathcompat import commonpath
+from .copy import copy_dir, copy_file
 from .errors import FSError
 from .opener import manage_fs
 from .path import frombase
 
 if typing.TYPE_CHECKING:
-    from .base import FS
     from typing import Text, Union
+
+    from .base import FS
 
 
 def move_fs(
@@ -80,7 +79,7 @@ def move_file(
                     with _src_fs.lock(), _dst_fs.lock():
                         with open_fs(common, writeable=True) as base:
                             base.move(rel_src, rel_dst, preserve_time=preserve_time)
-                    return  # optimization worked, exit early
+                            return  # optimization worked, exit early
                 except ValueError:
                     # This is raised if we cannot find a common base folder.
                     # In this case just fall through to the standard method.
