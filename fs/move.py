@@ -46,6 +46,7 @@ def move_file(
     dst_fs,  # type: Union[Text, FS]
     dst_path,  # type: Text
     preserve_time=False,  # type: bool
+    cleanup_dest_on_error=True,  # type: bool
 ):
     # type: (...) -> None
     """Move a file from one filesystem to another.
@@ -57,6 +58,8 @@ def move_file(
         dst_path (str): Path to a file on ``dst_fs``.
         preserve_time (bool): If `True`, try to preserve mtime of the
             resources (defaults to `False`).
+        cleanup_dest_on_error (bool): If `True`, tries to delete the file copied to
+            dst_fs if deleting the file from src_fs fails.
 
     """
     with manage_fs(src_fs, writeable=True) as _src_fs:
@@ -100,7 +103,8 @@ def move_file(
                 except FSError as e:
                     # if the source cannot be removed we delete the copy on the
                     # destination
-                    _dst_fs.remove(dst_path)
+                    if cleanup_dest_on_error:
+                        _dst_fs.remove(dst_path)
                     raise e
 
 

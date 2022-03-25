@@ -2,11 +2,17 @@ from __future__ import unicode_literals
 
 import unittest
 
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 from parameterized import parameterized_class
+
 
 import fs.move
 from fs import open_fs
-from fs.errors import ResourceReadOnly
+from fs.errors import FSError, ResourceReadOnly
 from fs.path import join
 from fs.wrap import read_only
 
@@ -145,22 +151,24 @@ class TestMove(unittest.TestCase):
             )
             self.assertTrue(src.exists("file.txt"))
 
-    def test_move_dir_cleanup(self):
-        src_fs = open_fs("mem://")
-        src_fs.makedirs("foo/bar")
-        src_fs.touch("foo/bar/baz.txt")
-        src_fs.touch("foo/test.txt")
+    def test_move_file_cleanup_on_error(self):
+        with open_fs("mem://") as src, open_fs("mem://") as dst:
+            src.writetext("file.txt", "Content")
+            with mock.patch.object(src, "remove") as mck:
+                mck.side_effect = FSError
+                with self.assertRaises(FSError):
+                    fs.move.move_file(src, "file.txt", dst, "file.txt")
+            self.assertTrue(src.exists("file.txt"))
+            self.assertFalse(dst.exists("file.txt"))
 
-        dst_fs = open_fs("mem://")
-        dst_fs.create("test.txt")
-
-        ro_src = read_only(src_fs)
-
-        with self.assertRaises(ResourceReadOnly):
-            fs.move.move_dir(ro_src, "/foo", dst_fs, "/")
-
-        self.assertTrue(src_fs.exists("foo/bar/baz.txt"))
-        self.assertTrue(src_fs.exists("foo/test.txt"))
-        self.assertFalse(dst_fs.isdir("bar"))
-        self.assertFalse(dst_fs.exists("bar/baz.txt"))
-        self.assertTrue(dst_fs.exists("test.txt"))
+    def test_move_file_no_cleanup_on_error(self):
+        with open_fs("mem://") as src, open_fs("mem://") as dst:
+            src.writetext("file.txt", "Content")
+            with mock.patch.object(src, "remove") as mck:
+                mck.side_effect = FSError
+                with self.assertRaises(FSError):
+                    fs.move.move_file(
+                        src, "file.txt", dst, "file.txt", cleanup_dest_on_error=False
+                    )
+            self.assertTrue(src.exists("file.txt"))
+            self.assertTrue(dst.exists("file.txt"))
