@@ -34,11 +34,37 @@ class TestMoveCheckTime(unittest.TestCase):
         self.assertTrue(dst_fs.isfile("foo/bar/baz.txt"))
         self.assertTrue(src_fs.isempty("/"))
 
-        if self.preserve_time:
-            dst_file1_info = dst_fs.getinfo("test.txt", namespaces)
-            dst_file2_info = dst_fs.getinfo("foo/bar/baz.txt", namespaces)
-            self.assertEqual(dst_file1_info.modified, src_file1_info.modified)
-            self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
+        dst_file1_info = dst_fs.getinfo("test.txt", namespaces)
+        dst_file2_info = dst_fs.getinfo("foo/bar/baz.txt", namespaces)
+        self.assertEqual(
+            dst_file1_info.modified == src_file1_info.modified,
+            self.preserve_time,
+        )
+        self.assertEqual(
+            dst_file2_info.modified == src_file2_info.modified,
+            self.preserve_time,
+        )
+
+    def test_move_file(self):
+        namespaces = ("details", "modified")
+        with open_fs("mem://") as src_fs, open_fs("mem://") as dst_fs:
+            src_fs.writetext("source.txt", "Source")
+            src_fs_file_info = src_fs.getinfo("source.txt", namespaces)
+            fs.move.move_file(
+                src_fs,
+                "source.txt",
+                dst_fs,
+                "dest.txt",
+                preserve_time=self.preserve_time,
+            )
+            self.assertFalse(src_fs.exists("source.txt"))
+            self.assertEqual(dst_fs.readtext("dest.txt"), "Source")
+
+            dst_fs_file_info = dst_fs.getinfo("dest.txt", namespaces)
+            self.assertEqual(
+                src_fs_file_info.modified == dst_fs_file_info.modified,
+                self.preserve_time,
+            )
 
     def test_move_dir(self):
         namespaces = ("details", "modified")
@@ -60,35 +86,26 @@ class TestMoveCheckTime(unittest.TestCase):
         self.assertFalse(src_fs.exists("foo"))
         self.assertTrue(src_fs.isfile("test.txt"))
 
-        if self.preserve_time:
-            dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
-            self.assertEqual(dst_file2_info.modified, src_file2_info.modified)
+        dst_file2_info = dst_fs.getinfo("bar/baz.txt", namespaces)
+        self.assertEqual(
+            dst_file2_info.modified == src_file2_info.modified, self.preserve_time
+        )
 
 
 class TestMove(unittest.TestCase):
-    def test_move_file(self):
-        with open_fs("temp://") as temp:
-            syspath = temp.getsyspath("/")
-            a = open_fs(syspath)
-            a.makedir("dir")
-            b = open_fs(join(syspath, "dir"))
-            b.writetext("file.txt", "Content")
-            fs.move.move_file(b, "file.txt", a, "here.txt")
-            self.assertEqual(a.readtext("here.txt"), "Content")
-            self.assertFalse(b.exists("file.txt"))
-
-    def test_move_file_different_mems(self):
-        with open_fs("mem://") as src, open_fs("mem://") as dst:
-            src.writetext("source.txt", "Source")
-            fs.move.move_file(src, "source.txt", dst, "dest.txt")
-            self.assertFalse(src.exists("source.txt"))
-            self.assertEqual(dst.readtext("dest.txt"), "Source")
+    def test_move_file_tempfs(self):
+        with open_fs("temp://") as a, open_fs("temp://") as b:
+            dir_a = a.makedir("dir")
+            dir_b = b.makedir("subdir")
+            dir_b.writetext("file.txt", "Content")
+            fs.move.move_file(dir_b, "file.txt", dir_a, "here.txt")
+            self.assertEqual(a.readtext("dir/here.txt"), "Content")
+            self.assertFalse(b.exists("subdir/file.txt"))
 
     def test_move_file_fs_urls(self):
         # create a temp dir to work on
         with open_fs("temp://") as tmp:
             path = tmp.getsyspath("/")
-
             tmp.writetext("file.txt", "Content")
             tmp.makedir("subdir")
             fs.move.move_file(
@@ -97,7 +114,6 @@ class TestMove(unittest.TestCase):
                 "osfs://" + join(path, "subdir"),
                 "file.txt",
             )
-
             self.assertFalse(tmp.exists("file.txt"))
             self.assertEqual(tmp.readtext("subdir/file.txt"), "Content")
 
@@ -107,7 +123,7 @@ class TestMove(unittest.TestCase):
             self.assertFalse(src.exists("source.txt"))
             self.assertEqual(dst.readtext("dest.txt"), "Source")
 
-    def test_move_file_read_only_source(self):
+    def test_move_file_same_fs_read_only_source(self):
         with open_fs("temp://") as tmp:
             path = tmp.getsyspath("/")
             tmp.writetext("file.txt", "Content")
@@ -129,6 +145,17 @@ class TestMove(unittest.TestCase):
                 fs.move.move_file(src_ro, "file.txt", sub, "file.txt")
             self.assertFalse(
                 sub.exists("file.txt"), "file should not have been copied over"
+            )
+            self.assertTrue(src.exists("file.txt"))
+
+    def test_move_file_read_only_mem_dest(self):
+        with open_fs("mem://") as src, open_fs("mem://") as dst:
+            src.writetext("file.txt", "Content")
+            dst_ro = read_only(dst)
+            with self.assertRaises(ResourceReadOnly):
+                fs.move.move_file(src, "file.txt", dst_ro, "file.txt")
+            self.assertFalse(
+                dst_ro.exists("file.txt"), "file should not have been copied over"
             )
             self.assertTrue(src.exists("file.txt"))
 
