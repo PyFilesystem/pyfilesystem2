@@ -89,6 +89,18 @@ class TestMove(unittest.TestCase):
             dst = tmp.makedir("sub")
             with self.assertRaises(ResourceReadOnly):
                 fs.move.move_file(src, "file.txt", dst, "file.txt")
+            self.assertFalse(dst.exists("file.txt"))
+            self.assertTrue(src.exists("file.txt"))
+
+    def test_move_file_read_only_mem_source(self):
+        with open_fs("mem://") as src, open_fs("mem://") as dst:
+            src.writetext("file.txt", "Content")
+            sub = dst.makedir("sub")
+            src_ro = read_only(src)
+            with self.assertRaises(ResourceReadOnly):
+                fs.move.move_file(src_ro, "file.txt", sub, "file.txt")
+            self.assertFalse(sub.exists("file.txt"))
+            self.assertTrue(src.exists("file.txt"))
 
     def test_move_dir(self):
         namespaces = ("details", "modified")
