@@ -71,13 +71,6 @@ def move_file(
             if _src_fs.hassyspath(src_path) and _dst_fs.hassyspath(dst_path):
                 # if both filesystems have a syspath we create a new OSFS from a
                 # common parent folder and use it to move the file.
-
-                # we have to raise ResourceReadOnly manually if a FS is read-only
-                if _src_fs.getmeta().get("read_only", True):
-                    raise ResourceReadOnly(_src_fs, src_path)
-                if _dst_fs.getmeta().get("read_only", True):
-                    raise ResourceReadOnly(_dst_fs, dst_path)
-
                 try:
                     src_syspath = _src_fs.getsyspath(src_path)
                     dst_syspath = _dst_fs.getsyspath(dst_path)
@@ -136,10 +129,10 @@ def move_dir(
     """
 
     def src():
-        return manage_fs(src_fs, writeable=False)
+        return manage_fs(src_fs, writeable=True)
 
     def dst():
-        return manage_fs(dst_fs, create=True)
+        return manage_fs(dst_fs, writeable=True, create=True)
 
     with src() as _src_fs, dst() as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
