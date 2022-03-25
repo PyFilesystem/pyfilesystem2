@@ -59,8 +59,8 @@ def move_file(
             resources (defaults to `False`).
 
     """
-    with manage_fs(src_fs) as _src_fs:
-        with manage_fs(dst_fs, create=True) as _dst_fs:
+    with manage_fs(src_fs, writeable=True) as _src_fs:
+        with manage_fs(dst_fs, writeable=True, create=True) as _dst_fs:
             if _src_fs is _dst_fs:
                 # Same filesystem, may be optimized
                 _src_fs.move(
@@ -90,6 +90,8 @@ def move_file(
                         base.move(rel_src, rel_dst, preserve_time=preserve_time)
                     return  # optimization worked, exit early
                 except ValueError:
+                    # This is raised if we cannot find a common base folder.
+                    # In this case just fall through to the standard method.
                     pass
 
             # Standard copy and delete
