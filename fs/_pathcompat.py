@@ -1,3 +1,4 @@
+# mypy: ignore-errors
 try:
     from os.path import commonpath
 except ImportError:

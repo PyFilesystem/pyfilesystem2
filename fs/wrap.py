@@ -325,7 +325,6 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
     def getmeta(self, namespace="standard"):
         # type: (Text) -> Mapping[Text, object]
         self.check()
-        meta = self.delegate_fs().getmeta(namespace=namespace)
-        meta["read_only"] = True
-        meta["supports_rename"] = False
+        meta = dict(self.delegate_fs().getmeta(namespace=namespace))
+        meta.update(read_only=True, supports_rename=True)
         return meta
