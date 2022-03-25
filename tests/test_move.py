@@ -49,6 +49,13 @@ class TestMove(unittest.TestCase):
             self.assertEqual(a.readtext("here.txt"), "Content")
             self.assertFalse(b.exists("file.txt"))
 
+    def test_move_file_different_mems(self):
+        with open_fs("mem://") as src, open_fs("mem://") as dst:
+            src.writetext("source.txt", "Source")
+            fs.move.move_file(src, "source.txt", dst, "dest.txt")
+            self.assertFalse(src.exists("source.txt"))
+            self.assertEqual(dst.readtext("dest.txt"), "Source")
+
     def test_move_dir(self):
         namespaces = ("details", "modified")
 
