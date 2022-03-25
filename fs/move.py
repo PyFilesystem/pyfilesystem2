@@ -1,21 +1,22 @@
 """Functions for moving files between filesystems.
 """
 
-from __future__ import print_function, unicode_literals
+from __future__ import print_function
+from __future__ import unicode_literals
 
 import typing
 
 from . import open_fs
-from ._pathcompat import commonpath
-from .copy import copy_dir, copy_file
+from .copy import copy_dir
+from .copy import copy_file
 from .errors import FSError
 from .opener import manage_fs
 from .path import frombase
+from ._pathcompat import commonpath
 
 if typing.TYPE_CHECKING:
-    from typing import Text, Union
-
     from .base import FS
+    from typing import Text, Union
 
 
 def move_fs(
