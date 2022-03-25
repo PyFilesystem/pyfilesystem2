@@ -12,7 +12,7 @@ from fs.wrap import read_only
 
 
 @parameterized_class(("preserve_time",), [(True,), (False,)])
-class TestMovePreserveTime(unittest.TestCase):
+class TestMoveCheckTime(unittest.TestCase):
     def test_move_fs(self):
         namespaces = ("details", "modified")
 
