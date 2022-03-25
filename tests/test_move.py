@@ -6,7 +6,9 @@ from parameterized import parameterized_class
 
 import fs.move
 from fs import open_fs
+from fs.errors import ResourceReadOnly
 from fs.path import join
+from fs.wrap import read_only
 
 
 @parameterized_class(("preserve_time",), [(True,), (False,)])
@@ -78,6 +80,15 @@ class TestMove(unittest.TestCase):
             fs.move.move_file(src, "source.txt", dst, "dest.txt")
             self.assertFalse(src.exists("source.txt"))
             self.assertEqual(dst.readtext("dest.txt"), "Source")
+
+    def test_move_file_read_only_source(self):
+        with open_fs("temp://") as tmp:
+            path = tmp.getsyspath("/")
+            tmp.writetext("file.txt", "Content")
+            src = read_only(open_fs(path))
+            dst = tmp.makedir("sub")
+            with self.assertRaises(ResourceReadOnly):
+                fs.move.move_file(src, "file.txt", dst, "file.txt")
 
     def test_move_dir(self):
         namespaces = ("details", "modified")
