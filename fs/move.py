@@ -77,10 +77,9 @@ def move_file(
                     common = commonpath([src_syspath, dst_syspath])
                     rel_src = frombase(common, src_syspath)
                     rel_dst = frombase(common, dst_syspath)
-                    with _src_fs.lock(), _dst_fs.lock(), open_fs(
-                        common, writeable=True
-                    ) as base:
-                        base.move(rel_src, rel_dst, preserve_time=preserve_time)
+                    with _src_fs.lock(), _dst_fs.lock():
+                        with open_fs(common, writeable=True) as base:
+                            base.move(rel_src, rel_dst, preserve_time=preserve_time)
                     return  # optimization worked, exit early
                 except ValueError:
                     # This is raised if we cannot find a common base folder.
