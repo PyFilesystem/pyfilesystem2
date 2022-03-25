@@ -285,7 +285,7 @@ class Registry(object):
 
         def assert_writeable(fs):
             if fs.getmeta().get("read_only", True):
-                raise ResourceReadOnly(path=str(fs_url))
+                raise ResourceReadOnly(path="/")
 
         if isinstance(fs_url, FS):
             if writeable:
