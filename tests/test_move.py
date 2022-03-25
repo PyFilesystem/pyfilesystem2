@@ -104,16 +104,17 @@ class TestMove(unittest.TestCase):
         # create a temp dir to work on
         with open_fs("temp://") as tmp:
             path = tmp.getsyspath("/")
-            tmp.writetext("file.txt", "Content")
-            tmp.makedir("subdir")
+            subdir_src = tmp.makedir("subdir_src")
+            subdir_src.writetext("file.txt", "Content")
+            tmp.makedir("subdir_dst")
             fs.move.move_file(
-                "osfs://" + path,
+                "osfs://" + join(path, "subdir_src"),
                 "file.txt",
-                "osfs://" + join(path, "subdir"),
+                "osfs://" + join(path, "subdir_dst"),
                 "file.txt",
             )
-            self.assertFalse(tmp.exists("file.txt"))
-            self.assertEqual(tmp.readtext("subdir/file.txt"), "Content")
+            self.assertFalse(subdir_src.exists("file.txt"))
+            self.assertEqual(tmp.readtext("subdir_dst/file.txt"), "Content")
 
     def test_move_file_same_fs_read_only_source(self):
         with open_fs("temp://") as tmp:
