@@ -10,7 +10,7 @@ import typing
 from . import open_fs
 from .copy import copy_dir
 from .copy import copy_file
-from .errors import FSError, ResourceReadOnly
+from .errors import FSError
 from .opener import manage_fs
 from .path import frombase
 
