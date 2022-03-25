@@ -56,6 +56,24 @@ class TestMove(unittest.TestCase):
             self.assertFalse(src.exists("source.txt"))
             self.assertEqual(dst.readtext("dest.txt"), "Source")
 
+    def test_move_file_fs_urls(self):
+        # create a temp dir to work on
+        with open_fs("temp://") as tmp:
+            path = tmp.getsyspath("/")
+
+            tmp.writetext("file.txt", "Content")
+            tmp.makedir("subdir")
+            fs.move.move_file(path, "file.txt", join(path, "subdir"), "file.txt")
+
+            self.assertFalse(tmp.exists("file.txt"))
+            self.assertEqual(tmp.readtext("subdir/file.txt"), "Content")
+
+        with open_fs("mem://") as src, open_fs("mem://") as dst:
+            src.writetext("source.txt", "Source")
+            fs.move.move_file(src, "source.txt", dst, "dest.txt")
+            self.assertFalse(src.exists("source.txt"))
+            self.assertEqual(dst.readtext("dest.txt"), "Source")
+
     def test_move_dir(self):
         namespaces = ("details", "modified")
 

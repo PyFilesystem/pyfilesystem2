@@ -59,20 +59,28 @@ def move_file(
             resources (defaults to `False`).
 
     """
-    if src_fs.hassyspath(src_path) and dst_fs.hassyspath(dst_path):
-        # we have to raise a ResourceReadOnly exception manually if a FS is read-only
-        if src_fs.getmeta().get("read_only", True):
-            raise ResourceReadOnly(src_fs, src_path)
-        if dst_fs.getmeta().get("read_only", True):
-            raise ResourceReadOnly(dst_fs, dst_path)
+    with manage_fs(src_fs) as _src_fs:
+        with manage_fs(dst_fs, create=True) as _dst_fs:
+            if _src_fs is _dst_fs:
+                # Same filesystem, may be optimized
+                _src_fs.move(
+                    src_path, dst_path, overwrite=True, preserve_time=preserve_time
+                )
+                return
 
-        # if both filesystems have a syspath we create a new OSFS from a
-        # common parent folder and use it to move the file.
-        with manage_fs(src_fs) as _src_fs:
-            with manage_fs(dst_fs, create=True) as _dst_fs:
+            if _src_fs.hassyspath(src_path) and _dst_fs.hassyspath(dst_path):
+                # if both filesystems have a syspath we create a new OSFS from a
+                # common parent folder and use it to move the file.
+
+                # we have to raise ResourceReadOnly manually if a FS is read-only
+                if _src_fs.getmeta().get("read_only", True):
+                    raise ResourceReadOnly(_src_fs, src_path)
+                if _dst_fs.getmeta().get("read_only", True):
+                    raise ResourceReadOnly(_dst_fs, dst_path)
+
                 try:
-                    src_syspath = src_fs.getsyspath(src_path)
-                    dst_syspath = dst_fs.getsyspath(dst_path)
+                    src_syspath = _src_fs.getsyspath(src_path)
+                    dst_syspath = _dst_fs.getsyspath(dst_path)
                     common = commonpath([src_syspath, dst_syspath])
                     rel_src = frombase(common, src_syspath)
                     rel_dst = frombase(common, dst_syspath)
@@ -84,24 +92,16 @@ def move_file(
                 except ValueError:
                     pass
 
-    with manage_fs(src_fs) as _src_fs:
-        with manage_fs(dst_fs, create=True) as _dst_fs:
-            if _src_fs is _dst_fs:
-                # Same filesystem, may be optimized
-                _src_fs.move(
-                    src_path, dst_path, overwrite=True, preserve_time=preserve_time
+            # Standard copy and delete
+            with _src_fs.lock(), _dst_fs.lock():
+                copy_file(
+                    _src_fs,
+                    src_path,
+                    _dst_fs,
+                    dst_path,
+                    preserve_time=preserve_time,
                 )
-            else:
-                # Standard copy and delete
-                with _src_fs.lock(), _dst_fs.lock():
-                    copy_file(
-                        _src_fs,
-                        src_path,
-                        _dst_fs,
-                        dst_path,
-                        preserve_time=preserve_time,
-                    )
-                    _src_fs.remove(src_path)
+                _src_fs.remove(src_path)
 
 
 def move_dir(
