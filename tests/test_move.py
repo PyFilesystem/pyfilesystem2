@@ -109,12 +109,6 @@ class TestMove(unittest.TestCase):
             self.assertFalse(tmp.exists("file.txt"))
             self.assertEqual(tmp.readtext("subdir/file.txt"), "Content")
 
-        with open_fs("mem://") as src, open_fs("mem://") as dst:
-            src.writetext("source.txt", "Source")
-            fs.move.move_file(src, "source.txt", dst, "dest.txt")
-            self.assertFalse(src.exists("source.txt"))
-            self.assertEqual(dst.readtext("dest.txt"), "Source")
-
     def test_move_file_same_fs_read_only_source(self):
         with open_fs("temp://") as tmp:
             path = tmp.getsyspath("/")
