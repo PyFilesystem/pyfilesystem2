@@ -92,13 +92,13 @@ class TestMoveCheckTime(unittest.TestCase):
 
 class TestMove(unittest.TestCase):
     def test_move_file_tempfs(self):
-        with open_fs("temp://") as a, open_fs("temp://") as b:
-            dir_a = a.makedir("dir")
-            dir_b = b.makedir("subdir")
-            dir_b.writetext("file.txt", "Content")
-            fs.move.move_file(dir_b, "file.txt", dir_a, "here.txt")
-            self.assertEqual(a.readtext("dir/here.txt"), "Content")
-            self.assertFalse(b.exists("subdir/file.txt"))
+        with open_fs("temp://") as src, open_fs("temp://") as dst:
+            src_dir = src.makedir("Some subfolder")
+            src_dir.writetext("file.txt", "Content")
+            dst_dir = dst.makedir("dest dir")
+            fs.move.move_file(src_dir, "file.txt", dst_dir, "target.txt")
+            self.assertEqual(dst.readtext("dest dir/target.txt"), "Content")
+            self.assertFalse(src.exists("Some subfolder/file.txt"))
 
     def test_move_file_fs_urls(self):
         # create a temp dir to work on
@@ -111,10 +111,10 @@ class TestMove(unittest.TestCase):
                 "osfs://" + join(path, "subdir_src"),
                 "file.txt",
                 "osfs://" + join(path, "subdir_dst"),
-                "file.txt",
+                "target.txt",
             )
             self.assertFalse(subdir_src.exists("file.txt"))
-            self.assertEqual(tmp.readtext("subdir_dst/file.txt"), "Content")
+            self.assertEqual(tmp.readtext("subdir_dst/target.txt"), "Content")
 
     def test_move_file_same_fs_read_only_source(self):
         with open_fs("temp://") as tmp:
@@ -123,21 +123,21 @@ class TestMove(unittest.TestCase):
             src = read_only(open_fs(path))
             dst = tmp.makedir("sub")
             with self.assertRaises(ResourceReadOnly):
-                fs.move.move_file(src, "file.txt", dst, "file.txt")
+                fs.move.move_file(src, "file.txt", dst, "target_file.txt")
             self.assertFalse(
-                dst.exists("file.txt"), "file should not have been copied over"
+                dst.exists("target_file.txt"), "file should not have been copied over"
             )
             self.assertTrue(src.exists("file.txt"))
 
     def test_move_file_read_only_mem_source(self):
         with open_fs("mem://") as src, open_fs("mem://") as dst:
             src.writetext("file.txt", "Content")
-            sub = dst.makedir("sub")
+            dst_sub = dst.makedir("sub")
             src_ro = read_only(src)
             with self.assertRaises(ResourceReadOnly):
-                fs.move.move_file(src_ro, "file.txt", sub, "file.txt")
+                fs.move.move_file(src_ro, "file.txt", dst_sub, "target.txt")
             self.assertFalse(
-                sub.exists("file.txt"), "file should not have been copied over"
+                dst_sub.exists("target.txt"), "file should not have been copied over"
             )
             self.assertTrue(src.exists("file.txt"))
 
@@ -146,9 +146,9 @@ class TestMove(unittest.TestCase):
             src.writetext("file.txt", "Content")
             dst_ro = read_only(dst)
             with self.assertRaises(ResourceReadOnly):
-                fs.move.move_file(src, "file.txt", dst_ro, "file.txt")
+                fs.move.move_file(src, "file.txt", dst_ro, "target.txt")
             self.assertFalse(
-                dst_ro.exists("file.txt"), "file should not have been copied over"
+                dst_ro.exists("target.txt"), "file should not have been copied over"
             )
             self.assertTrue(src.exists("file.txt"))
 
@@ -158,9 +158,9 @@ class TestMove(unittest.TestCase):
             with mock.patch.object(src, "remove") as mck:
                 mck.side_effect = FSError
                 with self.assertRaises(FSError):
-                    fs.move.move_file(src, "file.txt", dst, "file.txt")
+                    fs.move.move_file(src, "file.txt", dst, "target.txt")
             self.assertTrue(src.exists("file.txt"))
-            self.assertFalse(dst.exists("file.txt"))
+            self.assertFalse(dst.exists("target.txt"))
 
     def test_move_file_no_cleanup_on_error(self):
         with open_fs("mem://") as src, open_fs("mem://") as dst:
@@ -169,7 +169,7 @@ class TestMove(unittest.TestCase):
                 mck.side_effect = FSError
                 with self.assertRaises(FSError):
                     fs.move.move_file(
-                        src, "file.txt", dst, "file.txt", cleanup_dest_on_error=False
+                        src, "file.txt", dst, "target.txt", cleanup_dst_on_error=False
                     )
             self.assertTrue(src.exists("file.txt"))
-            self.assertTrue(dst.exists("file.txt"))
+            self.assertTrue(dst.exists("target.txt"))
