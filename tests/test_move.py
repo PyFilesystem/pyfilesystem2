@@ -35,10 +35,10 @@ class TestMoveCheckTime(unittest.TestCase):
 
         fs.move.move_fs(src_fs, dst_fs, preserve_time=self.preserve_time)
 
+        self.assertTrue(src_fs.isempty("/"))
         self.assertTrue(dst_fs.isdir("foo/bar"))
         self.assertTrue(dst_fs.isfile("test.txt"))
         self.assertTrue(dst_fs.isfile("foo/bar/baz.txt"))
-        self.assertTrue(src_fs.isempty("/"))
 
         if self.preserve_time:
             dst_file1_info = dst_fs.getinfo("test.txt", namespaces)
@@ -97,8 +97,8 @@ class TestMove(unittest.TestCase):
             src_dir.writetext("file.txt", "Content")
             dst_dir = dst.makedir("dest dir")
             fs.move.move_file(src_dir, "file.txt", dst_dir, "target.txt")
-            self.assertEqual(dst.readtext("dest dir/target.txt"), "Content")
             self.assertFalse(src.exists("Some subfolder/file.txt"))
+            self.assertEqual(dst.readtext("dest dir/target.txt"), "Content")
 
     def test_move_file_fs_urls(self):
         # create a temp dir to work on
