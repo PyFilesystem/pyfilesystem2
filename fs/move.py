@@ -59,7 +59,7 @@ def move_file(
         preserve_time (bool): If `True`, try to preserve mtime of the
             resources (defaults to `False`).
         cleanup_dst_on_error (bool): If `True`, tries to delete the file copied to
-            `dst_fs` if deleting the file from `src_fs` fails (defaults to `True`).
+            ``dst_fs`` if deleting the file from ``src_fs`` fails (defaults to `True`).
 
     """
     with manage_fs(src_fs, writeable=True) as _src_fs:
