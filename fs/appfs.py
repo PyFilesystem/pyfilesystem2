@@ -5,7 +5,7 @@ across platforms, which vary in their conventions. They are all
 subclasses of `~fs.osfs.OSFS`.
 
 """
-# Thanks to authors of https://pypi.org/project/platformdirs
+# Thanks to authors of https://pypi.org/project/appdirs
 
 # see http://technet.microsoft.com/en-us/library/cc766489(WS.10).aspx
 
@@ -16,7 +16,7 @@ import six
 
 from .osfs import OSFS
 from ._repr import make_repr
-from platformdirs import PlatformDirs
+from appdirs import AppDirs
 
 if typing.TYPE_CHECKING:
     from typing import Optional, Text
@@ -78,7 +78,7 @@ class _AppFS(OSFS):
                 will be created if it does not exist.
 
         """
-        self.app_dirs = PlatformDirs(appname, author, version, roaming)
+        self.app_dirs = AppDirs(appname, author, version, roaming)
         self._create = create
         super(_AppFS, self).__init__(
             getattr(self.app_dirs, self.app_dir), create=create

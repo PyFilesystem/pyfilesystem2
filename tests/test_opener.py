@@ -264,7 +264,7 @@ class TestOpeners(unittest.TestCase):
         mem_fs_2 = opener.open_fs(mem_fs)
         self.assertEqual(mem_fs, mem_fs_2)
 
-    @mock.patch("platformdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
+    @mock.patch("appdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
     def test_open_userdata(self, app_dir):
         app_dir.return_value = self.tmpdir
 
@@ -276,7 +276,7 @@ class TestOpeners(unittest.TestCase):
         self.assertEqual(app_fs.app_dirs.appauthor, "willmcgugan")
         self.assertEqual(app_fs.app_dirs.version, "1.0")
 
-    @mock.patch("platformdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
+    @mock.patch("appdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
     def test_open_userdata_no_version(self, app_dir):
         app_dir.return_value = self.tmpdir
 
@@ -285,7 +285,7 @@ class TestOpeners(unittest.TestCase):
         self.assertEqual(app_fs.app_dirs.appauthor, "willmcgugan")
         self.assertEqual(app_fs.app_dirs.version, None)
 
-    @mock.patch("platformdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
+    @mock.patch("appdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
     def test_user_data_opener(self, app_dir):
         app_dir.return_value = self.tmpdir
 
