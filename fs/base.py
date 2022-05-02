@@ -21,7 +21,7 @@ import warnings
 
 import six
 
-from . import copy, errors, fsencode, iotools, move, tools, walk, wildcard
+from . import copy, errors, fsencode, iotools, tools, walk, wildcard
 from .copy import copy_modified_time
 from .glob import BoundGlobber
 from .mode import validate_open_mode
@@ -1083,10 +1083,12 @@ class FS(object):
                 ancestors is not a directory.
 
         """
+        from .move import move_dir
+
         with self._lock:
             if not create and not self.exists(dst_path):
                 raise errors.ResourceNotFound(dst_path)
-            move.move_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
+            move_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
 
     def makedirs(
         self,

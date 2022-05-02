@@ -40,6 +40,7 @@ Many thanks to the following developers for contributing to this project:
 - [Silvan Spross](https://github.com/sspross)
 - [@sqwishy](https://github.com/sqwishy)
 - [Sven Schliesing](https://github.com/muffl0n)
+- [Thomas Feldmann](https://github.com/tfeldmann)
 - [Tim Gates](https://github.com/timgates42/)
 - [@tkossak](https://github.com/tkossak)
 - [Todd Levi](https://github.com/televi)

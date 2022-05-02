@@ -31,6 +31,7 @@ if typing.TYPE_CHECKING:
         Dict,
         Iterator,
         IO,
+        Mapping,
         Optional,
         Text,
         Tuple,
@@ -320,3 +321,10 @@ class WrapReadOnly(WrapFS[_F], typing.Generic[_F]):
         # type: (Text) -> None
         self.check()
         raise ResourceReadOnly(path)
+
+    def getmeta(self, namespace="standard"):
+        # type: (Text) -> Mapping[Text, object]
+        self.check()
+        meta = dict(self.delegate_fs().getmeta(namespace=namespace))
+        meta.update(read_only=True, supports_rename=False)
+        return meta

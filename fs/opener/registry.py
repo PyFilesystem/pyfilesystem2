@@ -14,6 +14,7 @@ import pkg_resources
 
 from .base import Opener
 from .errors import UnsupportedProtocol, EntryPointError
+from ..errors import ResourceReadOnly
 from .parse import parse_fs_url
 
 if typing.TYPE_CHECKING:
@@ -282,10 +283,18 @@ class Registry(object):
         """
         from ..base import FS
 
+        def assert_writeable(fs):
+            if fs.getmeta().get("read_only", True):
+                raise ResourceReadOnly(path="/")
+
         if isinstance(fs_url, FS):
+            if writeable:
+                assert_writeable(fs_url)
             yield fs_url
         else:
             _fs = self.open_fs(fs_url, create=create, writeable=writeable, cwd=cwd)
+            if writeable:
+                assert_writeable(_fs)
             try:
                 yield _fs
             finally:
