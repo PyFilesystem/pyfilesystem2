@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
-from datetime import datetime
 import unittest
+from datetime import datetime
 
 from fs.enums import ResourceType
 from fs.info import Info

@@ -4,8 +4,7 @@ This is the example code from the Python 2 documentation:
 https://docs.python.org/2.7/library/datetime.html#tzinfo-objects
 """
 
-from datetime import tzinfo, timedelta
-
+from datetime import timedelta, tzinfo
 
 ZERO = timedelta(0)
 

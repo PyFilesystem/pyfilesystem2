@@ -1,14 +1,12 @@
 """Manage several filesystems through a single view.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 import typing
-from collections import namedtuple, OrderedDict
-from operator import itemgetter
 
+from collections import OrderedDict, namedtuple
+from operator import itemgetter
 from six import text_type
 
 from . import errors
@@ -19,18 +17,19 @@ from .path import abspath, normpath
 
 if typing.TYPE_CHECKING:
     from typing import (
+        IO,
         Any,
         BinaryIO,
         Collection,
         Iterator,
-        IO,
-        MutableMapping,
         List,
+        MutableMapping,
         MutableSet,
         Optional,
         Text,
         Tuple,
     )
+
     from .enums import ResourceType
     from .info import Info, RawInfo
     from .permissions import Permissions

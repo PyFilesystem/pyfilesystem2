@@ -3,14 +3,12 @@ from __future__ import unicode_literals
 import os
 import platform
 import shutil
+import six
 import tempfile
 import unittest
 
-import six
-
 import fs
 from fs.osfs import OSFS
-
 
 if platform.system() != "Windows":
 

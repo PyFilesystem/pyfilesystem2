@@ -1,11 +1,9 @@
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
 import unittest
-
 from six import text_type
 
-from fs.permissions import make_mode, Permissions
+from fs.permissions import Permissions, make_mode
 
 
 class TestPermissions(unittest.TestCase):

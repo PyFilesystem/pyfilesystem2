@@ -1,9 +1,8 @@
 # coding: utf-8
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import calendar
+import datetime
 import os
 import platform
 import shutil
@@ -12,23 +11,19 @@ import tempfile
 import time
 import unittest
 import uuid
-import datetime
 
 try:
     from unittest import mock
 except ImportError:
     import mock
 
-from six import text_type, BytesIO
-
-from ftplib import error_perm
-from ftplib import error_temp
-
+from ftplib import error_perm, error_temp
 from pyftpdlib.authorizers import DummyAuthorizer
+from six import BytesIO, text_type
 
 from fs import errors
-from fs.opener import open_fs
 from fs.ftpfs import FTPFS, ftp_errors
+from fs.opener import open_fs
 from fs.path import join
 from fs.subfs import SubFS
 from fs.test import FSTestCases

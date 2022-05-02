@@ -1,10 +1,9 @@
 from __future__ import unicode_literals
 
 import shutil
+import six
 import tempfile
 import unittest
-
-import six
 
 try:
     from unittest import mock

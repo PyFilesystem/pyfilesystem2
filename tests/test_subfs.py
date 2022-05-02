@@ -6,9 +6,10 @@ import tempfile
 import unittest
 
 from fs import osfs
-from fs.subfs import SubFS
 from fs.memoryfs import MemoryFS
 from fs.path import relpath
+from fs.subfs import SubFS
+
 from .test_osfs import TestOSFS
 
 

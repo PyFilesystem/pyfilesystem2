@@ -5,11 +5,11 @@ import doctest
 import importlib
 import os
 import pkgutil
-import types
-import warnings
 import tempfile
 import time
+import types
 import unittest
+import warnings
 from pprint import pprint
 
 try:

@@ -1,10 +1,10 @@
 """Time related tools.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import typing
+
 from calendar import timegm
 from datetime import datetime
 

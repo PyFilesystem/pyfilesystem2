@@ -5,29 +5,24 @@ All Filesystems should be able to pass these.
 
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
-from datetime import datetime
 import io
 import itertools
 import json
 import os
+import six
 import time
 import unittest
 import warnings
+from datetime import datetime
+from six import text_type
 
 import fs.copy
 import fs.move
-from fs import ResourceType, Seek
-from fs import errors
-from fs import walk
-from fs import glob
+from fs import ResourceType, Seek, errors, glob, walk
 from fs.opener import open_fs
 from fs.subfs import ClosingSubFS, SubFS
-
-import six
-from six import text_type
 
 if six.PY2:
     import collections as collections_abc

@@ -1,8 +1,7 @@
 import os
+import unittest
 
 from fs import enums
-
-import unittest
 
 
 class TestEnums(unittest.TestCase):

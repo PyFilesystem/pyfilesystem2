@@ -2,9 +2,8 @@ from __future__ import unicode_literals
 
 import unittest
 
-from fs.mode import validate_open_mode
-from fs.mode import validate_openbin_mode
 from fs import tools
+from fs.mode import validate_open_mode, validate_openbin_mode
 from fs.opener import open_fs
 
 

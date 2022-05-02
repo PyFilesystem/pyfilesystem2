@@ -4,8 +4,7 @@ import posixpath
 import unittest
 
 from fs import memoryfs
-from fs.test import FSTestCases
-from fs.test import UNICODE_TEXT
+from fs.test import UNICODE_TEXT, FSTestCases
 
 try:
     # Only supported on Python 3.4+

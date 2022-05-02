@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
-from fs import filesize
-
 import unittest
+
+from fs import filesize
 
 
 class TestFilesize(unittest.TestCase):

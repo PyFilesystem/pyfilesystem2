@@ -8,12 +8,11 @@ which may be used as a catch-all filesystem exception.
 
 """
 
-from __future__ import unicode_literals
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
 
-import functools
 import typing
 
+import functools
 import six
 from six import text_type
 

@@ -1,9 +1,9 @@
 import six
 
 try:
-    from os import fsencode, fsdecode
+    from os import fsdecode, fsencode
 except ImportError:
-    from backports.os import fsencode, fsdecode  # type: ignore
+    from backports.os import fsdecode, fsencode  # type: ignore
 
 try:
     from os import fspath

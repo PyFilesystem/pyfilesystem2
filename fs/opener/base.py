@@ -2,13 +2,14 @@
 """`Opener` abstract base class.
 """
 
-import abc
 import typing
 
+import abc
 import six
 
 if typing.TYPE_CHECKING:
     from typing import List, Text
+
     from ..base import FS
     from .parse import ParseResult
 

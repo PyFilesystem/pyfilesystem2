@@ -1,29 +1,21 @@
 """Compatibility tools between Python 2 and Python 3 I/O interfaces.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
+
+import typing
 
 import array
 import io
-import typing
-from io import SEEK_SET, SEEK_CUR
+from io import SEEK_CUR, SEEK_SET
 
 from .mode import Mode
 
 if typing.TYPE_CHECKING:
+    from typing import IO, Any, Iterable, Iterator, List, Optional, Text, Union
+
     import mmap
     from io import RawIOBase
-    from typing import (
-        Any,
-        Iterable,
-        Iterator,
-        IO,
-        List,
-        Optional,
-        Text,
-        Union,
-    )
 
 
 class RawWrapper(io.RawIOBase):

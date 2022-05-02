@@ -8,15 +8,12 @@ searching etc. See :ref:`walking` for details.
 from __future__ import unicode_literals
 
 import typing
-from collections import defaultdict
-from collections import deque
-from collections import namedtuple
+
+from collections import defaultdict, deque, namedtuple
 
 from ._repr import make_repr
 from .errors import FSError
-from .path import abspath
-from .path import combine
-from .path import normpath
+from .path import abspath, combine, normpath
 
 if typing.TYPE_CHECKING:
     from typing import (
@@ -25,12 +22,13 @@ if typing.TYPE_CHECKING:
         Collection,
         Iterator,
         List,
-        Optional,
         MutableMapping,
+        Optional,
         Text,
         Tuple,
         Type,
     )
+
     from .base import FS
     from .info import Info
 

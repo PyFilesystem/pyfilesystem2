@@ -1,12 +1,11 @@
 """Least Recently Used cache mapping.
 """
 
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import typing
-from collections import OrderedDict
 
+from collections import OrderedDict
 
 _K = typing.TypeVar("_K")
 _V = typing.TypeVar("_V")

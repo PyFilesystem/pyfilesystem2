@@ -4,8 +4,7 @@
 Color is supported on UNIX terminals.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import sys
 import typing
@@ -14,6 +13,7 @@ from fs.path import abspath, join, normpath
 
 if typing.TYPE_CHECKING:
     from typing import List, Optional, Text, TextIO, Tuple
+
     from .base import FS
     from .info import Info
 

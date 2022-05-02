@@ -16,8 +16,7 @@ the expense of potentially copying extra files.
 
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import typing
 
@@ -30,6 +29,7 @@ from .walk import Walker
 
 if typing.TYPE_CHECKING:
     from typing import Callable, Optional, Text, Union
+
     from .base import FS
     from .info import Info
 

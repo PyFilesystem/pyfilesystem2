@@ -9,11 +9,11 @@ import tempfile
 import unittest
 
 from fs import tarfs
-from fs.enums import ResourceType
 from fs.compress import write_tar
+from fs.enums import ResourceType
+from fs.errors import NoURL
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
-from fs.errors import NoURL
 from fs.test import FSTestCases
 
 from .test_archives import ArchiveTestCases

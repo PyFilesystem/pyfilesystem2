@@ -1,9 +1,7 @@
 """Manage other filesystems as a folder hierarchy.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import typing
 
@@ -12,19 +10,16 @@ from six import text_type
 from . import errors
 from .base import FS
 from .memoryfs import MemoryFS
-from .path import abspath
-from .path import forcedir
-from .path import normpath
-from .mode import validate_open_mode
-from .mode import validate_openbin_mode
+from .mode import validate_open_mode, validate_openbin_mode
+from .path import abspath, forcedir, normpath
 
 if typing.TYPE_CHECKING:
     from typing import (
+        IO,
         Any,
         BinaryIO,
         Collection,
         Iterator,
-        IO,
         List,
         MutableSequence,
         Optional,
@@ -32,6 +27,7 @@ if typing.TYPE_CHECKING:
         Tuple,
         Union,
     )
+
     from .enums import ResourceType
     from .info import Info, RawInfo
     from .permissions import Permissions

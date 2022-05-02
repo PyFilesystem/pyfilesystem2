@@ -1,7 +1,7 @@
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals
 
-from datetime import datetime
 import unittest
+from datetime import datetime
 
 from fs.time import datetime_to_epoch, epoch_to_datetime
 

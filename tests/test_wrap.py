@@ -11,10 +11,10 @@ except ImportError:
 import six
 
 import fs.copy
+import fs.errors
 import fs.mirror
 import fs.move
 import fs.wrap
-import fs.errors
 from fs import open_fs
 from fs.info import Info
 

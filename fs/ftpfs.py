@@ -1,8 +1,9 @@
 """Manage filesystems on remote FTP servers.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
+
+import typing
 
 import array
 import calendar
@@ -11,7 +12,6 @@ import io
 import itertools
 import socket
 import threading
-import typing
 from collections import OrderedDict
 from contextlib import contextmanager
 from ftplib import FTP
@@ -20,41 +20,32 @@ try:
     from ftplib import FTP_TLS
 except ImportError as err:
     FTP_TLS = err  # type: ignore
-from ftplib import error_perm, error_temp
 from typing import cast
 
-from six import PY2
-from six import text_type
-from six import raise_from
+from ftplib import error_perm, error_temp
+from six import PY2, raise_from, text_type
 
+from . import _ftp_parse as ftp_parse
 from . import errors
 from .base import FS
 from .constants import DEFAULT_CHUNK_SIZE
-from .enums import ResourceType
-from .enums import Seek
+from .enums import ResourceType, Seek
 from .info import Info
 from .iotools import line_iterator
 from .mode import Mode
-from .path import abspath
-from .path import dirname
-from .path import basename
-from .path import normpath
-from .path import split
+from .path import abspath, basename, dirname, normpath, split
 from .time import epoch_to_datetime
-from . import _ftp_parse as ftp_parse
 
 if typing.TYPE_CHECKING:
-    import mmap
-    import ftplib
     from typing import (
         Any,
         BinaryIO,
         ByteString,
+        Container,
         ContextManager,
+        Dict,
         Iterable,
         Iterator,
-        Container,
-        Dict,
         List,
         Optional,
         SupportsInt,
@@ -62,6 +53,10 @@ if typing.TYPE_CHECKING:
         Tuple,
         Union,
     )
+
+    import ftplib
+    import mmap
+
     from .base import _OpendirFactory
     from .info import RawInfo
     from .permissions import Permissions
@@ -130,7 +125,6 @@ if PY2:
     def _decode(st, encoding):
         # type: (Union[Text, bytes], Text) -> Text
         return st.decode(encoding, "replace") if isinstance(st, bytes) else st
-
 
 else:
 

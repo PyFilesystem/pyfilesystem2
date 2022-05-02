@@ -1,13 +1,10 @@
 from __future__ import unicode_literals
 
 import io
+import six
 import unittest
 
-import six
-
-from fs import iotools
-from fs import tempfs
-
+from fs import iotools, tempfs
 from fs.test import UNICODE_TEXT
 
 

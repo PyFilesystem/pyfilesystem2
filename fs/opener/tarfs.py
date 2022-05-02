@@ -2,20 +2,19 @@
 """`TarFS` opener definition.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import typing
 
 from .base import Opener
-from .registry import registry
 from .errors import NotWriteable
+from .registry import registry
 
 if typing.TYPE_CHECKING:
     from typing import Text
-    from .parse import ParseResult
+
     from ..tarfs import TarFS  # noqa: F401
+    from .parse import ParseResult
 
 
 @registry.install

@@ -1,26 +1,25 @@
 """Container for filesystem resource informations.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import typing
 from typing import cast
-from copy import deepcopy
 
 import six
+from copy import deepcopy
 
-from .path import join
+from ._typing import Text, overload
 from .enums import ResourceType
 from .errors import MissingInfoNamespace
+from .path import join
 from .permissions import Permissions
 from .time import epoch_to_datetime
-from ._typing import overload, Text
 
 if typing.TYPE_CHECKING:
-    from datetime import datetime
     from typing import Any, Callable, List, Mapping, Optional, Union
+
+    from datetime import datetime
 
     RawInfo = Mapping[Text, Mapping[Text, object]]
     ToDatetime = Callable[[int], datetime]

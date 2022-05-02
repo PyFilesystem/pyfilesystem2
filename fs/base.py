@@ -8,18 +8,18 @@ can work with any of the supported filesystems.
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import typing
+
 import abc
 import hashlib
 import itertools
 import os
+import six
 import threading
 import time
-import typing
+import warnings
 from contextlib import closing
 from functools import partial, wraps
-import warnings
-
-import six
 
 from . import copy, errors, fsencode, iotools, tools, walk, wildcard
 from .copy import copy_modified_time
@@ -30,15 +30,13 @@ from .time import datetime_to_epoch
 from .walk import Walker
 
 if typing.TYPE_CHECKING:
-    from datetime import datetime
-    from threading import RLock
     from typing import (
+        IO,
         Any,
         BinaryIO,
         Callable,
         Collection,
         Dict,
-        IO,
         Iterable,
         Iterator,
         List,
@@ -49,11 +47,15 @@ if typing.TYPE_CHECKING:
         Type,
         Union,
     )
+
+    from datetime import datetime
+    from threading import RLock
     from types import TracebackType
+
     from .enums import ResourceType
     from .info import Info, RawInfo
-    from .subfs import SubFS
     from .permissions import Permissions
+    from .subfs import SubFS
     from .walk import BoundWalker
 
     _F = typing.TypeVar("_F", bound="FS")

@@ -7,11 +7,11 @@ Usage:
 
 """
 
-from collections import defaultdict
 import sys
 
-from fs import open_fs
+from collections import defaultdict
 
+from fs import open_fs
 
 hashes = defaultdict(list)
 with open_fs(sys.argv[1]) as fs:

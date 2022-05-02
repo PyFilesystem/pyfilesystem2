@@ -2,16 +2,17 @@
 """
 # Adapted from https://hg.python.org/cpython/file/2.7/Lib/fnmatch.py
 
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals
+
+import typing
 
 import re
-import typing
 from functools import partial
 
 from .lrucache import LRUCache
 
 if typing.TYPE_CHECKING:
-    from typing import Callable, Iterable, Text, Tuple, Pattern
+    from typing import Callable, Iterable, Pattern, Text, Tuple
 
 
 _PATTERN_CACHE = LRUCache(1000)  # type: LRUCache[Tuple[Text, bool], Pattern]

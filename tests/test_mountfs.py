@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 import unittest
 
-from fs.mountfs import MountError, MountFS
 from fs.memoryfs import MemoryFS
+from fs.mountfs import MountError, MountFS
 from fs.tempfs import TempFS
 from fs.test import FSTestCases
 

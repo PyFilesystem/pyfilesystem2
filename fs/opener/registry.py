@@ -2,32 +2,22 @@
 """`Registry` class mapping protocols and FS URLs to their `Opener`.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
+
+import typing
 
 import collections
 import contextlib
-import typing
-
 import pkg_resources
 
-from .base import Opener
-from .errors import UnsupportedProtocol, EntryPointError
 from ..errors import ResourceReadOnly
+from .base import Opener
+from .errors import EntryPointError, UnsupportedProtocol
 from .parse import parse_fs_url
 
 if typing.TYPE_CHECKING:
-    from typing import (
-        Callable,
-        Dict,
-        Iterator,
-        List,
-        Text,
-        Type,
-        Tuple,
-        Union,
-    )
+    from typing import Callable, Dict, Iterator, List, Text, Tuple, Type, Union
+
     from ..base import FS
 
 

@@ -11,35 +11,36 @@ Here's an example that opens a filesystem then makes it *read only*::
 
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import typing
 
-from .wrapfs import WrapFS
-from .path import abspath, normpath, split
-from .errors import ResourceReadOnly, ResourceNotFound
+from .errors import ResourceNotFound, ResourceReadOnly
 from .info import Info
 from .mode import check_writable
+from .path import abspath, normpath, split
+from .wrapfs import WrapFS
 
 if typing.TYPE_CHECKING:
-    from datetime import datetime
     from typing import (
+        IO,
         Any,
         BinaryIO,
         Collection,
         Dict,
         Iterator,
-        IO,
         Mapping,
         Optional,
         Text,
         Tuple,
     )
+
+    from datetime import datetime
+
     from .base import FS  # noqa: F401
     from .info import RawInfo
-    from .subfs import SubFS
     from .permissions import Permissions
+    from .subfs import SubFS
 
 
 _W = typing.TypeVar("_W", bound="WrapFS")

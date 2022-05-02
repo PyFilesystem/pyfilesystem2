@@ -9,23 +9,21 @@ import six
 
 from . import errors
 from .base import FS
-from .copy import copy_file, copy_dir
+from .copy import copy_dir, copy_file
+from .error_tools import unwrap_errors
 from .info import Info
 from .path import abspath, join, normpath
-from .error_tools import unwrap_errors
 
 if typing.TYPE_CHECKING:
-    from datetime import datetime
-    from threading import RLock
     from typing import (
+        IO,
         Any,
         AnyStr,
         BinaryIO,
         Callable,
         Collection,
-        Iterator,
         Iterable,
-        IO,
+        Iterator,
         List,
         Mapping,
         Optional,
@@ -33,6 +31,10 @@ if typing.TYPE_CHECKING:
         Tuple,
         Union,
     )
+
+    from datetime import datetime
+    from threading import RLock
+
     from .enums import ResourceType
     from .info import RawInfo
     from .permissions import Permissions

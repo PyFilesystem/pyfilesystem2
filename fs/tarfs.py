@@ -1,18 +1,18 @@
 """Manage the filesystem in a Tar archive.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
+
+import typing
+from typing import IO, cast
 
 import os
-import tarfile
-import typing
-from collections import OrderedDict
-from typing import cast, IO
-
 import six
+import tarfile
+from collections import OrderedDict
 
 from . import errors
+from ._url_tools import url_quote
 from .base import FS
 from .compress import write_tar
 from .enums import ResourceType
@@ -20,13 +20,11 @@ from .errors import IllegalBackReference, NoURL
 from .info import Info
 from .iotools import RawWrapper
 from .opener import open_fs
+from .path import basename, frombase, isbase, normpath, parts, relpath
 from .permissions import Permissions
-from ._url_tools import url_quote
-from .path import relpath, basename, isbase, normpath, parts, frombase
 from .wrapfs import WrapFS
 
 if typing.TYPE_CHECKING:
-    from tarfile import TarInfo
     from typing import (
         Any,
         BinaryIO,
@@ -38,6 +36,9 @@ if typing.TYPE_CHECKING:
         Tuple,
         Union,
     )
+
+    from tarfile import TarInfo
+
     from .info import RawInfo
     from .subfs import SubFS
 
@@ -52,7 +53,6 @@ if six.PY2:
     def _get_member_info(member, encoding):
         # type: (TarInfo, Text) -> Dict[Text, object]
         return member.get_info(encoding, None)
-
 
 else:
 

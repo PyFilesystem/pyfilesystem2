@@ -2,21 +2,20 @@
 """``AppFS`` opener definition.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
 import typing
 
 from .base import Opener
-from .registry import registry
 from .errors import OpenerError
+from .registry import registry
 
 if typing.TYPE_CHECKING:
     from typing import Text, Union
-    from .parse import ParseResult
+
     from ..appfs import _AppFS
     from ..subfs import SubFS
+    from .parse import ParseResult
 
 
 @registry.install
@@ -36,8 +35,8 @@ class AppFSOpener(Opener):
     ):
         # type: (...) -> Union[_AppFS, SubFS[_AppFS]]
 
-        from ..subfs import ClosingSubFS
         from .. import appfs
+        from ..subfs import ClosingSubFS
 
         if self._protocol_mapping is None:
             self._protocol_mapping = {

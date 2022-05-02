@@ -9,7 +9,6 @@ except ImportError:
 
 from parameterized import parameterized, parameterized_class
 
-
 import fs.move
 from fs import open_fs
 from fs.errors import FSError, ResourceReadOnly

@@ -2,8 +2,7 @@ from __future__ import unicode_literals
 
 import unittest
 
-from fs import glob
-from fs import open_fs
+from fs import glob, open_fs
 
 
 class TestGlob(unittest.TestCase):

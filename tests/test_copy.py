@@ -1,13 +1,12 @@
 from __future__ import unicode_literals
 
-import errno
-import datetime
-import os
-import unittest
-import tempfile
-import shutil
 import calendar
-
+import datetime
+import errno
+import os
+import shutil
+import tempfile
+import unittest
 from parameterized import parameterized
 
 import fs.copy

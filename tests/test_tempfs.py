@@ -2,8 +2,8 @@ from __future__ import unicode_literals
 
 import os
 
-from fs.tempfs import TempFS
 from fs import errors
+from fs.tempfs import TempFS
 
 from .test_osfs import TestOSFS
 

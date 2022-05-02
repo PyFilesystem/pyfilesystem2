@@ -3,15 +3,15 @@
 
 from __future__ import unicode_literals
 
-from collections import namedtuple
-import re
 import typing
 
-from .lrucache import LRUCache
-from ._repr import make_repr
-from .path import iteratepath
-from . import wildcard
+import re
+from collections import namedtuple
 
+from . import wildcard
+from ._repr import make_repr
+from .lrucache import LRUCache
+from .path import iteratepath
 
 GlobMatch = namedtuple("GlobMatch", ["path", "info"])
 Counts = namedtuple("Counts", ["files", "directories", "data"])
@@ -19,6 +19,7 @@ LineCounts = namedtuple("LineCounts", ["lines", "non_blank"])
 
 if typing.TYPE_CHECKING:
     from typing import Iterator, List, Optional, Pattern, Text, Tuple
+
     from .base import FS
 
 

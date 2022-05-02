@@ -1,29 +1,28 @@
 """Manage the filesystem in a Zip archive.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import sys
 import typing
+
+import six
 import zipfile
 from datetime import datetime
 
-import six
-
 from . import errors
+from ._url_tools import url_quote
 from .base import FS
 from .compress import write_zip
 from .enums import ResourceType, Seek
 from .info import Info
 from .iotools import RawWrapper
-from .permissions import Permissions
 from .memoryfs import MemoryFS
 from .opener import open_fs
 from .path import dirname, forcedir, normpath, relpath
+from .permissions import Permissions
 from .time import datetime_to_epoch
 from .wrapfs import WrapFS
-from ._url_tools import url_quote
 
 if typing.TYPE_CHECKING:
     from typing import (
@@ -38,6 +37,7 @@ if typing.TYPE_CHECKING:
         Tuple,
         Union,
     )
+
     from .info import RawInfo
     from .subfs import SubFS
 

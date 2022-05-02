@@ -1,21 +1,21 @@
 # -*- encoding: UTF-8
 from __future__ import unicode_literals
 
-import os
 import sys
+
+import os
+import six
 import tempfile
 import unittest
 import zipfile
 
-import six
-
 from fs import zipfs
 from fs.compress import write_zip
+from fs.enums import Seek
+from fs.errors import NoURL
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
-from fs.errors import NoURL
 from fs.test import FSTestCases
-from fs.enums import Seek
 
 from .test_archives import ArchiveTestCases
 
