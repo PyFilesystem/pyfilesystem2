@@ -499,7 +499,7 @@ class FSTestCases(object):
         except (TypeError, ValueError):
             raise AssertionError("info should be JSON serializable")
 
-        # Non existant namespace is not an error
+        # Non existent namespace is not an error
         no_info = self.fs.getinfo("foo", "__nosuchnamespace__").raw
         self.assertIsInstance(no_info, dict)
         self.assertEqual(no_info["basic"], {"name": "foo", "is_dir": False})
@@ -629,7 +629,7 @@ class FSTestCases(object):
         self.fs.move("foo2", "bar", overwrite=True)
         self.assert_not_exists("foo2")
 
-        # Check moving to a non-existant directory
+        # Check moving to a non-existent directory
         with self.assertRaises(errors.ResourceNotFound):
             self.fs.move("bar", "egg/bar")
 

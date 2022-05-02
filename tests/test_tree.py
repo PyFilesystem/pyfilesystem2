@@ -58,7 +58,7 @@ class TestInfo(unittest.TestCase):
 
         def broken_filterdir(path, **kwargs):
             if path.startswith("/deep/deep1/"):
-                # Because error messages differ accross Python versions
+                # Because error messages differ across Python versions
                 raise Exception("integer division or modulo by zero")
             return filterdir(path, **kwargs)
 

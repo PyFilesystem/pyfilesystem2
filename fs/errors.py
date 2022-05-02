@@ -170,7 +170,7 @@ class NoURL(PathError):
 
 
 class InvalidPath(PathError):
-    """Path can't be mapped on to the underlaying filesystem."""
+    """Path can't be mapped on to the underlying filesystem."""
 
     default_message = "path '{path}' is invalid on this filesystem "
 

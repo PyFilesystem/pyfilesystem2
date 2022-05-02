@@ -1,6 +1,6 @@
 """Manage filesystems in temporary locations.
 
-A temporary filesytem is stored in a location defined by your OS
+A temporary filesystem is stored in a location defined by your OS
 (``/tmp`` on linux). The contents are deleted when the filesystem
 is closed.
 

@@ -338,7 +338,7 @@ Please update your code accordingly.
 
 ### Fixed
 
-- Root dir of MemoryFS accesible as a file
+- Root dir of MemoryFS accessible as a file
 - Packaging issues @televi
 - Deprecation warning re collections.Mapping
 
