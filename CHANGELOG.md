@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+
+## [2.4.16] - 2022-05-02
+
 ### Changed
 
 - Make `fs.zipfs._ZipExtFile` use the seeking mechanism implemented
