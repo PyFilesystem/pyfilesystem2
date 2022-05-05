@@ -5,15 +5,13 @@ Mode strings are used in in `~fs.base.FS.open` and
 
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import typing
 
 import six
 
 from ._typing import Text
-
 
 if typing.TYPE_CHECKING:
     from typing import FrozenSet, Set, Union

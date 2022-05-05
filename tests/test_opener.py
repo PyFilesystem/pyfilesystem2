@@ -1,19 +1,20 @@
 from __future__ import unicode_literals
 
-import os
-import shutil
 import sys
+
+import os
+import pkg_resources
+import shutil
 import tempfile
 import unittest
-import pkg_resources
 
 from fs import open_fs, opener
-from fs.osfs import OSFS
-from fs.opener import registry, errors
-from fs.memoryfs import MemoryFS
 from fs.appfs import UserDataFS
+from fs.memoryfs import MemoryFS
+from fs.opener import errors, registry
 from fs.opener.parse import ParseResult
 from fs.opener.registry import Registry
+from fs.osfs import OSFS
 
 try:
     from unittest import mock

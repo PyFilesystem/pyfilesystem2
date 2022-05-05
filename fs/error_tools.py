@@ -1,22 +1,22 @@
 """Tools for managing OS errors.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
+
+import sys
+import typing
 
 import errno
 import platform
-import sys
-import typing
 from contextlib import contextmanager
-
 from six import reraise
 
 from . import errors
 
 if typing.TYPE_CHECKING:
-    from types import TracebackType
     from typing import Iterator, Optional, Text, Type, Union
+
+    from types import TracebackType
 
 try:
     from collections.abc import Mapping

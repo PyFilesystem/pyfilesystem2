@@ -3,13 +3,11 @@ from __future__ import unicode_literals
 
 import os
 import stat
-
 from six import text_type
 
-from fs.opener import open_fs
+from fs import errors, walk
 from fs.enums import ResourceType
-from fs import walk
-from fs import errors
+from fs.opener import open_fs
 from fs.test import UNICODE_TEXT
 
 

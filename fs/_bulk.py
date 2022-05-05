@@ -6,9 +6,9 @@ Implements a thread pool for parallel copying of files.
 
 from __future__ import unicode_literals
 
-import threading
 import typing
 
+import threading
 from six.moves.queue import Queue
 
 from .copy import copy_file_internal, copy_modified_time
@@ -16,9 +16,11 @@ from .errors import BulkCopyFailed
 from .tools import copy_file_data
 
 if typing.TYPE_CHECKING:
-    from .base import FS
+    from typing import IO, List, Optional, Text, Tuple, Type
+
     from types import TracebackType
-    from typing import List, Optional, Text, Type, IO, Tuple
+
+    from .base import FS
 
 
 class _Worker(threading.Thread):

@@ -1,32 +1,27 @@
 """Manage a volatile in-memory filesystem.
 """
-from __future__ import absolute_import
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
+
+import typing
 
 import contextlib
 import io
 import os
+import six
 import time
-import typing
 from collections import OrderedDict
 from threading import RLock
 
-import six
-
 from . import errors
+from ._typing import overload
 from .base import FS
 from .copy import copy_modified_time
 from .enums import ResourceType, Seek
 from .info import Info
 from .mode import Mode
-from .path import iteratepath
-from .path import normpath
-from .path import split
-from ._typing import overload
+from .path import iteratepath, normpath, split
 
 if typing.TYPE_CHECKING:
-    import array
-    import mmap
     from typing import (
         Any,
         BinaryIO,
@@ -37,10 +32,14 @@ if typing.TYPE_CHECKING:
         List,
         Optional,
         SupportsInt,
-        Union,
         Text,
         Tuple,
+        Union,
     )
+
+    import array
+    import mmap
+
     from .base import _OpendirFactory
     from .info import RawInfo
     from .permissions import Permissions

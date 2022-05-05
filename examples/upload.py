@@ -12,8 +12,9 @@ example:
 
 """
 
-import os
 import sys
+
+import os
 
 from fs import open_fs
 

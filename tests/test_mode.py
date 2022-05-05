@@ -1,10 +1,9 @@
 from __future__ import unicode_literals
 
 import unittest
-
 from six import text_type
 
-from fs.mode import check_readable, check_writable, Mode
+from fs.mode import Mode, check_readable, check_writable
 
 
 class TestMode(unittest.TestCase):

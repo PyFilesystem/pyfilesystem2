@@ -4,6 +4,7 @@
 from __future__ import print_function, unicode_literals
 
 import typing
+
 import warnings
 
 from .errors import ResourceNotFound
@@ -14,6 +15,7 @@ from .walk import Walker
 
 if typing.TYPE_CHECKING:
     from typing import Callable, Optional, Text, Union
+
     from .base import FS
 
     _OnCopy = Callable[[FS, Text, FS, Text], object]

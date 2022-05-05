@@ -1,8 +1,7 @@
 """Abstract permissions container.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import typing
 from typing import Iterable
@@ -10,7 +9,6 @@ from typing import Iterable
 import six
 
 from ._typing import Text
-
 
 if typing.TYPE_CHECKING:
     from typing import Iterator, List, Optional, Tuple, Type, Union

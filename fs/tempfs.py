@@ -9,14 +9,13 @@ that you can later copy. It can also be used as a temporary data store.
 
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
-import shutil
-import tempfile
 import typing
 
+import shutil
 import six
+import tempfile
 
 from . import errors
 from .osfs import OSFS

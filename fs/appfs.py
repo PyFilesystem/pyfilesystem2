@@ -9,14 +9,14 @@ subclasses of `~fs.osfs.OSFS`.
 
 # see http://technet.microsoft.com/en-us/library/cc766489(WS.10).aspx
 
-import abc
 import typing
 
+import abc
 import six
-
-from .osfs import OSFS
-from ._repr import make_repr
 from appdirs import AppDirs
+
+from ._repr import make_repr
+from .osfs import OSFS
 
 if typing.TYPE_CHECKING:
     from typing import Optional, Text

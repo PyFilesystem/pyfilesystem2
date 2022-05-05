@@ -9,24 +9,21 @@ import six
 
 from . import errors
 from .base import FS
-from .copy import copy_file, copy_dir
-from .info import Info
-from .move import move_file, move_dir
-from .path import abspath, join, normpath
+from .copy import copy_dir, copy_file
 from .error_tools import unwrap_errors
+from .info import Info
+from .path import abspath, join, normpath
 
 if typing.TYPE_CHECKING:
-    from datetime import datetime
-    from threading import RLock
     from typing import (
+        IO,
         Any,
         AnyStr,
         BinaryIO,
         Callable,
         Collection,
-        Iterator,
         Iterable,
-        IO,
+        Iterator,
         List,
         Mapping,
         Optional,
@@ -34,6 +31,10 @@ if typing.TYPE_CHECKING:
         Tuple,
         Union,
     )
+
+    from datetime import datetime
+    from threading import RLock
+
     from .enums import ResourceType
     from .info import RawInfo
     from .permissions import Permissions
@@ -169,24 +170,21 @@ class WrapFS(FS, typing.Generic[_F]):
 
     def move(self, src_path, dst_path, overwrite=False, preserve_time=False):
         # type: (Text, Text, bool, bool) -> None
-        # A custom move permits a potentially optimized code path
-        src_fs, _src_path = self.delegate_path(src_path)
-        dst_fs, _dst_path = self.delegate_path(dst_path)
+        _fs, _src_path = self.delegate_path(src_path)
+        _, _dst_path = self.delegate_path(dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
-            if not overwrite and dst_fs.exists(_dst_path):
-                raise errors.DestinationExists(_dst_path)
-            move_file(src_fs, _src_path, dst_fs, _dst_path, preserve_time=preserve_time)
+            _fs.move(
+                _src_path, _dst_path, overwrite=overwrite, preserve_time=preserve_time
+            )
 
     def movedir(self, src_path, dst_path, create=False, preserve_time=False):
         # type: (Text, Text, bool, bool) -> None
-        src_fs, _src_path = self.delegate_path(src_path)
-        dst_fs, _dst_path = self.delegate_path(dst_path)
+        _fs, _src_path = self.delegate_path(src_path)
+        _, _dst_path = self.delegate_path(dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
-            if not create and not dst_fs.exists(_dst_path):
-                raise errors.ResourceNotFound(dst_path)
-            if not src_fs.getinfo(_src_path).is_dir:
-                raise errors.DirectoryExpected(src_path)
-            move_dir(src_fs, _src_path, dst_fs, _dst_path, preserve_time=preserve_time)
+            _fs.movedir(
+                _src_path, _dst_path, create=create, preserve_time=preserve_time
+            )
 
     def openbin(self, path, mode="r", buffering=-1, **options):
         # type: (Text, Text, int, **Any) -> BinaryIO

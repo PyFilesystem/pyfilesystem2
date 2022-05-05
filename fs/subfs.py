@@ -1,19 +1,19 @@
 """Manage a directory in a *parent* filesystem.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import typing
 
 import six
 
-from .wrapfs import WrapFS
 from .path import abspath, join, normpath, relpath
+from .wrapfs import WrapFS
 
 if typing.TYPE_CHECKING:
-    from .base import FS  # noqa: F401
     from typing import Text, Tuple
+
+    from .base import FS  # noqa: F401
 
 
 _F = typing.TypeVar("_F", bound="FS", covariant=True)

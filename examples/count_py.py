@@ -11,7 +11,6 @@ import sys
 from fs import open_fs
 from fs.filesize import traditional
 
-
 fs_url = sys.argv[1]
 count = 0
 

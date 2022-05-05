@@ -1,7 +1,8 @@
+import typing
+
+import platform
 import re
 import six
-import platform
-import typing
 
 if typing.TYPE_CHECKING:
     from typing import Text

@@ -8,11 +8,11 @@ See :ref:`paths` for an explanation of PyFilesystem paths.
 
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
+
+import typing
 
 import re
-import typing
 
 from .errors import IllegalBackReference
 

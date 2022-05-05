@@ -1,12 +1,12 @@
 from __future__ import unicode_literals
 
+import six
 import unittest
 
+from fs import walk
 from fs.errors import FSError
 from fs.memoryfs import MemoryFS
-from fs import walk
 from fs.wrap import read_only
-import six
 
 
 class TestWalker(unittest.TestCase):

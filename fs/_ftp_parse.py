@@ -1,19 +1,19 @@
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
-import unicodedata
-import datetime
 import re
 import time
+import unicodedata
+from datetime import datetime
 
-from pytz import UTC
+try:
+    from datetime import timezone
+except ImportError:
+    from ._tzcompat import timezone  # type: ignore
 
 from .enums import ResourceType
 from .permissions import Permissions
 
-
-EPOCH_DT = datetime.datetime.fromtimestamp(0, UTC)
+EPOCH_DT = datetime.fromtimestamp(0, timezone.utc)
 
 
 RE_LINUX = re.compile(
@@ -98,7 +98,7 @@ def _parse_time(t, formats):
     day = _t.tm_mday
     hour = _t.tm_hour
     minutes = _t.tm_min
-    dt = datetime.datetime(year, month, day, hour, minutes, tzinfo=UTC)
+    dt = datetime(year, month, day, hour, minutes, tzinfo=timezone.utc)
 
     epoch_time = (dt - EPOCH_DT).total_seconds()
     return epoch_time

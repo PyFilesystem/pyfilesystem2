@@ -4,8 +4,8 @@ from __future__ import unicode_literals
 
 import unittest
 
-from fs.base import FS
 from fs import errors
+from fs.base import FS
 
 
 class DummyFS(FS):

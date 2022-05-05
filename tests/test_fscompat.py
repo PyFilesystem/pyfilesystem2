@@ -1,10 +1,9 @@
 from __future__ import unicode_literals
 
+import six
 import unittest
 
-import six
-
-from fs._fscompat import fsencode, fsdecode, fspath
+from fs._fscompat import fsdecode, fsencode, fspath
 
 
 class PathMock(object):

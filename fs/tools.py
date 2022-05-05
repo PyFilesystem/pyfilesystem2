@@ -1,21 +1,17 @@
 """Miscellaneous tools for operating on filesystems.
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
 import typing
 
 from . import errors
-from .errors import DirectoryNotEmpty
-from .errors import ResourceNotFound
-from .path import abspath
-from .path import dirname
-from .path import normpath
-from .path import recursepath
+from .errors import DirectoryNotEmpty, ResourceNotFound
+from .path import abspath, dirname, normpath, recursepath
 
 if typing.TYPE_CHECKING:
     from typing import IO, List, Optional, Text, Union
+
     from .base import FS
 
 

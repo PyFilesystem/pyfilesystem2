@@ -4,26 +4,25 @@ Currently zip and tar are supported, using the `zipfile` and
 `tarfile` modules from the standard library.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
 
-import time
-import tarfile
 import typing
+
+import six
+import tarfile
+import time
 import zipfile
 from datetime import datetime
 
-import six
-
 from .enums import ResourceType
+from .errors import MissingInfoNamespace, NoSysPath
 from .path import relpath
 from .time import datetime_to_epoch
-from .errors import NoSysPath, MissingInfoNamespace
 from .walk import Walker
 
 if typing.TYPE_CHECKING:
     from typing import BinaryIO, Optional, Text, Tuple, Union
+
     from .base import FS
 
     ZipTime = Tuple[int, int, int, int, int, int]

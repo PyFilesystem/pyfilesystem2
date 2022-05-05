@@ -13,9 +13,8 @@
 # serve to show the default.
 
 import sys
+
 import os
-
-
 import sphinx_rtd_theme
 
 html_theme = "sphinx_rtd_theme"
@@ -72,6 +71,7 @@ author = u'Will McGugan'
 # built documents.
 #
 from fs import __version__
+
 # The short X.Y version.
 version = '.'.join(__version__.split('.')[:2])
 # The full version, including alpha/beta/rc tags.

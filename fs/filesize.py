@@ -11,8 +11,7 @@ See Also:
 
 """
 
-from __future__ import division
-from __future__ import unicode_literals
+from __future__ import division, unicode_literals
 
 import typing
 
@@ -36,7 +35,7 @@ def _to_str(size, suffixes, base):
 
     # TODO (dargueta): Don't rely on unit or suffix being defined in the loop.
     for i, suffix in enumerate(suffixes, 2):  # noqa: B007
-        unit = base ** i
+        unit = base**i
         if size < unit:
             break
     return "{:,.1f} {}".format((base * size / unit), suffix)

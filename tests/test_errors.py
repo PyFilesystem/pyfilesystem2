@@ -2,7 +2,6 @@ from __future__ import unicode_literals
 
 import multiprocessing
 import unittest
-
 from six import text_type
 
 from fs import errors

@@ -4,9 +4,10 @@ In essence, an `OSFS` is a thin layer over the `io` and `os` modules
 of the Python standard library.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import absolute_import, print_function, unicode_literals
+
+import sys
+import typing
 
 import errno
 import io
@@ -15,12 +16,9 @@ import logging
 import os
 import platform
 import shutil
-import stat
-import sys
-import tempfile
-import typing
-
 import six
+import stat
+import tempfile
 
 try:
     from os import scandir
@@ -39,32 +37,33 @@ except ImportError:
         sendfile = None  # type: ignore  # pragma: no cover
 
 from . import errors
+from ._fscompat import fsdecode, fsencode, fspath
+from ._url_tools import url_quote
 from .base import FS
+from .copy import copy_modified_time
 from .enums import ResourceType
-from ._fscompat import fsencode, fsdecode, fspath
+from .error_tools import convert_os_errors
+from .errors import FileExpected, NoURL
 from .info import Info
+from .mode import Mode, validate_open_mode
 from .path import basename, dirname
 from .permissions import Permissions
-from .error_tools import convert_os_errors
-from .mode import Mode, validate_open_mode
-from .errors import FileExpected, NoURL
-from ._url_tools import url_quote
-from .copy import copy_modified_time
 
 if typing.TYPE_CHECKING:
     from typing import (
+        IO,
         Any,
         BinaryIO,
         Collection,
         Dict,
         Iterator,
-        IO,
         List,
         Optional,
         SupportsInt,
         Text,
         Tuple,
     )
+
     from .base import _OpendirFactory
     from .info import RawInfo
     from .subfs import SubFS

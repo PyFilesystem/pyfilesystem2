@@ -1,22 +1,21 @@
 # coding: utf-8
 from __future__ import unicode_literals
 
+import sys
+
 import errno
 import io
 import os
 import shutil
 import tempfile
-import sys
 import time
 import unittest
 import warnings
-
-from fs import osfs, open_fs
-from fs.path import relpath, dirname
-from fs import errors
-from fs.test import FSTestCases
-
 from six import text_type
+
+from fs import errors, open_fs, osfs
+from fs.path import dirname, relpath
+from fs.test import FSTestCases
 
 try:
     from unittest import mock
