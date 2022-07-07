@@ -151,6 +151,14 @@ class TestMove(unittest.TestCase):
                 dst_ro.exists("target.txt"), "file should not have been copied over"
             )
 
+    def test_overwrite(self):
+        with open_fs("temp://") as src, open_fs("temp://") as dst:
+            src.writetext("file.txt", "Content")
+            dst.writetext("target.txt", "Content")
+            fs.move.move_file(src, "file.txt", dst, "target.txt")
+            self.assertFalse(src.exists("file.txt"))
+            self.assertTrue(dst.exists("target.txt"))
+
     @parameterized.expand([(True,), (False,)])
     def test_move_file_cleanup_on_error(self, cleanup):
         with open_fs("mem://") as src, open_fs("mem://") as dst:
