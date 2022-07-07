@@ -8,6 +8,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- Fixes a backward incompatibility where `fs.move.move_file` raises `DestinationExists`
+  ([#535](https://github.com/PyFilesystem/pyfilesystem2/issues/535)).
+
 
 ## [2.4.16] - 2022-05-02
 
