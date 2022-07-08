@@ -151,13 +151,29 @@ class TestMove(unittest.TestCase):
                 dst_ro.exists("target.txt"), "file should not have been copied over"
             )
 
-    def test_overwrite(self):
-        with open_fs("temp://") as src, open_fs("temp://") as dst:
-            src.writetext("file.txt", "Content")
-            dst.writetext("target.txt", "Content")
+    @parameterized.expand([("temp://",), ("mem://",)])
+    def test_move_file_overwrite(self, fs_url):
+        # we use TempFS and MemoryFS in order to make sure the optimised code path
+        # behaves like the regular one
+        with open_fs(fs_url) as src, open_fs(fs_url) as dst:
+            src.writetext("file.txt", "source content")
+            dst.writetext("target.txt", "target content")
             fs.move.move_file(src, "file.txt", dst, "target.txt")
             self.assertFalse(src.exists("file.txt"))
+            self.assertFalse(src.exists("target.txt"))
+            self.assertFalse(dst.exists("file.txt"))
             self.assertTrue(dst.exists("target.txt"))
+            self.assertEquals(dst.readtext("target.txt"), "source content")
+
+    @parameterized.expand([("temp://",), ("mem://",)])
+    def test_move_file_overwrite_itself(self, fs_url):
+        # we use TempFS and MemoryFS in order to make sure the optimised code path
+        # behaves like the regular one
+        with open_fs(fs_url) as tmp:
+            tmp.writetext("file.txt", "content")
+            fs.move.move_file(tmp, "file.txt", tmp, "file.txt")
+            self.assertTrue(tmp.exists("file.txt"))
+            self.assertEquals(tmp.readtext("file.txt"), "content")
 
     @parameterized.expand([(True,), (False,)])
     def test_move_file_cleanup_on_error(self, cleanup):
