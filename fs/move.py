@@ -64,6 +64,9 @@ def move_file(
     with manage_fs(src_fs, writeable=True) as _src_fs:
         with manage_fs(dst_fs, writeable=True, create=True) as _dst_fs:
             if _src_fs is _dst_fs:
+                if src_path == dst_path:
+                    return
+
                 # Same filesystem, may be optimized
                 _src_fs.move(
                     src_path, dst_path, overwrite=True, preserve_time=preserve_time
