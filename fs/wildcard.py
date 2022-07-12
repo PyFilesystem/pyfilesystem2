@@ -147,14 +147,14 @@ def _translate(pattern, case_sensitive=True):
     if not case_sensitive:
         pattern = pattern.lower()
     i, n = 0, len(pattern)
-    res = ""
+    res = []
     while i < n:
         c = pattern[i]
         i = i + 1
         if c == "*":
-            res = res + "[^/]*"
+            res.append("[^/]*")
         elif c == "?":
-            res = res + "."
+            res.append(".")
         elif c == "[":
             j = i
             if j < n and pattern[j] == "!":
@@ -164,7 +164,7 @@ def _translate(pattern, case_sensitive=True):
             while j < n and pattern[j] != "]":
                 j = j + 1
             if j >= n:
-                res = res + "\\["
+                res.append("\\[")
             else:
                 stuff = pattern[i:j].replace("\\", "\\\\")
                 i = j + 1
@@ -172,7 +172,7 @@ def _translate(pattern, case_sensitive=True):
                     stuff = "^" + stuff[1:]
                 elif stuff[0] == "^":
                     stuff = "\\" + stuff
-                res = "%s[%s]" % (res, stuff)
+                res.append("[%s]" % stuff)
         else:
-            res = res + re.escape(c)
-    return res
+            res.append(re.escape(c))
+    return "".join(res)
