@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+
+### Added
+
+- Added `filter_glob` and `exclude_glob` parameters to `fs.walk.Walker`.
+  Closes [#459](https://github.com/PyFilesystem/pyfilesystem2/issues/459).
+
+### Fixed
+- Elaborated documentation of `filter_dirs` and `exclude_dirs` in `fs.walk.Walker`.
+  Closes [#371](https://github.com/PyFilesystem/pyfilesystem2/issues/371).
 - Fixes a backward incompatibility where `fs.move.move_file` raises `DestinationExists`
   ([#535](https://github.com/PyFilesystem/pyfilesystem2/issues/535)).
 
