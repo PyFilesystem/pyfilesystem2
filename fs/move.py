@@ -10,7 +10,7 @@ from .copy import copy_dir, copy_file
 from .errors import FSError
 from .opener import manage_fs
 from .osfs import OSFS
-from .path import frombase
+from .path import frombase, normpath
 
 if typing.TYPE_CHECKING:
     from typing import Text, Union
@@ -64,7 +64,8 @@ def move_file(
     with manage_fs(src_fs, writeable=True) as _src_fs:
         with manage_fs(dst_fs, writeable=True, create=True) as _dst_fs:
             if _src_fs is _dst_fs:
-                if src_path == dst_path:
+                # Exit early if source and destination are the same file
+                if normpath(src_path) == normpath(dst_path):
                     return
 
                 # Same filesystem, may be optimized
