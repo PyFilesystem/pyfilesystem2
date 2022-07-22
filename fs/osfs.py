@@ -409,7 +409,7 @@ class OSFS(FS):
         if self.gettype(src_path) is not ResourceType.file:
             raise errors.FileExpected(src_path)
         # check dst_path does not exist if we are not overwriting
-        if not overwrite and _src_path != _dst_path and self.exists(_dst_path):
+        if not overwrite and self.exists(_dst_path):
             raise errors.DestinationExists(dst_path)
         # check parent dir of _dst_path exists and is a directory
         if self.gettype(dirname(dst_path)) is not ResourceType.directory:

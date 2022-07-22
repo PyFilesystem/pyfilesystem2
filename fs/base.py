@@ -1161,6 +1161,9 @@ class FS(object):
             raise errors.DestinationExists(dst_path)
         if self.getinfo(src_path).is_dir:
             raise errors.FileExpected(src_path)
+        if normpath(src_path) == normpath(dst_path):
+            # early exit when moving a file onto itself
+            return
         if self.getmeta().get("supports_rename", False):
             try:
                 src_sys_path = self.getsyspath(src_path)

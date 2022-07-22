@@ -1816,22 +1816,34 @@ class FSTestCases(object):
         self.fs.move("file.txt", "file.txt", overwrite=True)
         self.assert_text("file.txt", "Hello")
 
+        with self.assertRaises(errors.DestinationExists):
+            self.fs.move("file.txt", "file.txt", overwrite=False)
+
     def test_move_file_onto_itself_relpath(self):
         subdir = self.fs.makedir("sub")
         subdir.writetext("file.txt", "Hello")
         self.fs.move("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
         self.assert_text("sub/file.txt", "Hello")
 
+        with self.assertRaises(errors.DestinationExists):
+            self.fs.move("sub/file.txt", "sub/../sub/file.txt", overwrite=False)
+
     def test_copy_file_onto_itself(self):
         self.fs.writetext("file.txt", "Hello")
         self.fs.copy("file.txt", "file.txt", overwrite=True)
         self.assert_text("file.txt", "Hello")
+
+        with self.assertRaises(errors.DestinationExists):
+            self.fs.copy("file.txt", "file.txt", overwrite=False)
 
     def test_copy_file_onto_itself_relpath(self):
         subdir = self.fs.makedir("sub")
         subdir.writetext("file.txt", "Hello")
         self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
         self.assert_text("sub/file.txt", "Hello")
+
+        with self.assertRaises(errors.DestinationExists):
+            self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=False)
 
     def test_copydir(self):
         self.fs.makedirs("foo/bar/baz/egg")
