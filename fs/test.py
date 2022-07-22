@@ -1811,6 +1811,28 @@ class FSTestCases(object):
     def test_move_file_temp(self):
         self._test_move_file("temp://")
 
+    def test_move_file_onto_itself(self):
+        self.fs.writetext("file.txt", "Hello")
+        self.fs.move("file.txt", "file.txt", overwrite=True)
+        self.assert_text("file.txt", "Hello")
+
+    def test_move_file_onto_itself_relpath(self):
+        subdir = self.fs.makedir("sub")
+        subdir.writetext("file.txt", "Hello")
+        self.fs.move("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
+        self.assert_text("sub/file.txt", "Hello")
+
+    def test_copy_file_onto_itself(self):
+        self.fs.writetext("file.txt", "Hello")
+        self.fs.copy("file.txt", "file.txt", overwrite=True)
+        self.assert_text("file.txt", "Hello")
+
+    def test_copy_file_onto_itself_relpath(self):
+        subdir = self.fs.makedir("sub")
+        subdir.writetext("file.txt", "Hello")
+        self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
+        self.assert_text("sub/file.txt", "Hello")
+
     def test_copydir(self):
         self.fs.makedirs("foo/bar/baz/egg")
         self.fs.writetext("foo/bar/foofoo.txt", "Hello")
