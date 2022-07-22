@@ -241,6 +241,18 @@ class RemoveRootError(OperationFailed):
     default_message = "root directory may not be removed"
 
 
+class IllegalMoveDestination(OperationFailed):
+    """Attempt to move a folder into its own subfolder."""
+
+    default_message = "'{path}' cannot be moved into itself"
+
+
+class IllegalCopyDestination(OperationFailed):
+    """Attempt to copy a folder into its own subfolder."""
+
+    default_message = "'{path}' cannot be copied into itself"
+
+
 class ResourceError(FSError):
     """Base exception class for error associated with a specific resource."""
 
@@ -302,12 +314,6 @@ class DirectoryNotEmpty(ResourceError):
     """Attempt to remove a non-empty directory."""
 
     default_message = "directory '{path}' is not empty"
-
-
-class InvalidMoveOperation(ResourceError):
-    """Attempt to move a folder into its own subfolder."""
-
-    default_message = "you cannot move '{path}' into its own subfolder"
 
 
 class ResourceLocked(ResourceError):

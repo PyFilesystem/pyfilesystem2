@@ -1924,7 +1924,7 @@ class FSTestCases(object):
         sub = folder.makedir("sub")
         sub.writetext("file2.txt", "Hello2")
 
-        with self.assertRaises(errors.InvalidMoveOperation):
+        with self.assertRaises(errors.IllegalMoveDestination):
             self.fs.movedir("folder", "folder/sub/")
 
     def test_match(self):
