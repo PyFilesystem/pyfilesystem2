@@ -423,13 +423,18 @@ class FS(object):
 
         """
         with self._lock:
-            if not overwrite and self.exists(dst_path):
+            _src_path = self.validatepath(src_path)
+            _dst_path = self.validatepath(dst_path)
+            if not overwrite and self.exists(_dst_path):
                 raise errors.DestinationExists(dst_path)
-            with closing(self.open(src_path, "rb")) as read_file:
+            if overwrite and _src_path == _dst_path:
+                # exit early when copying a file onto itself
+                return
+            with closing(self.open(_src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.upload(dst_path, read_file)  # type: ignore
+                self.upload(_dst_path, read_file)  # type: ignore
             if preserve_time:
-                copy_modified_time(self, src_path, self, dst_path)
+                copy_modified_time(self, _src_path, self, _dst_path)
 
     def copydir(
         self,

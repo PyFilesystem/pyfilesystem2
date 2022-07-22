@@ -462,6 +462,12 @@ class MemoryFS(FS):
             elif not overwrite and dst_name in dst_dir_entry:
                 raise errors.DestinationExists(dst_path)
 
+            # handle moving a file onto itself
+            if src_dir == dst_dir and src_name == dst_name:
+                if overwrite:
+                    return
+                raise errors.DestinationExists(dst_path)
+
             # move the entry from the src folder to the dst folder
             dst_dir_entry.set_entry(dst_name, src_entry)
             src_dir_entry.remove_entry(src_name)
