@@ -1862,6 +1862,29 @@ class FSTestCases(object):
         with self.assertRaises(errors.DirectoryExpected):
             self.fs.copydir("foo2/foofoo.txt", "foofoo.txt", create=True)
 
+    def test_copydir_onto_itself(self):
+        folder = self.fs.makedir("folder")
+        folder.writetext("file1.txt", "Hello1")
+        sub = folder.makedir("sub")
+        sub.writetext("file2.txt", "Hello2")
+
+        self.fs.copydir("folder", "folder")
+        self.assert_text("folder/file1.txt", "Hello1")
+        self.assert_text("folder/sub/file2.txt", "Hello2")
+
+    def test_copydir_into_its_own_subfolder(self):
+        # TODO: This test hangs forever at the moment.
+        #
+        # folder = self.fs.makedir("folder")
+        # folder.writetext("file1.txt", "Hello1")
+        # sub = folder.makedir("sub")
+        # sub.writetext("file2.txt", "Hello2")
+        # self.fs.copydir("folder", "folder/sub/")
+        # self.assert_text("folder/file1.txt", "Hello1")
+        # self.assert_text("folder/sub/file1.txt", "Hello1")
+        # self.assert_not_exists("folder/sub/file2.txt")
+        pass
+
     def test_movedir(self):
         self.fs.makedirs("foo/bar/baz/egg")
         self.fs.writetext("foo/bar/foofoo.txt", "Hello")
