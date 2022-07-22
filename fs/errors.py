@@ -34,6 +34,7 @@ __all__ = [
     "IllegalBackReference",
     "InsufficientStorage",
     "InvalidCharsInPath",
+    "InvalidMoveOperation",
     "InvalidPath",
     "MissingInfoNamespace",
     "NoSysPath",
@@ -301,6 +302,12 @@ class DirectoryNotEmpty(ResourceError):
     """Attempt to remove a non-empty directory."""
 
     default_message = "directory '{path}' is not empty"
+
+
+class InvalidMoveOperation(ResourceError):
+    """Attempt to move a folder into its own subfolder."""
+
+    default_message = "you cannot move '{path}' into its own subfolder"
 
 
 class ResourceLocked(ResourceError):

@@ -1885,6 +1885,25 @@ class FSTestCases(object):
         with self.assertRaises(errors.DirectoryExpected):
             self.fs.movedir("foo2/foofoo.txt", "foo2/baz/egg")
 
+    def test_movedir_onto_itself(self):
+        folder = self.fs.makedir("folder")
+        folder.writetext("file1.txt", "Hello1")
+        sub = folder.makedir("sub")
+        sub.writetext("file2.txt", "Hello2")
+
+        self.fs.movedir("folder", "folder")
+        self.assert_text("folder/file1.txt", "Hello1")
+        self.assert_text("folder/sub/file2.txt", "Hello2")
+
+    def test_movedir_into_its_own_subfolder(self):
+        folder = self.fs.makedir("folder")
+        folder.writetext("file1.txt", "Hello1")
+        sub = folder.makedir("sub")
+        sub.writetext("file2.txt", "Hello2")
+
+        with self.assertRaises(errors.InvalidMoveOperation):
+            self.fs.movedir("folder", "folder/sub/")
+
     def test_match(self):
         self.assertTrue(self.fs.match(["*.py"], "foo.py"))
         self.assertEqual(
