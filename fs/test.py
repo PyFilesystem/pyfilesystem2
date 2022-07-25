@@ -1880,6 +1880,8 @@ class FSTestCases(object):
         sub.writetext("file2.txt", "Hello2")
         with self.assertRaises(errors.IllegalDestination):
             self.fs.copydir("folder", "folder/sub/")
+        self.assert_text("folder/file1.txt", "Hello1")
+        self.assert_text("folder/sub/file2.txt", "Hello2")
 
     def test_movedir(self):
         self.fs.makedirs("foo/bar/baz/egg")
@@ -1922,6 +1924,8 @@ class FSTestCases(object):
 
         with self.assertRaises(errors.IllegalDestination):
             self.fs.movedir("folder", "folder/sub/")
+        self.assert_text("folder/file1.txt", "Hello1")
+        self.assert_text("folder/sub/file2.txt", "Hello2")
 
     def test_match(self):
         self.assertTrue(self.fs.match(["*.py"], "foo.py"))
