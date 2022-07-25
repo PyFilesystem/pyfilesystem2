@@ -12,7 +12,7 @@ from .base import FS
 from .copy import copy_dir, copy_file
 from .error_tools import unwrap_errors
 from .info import Info
-from .path import abspath, join, normpath
+from .path import abspath, isbase, join, normpath
 
 if typing.TYPE_CHECKING:
     from typing import (
@@ -267,7 +267,11 @@ class WrapFS(FS, typing.Generic[_F]):
         # type: (Text, Text, bool, bool) -> None
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
+        _val_src_path = self.validatepath(_src_path)
+        _val_dst_path = self.validatepath(_dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
+            if src_fs == dst_fs and _val_src_path == _val_dst_path:
+                raise errors.IllegalDestination(_dst_path)
             if not overwrite and dst_fs.exists(_dst_path):
                 raise errors.DestinationExists(_dst_path)
             copy_file(src_fs, _src_path, dst_fs, _dst_path, preserve_time=preserve_time)
@@ -276,7 +280,11 @@ class WrapFS(FS, typing.Generic[_F]):
         # type: (Text, Text, bool, bool) -> None
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
+        _val_src_path = self.validatepath(_src_path)
+        _val_dst_path = self.validatepath(_dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
+            if src_fs == dst_fs and isbase(_val_src_path, _val_dst_path):
+                raise errors.IllegalDestination(_dst_path)
             if not create and not dst_fs.exists(_dst_path):
                 raise errors.ResourceNotFound(dst_path)
             if not src_fs.getinfo(_src_path).is_dir:
