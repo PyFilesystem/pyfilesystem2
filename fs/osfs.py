@@ -408,6 +408,9 @@ class OSFS(FS):
         # check src_path exists and is a file
         if self.gettype(src_path) is not ResourceType.file:
             raise errors.FileExpected(src_path)
+        # it's not allowed to copy a file onto itself
+        if _src_path == _dst_path:
+            raise errors.IllegalDestination(dst_path)
         # check dst_path does not exist if we are not overwriting
         if not overwrite and self.exists(_dst_path):
             raise errors.DestinationExists(dst_path)
@@ -440,9 +443,6 @@ class OSFS(FS):
                     self.getsyspath(_src_path),
                     self.getsyspath(_dst_path),
                 )
-                # exit early if we copy the file onto itself
-                if overwrite and _src_sys == _dst_sys:
-                    return
                 # attempt using sendfile
                 try:
                     # initialise variables to pass to sendfile
@@ -474,9 +474,6 @@ class OSFS(FS):
                     self.getsyspath(_src_path),
                     self.getsyspath(_dst_path),
                 )
-                # exit early if we copy the file onto itself
-                if overwrite and _src_sys == _dst_sys:
-                    return
                 shutil.copy2(_src_sys, _dst_sys)
 
     # --- Backport of os.scandir for Python < 3.5 ------------
