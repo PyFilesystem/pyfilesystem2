@@ -1874,13 +1874,12 @@ class FSTestCases(object):
         self.assert_text("folder/sub/file2.txt", "Hello2")
 
     def test_copydir_into_its_own_subfolder(self):
-        # folder = self.fs.makedir("folder")
-        # folder.writetext("file1.txt", "Hello1")
-        # sub = folder.makedir("sub")
-        # sub.writetext("file2.txt", "Hello2")
-        # with self.assertRaises(errors.IllegalDestination):
-        #     self.fs.copydir("folder", "folder/sub/")
-        pass
+        folder = self.fs.makedir("folder")
+        folder.writetext("file1.txt", "Hello1")
+        sub = folder.makedir("sub")
+        sub.writetext("file2.txt", "Hello2")
+        with self.assertRaises(errors.IllegalDestination):
+            self.fs.copydir("folder", "folder/sub/")
 
     def test_movedir(self):
         self.fs.makedirs("foo/bar/baz/egg")
