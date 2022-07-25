@@ -1830,20 +1830,20 @@ class FSTestCases(object):
 
     def test_copy_file_onto_itself(self):
         self.fs.writetext("file.txt", "Hello")
-        self.fs.copy("file.txt", "file.txt", overwrite=True)
-        self.assert_text("file.txt", "Hello")
-
-        with self.assertRaises(errors.DestinationExists):
+        with self.assertRaises(errors.IllegalDestination):
+            self.fs.copy("file.txt", "file.txt", overwrite=True)
+        with self.assertRaises(errors.IllegalDestination):
             self.fs.copy("file.txt", "file.txt", overwrite=False)
+        self.assert_text("file.txt", "Hello")
 
     def test_copy_file_onto_itself_relpath(self):
         subdir = self.fs.makedir("sub")
         subdir.writetext("file.txt", "Hello")
-        self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
-        self.assert_text("sub/file.txt", "Hello")
-
-        with self.assertRaises(errors.DestinationExists):
+        with self.assertRaises(errors.IllegalDestination):
+            self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
+        with self.assertRaises(errors.IllegalDestination):
             self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=False)
+        self.assert_text("sub/file.txt", "Hello")
 
     def test_copydir(self):
         self.fs.makedirs("foo/bar/baz/egg")
@@ -1868,21 +1868,18 @@ class FSTestCases(object):
         sub = folder.makedir("sub")
         sub.writetext("file2.txt", "Hello2")
 
-        self.fs.copydir("folder", "folder")
+        with self.assertRaises(errors.IllegalDestination):
+            self.fs.copydir("folder", "folder")
         self.assert_text("folder/file1.txt", "Hello1")
         self.assert_text("folder/sub/file2.txt", "Hello2")
 
     def test_copydir_into_its_own_subfolder(self):
-        # TODO: This test hangs forever at the moment.
-        #
         # folder = self.fs.makedir("folder")
         # folder.writetext("file1.txt", "Hello1")
         # sub = folder.makedir("sub")
         # sub.writetext("file2.txt", "Hello2")
-        # self.fs.copydir("folder", "folder/sub/")
-        # self.assert_text("folder/file1.txt", "Hello1")
-        # self.assert_text("folder/sub/file1.txt", "Hello1")
-        # self.assert_not_exists("folder/sub/file2.txt")
+        # with self.assertRaises(errors.IllegalDestination):
+        #     self.fs.copydir("folder", "folder/sub/")
         pass
 
     def test_movedir(self):
@@ -1924,7 +1921,7 @@ class FSTestCases(object):
         sub = folder.makedir("sub")
         sub.writetext("file2.txt", "Hello2")
 
-        with self.assertRaises(errors.IllegalMoveDestination):
+        with self.assertRaises(errors.IllegalDestination):
             self.fs.movedir("folder", "folder/sub/")
 
     def test_match(self):

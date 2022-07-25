@@ -32,9 +32,9 @@ __all__ = [
     "FilesystemClosed",
     "FSError",
     "IllegalBackReference",
+    "IllegalDestination",
     "InsufficientStorage",
     "InvalidCharsInPath",
-    "InvalidMoveOperation",
     "InvalidPath",
     "MissingInfoNamespace",
     "NoSysPath",
@@ -241,16 +241,14 @@ class RemoveRootError(OperationFailed):
     default_message = "root directory may not be removed"
 
 
-class IllegalMoveDestination(OperationFailed):
-    """Attempt to move a folder into its own subfolder."""
+class IllegalDestination(OperationFailed):
+    """The given destination cannot be used for the operation.
 
-    default_message = "'{path}' cannot be moved into itself"
+    This error will occur when attempting to move / copy a folder into itself or copying
+    a file onto itself.
+    """
 
-
-class IllegalCopyDestination(OperationFailed):
-    """Attempt to copy a folder into its own subfolder."""
-
-    default_message = "'{path}' cannot be copied into itself"
+    default_message = "'{path}' is not a legal destination"
 
 
 class ResourceError(FSError):

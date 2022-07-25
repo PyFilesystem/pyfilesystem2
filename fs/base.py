@@ -21,11 +21,11 @@ import warnings
 from contextlib import closing
 from functools import partial, wraps
 
-from . import copy, errors, fsencode, iotools, tools, walk, wildcard, glob
+from . import copy, errors, fsencode, glob, iotools, tools, walk, wildcard
 from .copy import copy_modified_time
 from .glob import BoundGlobber
 from .mode import validate_open_mode
-from .path import abspath, join, normpath
+from .path import abspath, isbase, join, normpath
 from .time import datetime_to_epoch
 from .walk import Walker
 
@@ -425,11 +425,10 @@ class FS(object):
         with self._lock:
             _src_path = self.validatepath(src_path)
             _dst_path = self.validatepath(dst_path)
+            if _src_path == _dst_path:
+                raise errors.IllegalDestination(dst_path)
             if not overwrite and self.exists(_dst_path):
                 raise errors.DestinationExists(dst_path)
-            if overwrite and _src_path == _dst_path:
-                # exit early when copying a file onto itself
-                return
             with closing(self.open(_src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
                 self.upload(_dst_path, read_file)  # type: ignore
@@ -1093,6 +1092,12 @@ class FS(object):
         from .move import move_dir
 
         with self._lock:
+            _src_path = self.validatepath(src_path)
+            _dst_path = self.validatepath(dst_path)
+            if _src_path == _dst_path:
+                return
+            if isbase(_src_path, _dst_path):
+                raise errors.IllegalDestination(dst_path)
             if not create and not self.exists(dst_path):
                 raise errors.ResourceNotFound(dst_path)
             move_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
