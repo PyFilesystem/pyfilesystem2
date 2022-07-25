@@ -465,11 +465,11 @@ class FS(object):
             _dst_path = self.validatepath(dst_path)
             if isbase(_src_path, _dst_path):
                 raise errors.IllegalDestination(dst_path)
-            if not create and not self.exists(dst_path):
+            if not create and not self.exists(_dst_path):
                 raise errors.ResourceNotFound(dst_path)
-            if not self.getinfo(src_path).is_dir:
+            if not self.getinfo(_src_path).is_dir:
                 raise errors.DirectoryExpected(src_path)
-            copy.copy_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
+            copy.copy_dir(self, _src_path, self, _dst_path, preserve_time=preserve_time)
 
     def create(self, path, wipe=False):
         # type: (Text, bool) -> bool
