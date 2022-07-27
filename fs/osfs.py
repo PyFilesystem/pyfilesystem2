@@ -470,11 +470,7 @@ class OSFS(FS):
             # type: (Text, Text, bool, bool) -> None
             with self._lock:
                 _src_path, _dst_path = self._check_copy(src_path, dst_path, overwrite)
-                _src_sys, _dst_sys = (
-                    self.getsyspath(_src_path),
-                    self.getsyspath(_dst_path),
-                )
-                shutil.copy2(_src_sys, _dst_sys)
+                shutil.copy2(self.getsyspath(_src_path), self.getsyspath(_dst_path))
 
     # --- Backport of os.scandir for Python < 3.5 ------------
 
