@@ -7,9 +7,9 @@ import typing
 
 import warnings
 
-from .errors import ResourceNotFound
+from .errors import IllegalDestination, ResourceNotFound
 from .opener import manage_fs
-from .path import abspath, combine, frombase, normpath
+from .path import abspath, combine, frombase, isbase, normpath
 from .tools import is_thread_safe
 from .walk import Walker
 
@@ -438,6 +438,8 @@ def copy_dir_if(
         dst_fs, create=True
     ) as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
+            if src_fs == dst_fs and isbase(_src_path, _dst_path):
+                raise IllegalDestination(dst_path)
             _thread_safe = is_thread_safe(_src_fs, _dst_fs)
             with Copier(
                 num_workers=workers if _thread_safe else 0, preserve_time=preserve_time
