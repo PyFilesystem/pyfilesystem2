@@ -267,8 +267,6 @@ class WrapFS(FS, typing.Generic[_F]):
         # type: (Text, Text, bool, bool) -> None
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
-        _val_src_path = self.validatepath(_src_path)
-        _val_dst_path = self.validatepath(_dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
             if not overwrite and dst_fs.exists(_dst_path):
                 raise errors.DestinationExists(_dst_path)
@@ -278,8 +276,6 @@ class WrapFS(FS, typing.Generic[_F]):
         # type: (Text, Text, bool, bool) -> None
         src_fs, _src_path = self.delegate_path(src_path)
         dst_fs, _dst_path = self.delegate_path(dst_path)
-        _val_src_path = self.validatepath(_src_path)
-        _val_dst_path = self.validatepath(_dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
             if not create and not dst_fs.exists(_dst_path):
                 raise errors.ResourceNotFound(dst_path)
