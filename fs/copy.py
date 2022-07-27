@@ -306,14 +306,19 @@ def copy_structure(
         dst_root (str): Path to the target root of the tree structure.
 
     """
+    _src_root = abspath(normpath(src_root))
+    _dst_root = abspath(normpath(dst_root))
+    # It's not allowed to copy a structure into itself
+    if src_fs == dst_fs and isbase(_src_root, _dst_root):
+        raise IllegalDestination(dst_root)
     walker = walker or Walker()
     with manage_fs(src_fs) as _src_fs:
         with manage_fs(dst_fs, create=True) as _dst_fs:
             with _src_fs.lock(), _dst_fs.lock():
-                _dst_fs.makedirs(dst_root, recreate=True)
-                for dir_path in walker.dirs(_src_fs, src_root):
+                _dst_fs.makedirs(_dst_root, recreate=True)
+                for dir_path in walker.dirs(_src_fs, _src_root):
                     _dst_fs.makedir(
-                        combine(dst_root, frombase(src_root, dir_path)), recreate=True
+                        combine(_dst_root, frombase(_src_root, dir_path)), recreate=True
                     )
 
 

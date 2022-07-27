@@ -281,8 +281,6 @@ class WrapFS(FS, typing.Generic[_F]):
         _val_src_path = self.validatepath(_src_path)
         _val_dst_path = self.validatepath(_dst_path)
         with unwrap_errors({_src_path: src_path, _dst_path: dst_path}):
-            if src_fs == dst_fs and isbase(_val_src_path, _val_dst_path):
-                raise errors.IllegalDestination(_dst_path)
             if not create and not dst_fs.exists(_dst_path):
                 raise errors.ResourceNotFound(dst_path)
             if not src_fs.getinfo(_src_path).is_dir:
