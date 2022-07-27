@@ -12,7 +12,7 @@ from .base import FS
 from .copy import copy_dir, copy_file
 from .error_tools import unwrap_errors
 from .info import Info
-from .path import abspath, isbase, join, normpath
+from .path import abspath, join, normpath
 
 if typing.TYPE_CHECKING:
     from typing import (
