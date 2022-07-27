@@ -425,10 +425,10 @@ class FS(object):
         with self._lock:
             _src_path = self.validatepath(src_path)
             _dst_path = self.validatepath(dst_path)
-            if _src_path == _dst_path:
-                raise errors.IllegalDestination(dst_path)
             if not overwrite and self.exists(_dst_path):
                 raise errors.DestinationExists(dst_path)
+            if _src_path == _dst_path:
+                raise errors.IllegalDestination(dst_path)
             with closing(self.open(_src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
                 self.upload(_dst_path, read_file)  # type: ignore

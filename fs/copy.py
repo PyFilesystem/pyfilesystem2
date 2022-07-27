@@ -257,9 +257,13 @@ def copy_file_internal(
         lock (bool): Lock both filesystems before copying.
 
     """
+    _src_path = src_fs.validatepath(src_path)
+    _dst_path = dst_fs.validatepath(dst_path)
     if src_fs is dst_fs:
-        # Same filesystem, so we can do a potentially optimized
-        # copy
+        # It's not allowed to copy a file onto itself
+        if _src_path == _dst_path:
+            raise IllegalDestination(dst_path)
+        # Same filesystem, so we can do a potentially optimized copy
         src_fs.copy(src_path, dst_path, overwrite=True, preserve_time=preserve_time)
         return
 
@@ -438,8 +442,6 @@ def copy_dir_if(
         dst_fs, create=True
     ) as _dst_fs:
         with _src_fs.lock(), _dst_fs.lock():
-            if src_fs == dst_fs and isbase(_src_path, _dst_path):
-                raise IllegalDestination(dst_path)
             _thread_safe = is_thread_safe(_src_fs, _dst_fs)
             with Copier(
                 num_workers=workers if _thread_safe else 0, preserve_time=preserve_time

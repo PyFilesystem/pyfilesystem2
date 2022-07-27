@@ -1832,7 +1832,7 @@ class FSTestCases(object):
         self.fs.writetext("file.txt", "Hello")
         with self.assertRaises(errors.IllegalDestination):
             self.fs.copy("file.txt", "file.txt", overwrite=True)
-        with self.assertRaises(errors.IllegalDestination):
+        with self.assertRaises(errors.DestinationExists):
             self.fs.copy("file.txt", "file.txt", overwrite=False)
         self.assert_text("file.txt", "Hello")
 
@@ -1841,7 +1841,7 @@ class FSTestCases(object):
         subdir.writetext("file.txt", "Hello")
         with self.assertRaises(errors.IllegalDestination):
             self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
-        with self.assertRaises(errors.IllegalDestination):
+        with self.assertRaises(errors.DestinationExists):
             self.fs.copy("sub/file.txt", "sub/../sub/file.txt", overwrite=False)
         self.assert_text("sub/file.txt", "Hello")
 
