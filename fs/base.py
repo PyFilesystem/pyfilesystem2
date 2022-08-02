@@ -21,11 +21,11 @@ import warnings
 from contextlib import closing
 from functools import partial, wraps
 
-from . import copy, errors, fsencode, iotools, tools, walk, wildcard, glob
+from . import copy, errors, fsencode, glob, iotools, tools, walk, wildcard
 from .copy import copy_modified_time
 from .glob import BoundGlobber
 from .mode import validate_open_mode
-from .path import abspath, join, normpath
+from .path import abspath, isbase, join, normpath
 from .time import datetime_to_epoch
 from .walk import Walker
 
@@ -423,13 +423,17 @@ class FS(object):
 
         """
         with self._lock:
-            if not overwrite and self.exists(dst_path):
+            _src_path = self.validatepath(src_path)
+            _dst_path = self.validatepath(dst_path)
+            if not overwrite and self.exists(_dst_path):
                 raise errors.DestinationExists(dst_path)
-            with closing(self.open(src_path, "rb")) as read_file:
+            if _src_path == _dst_path:
+                raise errors.IllegalDestination(dst_path)
+            with closing(self.open(_src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.upload(dst_path, read_file)  # type: ignore
+                self.upload(_dst_path, read_file)  # type: ignore
             if preserve_time:
-                copy_modified_time(self, src_path, self, dst_path)
+                copy_modified_time(self, _src_path, self, _dst_path)
 
     def copydir(
         self,
@@ -457,11 +461,15 @@ class FS(object):
 
         """
         with self._lock:
-            if not create and not self.exists(dst_path):
+            _src_path = self.validatepath(src_path)
+            _dst_path = self.validatepath(dst_path)
+            if isbase(_src_path, _dst_path):
+                raise errors.IllegalDestination(dst_path)
+            if not create and not self.exists(_dst_path):
                 raise errors.ResourceNotFound(dst_path)
-            if not self.getinfo(src_path).is_dir:
+            if not self.getinfo(_src_path).is_dir:
                 raise errors.DirectoryExpected(src_path)
-            copy.copy_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
+            copy.copy_dir(self, _src_path, self, _dst_path, preserve_time=preserve_time)
 
     def create(self, path, wipe=False):
         # type: (Text, bool) -> bool
@@ -1088,6 +1096,12 @@ class FS(object):
         from .move import move_dir
 
         with self._lock:
+            _src_path = self.validatepath(src_path)
+            _dst_path = self.validatepath(dst_path)
+            if _src_path == _dst_path:
+                return
+            if isbase(_src_path, _dst_path):
+                raise errors.IllegalDestination(dst_path)
             if not create and not self.exists(dst_path):
                 raise errors.ResourceNotFound(dst_path)
             move_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
@@ -1157,14 +1171,19 @@ class FS(object):
                 ``dst_path`` does not exist.
 
         """
-        if not overwrite and self.exists(dst_path):
+        _src_path = self.validatepath(src_path)
+        _dst_path = self.validatepath(dst_path)
+        if not overwrite and self.exists(_dst_path):
             raise errors.DestinationExists(dst_path)
-        if self.getinfo(src_path).is_dir:
+        if self.getinfo(_src_path).is_dir:
             raise errors.FileExpected(src_path)
+        if _src_path == _dst_path:
+            # early exit when moving a file onto itself
+            return
         if self.getmeta().get("supports_rename", False):
             try:
-                src_sys_path = self.getsyspath(src_path)
-                dst_sys_path = self.getsyspath(dst_path)
+                src_sys_path = self.getsyspath(_src_path)
+                dst_sys_path = self.getsyspath(_dst_path)
             except errors.NoSysPath:  # pragma: no cover
                 pass
             else:
@@ -1174,15 +1193,15 @@ class FS(object):
                     pass
                 else:
                     if preserve_time:
-                        copy_modified_time(self, src_path, self, dst_path)
+                        copy_modified_time(self, _src_path, self, _dst_path)
                     return
         with self._lock:
-            with self.open(src_path, "rb") as read_file:
+            with self.open(_src_path, "rb") as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.upload(dst_path, read_file)  # type: ignore
+                self.upload(_dst_path, read_file)  # type: ignore
             if preserve_time:
-                copy_modified_time(self, src_path, self, dst_path)
-            self.remove(src_path)
+                copy_modified_time(self, _src_path, self, _dst_path)
+            self.remove(_src_path)
 
     def open(
         self,

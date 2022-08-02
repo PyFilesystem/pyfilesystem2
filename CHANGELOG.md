@@ -19,7 +19,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Closes [#371](https://github.com/PyFilesystem/pyfilesystem2/issues/371).
 - Fixes a backward incompatibility where `fs.move.move_file` raises `DestinationExists`
   ([#535](https://github.com/PyFilesystem/pyfilesystem2/issues/535)).
-
+- Fixed a bug where files could be truncated or deleted when moved / copied onto itself.
+  Closes [#546](https://github.com/PyFilesystem/pyfilesystem2/issues/546)
 
 ## [2.4.16] - 2022-05-02
 

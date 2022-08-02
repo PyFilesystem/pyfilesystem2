@@ -19,7 +19,7 @@ from .copy import copy_modified_time
 from .enums import ResourceType, Seek
 from .info import Info
 from .mode import Mode
-from .path import iteratepath, normpath, split
+from .path import isbase, iteratepath, normpath, split
 
 if typing.TYPE_CHECKING:
     from typing import (
@@ -462,6 +462,12 @@ class MemoryFS(FS):
             elif not overwrite and dst_name in dst_dir_entry:
                 raise errors.DestinationExists(dst_path)
 
+            # handle moving a file onto itself
+            if src_dir == dst_dir and src_name == dst_name:
+                if overwrite:
+                    return
+                raise errors.DestinationExists(dst_path)
+
             # move the entry from the src folder to the dst folder
             dst_dir_entry.set_entry(dst_name, src_entry)
             src_dir_entry.remove_entry(src_name)
@@ -472,8 +478,17 @@ class MemoryFS(FS):
                 copy_modified_time(self, src_path, self, dst_path)
 
     def movedir(self, src_path, dst_path, create=False, preserve_time=False):
-        src_dir, src_name = split(self.validatepath(src_path))
-        dst_dir, dst_name = split(self.validatepath(dst_path))
+        _src_path = self.validatepath(src_path)
+        _dst_path = self.validatepath(dst_path)
+        dst_dir, dst_name = split(_dst_path)
+        src_dir, src_name = split(_src_path)
+
+        # move a dir onto itself
+        if _src_path == _dst_path:
+            return
+        # move a dir into itself
+        if isbase(_src_path, _dst_path):
+            raise errors.IllegalDestination(dst_path)
 
         with self._lock:
             src_dir_entry = self._get_dir_entry(src_dir)
