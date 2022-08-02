@@ -10,7 +10,7 @@ from .copy import copy_dir, copy_file
 from .errors import FSError
 from .opener import manage_fs
 from .osfs import OSFS
-from .path import frombase, normpath
+from .path import frombase
 
 if typing.TYPE_CHECKING:
     from typing import Text, Union
