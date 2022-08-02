@@ -1171,17 +1171,19 @@ class FS(object):
                 ``dst_path`` does not exist.
 
         """
-        if not overwrite and self.exists(dst_path):
+        _src_path = self.validatepath(src_path)
+        _dst_path = self.validatepath(dst_path)
+        if not overwrite and self.exists(_dst_path):
             raise errors.DestinationExists(dst_path)
-        if self.getinfo(src_path).is_dir:
+        if self.getinfo(_src_path).is_dir:
             raise errors.FileExpected(src_path)
-        if normpath(src_path) == normpath(dst_path):
+        if _src_path == _dst_path:
             # early exit when moving a file onto itself
             return
         if self.getmeta().get("supports_rename", False):
             try:
-                src_sys_path = self.getsyspath(src_path)
-                dst_sys_path = self.getsyspath(dst_path)
+                src_sys_path = self.getsyspath(_src_path)
+                dst_sys_path = self.getsyspath(_dst_path)
             except errors.NoSysPath:  # pragma: no cover
                 pass
             else:
@@ -1191,15 +1193,15 @@ class FS(object):
                     pass
                 else:
                     if preserve_time:
-                        copy_modified_time(self, src_path, self, dst_path)
+                        copy_modified_time(self, _src_path, self, _dst_path)
                     return
         with self._lock:
-            with self.open(src_path, "rb") as read_file:
+            with self.open(_src_path, "rb") as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.upload(dst_path, read_file)  # type: ignore
+                self.upload(_dst_path, read_file)  # type: ignore
             if preserve_time:
-                copy_modified_time(self, src_path, self, dst_path)
-            self.remove(src_path)
+                copy_modified_time(self, _src_path, self, _dst_path)
+            self.remove(_src_path)
 
     def open(
         self,

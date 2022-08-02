@@ -306,8 +306,8 @@ def copy_structure(
         dst_root (str): Path to the target root of the tree structure.
 
     """
-    _src_root = abspath(normpath(src_root))
-    _dst_root = abspath(normpath(dst_root))
+    _src_root = src_fs.validatepath(src_root)
+    _dst_root = dst_fs.validatepath(dst_root)
     # It's not allowed to copy a structure into itself
     if src_fs == dst_fs and isbase(_src_root, _dst_root):
         raise IllegalDestination(dst_root)
