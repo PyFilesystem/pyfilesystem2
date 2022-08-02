@@ -32,6 +32,7 @@ __all__ = [
     "FilesystemClosed",
     "FSError",
     "IllegalBackReference",
+    "IllegalDestination",
     "InsufficientStorage",
     "InvalidCharsInPath",
     "InvalidPath",
@@ -238,6 +239,16 @@ class RemoveRootError(OperationFailed):
     """Attempt to remove the root directory."""
 
     default_message = "root directory may not be removed"
+
+
+class IllegalDestination(OperationFailed):
+    """The given destination cannot be used for the operation.
+
+    This error will occur when attempting to move / copy a folder into itself or copying
+    a file onto itself.
+    """
+
+    default_message = "'{path}' is not a legal destination"
 
 
 class ResourceError(FSError):

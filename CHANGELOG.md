@@ -16,7 +16,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
 - Elaborated documentation of `filter_dirs` and `exclude_dirs` in `fs.walk.Walker`.
   Closes [#371](https://github.com/PyFilesystem/pyfilesystem2/issues/371).
-
+- Fixed a bug where files could be truncated or deleted when moved / copied onto itself.
+  Closes [#546](https://github.com/PyFilesystem/pyfilesystem2/issues/546)
 
 ## [2.4.16] - 2022-05-02
 

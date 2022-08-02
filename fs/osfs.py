@@ -411,6 +411,9 @@ class OSFS(FS):
         # check dst_path does not exist if we are not overwriting
         if not overwrite and self.exists(_dst_path):
             raise errors.DestinationExists(dst_path)
+        # it's not allowed to copy a file onto itself
+        if _src_path == _dst_path:
+            raise errors.IllegalDestination(dst_path)
         # check parent dir of _dst_path exists and is a directory
         if self.gettype(dirname(dst_path)) is not ResourceType.directory:
             raise errors.DirectoryExpected(dirname(dst_path))
