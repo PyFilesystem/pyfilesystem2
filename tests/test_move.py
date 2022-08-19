@@ -151,6 +151,45 @@ class TestMove(unittest.TestCase):
                 dst_ro.exists("target.txt"), "file should not have been copied over"
             )
 
+    @parameterized.expand([("temp", "temp://"), ("mem", "mem://")])
+    def test_move_file_overwrite(self, _, fs_url):
+        # we use TempFS and MemoryFS in order to make sure the optimized code path
+        # behaves like the regular one (TempFS tests the optmized code path).
+        with open_fs(fs_url) as src, open_fs(fs_url) as dst:
+            src.writetext("file.txt", "source content")
+            dst.writetext("target.txt", "target content")
+            self.assertTrue(src.exists("file.txt"))
+            self.assertFalse(src.exists("target.txt"))
+            self.assertFalse(dst.exists("file.txt"))
+            self.assertTrue(dst.exists("target.txt"))
+            fs.move.move_file(src, "file.txt", dst, "target.txt")
+            self.assertFalse(src.exists("file.txt"))
+            self.assertFalse(src.exists("target.txt"))
+            self.assertFalse(dst.exists("file.txt"))
+            self.assertTrue(dst.exists("target.txt"))
+            self.assertEquals(dst.readtext("target.txt"), "source content")
+
+    @parameterized.expand([("temp", "temp://"), ("mem", "mem://")])
+    def test_move_file_overwrite_itself(self, _, fs_url):
+        # we use TempFS and MemoryFS in order to make sure the optimized code path
+        # behaves like the regular one (TempFS tests the optmized code path).
+        with open_fs(fs_url) as tmp:
+            tmp.writetext("file.txt", "content")
+            fs.move.move_file(tmp, "file.txt", tmp, "file.txt")
+            self.assertTrue(tmp.exists("file.txt"))
+            self.assertEquals(tmp.readtext("file.txt"), "content")
+
+    @parameterized.expand([("temp", "temp://"), ("mem", "mem://")])
+    def test_move_file_overwrite_itself_relpath(self, _, fs_url):
+        # we use TempFS and MemoryFS in order to make sure the optimized code path
+        # behaves like the regular one (TempFS tests the optmized code path).
+        with open_fs(fs_url) as tmp:
+            new_dir = tmp.makedir("dir")
+            new_dir.writetext("file.txt", "content")
+            fs.move.move_file(tmp, "dir/../dir/file.txt", tmp, "dir/file.txt")
+            self.assertTrue(tmp.exists("dir/file.txt"))
+            self.assertEquals(tmp.readtext("dir/file.txt"), "content")
+
     @parameterized.expand([(True,), (False,)])
     def test_move_file_cleanup_on_error(self, cleanup):
         with open_fs("mem://") as src, open_fs("mem://") as dst:
