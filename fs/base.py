@@ -1091,6 +1091,8 @@ class FS(object):
                 and ``create`` is `False`.
             fs.errors.DirectoryExpected: if ``src_path`` or one of its
                 ancestors is not a directory.
+            fs.errors.IllegalDestination: when attempting to move the
+                folder at ``src_path`` to itself or one of its subfolders.
 
         """
         from .move import move_dir
@@ -1169,6 +1171,8 @@ class FS(object):
                 and ``overwrite`` is `False`.
             fs.errors.ResourceNotFound: If a parent directory of
                 ``dst_path`` does not exist.
+            fs.errors.IllegalDestination: If ``src_path`` and ``dst_path``
+                refer to the same resource, and ``overwrite`` is `True`.
 
         """
         _src_path = self.validatepath(src_path)
@@ -1179,7 +1183,7 @@ class FS(object):
             raise errors.FileExpected(src_path)
         if _src_path == _dst_path:
             # early exit when moving a file onto itself
-            raise errors.IllegalDestination(dst_path)            
+            raise errors.IllegalDestination(dst_path)
         if self.getmeta().get("supports_rename", False):
             try:
                 src_sys_path = self.getsyspath(_src_path)
