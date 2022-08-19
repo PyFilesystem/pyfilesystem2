@@ -485,7 +485,7 @@ class MemoryFS(FS):
         src_dir, src_name = split(_src_path)
 
         # move a dir onto or into itself
-        if _src_path == _dst_path or isbase(_src_path, _dst_path):
+        if isbase(_src_path, _dst_path):
             raise errors.IllegalDestination(dst_path)
 
         with self._lock:

@@ -1100,8 +1100,6 @@ class FS(object):
         with self._lock:
             _src_path = self.validatepath(src_path)
             _dst_path = self.validatepath(dst_path)
-            if _src_path == _dst_path:
-                raise errors.IllegalDestination(dst_path)
             if isbase(_src_path, _dst_path):
                 raise errors.IllegalDestination(dst_path)
             if not create and not self.exists(dst_path):
