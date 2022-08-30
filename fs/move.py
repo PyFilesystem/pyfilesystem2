@@ -152,7 +152,7 @@ def move_dir(
             if not _src_fs.isdir(src_path):
                 raise DirectoryExpected(src_path)
 
-            # if both filesystems have a syspath we use `os.rename` to move the folder
+            # if both filesystems have a syspath we use `shutil.move` to move the folder
             if _src_fs.hassyspath(src_path) and _dst_fs.hassyspath(dst_path):
                 src_syspath = _src_fs.getsyspath(src_path)
                 dst_syspath = _dst_fs.getsyspath(dst_path)
