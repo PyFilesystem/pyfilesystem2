@@ -162,8 +162,7 @@ def move_dir(
                     with convert_os_errors("move_dir", dst_path, directory=True):
                         os.rename(src_syspath, dst_syspath)
                         # recreate the root dir if it has been renamed
-                        if src_path == "/" and not _src_fs.exists("/"):
-                            _src_fs.makedir("/")
+                        _src_fs.makedir("/", recreate=True)
                     return  # optimization worked, exit early
 
             # standard copy then delete
