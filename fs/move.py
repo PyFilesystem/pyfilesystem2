@@ -29,6 +29,7 @@ def move_fs(
 ):
     # type: (...) -> None
     """Move the contents of a filesystem to another filesystem.
+
     Arguments:
         src_fs (FS or str): Source filesystem (instance or URL).
         dst_fs (FS or str): Destination filesystem (instance or URL).
@@ -36,6 +37,7 @@ def move_fs(
             a single-threaded copy.
         preserve_time (bool): If `True`, try to preserve mtime of the
             resources (defaults to `False`).
+
     """
     move_dir(src_fs, "/", dst_fs, "/", workers=workers, preserve_time=preserve_time)
 
@@ -50,6 +52,7 @@ def move_file(
 ):
     # type: (...) -> None
     """Move a file from one filesystem to another.
+
     Arguments:
         src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a file on ``src_fs``.
@@ -59,6 +62,7 @@ def move_file(
             resources (defaults to `False`).
         cleanup_dst_on_error (bool): If `True`, tries to delete the file copied to
             ``dst_fs`` if deleting the file from ``src_fs`` fails (defaults to `True`).
+
     """
     with manage_fs(src_fs, writeable=True) as _src_fs:
         with manage_fs(dst_fs, writeable=True, create=True) as _dst_fs:
@@ -122,6 +126,7 @@ def move_dir(
 ):
     # type: (...) -> None
     """Move a directory from one filesystem to another.
+
     Arguments:
         src_fs (FS or str): Source filesystem (instance or URL).
         src_path (str): Path to a directory on ``src_fs``
@@ -131,11 +136,13 @@ def move_dir(
             (default) for a single-threaded copy.
         preserve_time (bool): If `True`, try to preserve mtime of the
             resources (defaults to `False`).
+
     Raises:
         fs.errors.ResourceNotFound: if ``src_path`` does not exist on `src_fs`
         fs.errors.DirectoryExpected: if ``src_path`` or one of its
             ancestors is not a directory.
         fs.errors.IllegalDestination: when moving a folder into itself
+
     """
     with manage_fs(src_fs, writeable=True) as _src_fs:
         with manage_fs(dst_fs, writeable=True, create=True) as _dst_fs:
