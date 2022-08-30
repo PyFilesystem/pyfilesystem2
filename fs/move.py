@@ -160,6 +160,8 @@ def move_dir(
                     raise IllegalDestination(dst_path)
                 with _src_fs.lock(), _dst_fs.lock():
                     with convert_os_errors("move_dir", dst_path, directory=True):
+                        if _dst_fs.exists(dst_path):
+                            os.rmdir(dst_syspath)
                         os.rename(src_syspath, dst_syspath)
                         # recreate the root dir if it has been renamed
                         _src_fs.makedir("/", recreate=True)
