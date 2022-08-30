@@ -159,10 +159,10 @@ def move_dir(
                 if isbase(src_syspath, dst_syspath):
                     raise IllegalDestination(dst_path)
                 with _src_fs.lock(), _dst_fs.lock():
-                    with convert_os_errors("move_dir", src_path, directory=True):
+                    with convert_os_errors("move_dir", dst_path, directory=True):
                         os.rename(src_syspath, dst_syspath)
                         # recreate the root dir if it has been renamed
-                        if src_path == "/":
+                        if src_path == "/" and not _src_fs.exists("/"):
                             _src_fs.makedir("/")
                     return  # optimization worked, exit early
 
