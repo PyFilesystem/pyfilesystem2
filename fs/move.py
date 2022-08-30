@@ -6,6 +6,7 @@ from __future__ import print_function, unicode_literals
 import typing
 
 import os
+import shutil
 
 from ._pathcompat import commonpath
 from .copy import copy_dir, copy_file
@@ -162,7 +163,7 @@ def move_dir(
                     with convert_os_errors("move_dir", dst_path, directory=True):
                         if _dst_fs.exists(dst_path):
                             os.rmdir(dst_syspath)
-                        os.rename(src_syspath, dst_syspath)
+                        shutil.move(src_syspath, dst_syspath)
                         # recreate the root dir if it has been renamed
                         _src_fs.makedir("/", recreate=True)
                     return  # optimization worked, exit early

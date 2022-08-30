@@ -7,7 +7,7 @@ try:
 except ImportError:
     import mock
 
-import os
+import shutil
 from parameterized import parameterized, parameterized_class
 
 import fs.move
@@ -211,7 +211,7 @@ class TestMove(unittest.TestCase):
     @parameterized.expand([("temp", "temp://", True), ("mem", "mem://", False)])
     def test_move_dir_optimized(self, _, fs_url, mv_called):
         with open_fs(fs_url) as tmp:
-            with mock.patch.object(os, "rename", wraps=os.rename) as mv:
+            with mock.patch.object(shutil, "move", wraps=shutil.move) as mv:
                 dir_ = tmp.makedir("dir")
                 dir_.writetext("file.txt", "content")
                 sub = dir_.makedir("sub")
