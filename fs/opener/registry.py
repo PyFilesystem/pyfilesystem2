@@ -4,11 +4,11 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import sys
 import typing
 
 import collections
 import contextlib
-import pkg_resources
 
 from ..errors import ResourceReadOnly
 from .base import Opener
@@ -16,9 +16,31 @@ from .errors import EntryPointError, UnsupportedProtocol
 from .parse import parse_fs_url
 
 if typing.TYPE_CHECKING:
-    from typing import Callable, Dict, Iterator, List, Text, Tuple, Type, Union
+    from typing import (
+        Callable,
+        Dict,
+        Iterator,
+        List,
+        Sequence,
+        Text,
+        Tuple,
+        Type,
+        Union,
+    )
 
     from ..base import FS
+
+if sys.version_info >= (3, 8):
+    # The entry_points function takes keyword arguments starting with Python 3.10
+    # https://docs.python.org/3.10/library/importlib.metadata.html#entry-points
+    from importlib import metadata as importlib_metadata
+else:
+    import importlib_metadata
+
+
+def _get_entry_points():
+    # type: () -> Sequence[importlib_metadata.EntryPoint]
+    return importlib_metadata.entry_points().get("fs.opener", [])
 
 
 class Registry(object):
@@ -74,10 +96,7 @@ class Registry(object):
         """`list`: the list of supported protocols."""
         _protocols = list(self._protocols)
         if self.load_extern:
-            _protocols.extend(
-                entry_point.name
-                for entry_point in pkg_resources.iter_entry_points("fs.opener")
-            )
+            _protocols.extend(entry_point.name for entry_point in _get_entry_points())
             _protocols = list(collections.OrderedDict.fromkeys(_protocols))
         return _protocols
 
@@ -103,7 +122,12 @@ class Registry(object):
 
         if self.load_extern:
             entry_point = next(
-                pkg_resources.iter_entry_points("fs.opener", protocol), None
+                (
+                    entry_point
+                    for entry_point in _get_entry_points()
+                    if entry_point.name == protocol
+                ),
+                None,
             )
         else:
             entry_point = None
