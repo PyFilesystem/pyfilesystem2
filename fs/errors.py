@@ -32,6 +32,7 @@ __all__ = [
     "FilesystemClosed",
     "FSError",
     "IllegalBackReference",
+    "IllegalDestination",
     "InsufficientStorage",
     "InvalidCharsInPath",
     "InvalidPath",
@@ -41,6 +42,7 @@ __all__ = [
     "OperationFailed",
     "OperationTimeout",
     "PathError",
+    "PatternError",
     "PermissionDenied",
     "RemoteConnectionError",
     "RemoveRootError",
@@ -239,6 +241,16 @@ class RemoveRootError(OperationFailed):
     default_message = "root directory may not be removed"
 
 
+class IllegalDestination(OperationFailed):
+    """The given destination cannot be used for the operation.
+
+    This error will occur when attempting to move / copy a folder into itself or copying
+    a file onto itself.
+    """
+
+    default_message = "'{path}' is not a legal destination"
+
+
 class ResourceError(FSError):
     """Base exception class for error associated with a specific resource."""
 
@@ -346,3 +358,19 @@ class UnsupportedHash(ValueError):
     not supported by hashlib.
 
     """
+
+
+class PatternError(ValueError):
+    """A string pattern with invalid syntax was given."""
+
+    default_message = "pattern '{pattern}' is invalid at position {position}"
+
+    def __init__(self, pattern, position, exc=None, msg=None):  # noqa: D107
+        # type: (Text, int, Optional[Exception], Optional[Text]) -> None
+        self.pattern = pattern
+        self.position = position
+        self.exc = exc
+        super(ValueError, self).__init__()
+
+    def __reduce__(self):
+        return type(self), (self.path, self.position, self.exc, self._msg)

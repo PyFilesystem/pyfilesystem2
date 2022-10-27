@@ -21,6 +21,7 @@ Many thanks to the following developers for contributing to this project:
 - [Giampaolo Cimino](https://github.com/gpcimino)
 - [@Hoboneer](https://github.com/Hoboneer)
 - [James Emerton](https://github.com/james-emerton)
+- [Jen Hagg](https://github.com/jenhagg)
 - [Jon Hagg](https://github.com/jon-hagg)
 - [Joseph Atkins-Turkish](https://github.com/Spacerat)
 - [Joshua Tauberer](https://github.com/JoshData)

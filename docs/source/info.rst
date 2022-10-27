@@ -46,7 +46,7 @@ file::
 
     resource_info = fs.getinfo('myfile.txt', namespaces=['details', 'access'])
 
-In addition to the specified namespaces, the fileystem will also return
+In addition to the specified namespaces, the filesystem will also return
 the ``basic`` namespace, which contains the name of the resource, and a
 flag which indicates if the resource is a directory.
 

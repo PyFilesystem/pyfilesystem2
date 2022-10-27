@@ -21,11 +21,11 @@ import warnings
 from contextlib import closing
 from functools import partial, wraps
 
-from . import copy, errors, fsencode, iotools, tools, walk, wildcard
+from . import copy, errors, fsencode, glob, iotools, tools, walk, wildcard
 from .copy import copy_modified_time
 from .glob import BoundGlobber
 from .mode import validate_open_mode
-from .path import abspath, join, normpath
+from .path import abspath, isbase, join, normpath
 from .time import datetime_to_epoch
 from .walk import Walker
 
@@ -423,13 +423,17 @@ class FS(object):
 
         """
         with self._lock:
-            if not overwrite and self.exists(dst_path):
+            _src_path = self.validatepath(src_path)
+            _dst_path = self.validatepath(dst_path)
+            if not overwrite and self.exists(_dst_path):
                 raise errors.DestinationExists(dst_path)
-            with closing(self.open(src_path, "rb")) as read_file:
+            if _src_path == _dst_path:
+                raise errors.IllegalDestination(dst_path)
+            with closing(self.open(_src_path, "rb")) as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.upload(dst_path, read_file)  # type: ignore
+                self.upload(_dst_path, read_file)  # type: ignore
             if preserve_time:
-                copy_modified_time(self, src_path, self, dst_path)
+                copy_modified_time(self, _src_path, self, _dst_path)
 
     def copydir(
         self,
@@ -457,11 +461,15 @@ class FS(object):
 
         """
         with self._lock:
-            if not create and not self.exists(dst_path):
+            _src_path = self.validatepath(src_path)
+            _dst_path = self.validatepath(dst_path)
+            if isbase(_src_path, _dst_path):
+                raise errors.IllegalDestination(dst_path)
+            if not create and not self.exists(_dst_path):
                 raise errors.ResourceNotFound(dst_path)
-            if not self.getinfo(src_path).is_dir:
+            if not self.getinfo(_src_path).is_dir:
                 raise errors.DirectoryExpected(src_path)
-            copy.copy_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
+            copy.copy_dir(self, _src_path, self, _dst_path, preserve_time=preserve_time)
 
     def create(self, path, wipe=False):
         # type: (Text, bool) -> bool
@@ -1088,6 +1096,12 @@ class FS(object):
         from .move import move_dir
 
         with self._lock:
+            _src_path = self.validatepath(src_path)
+            _dst_path = self.validatepath(dst_path)
+            if _src_path == _dst_path:
+                return
+            if isbase(_src_path, _dst_path):
+                raise errors.IllegalDestination(dst_path)
             if not create and not self.exists(dst_path):
                 raise errors.ResourceNotFound(dst_path)
             move_dir(self, src_path, self, dst_path, preserve_time=preserve_time)
@@ -1157,14 +1171,19 @@ class FS(object):
                 ``dst_path`` does not exist.
 
         """
-        if not overwrite and self.exists(dst_path):
+        _src_path = self.validatepath(src_path)
+        _dst_path = self.validatepath(dst_path)
+        if not overwrite and self.exists(_dst_path):
             raise errors.DestinationExists(dst_path)
-        if self.getinfo(src_path).is_dir:
+        if self.getinfo(_src_path).is_dir:
             raise errors.FileExpected(src_path)
+        if _src_path == _dst_path:
+            # early exit when moving a file onto itself
+            return
         if self.getmeta().get("supports_rename", False):
             try:
-                src_sys_path = self.getsyspath(src_path)
-                dst_sys_path = self.getsyspath(dst_path)
+                src_sys_path = self.getsyspath(_src_path)
+                dst_sys_path = self.getsyspath(_dst_path)
             except errors.NoSysPath:  # pragma: no cover
                 pass
             else:
@@ -1174,15 +1193,15 @@ class FS(object):
                     pass
                 else:
                     if preserve_time:
-                        copy_modified_time(self, src_path, self, dst_path)
+                        copy_modified_time(self, _src_path, self, _dst_path)
                     return
         with self._lock:
-            with self.open(src_path, "rb") as read_file:
+            with self.open(_src_path, "rb") as read_file:
                 # FIXME(@althonos): typing complains because open return IO
-                self.upload(dst_path, read_file)  # type: ignore
+                self.upload(_dst_path, read_file)  # type: ignore
             if preserve_time:
-                copy_modified_time(self, src_path, self, dst_path)
-            self.remove(src_path)
+                copy_modified_time(self, _src_path, self, _dst_path)
+            self.remove(_src_path)
 
     def open(
         self,
@@ -1695,6 +1714,63 @@ class FS(object):
         )
         matcher = wildcard.get_matcher(patterns, case_sensitive)
         return matcher(name)
+
+    def match_glob(self, patterns, path, accept_prefix=False):
+        # type: (Optional[Iterable[Text]], Text, bool) -> bool
+        """Check if a path matches any of a list of glob patterns.
+
+        If a filesystem is case *insensitive* (such as Windows) then
+        this method will perform a case insensitive match (i.e. ``*.py``
+        will match the same names as ``*.PY``). Otherwise the match will
+        be case sensitive (``*.py`` and ``*.PY`` will match different
+        names).
+
+        Arguments:
+            patterns (list, optional): A list of patterns, e.g.
+                ``['*.py']``, or `None` to match everything.
+            path (str): A resource path, starting with "/".
+            accept_prefix (bool): If ``True``, the path is
+                not required to match the patterns themselves
+                but only need to be a prefix of a string that does.
+
+        Returns:
+            bool: `True` if ``path`` matches any of the patterns.
+
+        Raises:
+            TypeError: If ``patterns`` is a single string instead of
+                a list (or `None`).
+            ValueError: If ``path`` is not a string starting with "/".
+
+        Example:
+            >>> my_fs.match_glob(['*.py'], '/__init__.py')
+            True
+            >>> my_fs.match_glob(['*.jpg', '*.png'], '/foo.gif')
+            False
+            >>> my_fs.match_glob(['dir/file.txt'], '/dir/', accept_prefix=True)
+            True
+            >>> my_fs.match_glob(['dir/file.txt'], '/dir/', accept_prefix=False)
+            False
+            >>> my_fs.match_glob(['dir/file.txt'], '/dir/gile.txt', accept_prefix=True)
+            False
+
+        Note:
+            If ``patterns`` is `None` (or ``['*']``), then this
+            method will always return `True`.
+
+        """
+        if patterns is None:
+            return True
+        if not path or path[0] != "/":
+            raise ValueError("%s needs to be a string starting with /" % path)
+        if isinstance(patterns, six.text_type):
+            raise TypeError("patterns must be a list or sequence")
+        case_sensitive = not typing.cast(
+            bool, self.getmeta().get("case_insensitive", False)
+        )
+        matcher = glob.get_matcher(
+            patterns, case_sensitive, accept_prefix=accept_prefix
+        )
+        return matcher(path)
 
     def tree(self, **kwargs):
         # type: (**Any) -> None
