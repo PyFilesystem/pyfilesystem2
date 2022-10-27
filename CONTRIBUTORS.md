@@ -20,6 +20,7 @@ Many thanks to the following developers for contributing to this project:
 - [George Macon](https://github.com/gmacon)
 - [Giampaolo Cimino](https://github.com/gpcimino)
 - [@Hoboneer](https://github.com/Hoboneer)
+- [James Emerton](https://github.com/james-emerton)
 - [Jon Hagg](https://github.com/jon-hagg)
 - [Joseph Atkins-Turkish](https://github.com/Spacerat)
 - [Joshua Tauberer](https://github.com/JoshData)
