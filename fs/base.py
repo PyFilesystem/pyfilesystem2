@@ -156,7 +156,7 @@ class FS(object):
         Arguments:
             path (str): A path to a resource on the filesystem.
             namespaces (list, optional): Info namespaces to query. The
-                `"basic"` namespace is alway included in the returned
+                `"basic"` namespace is always included in the returned
                 info, whatever the value of `namespaces` may be.
 
         Returns:
@@ -842,7 +842,7 @@ class FS(object):
 
     def getospath(self, path):
         # type: (Text) -> bytes
-        """Get the *system path* to a resource, in the OS' prefered encoding.
+        """Get the *system path* to a resource, in the OS' preferred encoding.
 
         Arguments:
             path (str): A path on the filesystem.
@@ -854,7 +854,7 @@ class FS(object):
             fs.errors.NoSysPath: If there is no corresponding system path.
 
         This method takes the output of `~getsyspath` and encodes it to
-        the filesystem's prefered encoding. In Python3 this step is
+        the filesystem's preferred encoding. In Python3 this step is
         not required, as the `os` module will do it automatically. In
         Python2.7, the encoding step is required to support filenames
         on the filesystem that don't encode correctly.
@@ -1563,11 +1563,11 @@ class FS(object):
 
     def validatepath(self, path):
         # type: (Text) -> Text
-        """Validate a path, returning a normalized absolute path on sucess.
+        """Validate a path, returning a normalized absolute path on success.
 
         Many filesystems have restrictions on the format of paths they
         support. This method will check that ``path`` is valid on the
-        underlaying storage mechanism and throw a
+        underlying storage mechanism and throw a
         `~fs.errors.InvalidPath` exception if it is not.
 
         Arguments:

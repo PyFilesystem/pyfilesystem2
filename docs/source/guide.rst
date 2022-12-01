@@ -85,7 +85,7 @@ This can be a useful debugging aid!
 Closing
 ~~~~~~~
 
-FS objects have a :meth:`~fs.base.FS.close` methd which will perform any required clean-up actions. For many filesystems (notably :class:`~fs.osfs.OSFS`), the ``close`` method does very little. Other filesystems may only finalize files or release resources once ``close()`` is called.
+FS objects have a :meth:`~fs.base.FS.close` method which will perform any required clean-up actions. For many filesystems (notably :class:`~fs.osfs.OSFS`), the ``close`` method does very little. Other filesystems may only finalize files or release resources once ``close()`` is called.
 
 You can call ``close`` explicitly once you are finished using a filesystem. For example::
 

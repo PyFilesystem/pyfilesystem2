@@ -1,4 +1,4 @@
-"""Container for filesystem resource informations.
+"""Container for filesystem resource information.
 """
 
 from __future__ import absolute_import, print_function, unicode_literals
