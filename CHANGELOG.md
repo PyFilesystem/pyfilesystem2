@@ -8,6 +8,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- Optimized moving folders between filesystems with syspaths
+  ([#550](https://github.com/PyFilesystem/pyfilesystem2/pull/550))
 
 ### Added
 
