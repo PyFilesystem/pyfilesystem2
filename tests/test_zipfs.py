@@ -247,6 +247,7 @@ class TestZipFSMtimeFallback(unittest.TestCase):
 
     def test_no_mtime(self):
         '''Fallback to current time when creating an archive of an fs that
+        doesn't support stat or details namespaces.
         '''
         src_fs = FSWithoutMtime()
         with src_fs.open('test.txt', 'w') as f:
