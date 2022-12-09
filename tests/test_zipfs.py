@@ -228,7 +228,7 @@ class TestOpener(unittest.TestCase):
             open_fs("zip://foo.zip", writeable=True)
 
 
-class FSWithoutMtime(MemoryFS):
+class FSWithoutDetailsNamespace(MemoryFS):
     '''MemoryFS subclass that doesn't return details namespace
     '''
     def getinfo(self, path, namespaces):
@@ -249,7 +249,7 @@ class TestZipFSMtimeFallback(unittest.TestCase):
         '''Fallback to current time when creating an archive of an fs that
         doesn't support stat or details namespaces.
         '''
-        src_fs = FSWithoutMtime()
+        src_fs = FSWithoutDetailsNamespace()
         with src_fs.open('test.txt', 'w') as f:
             f.write('Hello World')
 
