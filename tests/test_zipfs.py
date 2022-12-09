@@ -253,11 +253,11 @@ class TestZipFSMtimeFallback(unittest.TestCase):
         with src_fs.open('test.txt', 'w') as f:
             f.write('Hello World')
 
-        now = datetime.now()
+        expected_timestamp = datetime.now()
         write_zip(src_fs, self._temp_path)
 
         zf = zipfile.ZipFile(self._temp_path)
         info = zf.getinfo('test.txt')
         zf.close()
 
-        self.assertLessEqual(now - datetime(*info.date_time), timedelta(seconds=2))
+        self.assertLessEqual(expected_timestamp - datetime(*info.date_time), timedelta(seconds=2))
