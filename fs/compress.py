@@ -65,17 +65,15 @@ def write_zip(
                 # Python2 expects bytes filenames
                 zip_name = zip_name.encode(encoding, "replace")
 
-            if info.has_namespace("stat"):
-                # If the file has a stat namespace, get the
-                # zip time directory from the stat structure
-                st_mtime = info.get("stat", "st_mtime", None)
-                _mtime = time.localtime(st_mtime)
-                zip_time = _mtime[0:6]  # type: ZipTime
-            else:
-                # Otherwise, use the modified time from details
-                # namespace.
-                mt = info.modified or datetime.utcnow()
-                zip_time = (mt.year, mt.month, mt.day, mt.hour, mt.minute, mt.second)
+            # If the file has a stat namespace, get the
+            # zip time directory from the stat structure
+            st_mtime = info.get("stat", "st_mtime")
+            # Otherwise, use the modified time from details namespace.
+            if st_mtime is None:
+                st_mtime = info.get("details", "modified")
+
+            # If st_mtime is still None this will default to current time
+            zip_time = time.localtime(st_mtime)[:6]  # type: ZipTime
 
             # NOTE(@althonos): typeshed's `zipfile.py` on declares
             #     ZipInfo.__init__ for Python < 3 ?!

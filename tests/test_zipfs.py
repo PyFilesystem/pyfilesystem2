@@ -8,11 +8,13 @@ import six
 import tempfile
 import unittest
 import zipfile
+from datetime import datetime, timedelta
 
 from fs import zipfs
 from fs.compress import write_zip
 from fs.enums import Seek
 from fs.errors import NoURL
+from fs.memoryfs import MemoryFS
 from fs.opener import open_fs
 from fs.opener.errors import NotWriteable
 from fs.test import FSTestCases
@@ -224,3 +226,38 @@ class TestOpener(unittest.TestCase):
     def test_not_writeable(self):
         with self.assertRaises(NotWriteable):
             open_fs("zip://foo.zip", writeable=True)
+
+
+class FSWithoutDetailsNamespace(MemoryFS):
+    '''MemoryFS subclass that doesn't return details namespace
+    '''
+    def getinfo(self, path, namespaces):
+        if namespaces is not None:
+            namespaces = set(namespaces) - {'details'}
+        return super().getinfo(path, namespaces)
+
+
+class TestZipFSMtimeFallback(unittest.TestCase):
+    def setUp(self):
+        fh, self._temp_path = tempfile.mkstemp()
+        os.close(fh)
+
+    def tearDown(self):
+        os.remove(self._temp_path)
+
+    def test_no_mtime(self):
+        '''Fallback to current time when creating an archive of an fs that
+        doesn't support stat or details namespaces.
+        '''
+        src_fs = FSWithoutDetailsNamespace()
+        with src_fs.open('test.txt', 'w') as f:
+            f.write('Hello World')
+
+        expected_timestamp = datetime.now()
+        write_zip(src_fs, self._temp_path)
+
+        zf = zipfile.ZipFile(self._temp_path)
+        info = zf.getinfo('test.txt')
+        zf.close()
+
+        self.assertLessEqual(expected_timestamp - datetime(*info.date_time), timedelta(seconds=2))
