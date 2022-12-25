@@ -1813,20 +1813,20 @@ class FSTestCases(object):
 
     def test_move_file_onto_itself(self):
         self.fs.writetext("file.txt", "Hello")
-        self.fs.move("file.txt", "file.txt", overwrite=True)
-        self.assert_text("file.txt", "Hello")
-
+        with self.assertRaises(errors.IllegalDestination):
+            self.fs.move("file.txt", "file.txt", overwrite=True)
         with self.assertRaises(errors.DestinationExists):
             self.fs.move("file.txt", "file.txt", overwrite=False)
+        self.assert_text("file.txt", "Hello")
 
     def test_move_file_onto_itself_relpath(self):
         subdir = self.fs.makedir("sub")
         subdir.writetext("file.txt", "Hello")
-        self.fs.move("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
-        self.assert_text("sub/file.txt", "Hello")
-
+        with self.assertRaises(errors.IllegalDestination):
+            self.fs.move("sub/file.txt", "sub/../sub/file.txt", overwrite=True)
         with self.assertRaises(errors.DestinationExists):
             self.fs.move("sub/file.txt", "sub/../sub/file.txt", overwrite=False)
+        self.assert_text("sub/file.txt", "Hello")
 
     def test_copy_file_onto_itself(self):
         self.fs.writetext("file.txt", "Hello")
@@ -1911,8 +1911,8 @@ class FSTestCases(object):
         folder.writetext("file1.txt", "Hello1")
         sub = folder.makedir("sub")
         sub.writetext("file2.txt", "Hello2")
-
-        self.fs.movedir("folder", "folder")
+        with self.assertRaises(errors.IllegalDestination):
+            self.fs.movedir("folder", "folder")
         self.assert_text("folder/file1.txt", "Hello1")
         self.assert_text("folder/sub/file2.txt", "Hello2")
 

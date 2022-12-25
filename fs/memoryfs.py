@@ -465,8 +465,9 @@ class MemoryFS(FS):
             # handle moving a file onto itself
             if src_dir == dst_dir and src_name == dst_name:
                 if overwrite:
-                    return
-                raise errors.DestinationExists(dst_path)
+                    raise errors.IllegalDestination(dst_path)
+                else:
+                    raise errors.DestinationExists(dst_path)
 
             # move the entry from the src folder to the dst folder
             dst_dir_entry.set_entry(dst_name, src_entry)
@@ -483,10 +484,7 @@ class MemoryFS(FS):
         dst_dir, dst_name = split(_dst_path)
         src_dir, src_name = split(_src_path)
 
-        # move a dir onto itself
-        if _src_path == _dst_path:
-            return
-        # move a dir into itself
+        # move a dir onto or into itself
         if isbase(_src_path, _dst_path):
             raise errors.IllegalDestination(dst_path)
 
