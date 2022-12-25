@@ -306,6 +306,32 @@ class TestImplicitDirectories(unittest.TestCase):
         self.assertIs(info.type, ResourceType.directory)
 
 
+class TestEquality(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tmpfs = open_fs("temp://")
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.tmpfs.close()
+
+    def test_equality(self):
+        p1 = self.tmpfs.getospath("test.tar")
+        p2 = self.tmpfs.getospath("other.tar")
+
+        with tarfs.TarFS("test.tar", write=True) as fw, tarfs.TarFS(
+            "test.tar"
+        ) as fr, tarfs.TarFS("test.tar") as fr2, tarfs.TarFS(
+            "other.tar"
+        ) as other, open_fs(
+            "mem://"
+        ) as mem:
+            self.assertEqual(fr, fr2)
+            self.assertNotEqual(fw, fr)
+            self.assertNotEqual(fr, mem)
+            self.assertNotEqual(fw, mem)
+
+
 class TestReadTarFSMem(TestReadTarFS):
     def make_source_fs(self):
         return open_fs("mem://")

@@ -282,6 +282,9 @@ class WriteZipFS(WrapFS):
         # type: () -> Text
         return "<zipfs-write '{}'>".format(self._file)
 
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self._file == other._file
+
     def delegate_path(self, path):
         # type: (Text) -> Tuple[FS, Text]
         return self._temp_fs, path
@@ -360,6 +363,9 @@ class ReadZipFS(FS):
     def __str__(self):
         # type: () -> Text
         return "<zipfs '{}'>".format(self._file)
+
+    def __eq__(self, other):
+        return isinstance(other, self.__class__) and self._file == other._file
 
     def _path_to_zip_name(self, path):
         # type: (Text) -> str

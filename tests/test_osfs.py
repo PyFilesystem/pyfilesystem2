@@ -228,3 +228,16 @@ class TestOSFS(FSTestCases, unittest.TestCase):
 
     def test_geturl_return_no_url(self):
         self.assertRaises(errors.NoURL, self.fs.geturl, "test/path", "upload")
+
+    def test_equality(self):
+        dir_path = tempfile.mkdtemp()
+        t1 = open_fs(dir_path, create=True)
+        t2 = open_fs(dir_path, create=True)
+        self.assertEqual(t1, t2)
+
+        another_dir_path = tempfile.mkdtemp()
+        t3 = open_fs(another_dir_path, create=True)
+        self.assertNotEqual(t1, t3)
+
+        another_fs = open_fs("mem://")
+        self.assertNotEqual(t1, another_fs)
