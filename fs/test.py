@@ -1789,6 +1789,18 @@ class FSTestCases(object):
         self.assertEqual(self.fs.listdir("foo"), ["test2.txt"])
         self.assertEqual(next(self.fs.scandir("foo")).name, "test2.txt")
 
+    def test_move_file_same_fs_preserve_time(self):
+        text = "Hello, World"
+        self.fs.makedir("foo").writetext("test.txt", text)
+        self.assert_text("foo/test.txt", text)
+
+        fs.move.move_file(self.fs, "foo/test.txt", self.fs, "foo/test2.txt", preserve_time=True)
+        self.assert_not_exists("foo/test.txt")
+        self.assert_text("foo/test2.txt", text)
+
+        self.assertEqual(self.fs.listdir("foo"), ["test2.txt"])
+        self.assertEqual(next(self.fs.scandir("foo")).name, "test2.txt")
+
     def _test_move_file(self, protocol):
         other_fs = open_fs(protocol)
 
