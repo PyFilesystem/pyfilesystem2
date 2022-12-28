@@ -22,7 +22,7 @@ from contextlib import closing
 from functools import partial, wraps
 
 from . import copy, errors, fsencode, glob, iotools, tools, walk, wildcard
-from .copy import copy_modified_time
+from .copy import copy_modified_time, read_modified_time, update_details_namespace
 from .glob import BoundGlobber
 from .mode import validate_open_mode
 from .path import abspath, isbase, join, normpath
@@ -1187,14 +1187,27 @@ class FS(object):
             except errors.NoSysPath:  # pragma: no cover
                 pass
             else:
+                # Without preserving the modification time we can rename
+                # the file's path.
+                if not preserve_time:
+                    try:
+                        os.rename(src_sys_path, dst_sys_path)
+                    except OSError:
+                        pass
+                    else:
+                        return
+
+                # read the modification before moving the file 
+                modification_details = read_modified_time(self, _src_path)
                 try:
                     os.rename(src_sys_path, dst_sys_path)
                 except OSError:
                     pass
                 else:
-                    if preserve_time:
-                        copy_modified_time(self, _src_path, self, _dst_path)
+                    # update the meta info  
+                    update_details_namespace(self, _dst_path, modification_details)
                     return
+
         with self._lock:
             with self.open(_src_path, "rb") as read_file:
                 # FIXME(@althonos): typing complains because open return IO
