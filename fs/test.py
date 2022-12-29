@@ -1794,7 +1794,9 @@ class FSTestCases(object):
         self.fs.makedir("foo").writetext("test.txt", text)
         self.assert_text("foo/test.txt", text)
 
-        fs.move.move_file(self.fs, "foo/test.txt", self.fs, "foo/test2.txt", preserve_time=True)
+        fs.move.move_file(
+            self.fs, "foo/test.txt", self.fs, "foo/test2.txt", preserve_time=True
+        )
         self.assert_not_exists("foo/test.txt")
         self.assert_text("foo/test2.txt", text)
 
