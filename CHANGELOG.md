@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   ([#535](https://github.com/PyFilesystem/pyfilesystem2/issues/535)).
 - Fixed a bug where files could be truncated or deleted when moved / copied onto itself.
   Closes [#546](https://github.com/PyFilesystem/pyfilesystem2/issues/546)
+- Fixed a bug in `FS.move` and `MemoryFS.move`, where `peserve_time=True` resulted in an `ResourceNotFound` error. Closes [#558](https://github.com/PyFilesystem/pyfilesystem2/issues/558)
 
 ## [2.4.16] - 2022-05-02
 
