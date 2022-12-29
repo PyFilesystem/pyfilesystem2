@@ -15,7 +15,7 @@ from threading import RLock
 from . import errors
 from ._typing import overload
 from .base import FS
-from .copy import copy_modified_time, read_modified_time, update_details_namespace
+from .copy import copy_modified_time, read_modified_time, update_details_info
 from .enums import ResourceType, Seek
 from .info import Info
 from .mode import Mode
@@ -480,7 +480,7 @@ class MemoryFS(FS):
 
             # update the meta info, after moving
             if preserve_time:
-                update_details_namespace(self, dst_path, modification_details)
+                update_details_info(self, dst_path, modification_details)
 
     def movedir(self, src_path, dst_path, create=False, preserve_time=False):
         _src_path = self.validatepath(src_path)

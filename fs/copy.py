@@ -561,7 +561,7 @@ def read_modified_time(
     return mod_details
 
 
-def update_details_namespace(
+def update_details_info(
     dst_fs,  # type: Union[FS, Text]
     dst_path,  # type: Text
     details_dic,  # type: Dict
