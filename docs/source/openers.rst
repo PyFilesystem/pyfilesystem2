@@ -52,10 +52,15 @@ Query strings are used to provide additional filesystem-specific information use
 Opening FS URLS
 ---------------
 
-To open a filesysem with a FS URL, you can use :meth:`~fs.opener.registry.Registry.open_fs`, which may be imported and used as follows::
+To open a filesystem with a FS URL referring to a directory, you can use :meth:`~fs.opener.registry.Registry.open_fs`, which may be imported and used as follows::
 
     from fs import open_fs
     projects_fs = open_fs('osfs://~/projects')
+
+To open a filesysem with a FS URL referring to a file, you can use :meth:`~fs.opener.registry.Registry.open_parent_fs`, which may be imported and used as follows::
+
+    from fs.opener import open_parent_fs
+    projects_fs, path = open_parent_fs('osfs://~/projects/test.txt')
 
 
 Manually registering Openers

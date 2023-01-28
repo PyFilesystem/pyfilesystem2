@@ -8,6 +8,7 @@ Many thanks to the following developers for contributing to this project:
 - [Andrew Scheller](https://github.com/lurch)
 - [Andrey Serov](https://github.com/zmej-serow)
 - [Ben Lindsay](https://github.com/benlindsay)
+- [Bruno Grande](https://github.com/BrunoGrandePhD)
 - [Bernhard M. Wiedemann](https://github.com/bmwiedemann)
 - [@chfw](https://github.com/chfw)
 - [Dafna Hirschfeld](https://github.com/kamomil)

@@ -226,6 +226,80 @@ class Registry(object):
             )
         return _fs
 
+    def open_parent_fs(
+        self,
+        fs_url,  # type: Union[FS, Text]
+        writeable=False,  # type: bool
+        create=False,  # type: bool
+        cwd=".",  # type: Text
+        default_protocol="osfs",  # type: Text
+    ):
+        # type: (...) -> tuple[FS, str]
+        """Open a filesystem for the top-most directory in a FS URL.
+
+        Compared to `~Registry.open_fs`, this function is useful for
+        handling URLs that point to files instead of directories.
+
+        The top-most directory is used as the root of the file system
+        because it doesn't assume that the intermediate directories
+        exist at the time of creating the file system. The user can
+        opt to run `~FS.makedirs` to "fill in" the directories prior
+        to performing operations on the file indicated by the URL.
+
+        After determining the top-most directory, the remainder of the
+        given FS URL is provided as the second return value as a path
+        to be used in downstream FS operations.
+
+        Arguments:
+            fs_url (str): A filesystem URL. If a filesystem instance is
+                given instead, it will be returned transparently.
+            writeable (bool, optional): `True` if the filesystem must
+                be writeable.
+            create (bool, optional): `True` if the filesystem should be
+                created if it does not exist.
+            cwd (str): The current working directory (generally only
+                relevant for OS filesystems).
+            default_protocol (str): The protocol to use if one is not
+                supplied in the FS URL (defaults to ``"osfs"``).
+
+        Returns:
+            (FS, str): a tuple of ``(<filesystem>, <path from url>)``
+
+        Caution:
+            The ``writeable`` parameter only controls whether the
+            filesystem *needs* to be writable, which is relevant for
+            some archive filesystems. Passing ``writeable=False`` will
+            **not** make the return filesystem read-only. For this,
+            consider using `fs.wrap.read_only` to wrap the returned
+            instance.
+
+        """
+        # Split off prefix to avoid issues with `rpartition("/")`
+        scheme, separator, resource = fs_url.rpartition("://")
+        if separator == "":
+            prefix = "osfs://"
+        else:
+            prefix = scheme + separator
+
+        # Retrieve the "top-most" parent folder for the FS root
+        # to ensure that it exists for the FS to be constructed.
+        # The remainder of the string can be used as the FS path
+        fs_root, _, path = resource.partition("/")
+
+        # Handle the case when the path starts with "/"
+        if fs_root == "":
+            fs_root = "/"
+
+        # Handle the case when there is no "/" in the path
+        if path == "":
+            path = fs_root
+            fs_root = ""
+
+        fs_root_url = prefix + fs_root
+        fs = self.open_fs(fs_root_url, writeable, create, cwd, default_protocol)
+
+        return fs, path
+
     @contextlib.contextmanager
     def manage_fs(
         self,

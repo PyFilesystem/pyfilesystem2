@@ -15,8 +15,17 @@ from .registry import registry
 
 # Alias functions defined as Registry methods
 open_fs = registry.open_fs
+open_parent_fs = registry.open_parent_fs
 open = registry.open
 manage_fs = registry.manage_fs
 
 # __all__ with aliases and classes
-__all__ = ["registry", "Opener", "open_fs", "open", "manage_fs", "parse"]
+__all__ = [
+    "registry",
+    "Opener",
+    "open_fs",
+    "open_parent_fs",
+    "open",
+    "manage_fs",
+    "parse",
+]

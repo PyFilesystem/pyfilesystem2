@@ -265,6 +265,13 @@ class TestOpeners(unittest.TestCase):
         mem_fs_2 = opener.open_fs(mem_fs)
         self.assertEqual(mem_fs, mem_fs_2)
 
+    def test_open_parent_fs(self):
+        mem_fs, path = opener.open_parent_fs("mem://dir/test.txt")
+        mem_fs.writetext(path, "foo")
+        contents = mem_fs.readtext(path)
+        self.assertEqual(path, "test.txt")
+        self.assertEqual(contents, "foo")
+
     @mock.patch("appdirs.{}".format(UserDataFS.app_dir), autospec=True, spec_set=True)
     def test_open_userdata(self, app_dir):
         app_dir.return_value = self.tmpdir
