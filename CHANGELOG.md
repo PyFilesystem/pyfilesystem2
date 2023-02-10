@@ -51,6 +51,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Fixed
 
+- Fixed `ResourceLocked` error translation on Windows [#484](https://github.com/PyFilesystem/pyfilesystem2/issues/484).
 - Fixed `MemoryFS.move` and `MemoryFS.movedir` not updating the name of moved
   resources, causing `MemoryFS.scandir` to use the old name.
   ([#510](https://github.com/PyFilesystem/pyfilesystem2/pull/510)).
