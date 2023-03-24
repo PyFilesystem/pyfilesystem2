@@ -21,6 +21,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   ([#535](https://github.com/PyFilesystem/pyfilesystem2/issues/535)).
 - Fixed a bug where files could be truncated or deleted when moved / copied onto itself.
   Closes [#546](https://github.com/PyFilesystem/pyfilesystem2/issues/546)
+- TestCase method aliases removed in Python 3.12 were replaced and now work with all Python versions.
+  Closes [#568](https://github.com/PyFilesystem/pyfilesystem2/issues/568)
 
 ## [2.4.16] - 2022-05-02
 
