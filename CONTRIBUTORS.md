@@ -7,6 +7,7 @@ Many thanks to the following developers for contributing to this project:
 - [Andreas Tollkötter](https://github.com/atollk)
 - [Andrew Scheller](https://github.com/lurch)
 - [Andrey Serov](https://github.com/zmej-serow)
+- [Arjan Keeman](https://github.com/akeeman)
 - [Ben Lindsay](https://github.com/benlindsay)
 - [Bernhard M. Wiedemann](https://github.com/bmwiedemann)
 - [@chfw](https://github.com/chfw)
