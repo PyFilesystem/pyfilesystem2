@@ -39,12 +39,10 @@ import marshal
 import importlib
 from importlib.util import MAGIC_NUMBER
 
-from typing import Sequence, Text, Tuple, Optional
-
 from fs import open_fs
 from fs.base import FS
-from fs.errors import FSError
 
+from typing import Sequence, Text, Tuple, Optional
 
 ModuleInfo = Tuple[Text, int, bool]
 
