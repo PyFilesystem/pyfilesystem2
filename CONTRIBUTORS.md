@@ -47,3 +47,4 @@ Many thanks to the following developers for contributing to this project:
 - [Vilius Grigaliūnas](https://github.com/vilius-g)
 - [Will McGugan](https://github.com/willmcgugan)
 - [Zmej Serow](https://github.com/zmej-serow)
+- [Amir Rossert](https://github.com/arossert/)

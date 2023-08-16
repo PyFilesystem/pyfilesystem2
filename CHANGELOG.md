@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 - Added `filter_glob` and `exclude_glob` parameters to `fs.walk.Walker`.
   Closes [#459](https://github.com/PyFilesystem/pyfilesystem2/issues/459).
+- Added `fs.expose.importhook`.
 
 ### Fixed
 - Elaborated documentation of `filter_dirs` and `exclude_dirs` in `fs.walk.Walker`.
