@@ -66,7 +66,9 @@ class FSImportHook(importlib.abc.MetaPathFinder):
         # type: ([FS, Text]) -> None
         #  If given a string, try to open it as an FS url.
         #  Don't open things on the local filesystem though.
-        if (isinstance(fs_or_url, str) and ":/" not in fs_or_url) and (not isinstance(fs_or_url, FS)):
+        if (isinstance(fs_or_url, str) and ":/" not in fs_or_url) and (
+            not isinstance(fs_or_url, FS)
+        ):
             raise ImportError()
 
         self.fs = open_fs(fs_or_url)
@@ -223,7 +225,7 @@ class FSImportHook(importlib.abc.MetaPathFinder):
         path, _type, ispkg = info
         if _type != imp.PY_SOURCE:
             return None
-        return self.fs.getcontents(path, 'rb').replace(b"\r\n", b"\n")
+        return self.fs.getcontents(path, "rb").replace(b"\r\n", b"\n")
 
     def get_filename(self, fullname, info=None):
         # type: (Text, Optional[ModuleInfo]) -> str
