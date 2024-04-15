@@ -64,7 +64,7 @@ Or to count the Python lines on an FTP server:
 projects_fs = open_fs('ftp://ftp.example.org/projects')
 ```
 
-No changes to `count_python_loc` are necessary, because PyFileystem
+No changes to `count_python_loc` are necessary, because `PyFilesystem`
 provides a simple consistent interface to anything that resembles a
 collection of files and directories. Essentially, it allows you to write
 code that is independent of where and how the files are physically
@@ -90,7 +90,7 @@ directory walking functionality of `os.walk`.
 
 ## Credits
 
-The following developers have contributed code and their time to this projects:
+The following developers have contributed code and their time to this project:
 
 - [Will McGugan](https://github.com/willmcgugan)
 - [Martin Larralde](https://github.com/althonos)
