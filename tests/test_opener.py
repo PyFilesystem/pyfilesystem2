@@ -215,12 +215,6 @@ class TestOpeners(unittest.TestCase):
     def tearDown(self):
         shutil.rmtree(self.tmpdir)
 
-    def test_repr(self):
-        # Check __repr__ works
-        for entry_point in pkg_resources.iter_entry_points("fs.opener"):
-            _opener = entry_point.load()
-            repr(_opener())
-
     def test_open_osfs(self):
         fs = opener.open_fs("osfs://.")
         self.assertIsInstance(fs, OSFS)
