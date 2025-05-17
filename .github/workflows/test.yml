@@ -36,9 +36,9 @@ jobs:
     - name: Test with tox
       run: python -m tox
     - name: Store partial coverage reports
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
-        name: coverage
+        name: coverage-${{ matrix.runs-on }}
         path: .coverage.*
 
   coveralls:
@@ -54,9 +54,10 @@ jobs:
     - name: Install coverage package
       run: python -m pip install -U coverage
     - name: Download partial coverage reports
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v4
       with:
-        name: coverage
+        pattern: coverage-*
+        merge-multiple: true
     - name: Combine coverage
       run: python -m coverage combine
     - name: Report coverage
