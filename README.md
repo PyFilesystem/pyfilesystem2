@@ -13,8 +13,8 @@ Python's Filesystem abstraction layer.
 
 ## Documentation
 
-- [Wiki](https://www.pyfilesystem.org)
-- [API Documentation](https://docs.pyfilesystem.org/)
+- ~~[Wiki](https://www.pyfilesystem.org)~~ (currently offline)
+- [API Documentation](https://pyfilesystem2.readthedocs.io/en/latest/)
 - [GitHub Repository](https://github.com/PyFilesystem/pyfilesystem2)
 - [Blog](https://www.willmcgugan.com/tag/fs/)
 
