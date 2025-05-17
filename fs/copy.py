@@ -14,7 +14,7 @@ from .tools import is_thread_safe
 from .walk import Walker
 
 if typing.TYPE_CHECKING:
-    from typing import Callable, Optional, Text, Union
+    from typing import Callable, Optional, Text, Union, Dict
 
     from .base import FS
 
@@ -536,3 +536,43 @@ def copy_modified_time(
                 if value in src_details:
                     dst_details[value] = src_details[value]
             _dst_fs.setinfo(dst_path, {"details": dst_details})
+
+
+def read_modified_time(
+    src_fs,  # type: Union[FS, Text]
+    src_path,  # type: Text
+):
+    # type: (...) -> Dict
+    """Read modified time metadata from a file.
+
+    Arguments:
+        src_fs (FS or str): Source filesystem (instance or URL).
+        src_path (str): Path to a directory on the source filesystem.
+
+    """
+    namespaces = ("details",)
+    with manage_fs(src_fs, writeable=False) as _src_fs:
+        src_meta = _src_fs.getinfo(src_path, namespaces)
+        src_details = src_meta.raw.get("details", {})
+        mod_details = {}
+        for value in ("metadata_changed", "modified"):
+            if value in src_details:
+                mod_details[value] = src_details[value]
+    return mod_details
+
+
+def update_details_info(
+    dst_fs,  # type: Union[FS, Text]
+    dst_path,  # type: Text
+    details_dic,  # type: Dict
+):
+    # type: (...) -> None
+    """Update file metadata from a dict.
+
+    Arguments:
+        dst_fs (FS or str): Destination filesystem (instance or URL).
+        dst_path (str): Path to a directory on the destination filesystem.
+
+    """
+    with manage_fs(dst_fs, create=True) as _dst_fs:
+        _dst_fs.setinfo(dst_path, {"details": details_dic})

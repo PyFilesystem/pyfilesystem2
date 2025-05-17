@@ -25,6 +25,7 @@ Many thanks to the following developers for contributing to this project:
 - [Joshua Tauberer](https://github.com/JoshData)
 - [Justin Charlong](https://github.com/jcharlong)
 - [Louis Sautier](https://github.com/sbraz)
+- [Marcel Johannesmann](https://github.com/mj0nez)
 - [Martin Durant](https://github.com/martindurant)
 - [Martin Larralde](https://github.com/althonos)
 - [Masaya Nakamura](https://github.com/mashabow)

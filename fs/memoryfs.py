@@ -15,7 +15,7 @@ from threading import RLock
 from . import errors
 from ._typing import overload
 from .base import FS
-from .copy import copy_modified_time
+from .copy import copy_modified_time, read_modified_time, update_details_info
 from .enums import ResourceType, Seek
 from .info import Info
 from .mode import Mode
@@ -468,14 +468,19 @@ class MemoryFS(FS):
                     return
                 raise errors.DestinationExists(dst_path)
 
+            # get the time info to preserve it (see #558)
+            if preserve_time:
+                modification_details = read_modified_time(self, src_path)
+
             # move the entry from the src folder to the dst folder
             dst_dir_entry.set_entry(dst_name, src_entry)
             src_dir_entry.remove_entry(src_name)
             # make sure to update the entry name itself (see #509)
             src_entry.name = dst_name
 
+            # update the meta info, after moving
             if preserve_time:
-                copy_modified_time(self, src_path, self, dst_path)
+                update_details_info(self, dst_path, modification_details)
 
     def movedir(self, src_path, dst_path, create=False, preserve_time=False):
         _src_path = self.validatepath(src_path)
