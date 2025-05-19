@@ -545,3 +545,7 @@ class WrapFS(FS, typing.Generic[_F]):
     def walk(self):
         # type: () -> BoundWalker
         return self._wrap_fs.walker_class.bind(self)
+
+    def symlink(self, src, dst):
+        _fs, _dst = self.delegate_path(dst)
+        return _fs.symlink(src, _dst)

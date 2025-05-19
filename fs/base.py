@@ -313,6 +313,21 @@ class FS(object):
 
         """
 
+    def symlink(self, src, dst):
+        # type: (Text, Text) -> None
+        """Create a symbolic link pointing to src named dst.
+
+        Arguments:
+            src (str): Path to target
+            dst (str): Path to symlink
+
+        Raises:
+            fs.errors.ResourceNotFound: If ``path`` does not exist
+                on the filesystem
+            NotImplementedError: If not supported by underlying filesystem.
+        """
+        raise NotImplementedError()
+
     # ---------------------------------------------------------------- #
     # Optional methods                                                 #
     # Filesystems *may* implement these methods.                       #
@@ -761,6 +776,8 @@ class FS(object):
         read_only           `True` if this filesystem is read only.
         supports_rename     `True` if this filesystem supports an
                             `os.rename` operation.
+        symlink             `True` if this filesystem supports an
+                            `os.symlink` operation.
         =================== ============================================
 
         Most builtin filesystems will provide all these keys, and third-

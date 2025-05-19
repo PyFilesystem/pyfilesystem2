@@ -2001,3 +2001,35 @@ class FSTestCases(object):
             self.assertEqual(
                 foo_fs.hash("hashme.txt", "md5"), "9fff4bb103ab8ce4619064109c54cb9c"
             )
+
+    def test_create_symlink(self):
+        if not self.fs.getmeta().get("symlink", False):
+            raise unittest.SkipTest("the filesystem does not support symlinks.")
+        self.fs.writetext('a', 'hello')
+        self.fs.symlink('a', 'b')
+        info = self.fs.getinfo('b', namespaces=['link'])
+        self.assertTrue(info.is_link)
+        self.assertEqual(info.target, 'a')
+        read_text = self.fs.readtext('b', 'utf8')
+        self.assertEqual('hello', read_text)
+
+    def test_create_symlink_dir(self):
+        if not self.fs.getmeta().get("symlink", False):
+            raise unittest.SkipTest("the filesystem does not support symlinks.")
+        self.fs.makedirs('a1/a2')
+        self.fs.writetext('a1/a2/file.txt', 'hello')
+        self.fs.makedir('b1')
+        self.fs.symlink('../a1/a2', 'b1/b2')
+        b1 = self.fs.opendir('b1')
+        self.assertTrue(b1.islink('b2'))
+        b2 = b1.opendir('b2')
+        self.assertEqual('hello', b2.readtext('file.txt', 'utf8'))
+
+    def test_create_symlink_target_exists(self):
+        # Check it behaves like os.symlink and ln -T:
+        # if target is directory don't create inside directory
+        if not self.fs.getmeta().get("symlink", False):
+            raise unittest.SkipTest("the filesystem does not support symlinks.")
+        self.fs.makedir('dst')
+        with self.assertRaises(errors.FileExists):
+            self.fs.symlink('src', 'dst')

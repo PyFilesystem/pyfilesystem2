@@ -147,6 +147,7 @@ class OSFS(FS):
             "thread_safe": True,
             "unicode_paths": os.path.supports_unicode_filenames,
             "virtual": False,
+            "symlink": bool(getattr(os, 'symlink', None)),
         }
 
         try:
@@ -687,3 +688,8 @@ class OSFS(FS):
                 " env var); {error}".format(path=path, error=error),
             )
         return super(OSFS, self).validatepath(path)
+
+    def symlink(self, src, dst):
+        _dst = self._to_sys_path(self.validatepath(dst))
+        with convert_os_errors("symlink", _dst):
+            return os.symlink(src, _dst)
