@@ -1,7 +1,7 @@
 """Python filesystem abstraction layer.
 """
 
-__import__("pkg_resources").declare_namespace(__name__)  # type: ignore
+__path__ = __import__("pkgutil").extend_path(__path__, __name__)
 
 from . import path
 from ._fscompat import fsdecode, fsencode
