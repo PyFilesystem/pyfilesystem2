@@ -84,7 +84,11 @@ class _ConvertOSErrors(object):
             _errno = exc_value.errno
             fserror = os_errors.get(_errno, errors.OperationFailed)
             if _errno == errno.EACCES and sys.platform == "win32":
-                if getattr(exc_value, "args", None) == 32:  # pragma: no cover
+                windows_error = getattr(exc_value, "winerror", 0)
+                exception_args = getattr(exc_value, "args", None) or (0,)
+                if (
+                    windows_error == 32 or exception_args[0] == errno.EACCES
+                ):  # pragma: no cover
                     fserror = errors.ResourceLocked
             reraise(fserror, fserror(self._path, exc=exc_value), traceback)
 
