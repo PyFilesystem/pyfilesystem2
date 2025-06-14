@@ -7,6 +7,7 @@ try:
 except ImportError:
     import mock
 
+import shutil
 from parameterized import parameterized, parameterized_class
 
 import fs.move
@@ -167,7 +168,7 @@ class TestMove(unittest.TestCase):
             self.assertFalse(src.exists("target.txt"))
             self.assertFalse(dst.exists("file.txt"))
             self.assertTrue(dst.exists("target.txt"))
-            self.assertEquals(dst.readtext("target.txt"), "source content")
+            self.assertEqual(dst.readtext("target.txt"), "source content")
 
     @parameterized.expand([("temp", "temp://"), ("mem", "mem://")])
     def test_move_file_overwrite_itself(self, _, fs_url):
@@ -177,7 +178,7 @@ class TestMove(unittest.TestCase):
             tmp.writetext("file.txt", "content")
             fs.move.move_file(tmp, "file.txt", tmp, "file.txt")
             self.assertTrue(tmp.exists("file.txt"))
-            self.assertEquals(tmp.readtext("file.txt"), "content")
+            self.assertEqual(tmp.readtext("file.txt"), "content")
 
     @parameterized.expand([("temp", "temp://"), ("mem", "mem://")])
     def test_move_file_overwrite_itself_relpath(self, _, fs_url):
@@ -188,7 +189,7 @@ class TestMove(unittest.TestCase):
             new_dir.writetext("file.txt", "content")
             fs.move.move_file(tmp, "dir/../dir/file.txt", tmp, "dir/file.txt")
             self.assertTrue(tmp.exists("dir/file.txt"))
-            self.assertEquals(tmp.readtext("dir/file.txt"), "content")
+            self.assertEqual(tmp.readtext("dir/file.txt"), "content")
 
     @parameterized.expand([(True,), (False,)])
     def test_move_file_cleanup_on_error(self, cleanup):
@@ -206,3 +207,16 @@ class TestMove(unittest.TestCase):
                     )
             self.assertTrue(src.exists("file.txt"))
             self.assertEqual(not dst.exists("target.txt"), cleanup)
+
+    @parameterized.expand([("temp", "temp://", True), ("mem", "mem://", False)])
+    def test_move_dir_optimized(self, _, fs_url, mv_called):
+        with open_fs(fs_url) as tmp:
+            with mock.patch.object(shutil, "move", wraps=shutil.move) as mv:
+                dir_ = tmp.makedir("dir")
+                dir_.writetext("file.txt", "content")
+                sub = dir_.makedir("sub")
+                sub.writetext("file.txt", "sub content")
+                fs.move.move_dir(tmp, "dir", tmp, "newdir")
+                self.assertEqual(tmp.readtext("newdir/file.txt"), "content")
+                self.assertEqual(tmp.readtext("newdir/sub/file.txt"), "sub content")
+                self.assertEqual(mv.called, mv_called)
