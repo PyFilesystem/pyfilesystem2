@@ -11,7 +11,7 @@ from parameterized import parameterized, parameterized_class
 
 import fs.move
 from fs import open_fs
-from fs.errors import FSError, ResourceReadOnly
+from fs.errors import FSError, ResourceReadOnly, IllegalDestination
 from fs.path import join
 from fs.wrap import read_only
 
@@ -175,7 +175,8 @@ class TestMove(unittest.TestCase):
         # behaves like the regular one (TempFS tests the optmized code path).
         with open_fs(fs_url) as tmp:
             tmp.writetext("file.txt", "content")
-            fs.move.move_file(tmp, "file.txt", tmp, "file.txt")
+            with self.assertRaises(IllegalDestination):
+                fs.move.move_file(tmp, "file.txt", tmp, "file.txt")
             self.assertTrue(tmp.exists("file.txt"))
             self.assertEquals(tmp.readtext("file.txt"), "content")
 
@@ -186,7 +187,8 @@ class TestMove(unittest.TestCase):
         with open_fs(fs_url) as tmp:
             new_dir = tmp.makedir("dir")
             new_dir.writetext("file.txt", "content")
-            fs.move.move_file(tmp, "dir/../dir/file.txt", tmp, "dir/file.txt")
+            with self.assertRaises(IllegalDestination):
+                fs.move.move_file(tmp, "dir/../dir/file.txt", tmp, "dir/file.txt")
             self.assertTrue(tmp.exists("dir/file.txt"))
             self.assertEquals(tmp.readtext("dir/file.txt"), "content")
 
