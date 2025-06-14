@@ -1082,7 +1082,7 @@ class FSTestCases(object):
         self.fs.makedirs("foo/bar/baz/")
 
         error_msg = "resource 'foo/bar/egg/test.txt' not found"
-        assertRaisesRegex = getattr(self, "assertRaisesRegex", self.assertRaisesRegexp)
+        assertRaisesRegex = getattr(self, "assertRaisesRegex", self.assertRaisesRegex)
         with assertRaisesRegex(errors.ResourceNotFound, error_msg):
             self.fs.remove("foo/bar/egg/test.txt")
 
