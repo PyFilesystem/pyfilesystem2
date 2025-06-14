@@ -8,6 +8,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## Unreleased
 
+- Fix an issue with `fs.compress.write_zip` that would cause an error
+  interacting with `S3FS` directory entries.
+  ([#557](https://github.com/PyFilesystem/pyfilesystem2/pull/557))
+  Closes [#556](https://github.com/PyFilesystem/pyfilesystem2/issues/556).
+
 
 ### Added
 
