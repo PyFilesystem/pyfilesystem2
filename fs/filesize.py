@@ -33,12 +33,20 @@ def _to_str(size, suffixes, base):
     elif size < base:
         return "{:,} bytes".format(size)
 
-    # TODO (dargueta): Don't rely on unit or suffix being defined in the loop.
+    suffixes = list(suffixes)
     for i, suffix in enumerate(suffixes, 2):  # noqa: B007
         unit = base**i
         if size < unit:
             break
-    return "{:,.1f} {}".format((base * size / unit), suffix)
+
+    mantissa = base * size / unit
+    # Rounding can push the mantissa to `base` (e.g. 999,999 B is 999.999 kB,
+    # which formats as "1,000.0 kB"). Carry into the next suffix instead.
+    if round(mantissa, 1) >= base and i - 1 < len(suffixes):
+        suffix = suffixes[i - 1]
+        mantissa = size / unit
+
+    return "{:,.1f} {}".format(mantissa, suffix)
 
 
 def traditional(size):
