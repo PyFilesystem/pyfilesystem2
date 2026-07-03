@@ -26,7 +26,7 @@ def _to_str(size, suffixes, base):
     # type: (SupportsInt, Iterable[Text], int) -> Text
     try:
         size = int(size)
-    except ValueError:
+    except (ValueError, TypeError, OverflowError):
         raise TypeError("filesize requires a numeric value, not {!r}".format(size))
     if size == 1:
         return "1 byte"
