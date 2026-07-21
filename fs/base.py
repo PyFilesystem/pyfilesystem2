@@ -842,7 +842,7 @@ class FS(object):
 
     def getospath(self, path):
         # type: (Text) -> bytes
-        """Get the *system path* to a resource, in the OS' prefered encoding.
+        """Get the *system path* to a resource, in the OS' preferred encoding.
 
         Arguments:
             path (str): A path on the filesystem.
@@ -854,7 +854,7 @@ class FS(object):
             fs.errors.NoSysPath: If there is no corresponding system path.
 
         This method takes the output of `~getsyspath` and encodes it to
-        the filesystem's prefered encoding. In Python3 this step is
+        the filesystem's preferred encoding. In Python3 this step is
         not required, as the `os` module will do it automatically. In
         Python2.7, the encoding step is required to support filenames
         on the filesystem that don't encode correctly.
