@@ -261,7 +261,7 @@ def combine(path1, path2):
 
     """
     if not path1:
-        return path2.lstrip()
+        return path2
     return "{}/{}".format(path1.rstrip("/"), path2.lstrip("/"))
 
 
