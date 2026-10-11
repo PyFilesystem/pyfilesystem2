@@ -25,6 +25,13 @@ class TestWalker(unittest.TestCase):
         with self.assertRaises(TypeError):
             walk.Walker(on_error="nope")
 
+    def test_files_preserve_leading_whitespace_at_relative_root(self):
+        with MemoryFS() as fs:
+            fs.writetext(" report.txt", "content")
+            paths = list(self.walker.files(fs, path=""))
+            self.assertEqual(paths, [" report.txt"])
+            self.assertEqual(fs.readtext(paths[0]), "content")
+
 
 class TestBoundWalkerBase(unittest.TestCase):
     def setUp(self):

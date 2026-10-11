@@ -123,6 +123,12 @@ class TestPathFunctions(unittest.TestCase):
         self.assertEqual(combine("", "bar"), "bar")
         self.assertEqual(combine("foo", "bar"), "foo/bar")
 
+    def test_combine_preserves_leading_whitespace(self):
+        for path in (" report.txt", "\tfile", "  directory/file"):
+            self.assertEqual(combine("", path), path)
+            self.assertEqual(combine("foo", path), "foo/" + path)
+        self.assertEqual(combine("", "/file"), "/file")
+
     def test_parts(self):
         self.assertEqual(parts("/"), ["/"])
         self.assertEqual(parts(""), ["./"])
