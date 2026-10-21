@@ -1,8 +1,10 @@
 import typing
 
+import os.path
 import platform
 import re
 import six
+import sys
 
 if typing.TYPE_CHECKING:
     from typing import Text
@@ -27,12 +29,21 @@ def url_quote(path_snippet):
         if six.PY2:
             path = path.encode("utf-8")
         path = six.moves.urllib.request.pathname2url(path)
-        path_snippet = "{}:{}".format(drive_letter, path)
+        path = "{}:{}".format(drive_letter, path)
     else:
         if six.PY2:
             path_snippet = path_snippet.encode("utf-8")
-        path_snippet = six.moves.urllib.request.pathname2url(path_snippet)
-    return path_snippet
+        path = six.moves.urllib.request.pathname2url(path_snippet)
+        if sys.version_info >= (3, 14):
+            # For compatibility, restore the traditional behavior from before
+            # https://github.com/python/cpython/pull/127194. All callers prepend
+            # their own scheme including the '//'.
+            _, root, _ = os.path.splitroot(path_snippet)
+            if root:
+                assert path.startswith("//")
+                path = path[2:]
+
+    return path
 
 
 def _has_drive_letter(path_snippet):
