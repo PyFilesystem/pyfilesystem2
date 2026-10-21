@@ -86,7 +86,15 @@ def parse_line(line):
 def _parse_time(t, formats):
     for frmt in formats:
         try:
-            _t = time.strptime(t, frmt)
+            if "%d" in frmt and "%Y" not in frmt:
+                # Cope with https://github.com/python/cpython/issues/70647
+                # (deprecated in 3.13, removed in 3.15) by adding a year to
+                # achieve prior semantics.
+                _t = time.strptime(
+                    time.strftime("%Y!", time.localtime()) + t, "%Y!" + frmt
+                )
+            else:
+                _t = time.strptime(t, frmt)
             break
         except ValueError:
             continue
