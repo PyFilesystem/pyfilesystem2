@@ -118,7 +118,7 @@ class FS(object):
         self.close()
 
     def __enter__(self):
-        # type: (...) -> FS
+        # type: (_F) -> _F
         """Allow use of filesystem as a context manager."""
         return self
 
