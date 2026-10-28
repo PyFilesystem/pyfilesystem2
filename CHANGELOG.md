@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Closes [#459](https://github.com/PyFilesystem/pyfilesystem2/issues/459).
 
 ### Fixed
+- Restricted MultiFS file and directory removal to the configured write filesystem.
+  Closes [#572](https://github.com/PyFilesystem/pyfilesystem2/issues/572).
 - Elaborated documentation of `filter_dirs` and `exclude_dirs` in `fs.walk.Walker`.
   Closes [#371](https://github.com/PyFilesystem/pyfilesystem2/issues/371).
 - Fixes a backward incompatibility where `fs.move.move_file` raises `DestinationExists`

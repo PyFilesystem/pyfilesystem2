@@ -119,6 +119,58 @@ class TestMultiFS(FSTestCases, unittest.TestCase):
         multi_fs.add_fs("m3", m3, priority=10)
         self.assertEqual(multi_fs.readbytes("name"), b"m1")
 
+    def test_remove_requires_writable_filesystem(self):
+        with MultiFS() as fs:
+            readonly = MemoryFS()
+            readonly.writebytes("file", b"keep")
+            fs.add_fs("readonly", readonly)
+            with self.assertRaises(errors.ResourceReadOnly):
+                fs.remove("file")
+            self.assertEqual(readonly.readbytes("file"), b"keep")
+
+    def test_removedir_requires_writable_filesystem(self):
+        with MultiFS() as fs:
+            readonly = MemoryFS()
+            readonly.makedir("directory")
+            fs.add_fs("readonly", readonly)
+            with self.assertRaises(errors.ResourceReadOnly):
+                fs.removedir("directory")
+            self.assertTrue(readonly.isdir("directory"))
+
+    def test_remove_uses_writable_filesystem(self):
+        readonly = MemoryFS()
+        readonly.writebytes("file", b"keep")
+        self.mem_fs.writebytes("file", b"remove")
+        self.fs.add_fs("readonly", readonly, priority=1)
+        self.fs.remove("file")
+        self.assertFalse(self.mem_fs.exists("file"))
+        self.assertEqual(readonly.readbytes("file"), b"keep")
+
+    def test_removedir_uses_writable_filesystem(self):
+        readonly = MemoryFS()
+        readonly.makedir("directory")
+        self.mem_fs.makedir("directory")
+        self.fs.add_fs("readonly", readonly, priority=1)
+        self.fs.removedir("directory")
+        self.assertFalse(self.mem_fs.exists("directory"))
+        self.assertTrue(readonly.isdir("directory"))
+
+    def test_remove_does_not_fall_back_to_readonly_filesystem(self):
+        readonly = MemoryFS()
+        readonly.writebytes("file", b"keep")
+        self.fs.add_fs("readonly", readonly)
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.remove("file")
+        self.assertEqual(readonly.readbytes("file"), b"keep")
+
+    def test_removedir_does_not_fall_back_to_readonly_filesystem(self):
+        readonly = MemoryFS()
+        readonly.makedir("directory")
+        self.fs.add_fs("readonly", readonly)
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.removedir("directory")
+        self.assertTrue(readonly.isdir("directory"))
+
     def test_no_writable(self):
         fs = MultiFS()
         with self.assertRaises(errors.ResourceReadOnly):

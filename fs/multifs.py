@@ -249,13 +249,13 @@ class MultiFS(FS):
     def remove(self, path):
         # type: (Text) -> None
         self.check()
-        fs = self._delegate_required(path)
+        fs = self._writable_required(path)
         return fs.remove(path)
 
     def removedir(self, path):
         # type: (Text) -> None
         self.check()
-        fs = self._delegate_required(path)
+        fs = self._writable_required(path)
         return fs.removedir(path)
 
     def scandir(
