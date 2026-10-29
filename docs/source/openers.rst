@@ -36,6 +36,17 @@ If ``<type>`` is not specified then it is assumed to be an :class:`~fs.osfs.OSFS
 .. note::
     The `username` and `passwords` fields may not contain a colon (``:``) or an ``@`` symbol. If you need these symbols they may be `percent encoded <https://en.wikipedia.org/wiki/Percent-encoding>`_.
 
+The characters ``!`` and ``?`` have special meanings in an FS URL: ``!``
+separates an optional path within the filesystem, and ``?`` starts the query
+string. Percent-encode them when they are part of the resource itself. For
+example, to open an OS directory named ``!active`` under ``projects``, use::
+
+    from fs import open_fs
+    projects_fs = open_fs("osfs://projects/%21active")
+
+This also applies when the protocol is omitted. An unescaped ``!`` would be
+interpreted as the path separator, and ``open_fs`` ignores that path component.
+
 
 URL Parameters
 --------------
