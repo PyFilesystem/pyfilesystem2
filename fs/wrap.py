@@ -90,6 +90,12 @@ class WrapCachedDir(WrapFS[_F], typing.Generic[_F]):
         used only in a fairly limited scope where you don't expected
         anything on the filesystem to change.
 
+        Cached directory entries are matched case-sensitively by
+        `~fs.base.FS.getinfo`, `~fs.base.FS.isdir`, and `~fs.base.FS.isfile`,
+        even when the wrapped filesystem is case-insensitive. Use the spelling
+        returned by `~fs.base.FS.scandir`, or query the wrapped filesystem
+        directly if case-insensitive lookups are needed.
+
     """
 
     # FIXME (@althonos): The caching data structure can very likely be

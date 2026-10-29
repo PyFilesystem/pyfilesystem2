@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Closes [#459](https://github.com/PyFilesystem/pyfilesystem2/issues/459).
 
 ### Fixed
+- Documented the case-sensitive cached entry lookup in `fs.wrap.WrapCachedDir`
+  ([#560](https://github.com/PyFilesystem/pyfilesystem2/issues/560)).
 - Elaborated documentation of `filter_dirs` and `exclude_dirs` in `fs.walk.Walker`.
   Closes [#371](https://github.com/PyFilesystem/pyfilesystem2/issues/371).
 - Fixes a backward incompatibility where `fs.move.move_file` raises `DestinationExists`
