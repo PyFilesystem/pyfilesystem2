@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Closes [#459](https://github.com/PyFilesystem/pyfilesystem2/issues/459).
 
 ### Fixed
+- Preserve modification times when moving files within the same filesystem or
+  directories within `MemoryFS` without reading the old path after the move.
+  Closes [#558](https://github.com/PyFilesystem/pyfilesystem2/issues/558).
 - Elaborated documentation of `filter_dirs` and `exclude_dirs` in `fs.walk.Walker`.
   Closes [#371](https://github.com/PyFilesystem/pyfilesystem2/issues/371).
 - Fixes a backward incompatibility where `fs.move.move_file` raises `DestinationExists`

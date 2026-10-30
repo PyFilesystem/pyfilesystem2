@@ -90,6 +90,72 @@ class TestMoveCheckTime(unittest.TestCase):
 
 
 class TestMove(unittest.TestCase):
+    @parameterized.expand(
+        [
+            ("memory_direct", "mem://", False, False),
+            ("memory_helper", "mem://", True, False),
+            ("memory_overwrite", "mem://", True, True),
+            ("os_direct", "temp://", False, False),
+            ("os_helper", "temp://", True, False),
+            ("os_overwrite", "temp://", True, True),
+        ]
+    )
+    def test_move_file_preserves_time_on_same_fs(
+        self, _, fs_url, use_helper, destination_exists
+    ):
+        with open_fs(fs_url) as filesystem:
+            filesystem.writetext("source.txt", "Source")
+            filesystem.setinfo("source.txt", {"details": {"modified": 1000000}})
+            before = filesystem.getinfo("source.txt", namespaces=["details"]).modified
+            if destination_exists:
+                filesystem.writetext("destination.txt", "Old")
+
+            if use_helper:
+                fs.move.move_file(
+                    filesystem,
+                    "source.txt",
+                    filesystem,
+                    "destination.txt",
+                    preserve_time=True,
+                )
+            else:
+                filesystem.move(
+                    "source.txt", "destination.txt", overwrite=True, preserve_time=True
+                )
+
+            self.assertFalse(filesystem.exists("source.txt"))
+            self.assertEqual(filesystem.readtext("destination.txt"), "Source")
+            after = filesystem.getinfo(
+                "destination.txt", namespaces=["details"]
+            ).modified
+            self.assertEqual(after, before)
+
+    def test_move_memory_directory_preserves_time(self):
+        with open_fs("mem://") as filesystem:
+            filesystem.makedir("source")
+            filesystem.writetext("source/file.txt", "Source")
+            filesystem.setinfo("source", {"details": {"modified": 1000000}})
+            filesystem.setinfo("source/file.txt", {"details": {"modified": 1000001}})
+            before = filesystem.getinfo("source", namespaces=["details"]).modified
+            file_before = filesystem.getinfo(
+                "source/file.txt", namespaces=["details"]
+            ).modified
+
+            filesystem.movedir("source", "destination", create=True, preserve_time=True)
+
+            self.assertFalse(filesystem.exists("source"))
+            self.assertEqual(filesystem.readtext("destination/file.txt"), "Source")
+            self.assertEqual(
+                filesystem.getinfo("destination", namespaces=["details"]).modified,
+                before,
+            )
+            self.assertEqual(
+                filesystem.getinfo(
+                    "destination/file.txt", namespaces=["details"]
+                ).modified,
+                file_before,
+            )
+
     def test_move_file_tempfs(self):
         with open_fs("temp://") as src, open_fs("temp://") as dst:
             src_dir = src.makedir("Some subfolder")

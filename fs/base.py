@@ -1192,8 +1192,7 @@ class FS(object):
                 except OSError:
                     pass
                 else:
-                    if preserve_time:
-                        copy_modified_time(self, _src_path, self, _dst_path)
+                    # Renaming retains the file's modification time.
                     return
         with self._lock:
             with self.open(_src_path, "rb") as read_file:
