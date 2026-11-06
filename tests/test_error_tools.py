@@ -2,8 +2,10 @@ from __future__ import unicode_literals
 
 import errno
 import unittest
+from unittest import mock
 
 import fs.errors
+from fs import error_tools
 from fs.error_tools import convert_os_errors
 
 
@@ -21,5 +23,18 @@ class TestErrorTools(unittest.TestCase):
         with self.assertRaises(fs.errors.PathError) as ctx:
             with convert_os_errors("stat", "/tmp/test"):
                 raise exception
+        self.assertEqual(ctx.exception.exc, exception)
+        self.assertEqual(ctx.exception.path, "/tmp/test")
+
+    def test_convert_eacces_sharing_violation_on_windows(self):
+        # On Windows, EACCES with winerror 32 (ERROR_SHARING_VIOLATION)
+        # means the file is locked by another process, not a plain
+        # permissions problem.
+        exception = OSError(errno.EACCES, "file in use")
+        exception.winerror = 32
+        with mock.patch.object(error_tools.sys, "platform", "win32"):
+            with self.assertRaises(fs.errors.ResourceLocked) as ctx:
+                with convert_os_errors("open", "/tmp/test"):
+                    raise exception
         self.assertEqual(ctx.exception.exc, exception)
         self.assertEqual(ctx.exception.path, "/tmp/test")
