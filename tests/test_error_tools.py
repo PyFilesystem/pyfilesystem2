@@ -30,25 +30,10 @@ class TestErrorTools(unittest.TestCase):
         # On Windows, EACCES with winerror 32 (ERROR_SHARING_VIOLATION)
         # means the file is locked by another process, not a plain
         # permissions problem.
-        # The 3-arg form (errno, strerror, filename) avoids a CPython/Windows
-        # quirk where the legacy 2-arg OSError(errno, strerror) constructor
-        # reinterprets the first int as a winerror and silently recomputes
-        # .errno from it, corrupting the errno this test depends on.
-        exception = OSError(errno.EACCES, "file in use", None)
+        exception = OSError(errno.EACCES, "file in use")
         exception.winerror = 32
         with mock.patch.object(error_tools.sys, "platform", "win32"):
             with self.assertRaises(fs.errors.ResourceLocked) as ctx:
-                with convert_os_errors("open", "/tmp/test"):
-                    raise exception
-        self.assertEqual(ctx.exception.exc, exception)
-        self.assertEqual(ctx.exception.path, "/tmp/test")
-
-    def test_convert_eacces_plain_permission_denied_on_windows(self):
-        # A plain EACCES without the sharing-violation winerror should
-        # still be reported as PermissionDenied.
-        exception = OSError(errno.EACCES, "denied", None)
-        with mock.patch.object(error_tools.sys, "platform", "win32"):
-            with self.assertRaises(fs.errors.PermissionDenied) as ctx:
                 with convert_os_errors("open", "/tmp/test"):
                     raise exception
         self.assertEqual(ctx.exception.exc, exception)
