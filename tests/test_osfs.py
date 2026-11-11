@@ -136,6 +136,54 @@ class TestOSFS(FSTestCases, unittest.TestCase):
         with self.assertRaises(errors.DirectoryExpected):
             self.fs.copy("foo", "foo_copy/foo")
 
+    def test_copy_directory_destination(self):
+        self.fs.writebytes("source", b"NEW")
+        self.fs.makedir("destination")
+        with self.assertRaises(errors.FileExpected):
+            self.fs.copy("source", "destination", overwrite=True)
+        self.assertEqual(self.fs.listdir("destination"), [])
+
+    def test_copy_directory_preserves_nested_file(self):
+        from fs.copy import copy_file
+
+        self.fs.writebytes("source", b"NEW")
+        self.fs.makedir("destination")
+        self.fs.writebytes("destination/source", b"PRECIOUS")
+        with self.assertRaises(errors.FileExpected):
+            copy_file(self.fs, "source", self.fs, "destination")
+        self.assertEqual(self.fs.readbytes("destination/source"), b"PRECIOUS")
+
+    def test_copy_directory_error_precedence(self):
+        self.fs.writebytes("source", b"NEW")
+        self.fs.makedir("destination")
+        with self.assertRaises(errors.DestinationExists):
+            self.fs.copy("source", "destination")
+        with self.assertRaises(errors.ResourceNotFound):
+            self.fs.copy("missing", "destination", overwrite=True)
+        with self.assertRaises(errors.IllegalDestination):
+            self.fs.copy("source", "./source", overwrite=True)
+        with self.assertRaises(errors.FileExpected):
+            self.fs.copy("source", "/", overwrite=True)
+        self.assertEqual(self.fs.readbytes("source"), b"NEW")
+
+    @unittest.skipUnless(hasattr(os, "symlink"), "No symlink support")
+    def test_copy_directory_symlink(self):
+        self.fs.writebytes("source", b"NEW")
+        self.fs.makedir("destination")
+        self.fs.writebytes("destination/source", b"PRECIOUS")
+        os.symlink(self._get_real_path("destination"), self._get_real_path("alias"))
+        with self.assertRaises(errors.FileExpected):
+            self.fs.copy("source", "alias", overwrite=True)
+        self.assertEqual(self.fs.readbytes("destination/source"), b"PRECIOUS")
+
+    def test_check_copy_directory_before_copy_backend(self):
+        self.fs.writebytes("source", b"NEW")
+        self.fs.makedir("destination")
+        with mock.patch.object(osfs.shutil, "copy2") as copy2:
+            with self.assertRaises(errors.FileExpected):
+                self.fs.copy("source", "destination", overwrite=True)
+            copy2.assert_not_called()
+
     def test_create(self):
         """Test create=True"""
 
