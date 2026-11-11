@@ -15,6 +15,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
   Closes [#459](https://github.com/PyFilesystem/pyfilesystem2/issues/459).
 
 ### Fixed
+- Reject directory destinations in `OSFS.copy` instead of copying into them.
+  Closes [#496](https://github.com/PyFilesystem/pyfilesystem2/issues/496).
 - Elaborated documentation of `filter_dirs` and `exclude_dirs` in `fs.walk.Walker`.
   Closes [#371](https://github.com/PyFilesystem/pyfilesystem2/issues/371).
 - Fixes a backward incompatibility where `fs.move.move_file` raises `DestinationExists`
